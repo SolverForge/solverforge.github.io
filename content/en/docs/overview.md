@@ -1,48 +1,73 @@
 ---
 title: Overview
-description: Here's where your user finds out if your project is for them.
+description: Roadmap, goals and how to get involved.
 weight: 1
 ---
 
 {{% pageinfo %}}
 
-This is a placeholder page that shows you how to use this template site.
+This page presents the SolverForge project overview and official development roadmap. It explains our objectives, the core engineering challenge, the staged plan to deliver a high-performance solver for Python and Rust, and how you can help.
 
 {{% /pageinfo %}}
 
-The Overview is where your users find out about your project. Depending on the
-size of your docset, you can have a separate overview page (like this one) or
-put your overview contents in the Documentation landing page (like in the Docsy
-User Guide).
+# Project Overview & Roadmap
 
-Try answering these questions for your user in this page:
+SolverForge is a high-performance, 100% Timefold-compatible constraint solver focused on delivering a first-class developer experience for Python and Rust.
 
-## What is it?
+## Core objective
 
-Introduce your project, including what it does or lets you do, why you would use
-it, and its primary goal (and how it achieves it). This should be similar to
-your README description, though you can go into a little more detail here if you
-want.
+- Provide the Python and Rust ecosystems with a first-class, high-performance Constraint Programming and Optimization toolset
+- Deliver a seamless developer experience and enable new workflows in ML, data science, and operations research
 
-## Why do I want it?
+## Core challenge: the Python–Java bridge
 
-Help your user know if your project will help them. Useful information can
-include:
+Most JVM-backed Python tooling is limited by the interoperability layer between Python and Java. Our strategy is a ground-up rewrite of that layer in native Rust using `PyO3` and `JNI` so we can eliminate the bridge bottleneck and achieve near-native performance.
 
-- **What is it good for?**: What types of problems does your project solve? What
-  are the benefits of using it?
+## Roadmap
 
-- **What is it not good for?**: For example, point out situations that might
-  intuitively seem suited for your project, but aren't for some reason. Also
-  mention known limitations, scaling issues, or anything else that might let
-  your users know if the project is not for them.
+We’re executing a three-phase plan to preserve continuity for current users while delivering a production-ready native solution.
 
-- **What is it _not yet_ good for?**: Highlight any useful features that are
-  coming soon.
+### Phase 1 — Stabilize the legacy bridge (Present → Q4 2025)
+Objective: Maintain continuity for existing Timefold users with a supported, debranded continuation of the old Python API.
 
-## Where should I go next?
+Key deliverables:
+- `solverforge-legacy` (released): a maintained fork of Timefold 1.24.0. Installable via `pip install solverforge-legacy`. Serves as a stable baseline for production users.
+- `solverforge-quickstarts`: central repository of quickstarts and reproducible benchmarks.
+Status: Complete — provides continuity for existing projects.
 
-Give your users next steps from the Overview. For example:
+### Phase 2 — Alpha: native Rust solver (Q4 2025 → Q1 2026)
+Objective: Ship an alpha release with a native Rust backend that removes the Python→Java bridge overhead.
 
-- [Getting Started](/docs/getting-started/): Get started with $project
-- [Examples](/docs/examples/): Check out some example code!
+Key deliverables:
+- `solverforge-solver`: a ground-up rewrite in Rust using `PyO3` and direct `JNI` integration with the Timefold JVM core.
+- Full API compatibility with the discontinued Timefold Python API (API surface parity).
+- Lambda support:
+  - Simple lambdas: translated to Java bytecode for native performance.
+  - Complex lambdas: efficient proxy fallbacks to preserve Python semantics and feature parity.
+- Performance target: within ~0.5% overhead of pure Java.
+Status: Active development — core infrastructure implemented and functional.
+
+### Phase 3 — Production release & ecosystem expansion (H1 2026 → Q3 2026)
+Objective: Harden the Rust solver for production, publish stable packages, deepen documentation, and expand integrations into the ML ecosystem.
+
+Key deliverables:
+- Production PyPI package: `blackops` (expected `pip install blackops`).
+- Full documentation: installation, migration notes from Timefold, and advanced usage patterns.
+- Advanced quickstarts: predictive and ML-integrated scheduling examples (e.g., simple regressors to forecast demand).
+- Native Rust API: a first-class Rust client for pure Rust applications.
+- Near-zero-overhead `PyO3` Python API.
+- HuggingFace engagement: Dockerized quickstarts and example models to attract ML practitioners.
+
+## How you can contribute
+
+This project thrives on community involvement. You can help in several ways:
+
+- Test & benchmark: try `solverforge-legacy` and run examples from `solverforge-quickstarts`. Report issues, share performance numbers, and attach reproducible benchmarks.
+- Join the discussion: tell us which features, integrations, or APIs matter most for your workflows.
+- Contribute code: PRs, bug fixes, and documentation improvements are welcome.
+- Spread the word: star the repositories and share the project with colleagues in scheduling, optimization, and ML.
+
+## Where to go next
+
+- Quickstart guides: see the project’s quickstart guides in the docs.
+- Examples & quickstarts: explore `solverforge-quickstarts` for reproducible examples and benchmarks.

@@ -1,6 +1,7 @@
 ---
 title: Blog
 menu: {main: {weight: 30}}
+date: 2100-01-01
 ---
 
 This is the **blog** section. It has two categories: News and Releases.
