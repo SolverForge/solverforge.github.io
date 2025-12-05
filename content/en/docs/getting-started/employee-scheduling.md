@@ -25,8 +25,7 @@ A comprehensive quickstart guide to understanding and building intelligent emplo
 9. [Making Your First Customization](#making-your-first-customization)
 10. [Advanced Constraint Patterns](#advanced-constraint-patterns)
 11. [Testing and Validation](#testing-and-validation)
-12. [Production Considerations](#production-considerations)
-13. [Quick Reference](#quick-reference)
+12. [Quick Reference](#quick-reference)
 
 ---
 
@@ -42,6 +41,8 @@ This guide walks you through a complete employee scheduling application built wi
 - How to customize the system for your specific needs
 
 **No optimization background required** — we'll explain concepts as we encounter them in the code.
+
+> **Architecture Note:** This guide uses the "fast" implementation pattern with dataclass domain models and Pydantic only at API boundaries. For the architectural reasoning behind this design, see [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/python-constraint-solver-architecture/).
 
 ### Prerequisites
 
@@ -63,9 +64,10 @@ Think of it like describing what puzzle pieces you have and what rules they must
 
 ### Running the Application
 
-1. **Navigate to the project directory:**
+1. **Download and navigate to the project directory:**
    ```bash
-   cd /srv/lab/dev/solverforge/solverforge-quickstarts/fast/employee-scheduling-fast
+   git clone https://github.com/SolverForge/solverforge-quickstarts
+   cd ./solverforge-quickstarts/fast/employee-scheduling-fast
    ```
 
 2. **Install dependencies:**
@@ -122,6 +124,7 @@ You need to assign **employees** to **shifts** while satisfying rules like:
 - Employee needs 10 hours rest between shifts
 - Employee can't work more than one shift per day
 - Employee can't work on days they're unavailable
+- Employee can't work more than 12 shifts total
 
 **Soft constraints** (preferences to optimize):
 - Avoid scheduling on days the employee marked as "undesired"
@@ -139,6 +142,14 @@ For even 20 shifts and 10 employees, there are **10^20 possible assignments** (1
 ## Understanding the Data Model
 
 Let's examine the three core classes that model our problem. Open `src/employee_scheduling/domain.py`:
+
+### Domain Model Architecture
+
+This quickstart separates domain models (dataclasses) from API models (Pydantic):
+
+- **Domain layer** (`domain.py` lines 17-39): Pure `@dataclass` models for solver operations
+- **API layer** (`domain.py` lines 46-75): Pydantic `BaseModel` classes for REST endpoints  
+- **Converters** (`converters.py`): Translate between the two layers
 
 ### The Employee Class
 
@@ -239,7 +250,7 @@ Before diving into constraints, let's understand how the solver finds solutions.
 
 ### Why This Works: Metaheuristics
 
-SolverForge uses sophisticated **metaheuristic algorithms** like:
+[Timefold](http://timefold.ai) (the engine that powers SolverForge) uses sophisticated **metaheuristic algorithms** like:
 
 - **Tabu Search**: Remembers recent moves to avoid cycling
 - **Simulated Annealing**: Occasionally accepts worse solutions to escape local optima
@@ -285,6 +296,7 @@ def define_constraints(constraint_factory: ConstraintFactory):
         at_least_10_hours_between_two_shifts(constraint_factory),
         one_shift_per_day(constraint_factory),
         unavailable_employee(constraint_factory),
+        max_shifts_per_employee(constraint_factory),
         # Soft constraints
         undesired_day_for_employee(constraint_factory),
         desired_day_for_employee(constraint_factory),
@@ -294,6 +306,36 @@ def define_constraints(constraint_factory: ConstraintFactory):
 
 Each constraint is a function returning a `Constraint` object. Let's examine them from simple to complex.
 
+### Domain Model Methods for Constraints
+
+The `Shift` class in `domain.py` includes helper methods that support datetime calculations used by multiple constraints. Following object-oriented design principles, these methods are part of the domain model rather than standalone functions:
+
+```python
+def has_required_skill(self) -> bool:
+    """Check if assigned employee has the required skill."""
+    if self.employee is None:
+        return False
+    return self.required_skill in self.employee.skills
+
+def is_overlapping_with_date(self, dt: date) -> bool:
+    """Check if shift overlaps with a specific date."""
+    return self.start.date() == dt or self.end.date() == dt
+
+def get_overlapping_duration_in_minutes(self, dt: date) -> int:
+    """Calculate how many minutes of a shift fall on a specific date."""
+    start_date_time = datetime.combine(dt, datetime.min.time())
+    end_date_time = datetime.combine(dt, datetime.max.time())
+
+    # Calculate overlap between date range and shift range
+    max_start_time = max(start_date_time, self.start)
+    min_end_time = min(end_date_time, self.end)
+
+    minutes = (min_end_time - max_start_time).total_seconds() / 60
+    return int(max(0, minutes))
+```
+
+These methods encapsulate shift-related logic within the domain model, making constraints more readable and maintainable. They're particularly important for date-boundary calculations (e.g., a shift spanning midnight).
+
 ### Hard Constraint: Required Skill
 
 **Business rule:** "An employee assigned to a shift must have the required skill."
@@ -302,7 +344,7 @@ Each constraint is a function returning a `Constraint` object. Let's examine the
 def required_skill(constraint_factory: ConstraintFactory):
     return (
         constraint_factory.for_each(Shift)
-        .filter(lambda shift: shift.required_skill not in shift.employee.skills)
+        .filter(lambda shift: not shift.has_required_skill())
         .penalize(HardSoftDecimalScore.ONE_HARD)
         .as_constraint("Missing required skill")
     )
@@ -429,16 +471,10 @@ def unavailable_employee(constraint_factory: ConstraintFactory):
             Joiners.equal(lambda shift: shift.employee, lambda employee: employee),
         )
         .flatten_last(lambda employee: employee.unavailable_dates)
-        .filter(
-            lambda shift, unavailable_date: is_overlapping_with_date(
-                shift, unavailable_date
-            )
-        )
+        .filter(lambda shift, unavailable_date: shift.is_overlapping_with_date(unavailable_date))
         .penalize(
             HardSoftDecimalScore.ONE_HARD,
-            lambda shift, unavailable_date: get_shift_overlapping_duration_in_minutes(
-                shift, unavailable_date
-            ),
+            lambda shift, unavailable_date: shift.get_overlapping_duration_in_minutes(unavailable_date),
         )
         .as_constraint("Unavailable employee")
     )
@@ -451,18 +487,7 @@ def unavailable_employee(constraint_factory: ConstraintFactory):
 4. `.filter(...)`: Keep only when shift overlaps the unavailable date
 5. `.penalize(...)`: Penalize by overlapping duration in minutes
 
-**Optimization concept:** The `flatten_last` operation demonstrates **constraint streaming with collections**. We iterate over each date in the employee's unavailable set, creating (shift, date) pairs to check.
-
-**Helper functions:**
-```python
-def is_overlapping_with_date(shift: Shift, dt: date) -> bool:
-    return shift.start.date() == dt or shift.end.date() == dt
-
-def get_shift_overlapping_duration_in_minutes(shift: Shift, dt: date) -> int:
-    start_date_time = datetime.combine(dt, datetime.min.time())
-    end_date_time = datetime.combine(dt, datetime.max.time())
-    return overlapping_in_minutes(start_date_time, end_date_time, shift.start, shift.end)
-```
+**Optimization concept:** The `flatten_last` operation demonstrates **constraint streaming with collections**. We iterate over each date in the employee's unavailable set, creating (shift, date) pairs to check. The `shift.is_overlapping_with_date()` and `shift.get_overlapping_duration_in_minutes()` methods are defined on the Shift domain model class.
 
 ### Soft Constraint: Undesired Days
 
@@ -477,16 +502,10 @@ def undesired_day_for_employee(constraint_factory: ConstraintFactory):
             Joiners.equal(lambda shift: shift.employee, lambda employee: employee),
         )
         .flatten_last(lambda employee: employee.undesired_dates)
-        .filter(
-            lambda shift, undesired_date: is_overlapping_with_date(
-                shift, undesired_date
-            )
-        )
+        .filter(lambda shift, undesired_date: shift.is_overlapping_with_date(undesired_date))
         .penalize(
             HardSoftDecimalScore.ONE_SOFT,
-            lambda shift, undesired_date: get_shift_overlapping_duration_in_minutes(
-                shift, undesired_date
-            ),
+            lambda shift, undesired_date: shift.get_overlapping_duration_in_minutes(undesired_date),
         )
         .as_constraint("Undesired day for employee")
     )
@@ -509,14 +528,10 @@ def desired_day_for_employee(constraint_factory: ConstraintFactory):
             Joiners.equal(lambda shift: shift.employee, lambda employee: employee),
         )
         .flatten_last(lambda employee: employee.desired_dates)
-        .filter(
-            lambda shift, desired_date: is_overlapping_with_date(shift, desired_date)
-        )
+        .filter(lambda shift, desired_date: shift.is_overlapping_with_date(desired_date))
         .reward(
             HardSoftDecimalScore.ONE_SOFT,
-            lambda shift, desired_date: get_shift_overlapping_duration_in_minutes(
-                shift, desired_date
-            ),
+            lambda shift, desired_date: shift.get_overlapping_duration_in_minutes(desired_date),
         )
         .as_constraint("Desired day for employee")
     )
@@ -759,50 +774,54 @@ The `static/app.js` implements this polling workflow:
 
 ## Making Your First Customization
 
-Let's add a new constraint step-by-step.
+The quickstart includes a cardinality constraint that demonstrates a common pattern. Let's understand how it works and then learn how to create similar constraints.
 
-### Scenario: Limit Maximum Shifts Per Employee
+### Understanding the Max Shifts Constraint
 
-**New business rule:** "No employee can work more than 5 shifts in the schedule period."
+The codebase includes `max_shifts_per_employee` which limits workload imbalance:
+
+**Business rule:** "No employee can work more than 12 shifts in the schedule period."
 
 This is a **hard constraint** (must be satisfied).
 
-### Step 1: Open constraints.py
+### The Constraint Implementation
 
-Navigate to `src/employee_scheduling/constraints.py`.
-
-### Step 2: Write the Constraint Function
-
-Add this function:
+This constraint is already in `src/employee_scheduling/constraints.py`:
 
 ```python
 def max_shifts_per_employee(constraint_factory: ConstraintFactory):
     """
-    Hard constraint: No employee can have more than 5 shifts.
+    Hard constraint: No employee can have more than 12 shifts.
+
+    The limit of 12 is chosen based on the demo data dimensions:
+    - SMALL dataset: 139 shifts / 15 employees = ~9.3 average
+    - This provides headroom while preventing extreme imbalance
+
+    Note: A limit that's too low (e.g., 5) would make the problem infeasible.
+    Always ensure your constraints are compatible with your data dimensions.
     """
     return (
         constraint_factory.for_each(Shift)
-        .group_by(
-            lambda shift: shift.employee,
-            ConstraintCollectors.count()
-        )
-        .filter(lambda employee, shift_count: shift_count > 5)
+        .group_by(lambda shift: shift.employee, ConstraintCollectors.count())
+        .filter(lambda employee, shift_count: shift_count > 12)
         .penalize(
             HardSoftDecimalScore.ONE_HARD,
-            lambda employee, shift_count: shift_count - 5
+            lambda employee, shift_count: shift_count - 12,
         )
-        .as_constraint("Max 5 shifts per employee")
+        .as_constraint("Max 12 shifts per employee")
     )
 ```
 
 **How this works:**
 1. Group shifts by employee and count them
-2. Filter to employees with more than 5 shifts
-3. Penalize by the excess amount (6 shifts = penalty 1, 7 shifts = penalty 2, etc.)
+2. Filter to employees with more than 12 shifts
+3. Penalize by the excess amount (13 shifts = penalty 1, 14 shifts = penalty 2, etc.)
 
-### Step 3: Register the Constraint
+**Why 12?** The demo data has 139 shifts and 15 employees (~9.3 shifts per employee on average). A limit that's too low (e.g., 5) would make the problem **infeasible** — there simply aren't enough employees to cover all shifts. Always ensure your constraints are compatible with your problem's dimensions.
 
-Add it to the `define_constraints` function:
+### How It's Registered
+
+The constraint is registered in `define_constraints()` along with the other constraints:
 
 ```python
 @constraint_provider
@@ -814,7 +833,7 @@ def define_constraints(constraint_factory: ConstraintFactory):
         at_least_10_hours_between_two_shifts(constraint_factory),
         one_shift_per_day(constraint_factory),
         unavailable_employee(constraint_factory),
-        max_shifts_per_employee(constraint_factory),  # ← Add this line
+        max_shifts_per_employee(constraint_factory),  # ← Cardinality constraint
         # Soft constraints
         undesired_day_for_employee(constraint_factory),
         desired_day_for_employee(constraint_factory),
@@ -822,14 +841,26 @@ def define_constraints(constraint_factory: ConstraintFactory):
     ]
 ```
 
-### Step 4: Test It
+### Experimenting With It
 
-1. Restart the server
-2. Load demo data
-3. Click "Solve"
-4. Verify no employee has more than 5 shifts
+Try modifying the constraint to see its effect:
 
-**Testing tip:** Temporarily change the limit to 2 to see the constraint in action more obviously.
+1. Change the limit from 12 to 8 in `constraints.py`
+2. Restart the server: `python -m employee_scheduling.rest_api`
+3. Load demo data and click "Solve"
+4. Observe how the constraint affects the solution
+
+**Note:** A very low limit (e.g., 5) will make the problem infeasible.
+
+### Why Unit Testing Constraints Matters
+
+The quickstart includes unit tests in `tests/test_constraints.py` using `ConstraintVerifier`. Run them with:
+
+```bash
+pytest tests/test_constraints.py -v
+```
+
+Testing catches critical issues early. When we initially implemented this constraint with a limit of 5, the feasibility test (`test_feasible.py`) failed — the solver couldn't find a valid solution because there weren't enough employees to cover all shifts within that limit. Without tests, this would have silently broken the scheduling system. **Always test new constraints** — a typo in a filter or an overly restrictive limit can make your problem unsolvable.
 
 ### Understanding What You Did
 
@@ -1121,147 +1152,6 @@ def test_solve_small_dataset():
    - Verify no overlapping shifts (timeline shouldn't show overlaps)
    - Confirm unavailable days are respected (no shifts on red-highlighted dates)
 
----
-
-## Production Considerations
-
-### Performance: Constraint Evaluation Speed
-
-Constraints are evaluated **millions of times** during solving. Performance matters.
-
-**❌ DON'T: Database calls or expensive operations in constraints**
-
-```python
-def bad_constraint(constraint_factory: ConstraintFactory):
-    return (
-        constraint_factory.for_each(Shift)
-        .filter(lambda shift: 
-            check_external_api(shift.employee.name))  # SLOW!
-        .penalize(HardSoftDecimalScore.ONE_HARD)
-        .as_constraint("Bad constraint")
-    )
-```
-
-**✅ DO: Pre-compute before solving**
-
-```python
-# Before solving
-blacklisted_employees = fetch_from_api()  # Do this ONCE
-
-def good_constraint(constraint_factory: ConstraintFactory):
-    return (
-        constraint_factory.for_each(Shift)
-        .filter(lambda shift: 
-            shift.employee.name in blacklisted_employees)  # Fast set lookup
-        .penalize(HardSoftDecimalScore.ONE_HARD)
-        .as_constraint("Good constraint")
-    )
-```
-
-### Scaling Strategies
-
-**Problem size limits (30 second solve):**
-- Up to ~200 shifts × 50 employees = feasible
-- Beyond that:
-  - Increase solve time (minutes instead of seconds)
-  - Use **decomposition** (solve week-by-week)
-  - Use **warm starts** (start from previous solution)
-
-**Warm start example:**
-
-```python
-# Use last week's solution as starting point
-previous_solution = load_from_database("week-2025-11-18")
-
-# Adapt for new week (update dates, add/remove shifts)
-new_problem = adapt_for_new_week(previous_solution)
-
-# Solve (starts from previous assignments, converges faster)
-solver_manager.solve("week-2025-11-25", new_problem)
-```
-
-**Optimization concept:** Warm starts leverage **solution similarity**. If this week is similar to last week, starting from last week's assignments reaches a good solution faster than starting from scratch.
-
-### Data Quality and Validation
-
-**Critical validations:**
-
-1. **Skill normalization:**
-```python
-# Canonicalize to avoid mismatches
-employee.skills = {skill.strip().lower() for skill in raw_skills}
-shift.required_skill = shift.required_skill.strip().lower()
-```
-
-2. **Unique IDs:**
-```python
-assert len(set(e.name for e in employees)) == len(employees), "Duplicate employee names"
-assert len(set(s.id for s in shifts)) == len(shifts), "Duplicate shift IDs"
-```
-
-3. **Feasibility pre-check:**
-```python
-# Verify at least one employee has each required skill
-required_skills = {shift.required_skill for shift in shifts}
-available_skills = set().union(*(e.skills for e in employees))
-missing_skills = required_skills - available_skills
-if missing_skills:
-    raise ValueError(f"No employee has skills: {missing_skills}")
-```
-
-### Handling Infeasible Problems
-
-Sometimes no solution exists (e.g., not enough skilled employees).
-
-**Detect and report:**
-
-```python
-solution = solver_manager.get_solution(job_id)
-
-if solution.score.hard_score < 0:
-    # Problem is infeasible
-    unassigned_shifts = [s for s in solution.shifts if s.employee is None]
-    
-    return {
-        "error": "No feasible solution exists",
-        "hard_score": solution.score.hard_score,
-        "unassigned_count": len(unassigned_shifts),
-        "suggestion": "Try relaxing constraints or adding more employees"
-    }
-```
-
-### Monitoring and Logging
-
-**Track key metrics:**
-
-```python
-import logging
-import time
-
-logger = logging.getLogger(__name__)
-
-start_time = time.time()
-solver_manager.solve(job_id, schedule)
-
-# ... wait for completion ...
-
-solution = solver_manager.get_solution(job_id)
-solve_duration = time.time() - start_time
-
-logger.info(
-    f"Solved schedule {job_id}: "
-    f"duration={solve_duration:.1f}s, "
-    f"score={solution.score}, "
-    f"problem_size={len(solution.shifts)}×{len(solution.employees)}"
-)
-```
-
-**What to monitor in production:**
-- Solve duration (alert if suddenly increases)
-- Infeasible solutions (indicates data quality issues)
-- Score trends (degrading scores may indicate changing data patterns)
-
----
 
 ## Quick Reference
 
@@ -1391,53 +1281,8 @@ Add print statements (remove in production):
 
 ---
 
-## Conclusion
-
-You now have a complete understanding of constraint-based employee scheduling:
-
-✅ **Problem modeling** — How to represent scheduling problems declaratively  
-✅ **Constraint logic** — How to express business rules that guide the solver  
-✅ **Optimization concepts** — How metaheuristics find high-quality solutions efficiently  
-✅ **Customization patterns** — How to extend the system for your needs  
-✅ **Production readiness** — Performance, testing and scaling considerations
-
-### Next Steps
-
-1. **Run the application** and experiment with the demo data
-2. **Modify an existing constraint** — change a limit and observe the impact
-3. **Add your own constraint** — implement a rule from your domain
-4. **Test thoroughly** — write unit tests for your constraints
-5. **Customize the data model** — add fields relevant to your business
-6. **Deploy** — integrate with your real data sources
-
-### Key Takeaways
-
-**Declarative vs Imperative:**
-- Traditional: "Assign employee A to shift 1, B to shift 2..."
-- Constraint-based: "Here are the rules; find the best assignment"
-
-**Hard vs Soft Constraints:**
-- Hard: Must be satisfied (non-negotiable rules)
-- Soft: Preferences to optimize (business goals)
-
-**Metaheuristics:**
-- Efficiently explore massive solution spaces
-- Anytime algorithms: improve continuously, stop when satisfied
-- No guarantee of global optimum, but high-quality solutions in practical time
-
-**The Power of Constraints:**
-- Most business logic lives in one file (`constraints.py`)
-- Adding rules is often easier than removing them
-- Start with fewer constraints, add complexity as needed
-
 ### Additional Resources
 
-- [SolverForge Documentation](https://docs.solverforge.ai)
 - [GitHub Repository](https://github.com/solverforge/solverforge-quickstarts)
 - [Constraint Optimization Primer](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem)
 
----
-
-**Questions?** Start by modifying the demo constraints and observing how solutions change. The best way to learn optimization is to experiment with constraints and see the solver's behavior.
-
-Happy optimizing! 🚀
