@@ -151,6 +151,9 @@ This quickstart separates domain models (dataclasses) from API models (Pydantic)
 - **API layer** (`domain.py` lines 46-75): Pydantic `BaseModel` classes for REST endpoints  
 - **Converters** (`converters.py`): Translate between the two layers
 
+*This separation provides better performance during solving—Pydantic's validation overhead becomes expensive when constraints are evaluated millions of times per second. See the [architecture article](/blog/technical/python-constraint-solver-architecture/) for benchmark comparisons. Note that while benchmarks on small problems show comparable iteration counts between Python and Java, the JPype bridge overhead may compound at larger scales.
+
+
 ### The Employee Class
 
 ```python
