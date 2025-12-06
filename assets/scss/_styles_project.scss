@@ -1,0 +1,302 @@
+/*
+  Style overrides - loaded after theme styles
+*/
+
+@import "syntax";
+
+// Snake scale green shades for page sections
+$scale-dark: #064e3b;    // darkest green
+$scale-medium: #047857;  // medium green
+$scale-light: #10b981;   // primary green
+$scale-pale: #34d399;    // lighter green
+
+// Cover block - darkest scale
+.td-cover-block {
+  background-color: $scale-dark !important;
+  color: #ffffff !important;
+}
+
+// Box sections with snake scale colors (only numbered boxes)
+.td-box--1,
+.td-box--2 {
+  background-color: $scale-medium !important;
+  color: #ffffff !important;
+
+  h1, h2, h3, h4, h5, h6, p, li, td, th {
+    color: #ffffff !important;
+  }
+
+  a {
+    color: #ffffff !important;
+    text-decoration: underline;
+
+    &:hover {
+      color: #ecfdf5 !important;
+    }
+  }
+}
+
+.td-box--1 {
+  background-color: $scale-medium !important;
+}
+
+.td-box--2 {
+  background-color: $scale-light !important;
+  position: relative;
+}
+
+.td-box--3 {
+  background-color: $scale-pale !important;
+  color: #064e3b !important;
+
+  h1, h2, h3, h4, h5, h6, p, li, td, th {
+    color: #064e3b !important;
+  }
+
+  a {
+    color: #064e3b !important;
+
+    &:hover {
+      color: #047857 !important;
+    }
+  }
+}
+
+// Named box variants (used on About page)
+.td-box--primary {
+  background-color: $scale-medium !important;
+  color: #ffffff !important;
+
+  h1, h2, h3, h4, h5, h6, p, li, td, th {
+    color: #ffffff !important;
+  }
+
+  a:not(.td-link-down) {
+    color: #ffffff !important;
+    text-decoration: underline;
+
+    &:hover {
+      color: #ecfdf5 !important;
+    }
+  }
+}
+
+.td-box--dark {
+  background-color: $scale-light !important;
+  color: #ffffff !important;
+
+  h1, h2, h3, h4, h5, h6, p, li, td, th {
+    color: #ffffff !important;
+  }
+
+  a {
+    color: #ffffff !important;
+    text-decoration: underline;
+
+    &:hover {
+      color: #ecfdf5 !important;
+    }
+  }
+}
+
+// Arrow colors to match box backgrounds
+.td-cover-block .td-arrow-down::before {
+  border-color: $scale-dark transparent transparent transparent !important;
+}
+
+.td-box--1 .td-arrow-down::before,
+.td-box--primary .td-arrow-down::before {
+  border-color: $scale-medium transparent transparent transparent !important;
+}
+
+.td-box--2 .td-arrow-down::before,
+.td-box--dark .td-arrow-down::before {
+  border-color: $scale-light transparent transparent transparent !important;
+}
+
+.td-box--3 .td-arrow-down::before {
+  border-color: $scale-pale transparent transparent transparent !important;
+}
+
+// Code blocks - terminal style (dark green to match theme)
+pre {
+  background-color: #022c22 !important; // Very dark emerald
+  border-radius: 6px;
+  padding: 1rem;
+  margin: 1rem auto;
+  max-width: fit-content;
+
+  code {
+    font-size: 0.8rem;
+    color: #6ee7b7; // Mint green text
+    background-color: transparent !important;
+  }
+}
+
+// Inline code
+code {
+  font-size: 0.85em;
+  background-color: #022c22 !important;
+  color: #6ee7b7 !important;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+}
+
+// Modern terminal card for installation (home page only)
+.terminal-card {
+  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a2e 100%);
+  border-radius: 12px;
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(16, 185, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  max-width: 700px;
+  margin: 2rem auto;
+  overflow: hidden;
+
+  // macOS-style window header
+  .terminal-header {
+    background: linear-gradient(180deg, #2d2d2d 0%, #1f1f1f 100%);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #333;
+
+    .terminal-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+
+      &.close { background: #ff5f56; }
+      &.minimize { background: #ffbd2e; }
+      &.maximize { background: #27c93f; }
+    }
+
+    .terminal-title {
+      flex: 1;
+      text-align: center;
+      color: #888;
+      font-size: 0.75rem;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      margin-right: 52px; // offset for buttons
+    }
+  }
+
+  .terminal-body {
+    padding: 1.5rem;
+
+    pre {
+      background: transparent !important;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      max-width: 100%;
+
+      code {
+        font-size: 0.85rem;
+        line-height: 1.8;
+        color: #e2e8f0;
+      }
+    }
+
+    // Prompt styling
+    .command-line {
+      display: block;
+      margin-bottom: 0.5rem;
+
+      &::before {
+        content: "$ ";
+        color: #10b981;
+        font-weight: 600;
+      }
+    }
+
+    // Comment styling
+    .comment {
+      color: #64748b;
+      font-style: italic;
+    }
+  }
+}
+
+// Glow effect on hover
+.terminal-card:hover {
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(16, 185, 129, 0.2),
+    0 0 40px rgba(16, 185, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+// Badge styles
+.install-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+}
+
+// Ensure all td-box sections have position relative for arrows
+.td-box {
+  position: relative !important;
+}
+
+// Arrow styling for standalone arrow divs - match theme's exact positioning
+.text-center.td-arrow-down {
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    margin-left: -30px;
+    bottom: -25px;
+    border-style: solid;
+    border-width: 25px 30px 0 30px;
+    z-index: 3;
+  }
+}
+
+// Arrow colors for standalone arrows in each box
+.td-box--2 .text-center.td-arrow-down::before,
+.td-box--dark .text-center.td-arrow-down::before {
+  border-color: $scale-light transparent transparent transparent !important;
+}
+
+.td-box--3 .text-center.td-arrow-down::before {
+  border-color: $scale-pale transparent transparent transparent !important;
+}
+
+// Scroll down link button
+.td-link-down {
+  display: block;
+  margin-top: 1.5rem;
+  font-size: 2rem;
+  color: rgba(255, 255, 255, 0.7) !important;
+  text-decoration: none !important;
+  text-align: center;
+  animation: bounce 2s infinite;
+
+  &:hover {
+    color: #ffffff !important;
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}

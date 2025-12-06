@@ -9,33 +9,76 @@ title: SolverForge
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/google/docsy-example">
   Download <i class="fab fa-github ms-2 "></i>
 </a>
-<p class="lead mt-5">A 100% Timefold-compatible constraint solver for Python</p>
+<p class="lead mt-5">Write constraints like you write code.</p>
 {{< blocks/link-down color="info" >}}
 {{< /blocks/cover >}}
 
-{{% blocks/lead color="primary" %}}
-[SolverForge](https://www.solverforge.org) is a free, 100% [Timefold](https://www.timefold.ai) compatible AI constraint solver for Python and Rust.
+{{% blocks/lead %}}
+Model your planning problems with an expressive, business-object oriented syntax.
 
+<a class="td-link-down" href="#td-block-2"><i class="fas fa-chevron-down"></i></a>
 {{% /blocks/lead %}}
 
+{{% blocks/section %}}
 
-{{% blocks/section color="dark" type="row" %}}
+<div class="terminal-card">
+  <div class="terminal-header">
+    <span class="terminal-btn close"></span>
+    <span class="terminal-btn minimize"></span>
+    <span class="terminal-btn maximize"></span>
+    <span class="terminal-title">constraints.py</span>
+  </div>
+  <div class="terminal-body">
 
+```python
+def desired_day_for_employee(constraint_factory: ConstraintFactory):
+    return (
+        constraint_factory.for_each(Shift)
+        .join(
+            Employee,
+            Joiners.equal(lambda shift: shift.employee, lambda employee: employee),
+        )
+        .flatten_last(lambda employee: employee.desired_dates)
+        .filter(lambda shift, desired_date: shift.is_overlapping_with_date(desired_date))
+        .reward(
+            HardSoftDecimalScore.ONE_SOFT,
+            lambda shift, desired_date: shift.get_overlapping_duration_in_minutes(desired_date),
+        )
+        .as_constraint("Desired day for employee")
+    )
+```
 
-{{% blocks/feature icon="fab fa-github" title="Contributions welcome!" url="https://github.com/SolverForge/solverforge-quickstarts" %}}
-We do a [Pull Request](https://github.com/SolverForge/solverforge-legacy/pulls) contributions workflow on **GitHub**. New users are always welcome!
-{{% /blocks/feature %}}
+  </div>
+</div>
 
+<a class="td-link-down" href="#td-block-3"><i class="fas fa-chevron-down"></i></a>
 
-<!--{{% blocks/feature icon="fab fa-twitter" title="Follow us on Twitter!" url="https://twitter.com/docsydocs" %}}
-For announcement of latest features etc.
-{{% /blocks/feature %}}
--->
+<div class="text-center td-arrow-down"></div>
 
 {{% /blocks/section %}}
 
+{{% blocks/section %}}
 
+<div class="text-center mb-4">
+  <span class="install-badge">
+    <i class="fas fa-rocket"></i> Get started in seconds
+  </span>
+</div>
 
-{{% blocks/section type="row" %}}
+<div class="terminal-card">
+  <div class="terminal-header">
+    <span class="terminal-btn close"></span>
+    <span class="terminal-btn minimize"></span>
+    <span class="terminal-btn maximize"></span>
+    <span class="terminal-title">bash - solverforge</span>
+  </div>
+  <div class="terminal-body">
+    <pre><code><span class="command-line">git clone https://github.com/SolverForge/solverforge-quickstarts</span>
+<span class="command-line">cd solverforge-quickstarts/employee-scheduling</span>
+<span class="command-line">python -m venv .venv && source .venv/bin/activate</span>
+<span class="command-line">pip install -e .</span>
+<span class="command-line">run-app</span></code></pre>
+  </div>
+</div>
 
 {{% /blocks/section %}}

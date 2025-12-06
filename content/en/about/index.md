@@ -7,26 +7,46 @@ menu: {main: {weight: 10}}
 {{% blocks/cover title="SolverForge" image_anchor="bottom" height="auto" %}}
 {.mt-5}
 {{% /blocks/cover %}}
-{{% blocks/lead %}}
 
-SolverForge is a community-driven initiative to continue and expand upon the work started by Timefold's now-discontinued Python solver.
+{{% blocks/lead color="primary" %}}
 
+[SolverForge](https://www.solverforge.org) is a free, 100% [Timefold](https://www.timefold.ai) compatible AI constraint solver for Python and Rust.
+
+<a class="td-link-down" href="#td-block-2"><i class="fas fa-chevron-down"></i></a>
 {{% /blocks/lead %}}
 
-{{% blocks/section %}}
+{{% blocks/section color="dark" type="row" %}}
 
-{.text-center}
+{{% blocks/feature icon="fa-solid fa-truck-fast" title="Vehicle Routing" %}}
+Optimize delivery routes, minimize travel time, and respect capacity constraints for your fleet.
+{{% /blocks/feature %}}
 
-We aim to provide a first-class, open-source AI constraint solver for Python that is able to provide optimal solutions to problems such as Vehicle Routing, Employee Rostering, Maintenance Scheduling and more.
+{{% blocks/feature icon="fa-solid fa-calendar-days" title="Employee Scheduling" %}}
+Create fair rosters that balance employee preferences, skills, and labor regulations.
+{{% /blocks/feature %}}
+
+{{% blocks/feature icon="fa-solid fa-wrench" title="Maintenance Planning" %}}
+Schedule equipment maintenance to minimize downtime while meeting service requirements.
+{{% /blocks/feature %}}
+
+<a class="td-link-down" href="#td-block-3"><i class="fas fa-chevron-down"></i></a>
+
+<div class="text-center td-arrow-down"></div>
 
 {{% /blocks/section %}}
 
-{{% blocks/section %}}
+{{% blocks/section type="row" %}}
 
-{.text-center}
+{{% blocks/feature icon="fab fa-python" title="Pythonic API" %}}
+Write constraints using familiar Python syntax. No domain-specific language to learn.
+{{% /blocks/feature %}}
 
-We’re picking up where Timefold left off, ensuring no loss in momentum for Python users: our legacy solver is a 1:1 fork of version 1.24.0b0 of the original Python solver.
+{{% blocks/feature icon="fab fa-rust" title="Rust Performance" %}}
+Lightning-fast solving powered by Rust. Get optimal solutions in milliseconds.
+{{% /blocks/feature %}}
 
-Running `pip install solverforge-legacy` and updating your imports is all you need to get on board and continue receiving support.
+{{% blocks/feature icon="fab fa-github" title="100% Open Source" url="https://github.com/SolverForge" %}}
+Community-driven development. Fork it, extend it, make it yours.
+{{% /blocks/feature %}}
 
 {{% /blocks/section %}}

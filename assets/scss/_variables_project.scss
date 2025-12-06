@@ -8,6 +8,10 @@ Add styles or override variables from the theme here.
 $primary: #10b981;
 $primary-dark: #059669;
 
+// Override Bootstrap link colors
+$link-color: $primary;
+$link-hover-color: $primary-dark;
+
 // Scale up the navbar logo
 .navbar-brand__logo svg {
   width: auto !important;
@@ -15,23 +19,31 @@ $primary-dark: #059669;
   max-height: 4rem !important;
 }
 
-// Reduce navbar height
+// Navbar - always dark green background
 .td-navbar {
   min-height: 1rem !important;
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
-  background-color: #ffffff !important;
+  background-color: #064e3b !important; // dark green
+  opacity: 1 !important;
 
-  // Make menu items readable on light background
+  // Override any transparency on scroll or cover
+  &.navbar-bg-onscroll,
+  &.navbar-bg-ontop {
+    background-color: #064e3b !important;
+  }
+
+  // Menu items - muted green on dark green, bright white on hover
   .nav-link {
-    color: #1f2937 !important;
+    color: #34d399 !important; // muted emerald
 
     &:hover {
-      color: $primary !important;
+      color: #ffffff !important;
     }
 
     &.active {
-      color: $primary !important;
+      color: #ffffff !important;
+      font-weight: 500;
     }
   }
 }
@@ -62,27 +74,26 @@ $primary-dark: #059669;
 }
 
 a {
+  color: $primary;
+
   &:hover {
-    color: $primary;
+    color: $primary-dark;
   }
 }
 
-// Green inverted backgrounds for home and about pages only
-body.home,
-body.section-about {
+// Green inverted backgrounds for home page
+body.home {
   .td-content,
   .td-main {
     background-color: $primary !important;
     color: #ffffff !important;
   }
 
-  // Cover blocks with green background
   .td-cover-block {
     background-color: $primary !important;
     color: #ffffff !important;
   }
 
-  // Make text readable on green background
   .td-content {
     h1, h2, h3, h4, h5, h6 {
       color: #ffffff !important;
@@ -93,7 +104,6 @@ body.section-about {
     }
   }
 
-  // Links on green background
   .td-content a,
   .td-main a {
     color: #ffffff !important;
@@ -104,3 +114,4 @@ body.section-about {
     }
   }
 }
+
