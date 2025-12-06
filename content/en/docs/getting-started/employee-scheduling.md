@@ -90,7 +90,7 @@ You'll see a scheduling interface with employees, shifts and a "Solve" button. C
 ### File Structure Overview
 
 ```
-src/employee_scheduling/
+fast/employee_scheduling-fast/
 ├── domain.py              # Data classes (Employee, Shift, Schedule)
 ├── constraints.py         # Business rules (90% of customization happens here)
 ├── solver.py              # Solver configuration
