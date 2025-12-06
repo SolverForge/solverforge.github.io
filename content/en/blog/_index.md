@@ -1,9 +1,5 @@
 ---
 title: Blog
 menu: {main: {weight: 30}}
-date: 2100-01-01
+date: 2025-12-06
 ---
-
-This is the **blog** section. It has two categories: News and Releases.
-
-Files in these directories will be listed in reverse chronological order.

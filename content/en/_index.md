@@ -14,7 +14,7 @@ title: SolverForge
 {{< /blocks/cover >}}
 
 {{% blocks/lead %}}
-Model your planning problems with an expressive, business-object oriented syntax.
+Model your planning problems with an expressive, business-object oriented syntax
 
 <a class="td-link-down" href="#td-block-2"><i class="fas fa-chevron-down"></i></a>
 {{% /blocks/lead %}}
