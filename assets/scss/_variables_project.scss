@@ -4,3 +4,103 @@ Add styles or override variables from the theme here.
 
 */
 
+// Primary green colors from logo
+$primary: #10b981;
+$primary-dark: #059669;
+
+// Scale up the navbar logo
+.navbar-brand__logo svg {
+  width: auto !important;
+  height: auto !important;
+  max-height: 4rem !important;
+}
+
+// Reduce navbar height
+.td-navbar {
+  min-height: 1rem !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+  background-color: #ffffff !important;
+
+  // Make menu items readable on light background
+  .nav-link {
+    color: #1f2937 !important;
+
+    &:hover {
+      color: $primary !important;
+    }
+
+    &.active {
+      color: $primary !important;
+    }
+  }
+}
+
+// Reduce the container padding
+.td-navbar .container-fluid {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+// Make navbar brand more compact
+.navbar-brand {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+// Subtle green accents to match logo
+.btn-primary {
+  background-color: $primary !important;
+  border-color: $primary !important;
+
+  &:hover {
+    background-color: $primary-dark !important;
+    border-color: $primary-dark !important;
+  }
+}
+
+a {
+  &:hover {
+    color: $primary;
+  }
+}
+
+// Green inverted backgrounds for home and about pages only
+body.home,
+body.section-about {
+  .td-content,
+  .td-main {
+    background-color: $primary !important;
+    color: #ffffff !important;
+  }
+
+  // Cover blocks with green background
+  .td-cover-block {
+    background-color: $primary !important;
+    color: #ffffff !important;
+  }
+
+  // Make text readable on green background
+  .td-content {
+    h1, h2, h3, h4, h5, h6 {
+      color: #ffffff !important;
+    }
+
+    p, li, td, th {
+      color: #ffffff !important;
+    }
+  }
+
+  // Links on green background
+  .td-content a,
+  .td-main a {
+    color: #ffffff !important;
+    text-decoration: underline;
+
+    &:hover {
+      color: #f0fdf4 !important;
+    }
+  }
+}
