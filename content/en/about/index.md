@@ -10,7 +10,7 @@ menu: {main: {weight: 10}}
 
 {{% blocks/lead color="primary" %}}
 
-[SolverForge](https://www.solverforge.org) is a free, 100% [Timefold](https://www.timefold.ai) compatible AI constraint solver for Python and Rust.
+[SolverForge](https://www.solverforge.org) is a free constraint programming framework for Python and Rust
 
 <a class="td-link-down" href="#td-block-2"><i class="fas fa-chevron-down"></i></a>
 {{% /blocks/lead %}}
