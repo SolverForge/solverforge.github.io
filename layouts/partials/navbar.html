@@ -11,10 +11,7 @@
     {{- /**/ -}}
     <span class="navbar-brand__logo navbar-logo">
       {{- if ne .Site.Params.ui.navbar_logo false -}}
-        {{- $logoFile := "icons/solverforge-header-light-clean.svg" -}}
-        {{- if or (.IsHome) (hasPrefix .RelPermalink "/about") -}}
-          {{- $logoFile = "icons/solverforge-header-dark-clean.svg" -}}
-        {{- end -}}
+        {{- $logoFile := "icons/solverforge-header-dark-clean.svg" -}}
         {{ with resources.Get $logoFile -}}
           {{ ( . | minify).Content | safeHTML -}}
         {{ end -}}
