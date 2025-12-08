@@ -1,184 +1,217 @@
 ---
 title: Overview
-description: Roadmap, goals and how to get involved.
+description: What SolverForge is, how it differs from mathematical solvers, and the project roadmap.
 weight: 1
 ---
 
+# What is SolverForge?
+
+SolverForge is a **constraint satisfaction solver** for real-world planning and scheduling problems. It helps you assign resources to tasks while respecting business rules and optimizing for your goals.
+
+## What Problems Does It Solve?
+
+SolverForge excels at **combinatorial planning problems** where you need to:
+
+- **Employee Scheduling** — Assign staff to shifts based on skills, availability, and labor regulations
+- **Vehicle Routing** — Plan delivery routes that minimize travel time while meeting time windows
+- **School Timetabling** — Schedule lessons to rooms and timeslots without conflicts
+- **Task Assignment** — Allocate jobs to workers or machines optimally
+- **Meeting Scheduling** — Find times and rooms that work for all attendees
+- **Bin Packing** — Fit items into containers efficiently
+
+These are problems where a brute-force search is impossible (millions to billions of possibilities), but a good solution dramatically improves efficiency.
+
+## How Is This Different from Gurobi or CVXPY?
+
+This is a common question. **SolverForge and mathematical programming solvers (Gurobi, CPLEX, OR-Tools, CVXPY) solve different kinds of problems using different approaches.**
+
+| | SolverForge | Mathematical Solvers (Gurobi, CVXPY) |
+|---|---|---|
+| **Problem type** | Constraint satisfaction & scheduling | Linear/mixed-integer programming |
+| **Modeling approach** | Business objects with rules | Mathematical equations & matrices |
+| **Constraints** | Natural language-like rules on objects | Linear inequalities (Ax ≤ b) |
+| **Best for** | Scheduling, routing, assignment | Resource allocation, network flow, portfolio optimization |
+| **Developer experience** | Write rules about "Shifts" and "Employees" | Formulate objective functions and constraint matrices |
+
+### A Concrete Example
+
+**Mathematical programming (Gurobi/CVXPY):**
+```python
+# You must translate your problem into mathematical form
+x = model.addVars(employees, shifts, vtype=GRB.BINARY)
+model.addConstrs(sum(x[e,s] for e in employees) == 1 for s in shifts)
+model.addConstrs(sum(x[e,s] for s in shifts) <= max_shifts for e in employees)
+```
+
+**Constraint satisfaction (SolverForge):**
+```python
+# You describe rules about your business objects directly
+@constraint_provider
+def define_constraints(factory):
+    return [
+        factory.for_each(Shift)
+            .filter(lambda s: s.employee is None)
+            .penalize("Unassigned shift", HardSoftScore.ONE_HARD),
+        factory.for_each(Shift)
+            .filter(lambda s: s.required_skill not in s.employee.skills)
+            .penalize("Missing skill", HardSoftScore.ONE_HARD),
+    ]
+```
+
+**The key difference:** With SolverForge, you work with domain objects (`Shift`, `Employee`) and express constraints as natural business rules. You don't need to reformulate your problem as a system of linear equations.
+
+### When to Use Each
+
+**Use SolverForge when:**
+- Your problem involves scheduling, routing, or assignment
+- Constraints are naturally expressed as business rules
+- The problem structure doesn't fit neatly into linear programming
+- You want readable, maintainable constraint definitions
+
+**Use Gurobi/CVXPY when:**
+- Your problem is naturally linear or convex
+- You need provably optimal solutions with bounds
+- The problem fits the mathematical programming paradigm (LP, MIP, QP)
+
+## The Developer Experience
+
+SolverForge provides a **Pythonic, business-object-oriented API**:
+
+```python
+from dataclasses import dataclass
+from typing import Annotated
+from solverforge import planning_entity, planning_solution, PlanningVariable
+
+@planning_entity
+@dataclass
+class Shift:
+    id: str
+    required_skill: str
+    employee: Annotated[Employee | None, PlanningVariable] = None  # Solver fills this in
+
+@planning_solution
+@dataclass
+class Schedule:
+    employees: list[Employee]
+    shifts: list[Shift]
+    score: HardSoftScore = None
+```
+
+You define your domain model with standard Python dataclasses and type annotations. The solver figures out how to assign employees to shifts while respecting your constraints.
+
+---
+
+# Project Status & Roadmap
+
 {{% pageinfo %}}
-
-This page presents the SolverForge project overview and official development roadmap. It explains our objectives, the core engineering challenge, the staged plan to deliver a high-performance solver for Python and Rust, and how you can help.
-
+SolverForge is under active development. The Python API shown above works today via `solverforge-legacy`. We're building a new high-performance backend to make it faster.
 {{% /pageinfo %}}
 
-# Project Overview & Roadmap
+## Current Status
 
-SolverForge is a high-performance, 100% Timefold-compatible constraint solver focused on delivering a first-class developer experience for Python and Rust.
+| Component | Status | Description |
+|-----------|--------|-------------|
+| **solverforge-legacy** | ✅ Usable now | Pure Python solver — works today, great for learning and prototyping |
+| **solverforge-core** | ✅ Complete | High-performance Rust backend — foundation complete, not yet user-facing |
+| **Python bindings** | 🚧 In progress | PyO3-based bindings to the fast Rust core — coming Q1-Q2 2026 |
 
-## Core Objective
+**Want to try it today?** Start with the [Python quickstarts](/docs/getting-started/hello-world/) using `solverforge-legacy`.
 
-To provide the Rust, Python and broader language ecosystems with a first-class, high-performance Constraint Programming and Optimization solver, offering a seamless experience and unlocking new possibilities for the ML, data science, and systems programming communities.
+## Roadmap
 
-## Core Innovation: WASM + HTTP Bridge Architecture
+### Phase 1: Foundation ✅ Complete
 
-Unlike traditional approaches that rely on complex JNI bridges or interpreter overhead, SolverForge eliminates these bottlenecks entirely through a novel architecture:
+We've built the core solver infrastructure:
+- Complete constraint streams API (forEach, filter, join, groupBy, penalize, reward)
+- Support for all common score types (HardSoft, HardMediumSoft, Bendable)
+- End-to-end solving with employee scheduling, vehicle routing, and more
 
-1. **WebAssembly-compiled constraints** - Constraint predicates are compiled to WASM and executed directly in the JVM via the Chicory WASM runtime
-2. **HTTP/JSON communication** - Clean separation between language bindings and the solver service
-3. **Native Rust core** - Language-agnostic core library with zero-cost abstractions
-4. **No JNI complexity** - Pure HTTP interface eliminates the need for platform-specific native bindings
+### Phase 2: Python Bindings (Q1-Q2 2026)
 
-This architecture provides near-native performance while maintaining complete language independence.
+Making the fast Rust core available to Python developers:
+- PyO3-based native extension: `pip install solverforge`
+- Same Pythonic API you know from solverforge-legacy
+- Seamless migration path — change one import, keep your code
 
-## What We've Achieved
+### Phase 3: Production Ready (H2 2026)
 
-### ✅ Core Architecture (Completed - Q4 2025)
+- Stable v1.0.0 release
+- Performance tuning guides
+- Advanced features (custom move selectors, real-time solving)
+
+---
+
+## How You Can Help
+
+- **Try the quickstarts** — [Build your first solver](/docs/getting-started/hello-world/) and share feedback
+- **Report issues** — Found a bug or have a suggestion? [Open an issue](https://github.com/solverforge/solverforge/issues)
+- **Contribute** — We're actively developing Python bindings. PRs welcome!
+- **Spread the word** — Star the [GitHub repo](https://github.com/solverforge/solverforge) and share with colleagues
+
+---
+
+## Technical Details
+
+<details>
+<summary><strong>Architecture (for the curious)</strong></summary>
+
+SolverForge uses a unique architecture to achieve both developer ergonomics and performance:
+
+```
+┌────────────────────────────────────────────────────────┐
+│              Your Python/Rust Code                     │
+│     (Domain models, constraints, problem data)         │
+└────────────────────────────────────────────────────────┘
+                           │
+                      HTTP/JSON
+                           │
+                           ▼
+┌────────────────────────────────────────────────────────┐
+│            Solver Service (Java + Timefold)            │
+│                                                        │
+│   • Executes metaheuristic search algorithms           │
+│   • Runs WASM-compiled constraint predicates           │
+│   • Returns optimized solutions                        │
+└────────────────────────────────────────────────────────┘
+```
+
+**Why this design?**
+
+1. **Timefold's algorithms are battle-tested** — Rather than reimplementing 20+ years of metaheuristic research, we leverage Timefold's proven solver engine
+
+2. **WASM enables portable constraints** — Your constraint logic compiles to WebAssembly, which runs efficiently inside the JVM via the Chicory runtime
+
+3. **HTTP keeps things simple** — No JNI, no platform-specific native code, no complex build configurations
+
+**The result:** You write clean Python code; we handle the complexity of making it run fast.
+
+</details>
+
+<details>
+<summary><strong>Detailed achievements (Q4 2025)</strong></summary>
 
 **Repository**: [solverforge/solverforge](https://github.com/solverforge/solverforge) (v0.1.56)
 
-- **Complete Rust core library** (`solverforge-core`) - Language-agnostic foundation
-  - Domain model definition with planning annotations (@PlanningEntity, @PlanningVariable, etc.)
-  - Comprehensive constraint streams API (forEach, filter, join, groupBy, complement, flattenLast)
-  - Advanced collectors (count, countDistinct, loadBalance)
-  - Full score type system (Simple, HardSoft, HardMediumSoft, Bendable, BigDecimal variants)
-  - Score analysis with constraint breakdown and indictments
+**Rust core library (`solverforge-core`):**
+- Domain model definition with planning annotations
+- Comprehensive constraint streams API (forEach, filter, join, groupBy, complement, flattenLast)
+- Advanced collectors (count, countDistinct, loadBalance)
+- Full score type system with BigDecimal variants
+- Score analysis with constraint breakdown
 
-- **WASM module generation** with proper memory alignment
-  - Domain object layout with 32-bit and 64-bit type alignment
-  - Field accessors (getters/setters)
-  - Constraint predicates with complex logic (conditionals, arithmetic, range checking)
-  - Primitive list operations (LocalDate[], LocalDateTime[], etc.)
+**WASM module generation:**
+- Proper memory alignment for 32-bit and 64-bit types
+- Field accessors and constraint predicates
+- Support for temporal types (LocalDate, LocalDateTime)
 
-- **Java service integration** (`timefold-wasm-service` submodule)
-  - Chicory WASM runtime integration
-  - Dynamic bytecode generation for domain classes and constraint providers
-  - Host function provider for WASM-Java interop
-  - HTTP endpoints for solving and score analysis
+**Java service (`timefold-wasm-service`):**
+- Chicory WASM runtime integration
+- Dynamic bytecode generation for domain classes
+- HTTP endpoints for solving and score analysis
 
-- **End-to-end integration tests**
-  - Employee scheduling with 5 complex constraints
-  - Temporal types (LocalDate, LocalDateTime) with proper alignment
-  - Weighted penalties and custom weighers
-  - Load balancing with fair distribution
+**End-to-end validation:**
+- Employee scheduling with 5+ constraints
+- Load balancing with fair distribution
+- Comprehensive test suite
 
-## Roadmap Phases
-
-### Phase 1: Foundation & Proof of Concept ✅ (Complete)
-
-**Status**: Complete as of Q4 2025
-
-**Achievements**:
-- ✅ Core Rust library with language-agnostic types
-- ✅ Complete constraint streams API
-- ✅ WASM generation pipeline
-- ✅ HTTP communication layer
-- ✅ Java service integration
-- ✅ Memory alignment correctness
-- ✅ End-to-end solving with real constraint problems
-
-### Phase 2: Performance Optimization & Python Bindings (Q1 2026 - Q2 2026)
-
-**Objective**: Achieve production-grade performance and deliver Python bindings via PyO3
-
-**Key Deliverables**:
-- **Performance optimization**:
-  - WASM module caching optimization for repeated solves
-  - Export function lookup optimization
-  - Incremental scoring with delta calculations
-  - Join indexing for O(1) lookups 
-
-- **Python bindings** (`solverforge-python`):
-  - PyO3-based native extension module
-  - Pythonic API matching Timefold Python conventions
-  - Type hints and comprehensive documentation
-  - PyPI package: `pip install solverforge`
-
-- **Enhanced testing**:
-  - Complete benchmark suite supporting all official Timefold quickstarts
-  - Performance regression tests
-  - Cross-language validation tests
-
-### Phase 3: Production Readiness & Ecosystem Expansion (H2 2026)
-
-**Objective**: Deliver production-ready solver with comprehensive ecosystem support
-
-**Key Deliverables**:
-- **Production release**: Stable v1.0.0 release
-  - Comprehensive API documentation
-  - Seamless migration from solverforge-legacy or Timefold Python
-  - Performance tuning guide
-  - Production deployment patterns
-
-- **Language bindings expansion**:
-  - 1:1 Timefold-compatible bindings in Python
-  - Native Rust API for pure Rust applications
-
-- **Advanced features**:
-  - Custom move selectors
-  - Real-time solving with event streaming
-  - Multi-stage solving
-  - Constraint configuration at runtime
-
-- **ML/AI integration examples (?)**:
-  - Predictive scheduling using ML forecasts
-  - HuggingFace integration demos
-  - Dockerized quickstarts for easy experimentation
-  - Integration with popular Python data stack (pandas, numpy, polars)
-
-## Technical Architecture
-```
-┌───────────────────────────────────────────────────────────────┐
-│                       Language Bindings                       │
-│                (Python, JavaScript, Rust, Go)                 │
-└───────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌───────────────────────────────────────────────────────────────┐
-│                   solverforge-core (Rust)                     │
-│                                                               │
-│  ┌───────┐   ┌───────┐   ┌───────┐   ┌───────┐                │
-│  │Domain │   │Constr-│   │ WASM  │   │ HTTP  │                │
-│  │Model  │   │ aint  │   │Builder│   │Client │                │
-│  │       │   │Stream │   │       │   │       │                │
-│  └───────┘   └───────┘   └───────┘   └───────┘                │
-└───────────────────────────────────────────────────────────────┘
-                              │
-                        HTTP/JSON + WASM
-                              │
-                              ▼
-┌───────────────────────────────────────────────────────────────┐
-│               timefold-wasm-service (Java)                    │
-│                                                               │
-│  ┌───────┐   ┌───────┐   ┌───────┐   ┌───────┐                │
-│  │Chicory│   │Dynamic│   │Timefld│   │  Host │                │
-│  │ WASM  │   │Bytcde │   │Solver │   │  Func │                │
-│  │Runtime│   │  Gen  │   │Engine │   │  tions│                │
-│  └───────┘   └───────┘   └───────┘   └───────┘                │
-└───────────────────────────────────────────────────────────────┘
-```
-
-## How You Can Contribute
-
-This project thrives on community input. Here's how you can help:
-
-1. **Test the core library**: Clone the repository and run the integration tests
-   ```bash
-   git clone https://github.com/solverforge/solverforge
-   cd solverforge
-   cargo test --workspace
-   ```
-
-2. **Benchmark your use cases**: We're collecting real-world constraint problems to ensure SolverForge works well for diverse scenarios
-
-3. **Contribute to Python bindings**: We're starting work on PyO3 bindings - contributions welcome!
-
-4. **Join the discussion**: Share your thoughts on this roadmap! What features are most critical for your use case?
-
-5. **Spread the word**: Star the GitHub repository and share this project with anyone interested in constraint optimization
-
-## Why SolverForge?
-
-- **Language independence**: Write constraints in Python, Rust, JavaScript, or any language
-- **No JNI complexity**: Clean HTTP/JSON interface eliminates platform-specific native code
-- **Near-native performance**: WASM-compiled constraints with minimal overhead
-- **Modern architecture**: Built for cloud-native deployment and microservices
-- **Open source**: Apache 2.0 license, community-driven development
+</details>

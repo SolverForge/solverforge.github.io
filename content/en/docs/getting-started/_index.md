@@ -1,16 +1,23 @@
 ---
 title: Getting Started
+linkTitle: "Getting Started"
 description: Quickstart Guides — repository layout, prerequisites, and how to run examples locally.
 categories: [Examples, Quickstarts]
 tags: [solverforge, quickstarts, python, docs]
 weight: 2
 ---
 
-{{% pageinfo %}}
-This page introduces the SolverForge Python quickstarts: what is included, how the repository is organised, and simple steps to try the examples locally.
+{{% pageinfo color="warning" %}}
+**🚧 Work in Progress**
+
+SolverForge is under active development. User-facing language bindings (Python, JavaScript, etc.) are not yet available.
+
+If you want to try SolverForge today, you'll need to write your own language bindings against the [SolverForge Core](../solverforge/) library. **This is not recommended for production use** — or even casual experimentation unless you're comfortable with low-level integration work.
+
+We're working hard to deliver proper bindings. Stay tuned!
 {{% /pageinfo %}}
 
-SolverForge Quickstarts provide Python examples demonstrating common constraint-solver use cases and patterns. They are fully Timefold-compatible and focus on practical, performant Python implementations.
+The quickstart guides below demonstrate constraint-solver patterns using the legacy Python implementation. They serve as reference material for understanding SolverForge concepts while the new bindings are being developed.
 
 This page covers:
 - Repository layout and quickstart variants

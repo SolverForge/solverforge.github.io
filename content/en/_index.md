@@ -1,5 +1,6 @@
 ---
 title: SolverForge
+date: 2025-12-08
 ---
 
 {{< blocks/cover title="SolverForge" image_anchor="top" height="full" >}}

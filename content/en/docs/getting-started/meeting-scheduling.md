@@ -1,6 +1,8 @@
 ---
 title: "Meeting Scheduling"
-date: 2225-11-26
+linkTitle: "Meeting Scheduling"
+icon: fa-brands fa-python
+date: 2025-11-26
 description: "A comprehensive quickstart guide to understanding and building intelligent meeting scheduling with SolverForge"
 categories: [Examples]
 tags: [scheduling, optimization, meetings, calendar, tutorial]

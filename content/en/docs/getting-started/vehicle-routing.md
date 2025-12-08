@@ -1,6 +1,8 @@
 ---
 title: "Vehicle Routing"
-date: 2225-11-26
+linkTitle: "Vehicle Routing"
+icon: fa-brands fa-python
+date: 2025-11-26
 description: "A comprehensive quickstart guide to understanding and building intelligent vehicle routing with SolverForge"
 categories: [Examples]
 tags: [routing, optimization, logistics, tutorial]

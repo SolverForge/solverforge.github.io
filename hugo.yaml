@@ -106,10 +106,10 @@ params:
   url_latest_version: https://www.solverforge.org
 
   # Repository configuration (URLs for in-page links to opening issues and suggesting changes)
-  github_repo: https://github.com/SolverForge/solverforge-legacy
+  github_repo: https://github.com/SolverForge/solverforge.github.io
 
   # An optional link to a related project repo. For example, the sibling repository where your product code lives.
-  github_project_repo: https://github.com/SolverForge/solverforge-legacy
+  github_project_repo: https://github.com/SolverForge/solverforge
 
   # Specify a value here if your content directory is not in your repo's root directory
   # github_subdir: ""
@@ -142,6 +142,8 @@ params:
     navbar_translucent_over_cover_disable: false
     # Enable to show the side bar menu in its compact state.
     sidebar_menu_compact: false
+    # Set to true to make the sidebar menu foldable (collapsible)
+    sidebar_menu_foldable: true
     # Set to true to hide the sidebar search box (the top nav search box will still be displayed if search is enabled)
     sidebar_search_disable: false
 
@@ -154,11 +156,11 @@ params:
       # The responses that the user sees after clicking "yes" (the page was helpful) or "no" (the page was not helpful).
       'yes': >-
         Glad to hear it! Please <a
-        href="https://github.com/USERNAME/REPOSITORY/issues/new">tell us how we
+        href="https://github.com/SolverForge/solverforge.github.io/issues/new">tell us how we
         can improve</a>.
       'no': >-
         Sorry to hear that. Please <a
-        href="https://github.com/USERNAME/REPOSITORY/issues/new">tell us how we
+        href="https://github.com/SolverForge/solverforge.github.io/issues/new">tell us how we
         can improve</a>.
 
     # Adds a reading time to the top of each doc.
