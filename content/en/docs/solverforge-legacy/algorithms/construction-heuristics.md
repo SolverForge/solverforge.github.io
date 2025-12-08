@@ -2,6 +2,7 @@
 title: "Construction Heuristics"
 linkTitle: "Construction Heuristics"
 weight: 10
+tags: [concepts, python]
 description: >
   Build an initial solution quickly with construction heuristics.
 ---

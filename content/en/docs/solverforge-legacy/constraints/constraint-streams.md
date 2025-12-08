@@ -2,6 +2,7 @@
 title: "Constraint Streams"
 linkTitle: "Constraint Streams"
 weight: 10
+tags: [reference, python]
 description: >
   Build constraints using the fluent Constraint Streams API.
 ---

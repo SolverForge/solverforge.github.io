@@ -2,6 +2,7 @@
 title: "Planning Solutions"
 linkTitle: "Planning Solutions"
 weight: 30
+tags: [concepts, python]
 description: >
   Define the container for problem data and solution score.
 ---

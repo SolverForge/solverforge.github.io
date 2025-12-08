@@ -2,10 +2,9 @@
 title: "Error Handling"
 linkTitle: "Errors"
 weight: 20
+tags: [reference, rust]
 description: "Handle SolverForgeError types and troubleshoot common issues"
 ---
-
-# Error Handling
 
 SolverForge uses the `SolverForgeError` enum for all error types.
 

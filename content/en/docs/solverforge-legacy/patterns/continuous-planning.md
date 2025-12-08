@@ -2,6 +2,7 @@
 title: "Continuous Planning"
 linkTitle: "Continuous Planning"
 weight: 20
+tags: [concepts, python]
 description: >
   Rolling horizon and replanning strategies.
 ---

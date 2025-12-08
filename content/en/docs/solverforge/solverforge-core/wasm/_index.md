@@ -2,10 +2,9 @@
 title: "WASM Generation"
 linkTitle: "WASM"
 weight: 60
+tags: [reference, rust]
 description: "Generate WASM modules for constraint predicates"
 ---
-
-# WASM Generation
 
 This section covers generating WebAssembly modules for constraint predicates.
 

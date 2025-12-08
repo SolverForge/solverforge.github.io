@@ -2,6 +2,7 @@
 title: "Optimization Algorithms"
 linkTitle: "Algorithms"
 weight: 60
+tags: [concepts, python]
 description: >
   Understand the algorithms that power SolverForge's optimization.
 ---

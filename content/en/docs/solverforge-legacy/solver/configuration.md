@@ -2,6 +2,7 @@
 title: "Solver Configuration"
 linkTitle: "Configuration"
 weight: 10
+tags: [reference, python]
 description: >
   Configure the solver with SolverConfig and related classes.
 ---

@@ -2,6 +2,7 @@
 title: "Exhaustive Search"
 linkTitle: "Exhaustive Search"
 weight: 30
+tags: [concepts, python]
 description: >
   Find optimal solutions with exhaustive search (for small problems).
 ---

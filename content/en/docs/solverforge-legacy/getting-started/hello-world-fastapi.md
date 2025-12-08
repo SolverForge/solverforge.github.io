@@ -2,6 +2,7 @@
 title: "Hello World with FastAPI"
 linkTitle: "Hello World (FastAPI)"
 weight: 30
+tags: [quickstart, python]
 description: >
   Add a REST API to your school timetabling solver.
 ---

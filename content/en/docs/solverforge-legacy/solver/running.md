@@ -2,6 +2,7 @@
 title: "Running the Solver"
 linkTitle: "Running"
 weight: 20
+tags: [reference, python]
 description: >
   Execute the solver synchronously with Solver.solve().
 ---

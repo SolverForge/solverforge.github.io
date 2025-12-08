@@ -2,10 +2,9 @@
 title: "Installation"
 linkTitle: "Installation"
 weight: 10
+tags: [quickstart, rust]
 description: "Add SolverForge to your Rust project and set up the solver service"
 ---
-
-# Installation
 
 ## Add Dependencies
 

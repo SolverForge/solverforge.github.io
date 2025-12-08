@@ -2,10 +2,9 @@
 title: "Score Types"
 linkTitle: "Scores"
 weight: 30
+tags: [reference, rust]
 description: "Understand SimpleScore, HardSoftScore, HardMediumSoftScore, and BendableScore"
 ---
-
-# Score Types
 
 Scores measure solution quality. SolverForge supports multiple score types.
 

@@ -2,6 +2,7 @@
 title: "Logging"
 linkTitle: "Logging"
 weight: 30
+tags: [reference, python]
 description: >
   Configure logging for debugging and monitoring.
 ---

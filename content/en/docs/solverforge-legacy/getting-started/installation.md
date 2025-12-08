@@ -2,6 +2,7 @@
 title: "Installation"
 linkTitle: "Installation"
 weight: 10
+tags: [quickstart, python]
 description: >
   Set up Python, JDK, and install SolverForge.
 ---

@@ -2,10 +2,9 @@
 title: "Domain Model"
 linkTitle: "Domain Model"
 weight: 10
+tags: [concepts, rust]
 description: "Build domain models with DomainModel, DomainClass, and FieldDescriptor"
 ---
-
-# Domain Model
 
 The `DomainModel` is the central data structure that describes your planning domain.
 

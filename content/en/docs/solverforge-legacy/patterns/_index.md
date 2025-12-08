@@ -2,6 +2,7 @@
 title: "Design Patterns"
 linkTitle: "Patterns"
 weight: 80
+tags: [concepts, python]
 description: >
   Common patterns for handling real-world planning scenarios.
 ---

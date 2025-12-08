@@ -2,6 +2,7 @@
 title: "Planning Variables"
 linkTitle: "Planning Variables"
 weight: 20
+tags: [concepts, python]
 description: >
   Define what the solver assigns: simple variables and list variables.
 ---

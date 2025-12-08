@@ -2,6 +2,7 @@
 title: "Shadow Variables"
 linkTitle: "Shadow Variables"
 weight: 40
+tags: [concepts, python]
 description: >
   Define calculated variables that update automatically.
 ---

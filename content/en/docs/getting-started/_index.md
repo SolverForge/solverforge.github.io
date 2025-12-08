@@ -2,8 +2,8 @@
 title: Getting Started
 linkTitle: "Getting Started"
 description: Quickstart Guides — repository layout, prerequisites, and how to run examples locally.
-categories: [Examples, Quickstarts]
-tags: [solverforge, quickstarts, python, docs]
+categories: [Quickstarts]
+tags: [quickstart, python]
 weight: 2
 ---
 
@@ -18,6 +18,42 @@ We're working hard to deliver proper bindings. Stay tuned!
 {{% /pageinfo %}}
 
 The quickstart guides below demonstrate constraint-solver patterns using the legacy Python implementation. They serve as reference material for understanding SolverForge concepts while the new bindings are being developed.
+
+## Choose a Quickstart
+
+{{< cardpane >}}
+{{< card header="**Employee Scheduling**" >}}
+Assign staff to shifts based on skills and availability.
+Perfect for learning core optimization concepts.
+
+[Start Tutorial →](employee-scheduling/)
+{{< /card >}}
+{{< card header="**Meeting Scheduling**" >}}
+Find optimal times and rooms for meetings while avoiding conflicts.
+
+[Start Tutorial →](meeting-scheduling/)
+{{< /card >}}
+{{< card header="**Vehicle Routing**" >}}
+Plan delivery routes that minimize travel time with capacity constraints.
+
+[Start Tutorial →](vehicle-routing/)
+{{< /card >}}
+{{< /cardpane >}}
+
+{{< cardpane >}}
+{{< card header="**School Timetabling**" >}}
+Schedule lessons to rooms and timeslots without teacher or room conflicts.
+
+[Start Tutorial →](school-timetabling/)
+{{< /card >}}
+{{< card header="**Rust Quickstart**" footer="Experimental" >}}
+Build a solver using the core Rust library directly. For advanced users interested in the internals.
+
+[Start Tutorial →](rust-quickstart/)
+{{< /card >}}
+{{< /cardpane >}}
+
+---
 
 This page covers:
 - Repository layout and quickstart variants

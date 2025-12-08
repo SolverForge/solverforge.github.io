@@ -2,6 +2,7 @@
 title: "FastAPI Integration"
 linkTitle: "FastAPI"
 weight: 10
+tags: [reference, python]
 description: >
   Build REST APIs for your solver with FastAPI.
 ---

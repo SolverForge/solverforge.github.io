@@ -2,6 +2,7 @@
 title: "Serialization"
 linkTitle: "Serialization"
 weight: 20
+tags: [reference, python]
 description: >
   JSON serialization with dataclasses and Pydantic.
 ---

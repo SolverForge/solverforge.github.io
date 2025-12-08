@@ -123,13 +123,16 @@ pre {
   background-color: #022c22 !important; // Very dark emerald
   border-radius: 6px;
   padding: 1rem;
-  margin: 1rem auto;
-  max-width: fit-content;
+  margin: 1rem 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 
   code {
     font-size: 0.8rem;
     color: #6ee7b7; // Mint green text
     background-color: transparent !important;
+    white-space: pre-wrap;
+    word-wrap: break-word;
   }
 }
 
@@ -300,4 +303,5 @@ code {
     transform: translateY(-5px);
   }
 }
+
 

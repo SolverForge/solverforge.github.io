@@ -2,6 +2,7 @@
 title: "SolverManager"
 linkTitle: "SolverManager"
 weight: 30
+tags: [reference, python]
 description: >
   Manage concurrent and asynchronous solving jobs.
 ---

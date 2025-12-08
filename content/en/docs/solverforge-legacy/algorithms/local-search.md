@@ -2,6 +2,7 @@
 title: "Local Search"
 linkTitle: "Local Search"
 weight: 20
+tags: [concepts, python]
 description: >
   Improve solutions iteratively with local search algorithms.
 ---

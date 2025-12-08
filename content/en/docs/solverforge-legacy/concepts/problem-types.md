@@ -2,6 +2,7 @@
 title: "Problem Types"
 linkTitle: "Problem Types"
 weight: 20
+tags: [concepts, python]
 description: >
   Common categories of planning and scheduling problems.
 ---

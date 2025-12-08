@@ -2,6 +2,7 @@
 title: "Pinning"
 linkTitle: "Pinning"
 weight: 50
+tags: [concepts, python]
 description: >
   Lock specific assignments to prevent the solver from changing them.
 ---

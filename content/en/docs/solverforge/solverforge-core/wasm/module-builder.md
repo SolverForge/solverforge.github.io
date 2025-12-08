@@ -2,10 +2,9 @@
 title: "Module Builder"
 linkTitle: "Module Builder"
 weight: 20
+tags: [reference, rust]
 description: "Generate WASM modules with WasmModuleBuilder"
 ---
-
-# Module Builder
 
 The `WasmModuleBuilder` compiles expressions into a WebAssembly module.
 

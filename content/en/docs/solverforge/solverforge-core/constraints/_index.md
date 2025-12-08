@@ -2,10 +2,9 @@
 title: "Constraints"
 linkTitle: "Constraints"
 weight: 40
+tags: [reference, rust]
 description: "Define hard and soft constraints using the constraint streams API"
 ---
-
-# Constraints
 
 This section covers the constraint streams API for defining constraints.
 

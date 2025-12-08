@@ -1,6 +1,7 @@
 ---
 title: "Dataclasses vs Pydantic in Constraint Solvers"
 date: 2025-12-06
+tags: [concepts, python]
 description: >
   Architectural guidance for Python constraint solvers: when to use dataclasses vs Pydantic for optimal performance.
 ---

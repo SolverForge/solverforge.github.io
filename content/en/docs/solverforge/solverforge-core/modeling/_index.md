@@ -2,10 +2,9 @@
 title: "Domain Modeling"
 linkTitle: "Modeling"
 weight: 30
+tags: [concepts, rust]
 description: "Define your planning domain with DomainModel, classes, and fields"
 ---
-
-# Domain Modeling
 
 This section covers how to define your planning domain using SolverForge's domain modeling API.
 

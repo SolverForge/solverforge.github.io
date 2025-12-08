@@ -2,10 +2,9 @@
 title: "Concepts"
 linkTitle: "Concepts"
 weight: 20
+tags: [concepts, rust]
 description: "Understand the core concepts behind SolverForge"
 ---
-
-# Concepts
 
 This section covers the foundational concepts you need to understand when working with SolverForge.
 

@@ -2,6 +2,7 @@
 title: "API Summary"
 linkTitle: "API Summary"
 weight: 10
+tags: [reference, python]
 description: >
   Quick reference for SolverForge Python API.
 ---

@@ -3,6 +3,7 @@ title: "SolverForge"
 linkTitle: "Rust Solver"
 icon: fa-brands fa-rust
 weight: 3
+tags: [rust]
 description: "Rust-based constraint solver library using WASM modules and HTTP communication"
 ---
 

@@ -2,6 +2,7 @@
 title: "Terminology"
 linkTitle: "Terminology"
 weight: 30
+tags: [concepts, python]
 description: >
   Glossary of terms used in SolverForge documentation.
 ---

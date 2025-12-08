@@ -2,6 +2,7 @@
 title: "FAQ"
 linkTitle: "FAQ"
 weight: 20
+tags: [reference, python]
 description: >
   Frequently asked questions about SolverForge.
 ---

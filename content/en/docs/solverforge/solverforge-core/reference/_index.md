@@ -2,10 +2,9 @@
 title: "Reference"
 linkTitle: "Reference"
 weight: 70
+tags: [reference, rust]
 description: "API reference and quick lookup guides"
 ---
-
-# Reference
 
 Quick reference guides and API documentation.
 

@@ -2,6 +2,7 @@
 title: "What is Planning Optimization?"
 linkTitle: "What is Planning?"
 weight: 10
+tags: [concepts, python]
 description: >
   Introduction to planning optimization and constraint satisfaction.
 ---

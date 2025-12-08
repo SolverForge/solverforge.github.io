@@ -2,10 +2,9 @@
 title: "Planning Annotations"
 linkTitle: "Annotations"
 weight: 20
+tags: [concepts, rust]
 description: "Configure planning behavior with PlanningAnnotation types"
 ---
-
-# Planning Annotations
 
 Annotations configure how the solver interprets your domain model.
 

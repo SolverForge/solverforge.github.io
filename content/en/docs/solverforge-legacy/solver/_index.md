@@ -2,6 +2,7 @@
 title: "Solver"
 linkTitle: "Solver"
 weight: 50
+tags: [reference, python]
 description: >
   Configure and run the solver to find optimal solutions.
 ---

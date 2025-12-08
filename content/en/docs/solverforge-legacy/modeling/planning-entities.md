@@ -2,6 +2,7 @@
 title: "Planning Entities"
 linkTitle: "Planning Entities"
 weight: 10
+tags: [concepts, python]
 description: >
   Define planning entities that the solver will optimize.
 ---

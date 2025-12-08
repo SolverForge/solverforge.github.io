@@ -3,9 +3,11 @@ title: "Vehicle Routing"
 linkTitle: "Vehicle Routing"
 icon: fa-brands fa-python
 date: 2025-11-26
+weight: 30
+draft: true
 description: "A comprehensive quickstart guide to understanding and building intelligent vehicle routing with SolverForge"
-categories: [Examples]
-tags: [routing, optimization, logistics, tutorial]
+categories: [Quickstarts]
+tags: [quickstart, python]
 ---
 
 {{% pageinfo %}}
@@ -45,7 +47,9 @@ This guide walks you through a complete vehicle routing application built with *
 
 **No optimization background required** — we'll explain concepts as we encounter them in the code.
 
-> **Performance Note:** Vehicle routing is particularly sensitive to constraint evaluation performance, as the solver must recalculate distances and arrival times millions of times during optimization. This implementation uses the "fast" dataclass architecture—see [benchmark results](/blog/news/python-constraint-solver-architecture/#results-vehicle-routing). Note: benchmarks were run on small test problems (25-77 customers); JPype bridge overhead may compound at larger scales.
+{{% alert title="Performance Note" %}}
+Vehicle routing is particularly sensitive to constraint evaluation performance, as the solver must recalculate distances and arrival times millions of times during optimization. This implementation uses the "fast" dataclass architecture—see [benchmark results](/blog/technical/python-constraint-solver-architecture/#results-vehicle-routing). Note: benchmarks were run on small test problems (25-77 customers); JPype bridge overhead may compound at larger scales.
+{{% /alert %}}
 
 ### Prerequisites
 
@@ -373,7 +377,7 @@ Routes are built using **shadow variable chaining**:
 
 **Optimization concept:** This is **incremental score calculation**. When the solver moves one visit, only affected arrival times recalculate — not the entire solution. This enables evaluating millions of route modifications per second.
 
-**Why this matters for performance:** Shadow variables enable efficient incremental updates. With Pydantic models, validation overhead would occur on every update—compounding across millions of moves per second. The dataclass approach avoids this overhead entirely. See [benchmark analysis](/blog/news/python-constraint-solver-architecture/#object-equality-in-hot-paths) for details on this architectural choice.
+**Why this matters for performance:** Shadow variables enable efficient incremental updates. With Pydantic models, validation overhead would occur on every update—compounding across millions of moves per second. The dataclass approach avoids this overhead entirely. See [benchmark analysis](/blog/technical/python-constraint-solver-architecture/#object-equality-in-hot-paths) for details on this architectural choice.
 
 ### The Search Process
 

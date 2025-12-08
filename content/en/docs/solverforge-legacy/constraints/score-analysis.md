@@ -2,6 +2,7 @@
 title: "Score Analysis"
 linkTitle: "Score Analysis"
 weight: 50
+tags: [reference, python]
 description: >
   Understand why a solution has its score.
 ---

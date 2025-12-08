@@ -2,6 +2,7 @@
 title: "Score Types"
 linkTitle: "Score Types"
 weight: 40
+tags: [reference, python]
 description: >
   Choose the right score type for your constraints.
 ---

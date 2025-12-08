@@ -2,6 +2,7 @@
 title: "SolutionManager"
 linkTitle: "SolutionManager"
 weight: 40
+tags: [reference, python]
 description: >
   Analyze and explain solutions with SolutionManager.
 ---

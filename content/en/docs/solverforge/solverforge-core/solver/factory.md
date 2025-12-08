@@ -2,10 +2,9 @@
 title: "Solver Factory"
 linkTitle: "Factory"
 weight: 20
+tags: [reference, rust]
 description: "Create and run solvers with SolverFactory and Solver"
 ---
-
-# Solver Factory
 
 The solver is executed via HTTP requests to the solver service.
 

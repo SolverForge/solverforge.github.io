@@ -2,6 +2,7 @@
 title: "Quickstart"
 linkTitle: "Quickstart"
 weight: 20
+tags: [quickstart, rust]
 description: "Build and run your first constraint solver"
 aliases:
   - /docs/solverforge/quickstart/

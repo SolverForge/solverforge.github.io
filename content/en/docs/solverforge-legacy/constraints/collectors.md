@@ -2,6 +2,7 @@
 title: "Collectors"
 linkTitle: "Collectors"
 weight: 30
+tags: [reference, python]
 description: >
   Aggregate data in constraint streams using collectors.
 ---

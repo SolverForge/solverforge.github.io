@@ -2,6 +2,7 @@
 title: "Move Selectors"
 linkTitle: "Move Selectors"
 weight: 40
+tags: [concepts, python]
 description: >
   Reference for move types available in local search.
 ---

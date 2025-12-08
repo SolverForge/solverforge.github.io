@@ -2,6 +2,7 @@
 title: "Reference"
 linkTitle: "Reference"
 weight: 100
+tags: [reference, python]
 description: >
   API reference and frequently asked questions.
 ---

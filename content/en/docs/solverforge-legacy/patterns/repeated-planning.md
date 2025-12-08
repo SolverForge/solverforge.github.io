@@ -2,6 +2,7 @@
 title: "Repeated Planning"
 linkTitle: "Repeated Planning"
 weight: 30
+tags: [concepts, python]
 description: >
   Batch optimization and periodic replanning.
 ---

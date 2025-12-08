@@ -2,10 +2,9 @@
 title: "Collectors"
 linkTitle: "Collectors"
 weight: 30
+tags: [reference, rust]
 description: "Aggregate values with count, sum, average, min, max, toList, toSet, and loadBalance"
 ---
-
-# Collectors
 
 Collectors aggregate values during `group_by` operations.
 

@@ -2,6 +2,7 @@
 title: "Integration"
 linkTitle: "Integration"
 weight: 90
+tags: [reference, python]
 description: >
   Integrate SolverForge with web frameworks and other systems.
 ---

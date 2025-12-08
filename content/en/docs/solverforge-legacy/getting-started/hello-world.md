@@ -2,6 +2,7 @@
 title: "Hello World"
 linkTitle: "Hello World"
 weight: 20
+tags: [quickstart, python]
 description: >
   Build a school timetabling solver from scratch.
 ---

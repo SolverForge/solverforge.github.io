@@ -2,6 +2,7 @@
 title: "Getting Started"
 linkTitle: "Getting Started"
 weight: 20
+tags: [quickstart, python]
 description: >
   Install SolverForge and solve your first planning problem.
 ---

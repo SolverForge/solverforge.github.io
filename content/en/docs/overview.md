@@ -2,6 +2,7 @@
 title: Overview
 description: What SolverForge is, how it differs from mathematical solvers, and the project roadmap.
 weight: 1
+tags: [concepts]
 ---
 
 # What is SolverForge?
@@ -10,16 +11,31 @@ SolverForge is a **constraint satisfaction solver** for real-world planning and 
 
 ## What Problems Does It Solve?
 
-SolverForge excels at **combinatorial planning problems** where you need to:
+SolverForge excels at **combinatorial planning problems** — problems where a brute-force search is impossible (millions to billions of possibilities), but a good solution dramatically improves efficiency.
 
-- **Employee Scheduling** — Assign staff to shifts based on skills, availability, and labor regulations
-- **Vehicle Routing** — Plan delivery routes that minimize travel time while meeting time windows
-- **School Timetabling** — Schedule lessons to rooms and timeslots without conflicts
-- **Task Assignment** — Allocate jobs to workers or machines optimally
-- **Meeting Scheduling** — Find times and rooms that work for all attendees
-- **Bin Packing** — Fit items into containers efficiently
+{{< cardpane >}}
+{{< card header="**Employee Scheduling**" >}}
+Assign staff to shifts based on skills, availability, and labor regulations.
+{{< /card >}}
+{{< card header="**Vehicle Routing**" >}}
+Plan delivery routes that minimize travel time while meeting time windows.
+{{< /card >}}
+{{< card header="**School Timetabling**" >}}
+Schedule lessons to rooms and timeslots without conflicts.
+{{< /card >}}
+{{< /cardpane >}}
 
-These are problems where a brute-force search is impossible (millions to billions of possibilities), but a good solution dramatically improves efficiency.
+{{< cardpane >}}
+{{< card header="**Task Assignment**" >}}
+Allocate jobs to workers or machines optimally.
+{{< /card >}}
+{{< card header="**Meeting Scheduling**" >}}
+Find times and rooms that work for all attendees.
+{{< /card >}}
+{{< card header="**Bin Packing**" >}}
+Fit items into containers efficiently.
+{{< /card >}}
+{{< /cardpane >}}
 
 ## How Is This Different from Gurobi or CVXPY?
 
@@ -35,15 +51,8 @@ This is a common question. **SolverForge and mathematical programming solvers (G
 
 ### A Concrete Example
 
-**Mathematical programming (Gurobi/CVXPY):**
-```python
-# You must translate your problem into mathematical form
-x = model.addVars(employees, shifts, vtype=GRB.BINARY)
-model.addConstrs(sum(x[e,s] for e in employees) == 1 for s in shifts)
-model.addConstrs(sum(x[e,s] for s in shifts) <= max_shifts for e in employees)
-```
-
-**Constraint satisfaction (SolverForge):**
+{{< tabpane text=true >}}
+{{% tab header="SolverForge" %}}
 ```python
 # You describe rules about your business objects directly
 @constraint_provider
@@ -57,6 +66,16 @@ def define_constraints(factory):
             .penalize("Missing skill", HardSoftScore.ONE_HARD),
     ]
 ```
+{{% /tab %}}
+{{% tab header="Gurobi/CVXPY" %}}
+```python
+# You must translate your problem into mathematical form
+x = model.addVars(employees, shifts, vtype=GRB.BINARY)
+model.addConstrs(sum(x[e,s] for e in employees) == 1 for s in shifts)
+model.addConstrs(sum(x[e,s] for s in shifts) <= max_shifts for e in employees)
+```
+{{% /tab %}}
+{{< /tabpane >}}
 
 **The key difference:** With SolverForge, you work with domain objects (`Shift`, `Employee`) and express constraints as natural business rules. You don't need to reformulate your problem as a system of linear equations.
 
@@ -115,7 +134,7 @@ SolverForge is under active development. The Python API shown above works today 
 | **solverforge-core** | ✅ Complete | High-performance Rust backend — foundation complete, not yet user-facing |
 | **Python bindings** | 🚧 In progress | PyO3-based bindings to the fast Rust core — coming Q1-Q2 2026 |
 
-**Want to try it today?** Start with the [Python quickstarts](/docs/getting-started/hello-world/) using `solverforge-legacy`.
+**Want to try it today?** Start with the [Python quickstarts](/docs/getting-started/) using `solverforge-legacy`.
 
 ## Roadmap
 
@@ -143,7 +162,7 @@ Making the fast Rust core available to Python developers:
 
 ## How You Can Help
 
-- **Try the quickstarts** — [Build your first solver](/docs/getting-started/hello-world/) and share feedback
+- **Try the quickstarts** — [Try a quickstart](/docs/getting-started/) and share feedback
 - **Report issues** — Found a bug or have a suggestion? [Open an issue](https://github.com/solverforge/solverforge/issues)
 - **Contribute** — We're actively developing Python bindings. PRs welcome!
 - **Spread the word** — Star the [GitHub repo](https://github.com/solverforge/solverforge) and share with colleagues

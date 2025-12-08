@@ -3,9 +3,11 @@ title: "School Timetabling"
 linkTitle: "School Timetabling"
 icon: fa-brands fa-python
 date: 2025-11-26
+weight: 40
+draft: true
 description: "A comprehensive quickstart guide to understanding and building intelligent school timetabling with SolverForge"
-categories: [Examples]
-tags: [scheduling, optimization, timetabling, tutorial]
+categories: [Quickstarts]
+tags: [quickstart, python]
 ---
 
 {{% pageinfo %}}

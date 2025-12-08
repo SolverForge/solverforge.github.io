@@ -2,10 +2,9 @@
 title: "API Quick Reference"
 linkTitle: "Quick Reference"
 weight: 10
+tags: [reference, rust]
 description: "Cheat sheet for common SolverForge APIs"
 ---
-
-# API Quick Reference
 
 ## Domain Model
 

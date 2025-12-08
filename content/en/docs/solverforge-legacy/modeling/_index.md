@@ -2,6 +2,7 @@
 title: "Domain Modeling"
 linkTitle: "Modeling"
 weight: 30
+tags: [concepts, python]
 description: >
   Model your planning problem with entities, variables, and solutions.
 ---

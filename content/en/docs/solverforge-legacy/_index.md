@@ -3,6 +3,7 @@ title: "SolverForge (Legacy)"
 linkTitle: "Python Solver"
 icon: fa-brands fa-python
 weight: 100
+tags: [python]
 description: >
   Technical documentation for SolverForge Legacy — the pure Python constraint solver using the Timefold backend.
 ---
@@ -64,5 +65,5 @@ class Timetable:
 
 ## Next Steps
 
-- Follow the [Hello World Quickstarts](/docs/getting-started/hello-world/) to solve your first planning problem
+- Follow the [Getting Started guides](/docs/getting-started/) to solve your first planning problem
 - Learn about [Planning AI concepts](concepts/what-is-planning.md)

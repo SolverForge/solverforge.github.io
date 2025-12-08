@@ -3,9 +3,11 @@ title: "Meeting Scheduling"
 linkTitle: "Meeting Scheduling"
 icon: fa-brands fa-python
 date: 2025-11-26
+weight: 20
+draft: true
 description: "A comprehensive quickstart guide to understanding and building intelligent meeting scheduling with SolverForge"
-categories: [Examples]
-tags: [scheduling, optimization, meetings, calendar, tutorial]
+categories: [Quickstarts]
+tags: [quickstart, python]
 ---
 
 {{% pageinfo %}}
@@ -45,7 +47,9 @@ This guide walks you through a complete meeting scheduling application built wit
 
 **No optimization background required** — we'll explain concepts as we encounter them in the code.
 
-> **Architecture Note:** This implementation uses dataclass domain models for optimal solver performance. See [benchmark results](/blog/news/python-constraint-solver-architecture/#results-meeting-scheduling) showing this approach completes 60/60 optimization iterations while Pydantic-based alternatives complete only 46-58. Note: benchmarks were run on small test problems; JPype bridge overhead may increase at larger scales.
+{{% alert title="Architecture Note" %}}
+This implementation uses dataclass domain models for optimal solver performance. See [benchmark results](/blog/technical/python-constraint-solver-architecture/#results-meeting-scheduling) showing this approach completes 60/60 optimization iterations while Pydantic-based alternatives complete only 46-58. Note: benchmarks were run on small test problems; JPype bridge overhead may increase at larger scales.
+{{% /alert %}}
 
 ### Prerequisites
 
@@ -317,7 +321,7 @@ class MeetingAssignment:
 
 **Optimization concept:** Unlike employee scheduling (one variable: which employee) or vehicle routing (one list variable: which visits), this problem has **two independent planning variables** per entity. The solver must simultaneously decide both time and room.
 
-**Why multiple planning variables matter:** Having two planning variables (time and room) per entity creates a larger search space but more flexibility. The dataclass-based domain model enables efficient evaluation of variable combinations. For architectural details on why dataclasses outperform Pydantic in constraint evaluation, see [Dataclasses vs Pydantic in Constraint Solvers](/blog/news/python-constraint-solver-architecture/).
+**Why multiple planning variables matter:** Having two planning variables (time and room) per entity creates a larger search space but more flexibility. The dataclass-based domain model enables efficient evaluation of variable combinations. For architectural details on why dataclasses outperform Pydantic in constraint evaluation, see [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/python-constraint-solver-architecture/).
 
 **Important methods:**
 

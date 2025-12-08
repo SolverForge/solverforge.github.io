@@ -2,6 +2,7 @@
 title: "Benchmarking"
 linkTitle: "Benchmarking"
 weight: 50
+tags: [reference, python]
 description: >
   Compare solver configurations and tune performance.
 ---

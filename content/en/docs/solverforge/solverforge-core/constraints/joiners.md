@@ -2,10 +2,9 @@
 title: "Joiners"
 linkTitle: "Joiners"
 weight: 20
+tags: [reference, rust]
 description: "Efficiently match entities with equal, lessThan, overlapping, and filtering joiners"
 ---
-
-# Joiners
 
 Joiners define how entities are matched in join operations. They enable indexed lookups instead of O(n*m) scans.
 

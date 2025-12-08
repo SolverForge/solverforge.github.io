@@ -2,10 +2,9 @@
 title: "Expressions"
 linkTitle: "Expressions"
 weight: 10
+tags: [reference, rust]
 description: "Build predicate expressions with the Expression API"
 ---
-
-# Expressions
 
 The `Expression` enum represents predicate logic as an abstract syntax tree. Use the `Expr` helper for fluent construction.
 

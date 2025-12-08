@@ -2,6 +2,7 @@
 title: "SolverForge Core"
 linkTitle: "Core Library"
 weight: 10
+tags: [rust]
 description: "Complete reference documentation for the solverforge-core Rust library"
 ---
 
@@ -47,14 +48,12 @@ SolverForge is a Rust library for solving constraint satisfaction and optimizati
 
 ## Getting Started
 
-- [Installation](getting-started/installation/) - Add SolverForge to your project
-- [Quickstart](getting-started/quickstart/) - Build your first constraint solver
+For user-facing quickstarts, see the [Getting Started guides](/docs/getting-started/), including the [Rust Quickstart](/docs/getting-started/rust-quickstart/) which demonstrates using the core library directly.
 
 ## Documentation Sections
 
 | Section | Description |
 |---------|-------------|
-| [Getting Started](getting-started/) | Installation and first steps |
 | [Concepts](concepts/) | Architecture and core concepts |
 | [Modeling](modeling/) | Define planning domains |
 | [Constraints](constraints/) | Build constraint streams |

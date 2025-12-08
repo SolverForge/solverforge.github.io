@@ -2,10 +2,9 @@
 title: "Constraint Streams"
 linkTitle: "Streams"
 weight: 10
+tags: [reference, rust]
 description: "Build constraints with forEach, filter, join, groupBy, and more"
 ---
-
-# Constraint Streams
 
 Constraint streams are pipelines of operations that select, filter, and score entities.
 

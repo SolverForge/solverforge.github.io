@@ -2,6 +2,7 @@
 title: "Constraints"
 linkTitle: "Constraints"
 weight: 40
+tags: [reference, python]
 description: >
   Define constraints using the fluent Constraint Streams API.
 ---

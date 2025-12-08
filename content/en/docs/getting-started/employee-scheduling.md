@@ -3,9 +3,10 @@ title: "Employee Scheduling"
 linkTitle: "Employee Scheduling"
 icon: fa-brands fa-python
 date: 2025-11-21
+weight: 10
 description: "A comprehensive quickstart guide to understanding and building intelligent employee scheduling with SolverForge"
-categories: [Examples]
-tags: [scheduling, optimization, tutorial]
+categories: [Quickstarts]
+tags: [quickstart, python]
 ---
 
 {{% pageinfo %}}

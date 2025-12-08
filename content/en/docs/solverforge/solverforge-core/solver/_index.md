@@ -2,10 +2,9 @@
 title: "Solver"
 linkTitle: "Solver"
 weight: 50
+tags: [reference, rust]
 description: "Configure and run the constraint solver"
 ---
-
-# Solver
 
 This section covers solver configuration and execution.
 

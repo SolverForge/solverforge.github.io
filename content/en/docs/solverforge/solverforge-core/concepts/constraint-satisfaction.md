@@ -2,10 +2,9 @@
 title: "Constraint Satisfaction"
 linkTitle: "Constraint Satisfaction"
 weight: 20
+tags: [concepts, rust]
 description: "Core concepts of constraint satisfaction and optimization problems"
 ---
-
-# Constraint Satisfaction
 
 SolverForge solves constraint satisfaction and optimization problems (CSPs). This page explains the core concepts.
 

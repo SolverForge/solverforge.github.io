@@ -2,10 +2,9 @@
 title: "Architecture"
 linkTitle: "Architecture"
 weight: 10
+tags: [concepts, rust]
 description: "How SolverForge uses WASM and HTTP to solve constraints"
 ---
-
-# Architecture
 
 SolverForge uses a layered architecture that separates constraint definition (Rust) from solving execution (Java/Timefold).
 

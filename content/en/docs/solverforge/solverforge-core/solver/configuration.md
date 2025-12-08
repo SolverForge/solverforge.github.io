@@ -2,10 +2,9 @@
 title: "Solver Configuration"
 linkTitle: "Configuration"
 weight: 10
+tags: [reference, rust]
 description: "Configure solver behavior with SolverConfig and TerminationConfig"
 ---
-
-# Solver Configuration
 
 Configure how the solver runs with `SolverConfig` and `TerminationConfig`.
 

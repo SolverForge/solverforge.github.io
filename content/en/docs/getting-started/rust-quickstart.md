@@ -3,10 +3,11 @@ title: "Rust Quickstart"
 linkTitle: "Rust Quickstart"
 icon: fa-brands fa-rust
 date: 2025-12-08
-weight: 1
+weight: 100
+draft: true
 description: "Build your first constraint solver with the SolverForge Rust core library"
-categories: [Examples]
-tags: [rust, optimization, tutorial, experimental]
+categories: [Quickstarts]
+tags: [quickstart, rust]
 ---
 
 {{% pageinfo color="warning" %}}

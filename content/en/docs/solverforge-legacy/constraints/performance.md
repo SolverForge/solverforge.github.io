@@ -2,6 +2,7 @@
 title: "Constraint Performance"
 linkTitle: "Performance"
 weight: 60
+tags: [reference, python]
 description: >
   Optimize constraint evaluation for faster solving.
 ---

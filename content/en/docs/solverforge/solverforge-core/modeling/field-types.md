@@ -2,10 +2,9 @@
 title: "Field Types"
 linkTitle: "Field Types"
 weight: 30
+tags: [concepts, rust]
 description: "Supported field types including primitives, objects, collections, and scores"
 ---
-
-# Field Types
 
 SolverForge supports various field types for domain modeling.
 

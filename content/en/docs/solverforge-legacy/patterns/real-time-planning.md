@@ -2,6 +2,7 @@
 title: "Real-Time Planning"
 linkTitle: "Real-Time Planning"
 weight: 10
+tags: [concepts, python]
 description: >
   Handle changes while the solver is running.
 ---
