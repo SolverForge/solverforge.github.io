@@ -73,17 +73,23 @@ Think of it like describing what puzzle pieces you have and what rules they must
    cd ./solverforge-quickstarts/fast/employee-scheduling-fast
    ```
 
-2. **Install dependencies:**
+2. **Create and activate virtual environment:**
    ```bash
-   pip install -r requirements.txt
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
    ```
 
-3. **Start the server:**
+3. **Install the package:**
    ```bash
-   python -m employee_scheduling.rest_api
+   pip install -e .
    ```
 
-4. **Open your browser:**
+4. **Start the server:**
+   ```bash
+   run-app
+   ```
+
+5. **Open your browser:**
    ```
    http://localhost:8080
    ```
@@ -93,22 +99,22 @@ You'll see a scheduling interface with employees, shifts and a "Solve" button. C
 ### File Structure Overview
 
 ```
-fast/employee_scheduling-fast/
-├── domain.py              # Data classes (Employee, Shift, Schedule)
-├── constraints.py         # Business rules (90% of customization happens here)
-├── solver.py              # Solver configuration
-├── demo_data.py           # Sample data generation
-├── rest_api.py            # HTTP API endpoints
-├── converters.py          # REST ↔ Domain model conversion
-└── json_serialization.py  # JSON helpers
-
-static/
-├── index.html             # Web UI
-└── app.js                 # UI logic and visualization
-
-tests/
-├── test_constraints.py    # Unit tests for constraints
-└── test_feasible.py       # Integration tests
+fast/employee-scheduling-fast/
+├── src/employee_scheduling/
+│   ├── domain.py              # Data classes (Employee, Shift, Schedule)
+│   ├── constraints.py         # Business rules (90% of customization happens here)
+│   ├── solver.py              # Solver configuration
+│   ├── demo_data.py           # Sample data generation
+│   ├── rest_api.py            # HTTP API endpoints
+│   ├── converters.py          # REST ↔ Domain model conversion
+│   ├── json_serialization.py  # JSON helpers
+│   └── score_analysis.py      # Score breakdown DTOs
+├── static/
+│   ├── index.html             # Web UI
+│   └── app.js                 # UI logic and visualization
+└── tests/
+    ├── test_constraints.py    # Unit tests for constraints
+    └── test_feasible.py       # Integration tests
 ```
 
 **Key insight:** Most business customization happens in `constraints.py` alone. You rarely need to modify other files.
@@ -127,7 +133,6 @@ You need to assign **employees** to **shifts** while satisfying rules like:
 - Employee needs 10 hours rest between shifts
 - Employee can't work more than one shift per day
 - Employee can't work on days they're unavailable
-- Employee can't work more than 12 shifts total
 
 **Soft constraints** (preferences to optimize):
 - Avoid scheduling on days the employee marked as "undesired"
@@ -302,7 +307,6 @@ def define_constraints(constraint_factory: ConstraintFactory):
         at_least_10_hours_between_two_shifts(constraint_factory),
         one_shift_per_day(constraint_factory),
         unavailable_employee(constraint_factory),
-        max_shifts_per_employee(constraint_factory),
         # Soft constraints
         undesired_day_for_employee(constraint_factory),
         desired_day_for_employee(constraint_factory),
@@ -326,21 +330,11 @@ def has_required_skill(self) -> bool:
 def is_overlapping_with_date(self, dt: date) -> bool:
     """Check if shift overlaps with a specific date."""
     return self.start.date() == dt or self.end.date() == dt
-
-def get_overlapping_duration_in_minutes(self, dt: date) -> int:
-    """Calculate how many minutes of a shift fall on a specific date."""
-    start_date_time = datetime.combine(dt, datetime.min.time())
-    end_date_time = datetime.combine(dt, datetime.max.time())
-
-    # Calculate overlap between date range and shift range
-    max_start_time = max(start_date_time, self.start)
-    min_end_time = min(end_date_time, self.end)
-
-    minutes = (min_end_time - max_start_time).total_seconds() / 60
-    return int(max(0, minutes))
 ```
 
-These methods encapsulate shift-related logic within the domain model, making constraints more readable and maintainable. They're particularly important for date-boundary calculations (e.g., a shift spanning midnight).
+These methods encapsulate shift-related logic within the domain model, making constraints more readable and maintainable.
+
+> **Implementation Note:** For datetime overlap calculations in constraint penalty lambdas, the codebase uses inline calculations with explicit `time(0, 0, 0)` and `time(23, 59, 59)` rather than calling domain methods. This avoids transpilation issues with `datetime.min.time()` and `datetime.max.time()` in the constraint stream API.
 
 ### Hard Constraint: Required Skill
 
@@ -469,6 +463,8 @@ def one_shift_per_day(constraint_factory: ConstraintFactory):
 **Business rule:** "Employees cannot work on days they marked as unavailable."
 
 ```python
+from datetime import time
+
 def unavailable_employee(constraint_factory: ConstraintFactory):
     return (
         constraint_factory.for_each(Shift)
@@ -477,10 +473,13 @@ def unavailable_employee(constraint_factory: ConstraintFactory):
             Joiners.equal(lambda shift: shift.employee, lambda employee: employee),
         )
         .flatten_last(lambda employee: employee.unavailable_dates)
-        .filter(lambda shift, unavailable_date: shift.is_overlapping_with_date(unavailable_date))
+        .filter(lambda shift, unavailable_date: is_overlapping_with_date(shift, unavailable_date))
         .penalize(
             HardSoftDecimalScore.ONE_HARD,
-            lambda shift, unavailable_date: shift.get_overlapping_duration_in_minutes(unavailable_date),
+            lambda shift, unavailable_date: int((
+                min(shift.end, datetime.combine(unavailable_date, time(23, 59, 59)))
+                - max(shift.start, datetime.combine(unavailable_date, time(0, 0, 0)))
+            ).total_seconds() / 60),
         )
         .as_constraint("Unavailable employee")
     )
@@ -491,9 +490,11 @@ def unavailable_employee(constraint_factory: ConstraintFactory):
 2. `.join(Employee, ...)`: Join with the assigned employee
 3. `.flatten_last(lambda employee: employee.unavailable_dates)`: Expand each employee's unavailable_dates set
 4. `.filter(...)`: Keep only when shift overlaps the unavailable date
-5. `.penalize(...)`: Penalize by overlapping duration in minutes
+5. `.penalize(...)`: Penalize by overlapping duration in minutes (calculated inline)
 
-**Optimization concept:** The `flatten_last` operation demonstrates **constraint streaming with collections**. We iterate over each date in the employee's unavailable set, creating (shift, date) pairs to check. The `shift.is_overlapping_with_date()` and `shift.get_overlapping_duration_in_minutes()` methods are defined on the Shift domain model class.
+**Optimization concept:** The `flatten_last` operation demonstrates **constraint streaming with collections**. We iterate over each date in the employee's unavailable set, creating (shift, date) pairs to check.
+
+> **Why inline calculation?** The penalty lambda uses explicit `time(0, 0, 0)` and `time(23, 59, 59)` rather than `datetime.min.time()` or calling domain methods. This is required because certain datetime methods don't transpile correctly to the constraint stream engine.
 
 ### Soft Constraint: Undesired Days
 
@@ -511,7 +512,10 @@ def undesired_day_for_employee(constraint_factory: ConstraintFactory):
         .filter(lambda shift, undesired_date: shift.is_overlapping_with_date(undesired_date))
         .penalize(
             HardSoftDecimalScore.ONE_SOFT,
-            lambda shift, undesired_date: shift.get_overlapping_duration_in_minutes(undesired_date),
+            lambda shift, undesired_date: int((
+                min(shift.end, datetime.combine(undesired_date, time(23, 59, 59)))
+                - max(shift.start, datetime.combine(undesired_date, time(0, 0, 0)))
+            ).total_seconds() / 60),
         )
         .as_constraint("Undesired day for employee")
     )
@@ -537,7 +541,10 @@ def desired_day_for_employee(constraint_factory: ConstraintFactory):
         .filter(lambda shift, desired_date: shift.is_overlapping_with_date(desired_date))
         .reward(
             HardSoftDecimalScore.ONE_SOFT,
-            lambda shift, desired_date: shift.get_overlapping_duration_in_minutes(desired_date),
+            lambda shift, desired_date: int((
+                min(shift.end, datetime.combine(desired_date, time(23, 59, 59)))
+                - max(shift.start, datetime.combine(desired_date, time(0, 0, 0)))
+            ).total_seconds() / 60),
         )
         .as_constraint("Desired day for employee")
     )
@@ -749,14 +756,65 @@ Check solving status and get current solution:
 }
 ```
 
+#### GET /schedules
+
+List all active job IDs:
+
+**Response:**
+```json
+["a1b2c3d4-e5f6-7890-abcd-ef1234567890", "b2c3d4e5-f6a7-8901-bcde-f23456789012"]
+```
+
+#### GET /schedules/{problem_id}/status
+
+Lightweight status check (score and solver status only):
+
+**Response:**
+```json
+{
+  "score": {
+    "hardScore": 0,
+    "softScore": -12
+  },
+  "solverStatus": "SOLVING_ACTIVE"
+}
+```
+
 #### DELETE /schedules/{problem_id}
 
 Stop solving early and return best solution found so far:
 
 ```python
 @app.delete("/schedules/{problem_id}")
-async def stop_solving(problem_id: str) -> None:
+async def stop_solving(problem_id: str) -> EmployeeScheduleModel:
     solver_manager.terminate_early(problem_id)
+    return await get_timetable(problem_id)
+```
+
+#### PUT /schedules/analyze
+
+Analyze a schedule without solving to understand constraint violations:
+
+**Request body:** Same format as demo-data response
+
+**Response:**
+```json
+{
+  "constraints": [
+    {
+      "name": "Required skill",
+      "weight": "1hard",
+      "score": "-2hard",
+      "matches": [
+        {
+          "name": "Required skill",
+          "score": "-1hard",
+          "justification": "Shift(id=5) assigned to Employee(Amy Cole)"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 ### Web UI Flow
@@ -780,15 +838,15 @@ The `static/app.js` implements this polling workflow:
 
 ## Making Your First Customization
 
-The quickstart includes a cardinality constraint that demonstrates a common pattern. Let's understand how it works and then learn how to create similar constraints.
+The quickstart includes an optional cardinality constraint that demonstrates a common pattern. Let's understand how it works and then learn how to create similar constraints.
 
 ### Understanding the Max Shifts Constraint
 
-The codebase includes `max_shifts_per_employee` which limits workload imbalance:
+The codebase includes `max_shifts_per_employee` which limits workload imbalance. This constraint is **disabled by default** (commented out in `define_constraints()`) but serves as a useful example:
 
 **Business rule:** "No employee can work more than 12 shifts in the schedule period."
 
-This is a **hard constraint** (must be satisfied).
+This is a **hard constraint** (must be satisfied when enabled).
 
 ### The Constraint Implementation
 
@@ -827,7 +885,7 @@ def max_shifts_per_employee(constraint_factory: ConstraintFactory):
 
 ### How It's Registered
 
-The constraint is registered in `define_constraints()` along with the other constraints:
+To enable this constraint, uncomment it in `define_constraints()`:
 
 ```python
 @constraint_provider
@@ -839,7 +897,7 @@ def define_constraints(constraint_factory: ConstraintFactory):
         at_least_10_hours_between_two_shifts(constraint_factory),
         one_shift_per_day(constraint_factory),
         unavailable_employee(constraint_factory),
-        max_shifts_per_employee(constraint_factory),  # ← Cardinality constraint
+        # max_shifts_per_employee(constraint_factory),  # ← Uncomment to enable
         # Soft constraints
         undesired_day_for_employee(constraint_factory),
         desired_day_for_employee(constraint_factory),
@@ -849,12 +907,13 @@ def define_constraints(constraint_factory: ConstraintFactory):
 
 ### Experimenting With It
 
-Try modifying the constraint to see its effect:
+Try enabling and modifying the constraint to see its effect:
 
-1. Change the limit from 12 to 8 in `constraints.py`
-2. Restart the server: `python -m employee_scheduling.rest_api`
-3. Load demo data and click "Solve"
-4. Observe how the constraint affects the solution
+1. Uncomment `max_shifts_per_employee(constraint_factory),` in `constraints.py`
+2. Change the limit from 12 to 8 if desired
+3. Restart the server: `python -m employee_scheduling.rest_api`
+4. Load demo data and click "Solve"
+5. Observe how the constraint affects the solution
 
 **Note:** A very low limit (e.g., 5) will make the problem infeasible.
 
