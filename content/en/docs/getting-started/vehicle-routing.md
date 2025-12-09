@@ -2,9 +2,8 @@
 title: "Vehicle Routing"
 linkTitle: "Vehicle Routing"
 icon: fa-brands fa-python
-date: 2025-11-26
+date: 2025-12-09
 weight: 30
-draft: true
 description: "A comprehensive quickstart guide to understanding and building intelligent vehicle routing with SolverForge"
 categories: [Quickstarts]
 tags: [quickstart, python]
