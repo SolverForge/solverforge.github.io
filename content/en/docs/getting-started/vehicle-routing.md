@@ -84,7 +84,7 @@ These features give you more control over the performance/memory tradeoff during
 
 1. **Navigate to the project directory:**
    ```bash
-   cd /srv/lab/dev/solverforge/solverforge-quickstarts/fast/vehicle-routing-fast
+   cd solverforge-quickstarts/fast/vehicle-routing-fast
    ```
 
 2. **Create and activate virtual environment:**
