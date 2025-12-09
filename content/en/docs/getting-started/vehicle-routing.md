@@ -71,7 +71,6 @@ This implementation includes several enhancements over the standard Timefold qui
 
 | Feature | Benefit |
 |---------|---------|
-| **Distance calculation mode selector** | Choose between on-demand Haversine (memory-efficient) or pre-computed matrix (faster solving) directly from the UI |
 | **Adaptive time windows** | Time windows dynamically scale based on problem area and visit count, ensuring feasible solutions |
 | **Haversine formula** | Realistic great-circle distances without external API dependencies |
 
@@ -185,65 +184,22 @@ class Location:
 
     def driving_time_to(self, other: "Location") -> int:
         """
-        Get driving time in seconds to another location.
-
-        If a pre-computed matrix is available, uses O(1) lookup.
-        Otherwise, calculates on-demand using Haversine formula.
+        Get driving time in seconds to another location using Haversine formula.
         """
-        # Check pre-computed matrix first
-        key = _get_matrix_key(self, other)
-        if key in _DRIVING_TIME_MATRIX:
-            return _DRIVING_TIME_MATRIX[key]
-
-        # Fall back to on-demand Haversine calculation
         return self._calculate_driving_time_haversine(other)
 ```
 
 **What it represents:** A geographic coordinate (latitude/longitude).
 
 **Key method:**
-- `driving_time_to()`: Gets driving time using either:
-  1. **Pre-computed matrix lookup** (O(1)) — if matrix is initialized
-  2. **On-demand Haversine calculation** — fallback for flexibility
-
-#### Distance Calculation Modes
-
-SolverForge offers two distance calculation strategies, selectable from the UI:
-
-| Mode | Memory | Speed | Best For |
-|------|--------|-------|----------|
-| **On-demand** | O(1) | Moderate | Development, small problems, memory-constrained |
-| **Pre-computed** | O(n²) | Fast | Production, large problems, performance-critical |
-
-**On-demand mode** (default):
-- Calculates Haversine distance on each `driving_time_to()` call
-- Zero memory overhead for distance storage
-- Good for development and testing
-
-**Pre-computed mode**:
-- Builds distance matrix once before solving: `init_driving_time_matrix(all_locations)`
-- All subsequent lookups are O(1) dictionary access
-- For FIRENZE (77 visits + 6 depots = 83 locations): only 6,889 entries (~55 KB)
-- Significantly faster solving due to millions of distance lookups per solve
-
-```python
-# Pre-compute distances for all locations
-from vehicle_routing.domain import init_driving_time_matrix, clear_driving_time_matrix
-
-all_locations = [v.home_location for v in vehicles] + [v.location for v in visits]
-init_driving_time_matrix(all_locations)  # O(n²) one-time cost
-
-# ... solve ...
-
-clear_driving_time_matrix()  # Clean up when done
-```
+- `driving_time_to()`: Calculates driving time using the Haversine formula
 
 **Haversine formula details:**
 - Accounts for Earth's curvature using great-circle distance
 - Assumes 50 km/h average driving speed
 - Example: Philadelphia to New York (~130 km) → ~9,400 seconds (~2.6 hours)
 
-**Optimization concept:** The Haversine formula provides realistic geographic distances without external API dependencies. For production with real road networks, you can replace the distance calculation with a pre-loaded matrix from a routing API (Google Maps, OSRM, etc.) — the solver doesn't care how distances are calculated, only that they're fast to retrieve.
+**Optimization concept:** The Haversine formula provides realistic geographic distances without external API dependencies. For production with real road networks, you can replace the distance calculation with a routing API (Google Maps, OSRM, etc.).
 
 ### The Visit Class (Planning Entity)
 
@@ -777,13 +733,10 @@ Returns a specific demo dataset:
 
 **Parameters:**
 - `demo_name`: Name of the demo dataset (PHILADELPHIA, HARTFORT, FIRENZE)
-- `distanceMode` (query, optional): Distance calculation mode
-  - `ON_DEMAND` (default): Calculate distances using Haversine formula on each call
-  - `PRECOMPUTED`: Pre-compute distance matrix for O(1) lookups (faster solving)
 
 **Request:**
 ```
-GET /demo-data/PHILADELPHIA?distanceMode=PRECOMPUTED
+GET /demo-data/PHILADELPHIA
 ```
 
 **Response:**
@@ -1591,11 +1544,9 @@ pytest tests/test_feasible.py -v
    - Click "Stop" after 10 seconds
    - Verify you get a partial solution (may be infeasible)
 
-8. **Test distance calculation modes:**
-   - Use the calculator dropdown (header) to switch to "Pre-computed matrix"
-   - Load FIRENZE dataset again
-   - Solve and compare performance with on-demand mode
-   - Pre-computed mode should solve faster (O(1) lookups vs repeated Haversine calculations)
+8. **Test with different datasets:**
+   - Try PHILADELPHIA (55 visits), HARTFORT (50 visits), and FIRENZE (77 visits)
+   - Larger datasets take longer to solve but demonstrate scalability
 
 ---
 
@@ -1646,52 +1597,22 @@ def good_constraint(constraint_factory: ConstraintFactory):
 
 SolverForge includes a **built-in distance mode selector** — no custom code required. Choose between:
 
-| Mode | When to Use |
-|------|-------------|
-| **On-demand** (default) | Development, small problems (< 50 locations), memory-constrained |
-| **Pre-computed** | Production, large problems, performance-critical deployments |
-
-**From the UI:** Use the calculator dropdown in the header to switch modes.
-
-**Programmatically:**
-
-```python
-from vehicle_routing.domain import init_driving_time_matrix, clear_driving_time_matrix
-from vehicle_routing.demo_data import generate_demo_data, DemoData
-
-# Option 1: Generate demo data with pre-computed matrix
-plan = generate_demo_data(DemoData.PHILADELPHIA, use_precomputed_matrix=True)
-
-# Option 2: Initialize matrix manually for custom data
-all_locations = [v.home_location for v in vehicles] + [v.location for v in visits]
-init_driving_time_matrix(all_locations)  # Pre-computes n² driving times
-
-# To switch back to on-demand
-clear_driving_time_matrix()
-```
-
-**Why this matters:**
-
-The solver evaluates distances **millions of times** during optimization. With 77 locations (FIRENZE dataset), pre-computing stores only 5,929 entries but eliminates repeated trigonometric calculations.
+This quickstart uses the Haversine formula for distance calculations, which provides realistic great-circle distances without external dependencies.
 
 ### Real Road Network Data
 
-For production deployments requiring actual road distances (not straight-line approximations), pre-compute using a routing API **before** solving:
+For production deployments requiring actual road distances (not straight-line approximations), you can replace the distance calculation in `Location.driving_time_to()` with a pre-computed matrix from a routing API:
 
 ```python
 def build_real_distance_matrix(locations):
-    """Fetch actual driving times from routing API (run once)."""
+    """Fetch actual driving times from routing API (run once, before solving)."""
     matrix = {}
     for loc1 in locations:
         for loc2 in locations:
             if loc1 != loc2:
                 # Call Google Maps / Mapbox / OSRM once per pair
-                matrix[(loc1.lat, loc1.lng, loc2.lat, loc2.lng)] = call_routing_api(loc1, loc2)
+                matrix[(loc1, loc2)] = call_routing_api(loc1, loc2)
     return matrix
-
-# Then inject into SolverForge's matrix
-from vehicle_routing.domain import _DRIVING_TIME_MATRIX
-_DRIVING_TIME_MATRIX.update(build_real_distance_matrix(all_locations))
 ```
 
 **Never** call external APIs during solving — pre-compute everything.
