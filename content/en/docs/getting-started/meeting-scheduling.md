@@ -967,34 +967,72 @@ The choice depends on your organization's room utilization patterns.
 
 **Business rule:** "Encourage attendees to stay in the same room for nearby meetings."
 
+This constraint handles **both required and preferred attendees** using `concat()` to combine both attendance types into a single stream:
+
 ```python
 def room_stability(constraint_factory: ConstraintFactory):
+    """
+    Soft constraint: Encourages room stability for people attending multiple meetings.
+
+    Penalizes when a person attends meetings in different rooms that are close in time,
+    encouraging room stability. This handles both required and preferred attendees by
+    creating separate constraint streams that are combined.
+
+    Since Python doesn't have a common Attendance base class for RequiredAttendance
+    and PreferredAttendance, we use concat() to combine both attendance types into
+    a single stream.
+    """
+    # Create a stream that combines both required and preferred attendances
     return (
-        constraint_factory.for_each(MeetingAssignment)
-        .join(
-            RequiredAttendance,
-            Joiners.equal(
-                lambda meeting_assignment: meeting_assignment.meeting,
-                lambda attendance: attendance.meeting
-            )
+        constraint_factory.for_each(RequiredAttendance)
+        .map(lambda ra: (ra.person, ra.meeting_id))
+        .concat(
+            constraint_factory.for_each(PreferredAttendance)
+            .map(lambda pa: (pa.person, pa.meeting_id))
         )
         .join(
-            RequiredAttendance,
+            constraint_factory.for_each(RequiredAttendance)
+            .map(lambda ra: (ra.person, ra.meeting_id))
+            .concat(
+                constraint_factory.for_each(PreferredAttendance)
+                .map(lambda pa: (pa.person, pa.meeting_id))
+            ),
             Joiners.equal(
-                lambda attendance, attendance2: attendance.person,
-                lambda attendance2: attendance2.person
+                lambda left: left[0],  # person
+                lambda right: right[0],  # person
+            ),
+            Joiners.filtering(
+                lambda left, right: left[1] != right[1]  # different meeting_id
+            ),
+        )
+        .join(
+            MeetingAssignment,
+            Joiners.equal(
+                lambda left, right: left[1],  # left.meeting_id
+                lambda assignment: assignment.meeting.id,
+            ),
+        )
+        .join(
+            MeetingAssignment,
+            Joiners.equal(
+                lambda left, right, left_assignment: right[1],  # right.meeting_id
+                lambda assignment: assignment.meeting.id,
             ),
             Joiners.less_than(
-                lambda meeting_assignment, attendance: meeting_assignment.id,
-                lambda attendance: attendance.meeting.meeting_assignment.id
-            )
-        )
-        .filter(
-            lambda meeting1, attendance1, attendance2:
-                meeting1.room != attendance2.meeting.meeting_assignment.room and
-                abs(meeting1.starting_time_grain.grain_index - 
-                    attendance2.meeting.meeting_assignment.starting_time_grain.grain_index)
-                <= 2  # Within 2 time grains (30 minutes)
+                lambda left, right, left_assignment: left_assignment.get_grain_index(),
+                lambda assignment: assignment.get_grain_index(),
+            ),
+            Joiners.filtering(
+                lambda left, right, left_assignment, right_assignment:
+                    left_assignment.room != right_assignment.room
+            ),
+            Joiners.filtering(
+                lambda left, right, left_assignment, right_assignment:
+                    right_assignment.get_grain_index()
+                    - left_assignment.meeting.duration_in_grains
+                    - left_assignment.get_grain_index()
+                    <= 2
+            ),
         )
         .penalize(HardMediumSoftScore.ONE_SOFT)
         .as_constraint("Room stability")
@@ -1002,24 +1040,29 @@ def room_stability(constraint_factory: ConstraintFactory):
 ```
 
 **How to read this:**
-1. `for_each(MeetingAssignment)`: All meetings
-2. `.join(RequiredAttendance, ...)`: Get required attendances for this meeting
-3. `.join(RequiredAttendance, ...)`: Get other meetings the same person attends
-4. `.filter(...)`: Keep pairs in different rooms and close in time
-5. `.penalize(ONE_SOFT)`: Simple penalty for room switches
+1. Create a combined stream of `(person, meeting_id)` tuples from both `RequiredAttendance` and `PreferredAttendance` using `concat()`
+2. Self-join on same person, different meetings
+3. Join to `MeetingAssignment` to get time and room for left meeting
+4. Join to `MeetingAssignment` to get time and room for right meeting
+5. Filter: different rooms and close in time (within 2 grains gap)
+6. `.penalize(ONE_SOFT)`: Simple penalty for room switches
+
+**Why use `concat()`?**
+
+Python doesn't have a common base class for `RequiredAttendance` and `PreferredAttendance`. The `concat()` method combines two constraint streams into one, allowing us to treat both attendance types uniformly.
 
 **Example scenario:**
 
 Person "Carol Johnson":
-- Meeting A at 9:00 AM in Room A
-- Meeting B at 9:30 AM in Room B (different room, 30 minutes apart)
+- Required at Meeting A at 9:00 AM in Room A
+- Preferred at Meeting B at 9:30 AM in Room B (different room, close in time)
 - **Penalty: 1 soft point** (room switch)
 
 If Meeting B were also in Room A, no penalty.
 
-**Optimization concept:** This is a **locality constraint** — encouraging spatial proximity for temporally close activities. It reduces attendee movement.
+**Optimization concept:** This is a **locality constraint** — encouraging spatial proximity for temporally close activities. It reduces attendee movement for both required and preferred attendees.
 
-**Time threshold:** The `<= 2` filter means within 30 minutes (2 × 15-minute grains). Adjust this based on building size and walking times.
+**Time threshold:** The `<= 2` filter means within 2 time grains gap after the first meeting ends. Adjust this based on building size and walking times.
 
 ---
 
@@ -1215,6 +1258,15 @@ async def solve(schedule: MeetingScheduleModel) -> str:
 ```
 
 The solver runs in the background, continuously updating the best solution.
+
+#### GET /schedules
+
+List all active job IDs:
+
+**Response:**
+```json
+["a1b2c3d4-e5f6-7890-abcd-ef1234567890", "b2c3d4e5-f6a7-8901-bcde-f23456789012"]
+```
 
 #### GET /schedules/{schedule_id}
 

@@ -66,6 +66,18 @@ Traditional planning: Manually assign deliveries to drivers and plan routes usin
 
 Think of it like having an expert logistics planner who can evaluate millions of route combinations per second to find near-optimal solutions.
 
+### SolverForge Enhancements
+
+This implementation includes several enhancements over the standard Timefold quickstart:
+
+| Feature | Benefit |
+|---------|---------|
+| **Distance calculation mode selector** | Choose between on-demand Haversine (memory-efficient) or pre-computed matrix (faster solving) directly from the UI |
+| **Adaptive time windows** | Time windows dynamically scale based on problem area and visit count, ensuring feasible solutions |
+| **Haversine formula** | Realistic great-circle distances without external API dependencies |
+
+These features give you more control over the performance/memory tradeoff during development and production.
+
 ---
 
 ## Getting Started
@@ -165,25 +177,74 @@ Let's examine the core classes that model our routing problem. Open `src/vehicle
 class Location:
     latitude: float
     longitude: float
-    
-    def driving_time_to(self, other: 'Location') -> int:
-        """Calculate driving time in seconds using Euclidean distance."""
-        distance = math.sqrt(
-            (self.latitude - other.latitude) ** 2 +
-            (self.longitude - other.longitude) ** 2
-        )
-        return int(distance * 4000)
+
+    # Earth radius in meters
+    _EARTH_RADIUS_M = 6371000
+    _TWICE_EARTH_RADIUS_M = 2 * _EARTH_RADIUS_M
+    # Average driving speed assumption: 50 km/h
+    _AVERAGE_SPEED_KMPH = 50
+
+    def driving_time_to(self, other: "Location") -> int:
+        """
+        Get driving time in seconds to another location.
+
+        If a pre-computed matrix is available, uses O(1) lookup.
+        Otherwise, calculates on-demand using Haversine formula.
+        """
+        # Check pre-computed matrix first
+        key = _get_matrix_key(self, other)
+        if key in _DRIVING_TIME_MATRIX:
+            return _DRIVING_TIME_MATRIX[key]
+
+        # Fall back to on-demand Haversine calculation
+        return self._calculate_driving_time_haversine(other)
 ```
 
 **What it represents:** A geographic coordinate (latitude/longitude).
 
 **Key method:**
-- `driving_time_to()`: Calculates approximate travel time to another location
-  - Uses simplified Euclidean distance × 4000 for seconds
-  - Example: Distance from (0,0) to (3,4) = sqrt(9+16) = 5 units → 20,000 seconds
-  - Not actual road distances, but proportionally accurate for optimization
+- `driving_time_to()`: Gets driving time using either:
+  1. **Pre-computed matrix lookup** (O(1)) — if matrix is initialized
+  2. **On-demand Haversine calculation** — fallback for flexibility
 
-**Optimization concept:** The solver uses these distances to evaluate route quality. More accurate distance calculations (e.g., actual road networks) can be plugged in without changing the optimization logic.
+#### Distance Calculation Modes
+
+SolverForge offers two distance calculation strategies, selectable from the UI:
+
+| Mode | Memory | Speed | Best For |
+|------|--------|-------|----------|
+| **On-demand** | O(1) | Moderate | Development, small problems, memory-constrained |
+| **Pre-computed** | O(n²) | Fast | Production, large problems, performance-critical |
+
+**On-demand mode** (default):
+- Calculates Haversine distance on each `driving_time_to()` call
+- Zero memory overhead for distance storage
+- Good for development and testing
+
+**Pre-computed mode**:
+- Builds distance matrix once before solving: `init_driving_time_matrix(all_locations)`
+- All subsequent lookups are O(1) dictionary access
+- For FIRENZE (77 visits + 6 depots = 83 locations): only 6,889 entries (~55 KB)
+- Significantly faster solving due to millions of distance lookups per solve
+
+```python
+# Pre-compute distances for all locations
+from vehicle_routing.domain import init_driving_time_matrix, clear_driving_time_matrix
+
+all_locations = [v.home_location for v in vehicles] + [v.location for v in visits]
+init_driving_time_matrix(all_locations)  # O(n²) one-time cost
+
+# ... solve ...
+
+clear_driving_time_matrix()  # Clean up when done
+```
+
+**Haversine formula details:**
+- Accounts for Earth's curvature using great-circle distance
+- Assumes 50 km/h average driving speed
+- Example: Philadelphia to New York (~130 km) → ~9,400 seconds (~2.6 hours)
+
+**Optimization concept:** The Haversine formula provides realistic geographic distances without external API dependencies. For production with real road networks, you can replace the distance calculation with a pre-loaded matrix from a routing API (Google Maps, OSRM, etc.) — the solver doesn't care how distances are calculated, only that they're fast to retrieve.
 
 ### The Visit Class (Planning Entity)
 
@@ -268,7 +329,8 @@ These methods support constraint evaluation without duplicating logic.
 @planning_entity
 @dataclass
 class Vehicle:
-    id: str
+    id: Annotated[str, PlanningId]
+    name: str                                          # Vehicle name (e.g., "Alpha", "Bravo")
     capacity: int                                      # Maximum demand it can handle
     home_location: Location                            # Depot location
     departure_time: datetime                           # When vehicle leaves depot
@@ -278,6 +340,8 @@ class Vehicle:
 **What it represents:** A delivery vehicle that starts from a depot, visits customers, and returns.
 
 **Key fields:**
+- `id`: Unique identifier for the vehicle
+- `name`: Human-readable name (e.g., "Alpha", "Bravo" from phonetic alphabet)
 - `capacity`: Total demand the vehicle can carry (e.g., 100 packages, 1000 kg)
 - `home_location`: Depot where vehicle starts and ends its route
 - `departure_time`: When vehicle begins its route
@@ -452,7 +516,7 @@ def vehicle_capacity(constraint_factory: ConstraintFactory):
             HardSoftScore.ONE_HARD,
             lambda vehicle: vehicle.calculate_total_demand() - vehicle.capacity
         )
-        .as_constraint("Vehicle capacity")
+        .as_constraint("vehicleCapacity")
     )
 ```
 
@@ -492,7 +556,7 @@ def service_finished_after_max_end_time(constraint_factory: ConstraintFactory):
             HardSoftScore.ONE_HARD,
             lambda visit: visit.service_finished_delay_in_minutes()
         )
-        .as_constraint("Service finished after max end time")
+        .as_constraint("serviceFinishedAfterMaxEndTime")
     )
 ```
 
@@ -548,7 +612,7 @@ def minimize_travel_time(constraint_factory: ConstraintFactory):
             HardSoftScore.ONE_SOFT,
             lambda vehicle: vehicle.calculate_total_driving_time_seconds()
         )
-        .as_constraint("Minimize travel time")
+        .as_constraint("minimizeTravelTime")
     )
 ```
 
@@ -712,49 +776,61 @@ Each dataset uses real city coordinates with different problem sizes.
 
 Returns a specific demo dataset:
 
+**Parameters:**
+- `demo_name`: Name of the demo dataset (PHILADELPHIA, HARTFORT, FIRENZE)
+- `distanceMode` (query, optional): Distance calculation mode
+  - `ON_DEMAND` (default): Calculate distances using Haversine formula on each call
+  - `PRECOMPUTED`: Pre-compute distance matrix for O(1) lookups (faster solving)
+
 **Request:**
 ```
-GET /demo-data/PHILADELPHIA
+GET /demo-data/PHILADELPHIA?distanceMode=PRECOMPUTED
 ```
 
 **Response:**
 ```json
 {
-  "name": "PHILADELPHIA",
-  "southWestCorner": [39.7784, -76.8459],
-  "northEastCorner": [40.7831, -74.9376],
+  "name": "demo",
+  "southWestCorner": [39.7656, -76.8378],
+  "northEastCorner": [40.7764, -74.9301],
   "vehicles": [
     {
-      "id": "vehicle_0",
-      "capacity": 30,
+      "id": "0",
+      "name": "Alpha",
+      "capacity": 25,
       "homeLocation": [40.5154, -75.3721],
-      "departureTime": "2025-11-27T07:30:00",
-      "visits": []
+      "departureTime": "2025-12-10T06:00:00",
+      "visits": [],
+      "totalDemand": 0,
+      "totalDrivingTimeSeconds": 0
     }
   ],
   "visits": [
     {
       "id": "0",
-      "name": "Emma Rodriguez",
+      "name": "Amy Cole",
       "location": [40.7831, -74.9376],
       "demand": 1,
-      "minStartTime": "2025-11-27T08:00:00",
-      "maxEndTime": "2025-11-27T12:00:00",
-      "serviceDuration": 1200,
+      "minStartTime": "2025-12-10T17:00:00",
+      "maxEndTime": "2025-12-10T20:00:00",
+      "serviceDuration": 420,
       "vehicle": null,
       "arrivalTime": null
     }
   ],
   "score": null,
-  "solverStatus": "NOT_SOLVING"
+  "solverStatus": null,
+  "totalDrivingTimeSeconds": 0
 }
 ```
 
 **Field notes:**
 - Coordinates are `[latitude, longitude]` arrays
 - Times use ISO format strings
-- `serviceDuration` is in seconds (1200 = 20 minutes)
+- `serviceDuration` is in seconds (420 = 7 minutes)
 - Initially `vehicle` is null (unassigned) and `visits` lists are empty
+- Vehicles have names from the phonetic alphabet (Alpha, Bravo, Charlie, etc.)
+- Customer names are randomly generated from first/last name combinations
 
 **Demo datasets:**
 - **PHILADELPHIA**: 55 visits, 6 vehicles, moderate capacity (15-30)
@@ -833,17 +909,90 @@ GET /route-plans/a1b2c3d4-e5f6-7890-abcd-ef1234567890
 
 **Important:** The response updates in real-time as solving progresses. Clients should poll this endpoint (e.g., every 2 seconds) to show live progress.
 
+#### GET /route-plans
+
+List all active job IDs:
+
+**Response:**
+```json
+["a1b2c3d4-e5f6-7890-abcd-ef1234567890", "b2c3d4e5-f6a7-8901-bcde-f23456789012"]
+```
+
+#### GET /route-plans/{problem_id}/status
+
+Lightweight status check (score and solver status only):
+
+**Response:**
+```json
+{
+  "name": "PHILADELPHIA",
+  "score": "0hard/-45657soft",
+  "solverStatus": "SOLVING_ACTIVE"
+}
+```
+
 #### DELETE /route-plans/{problem_id}
 
 Terminate solving early:
 
 ```python
 @app.delete("/route-plans/{problem_id}")
-async def stop(problem_id: str) -> None:
+async def stop_solving(problem_id: str) -> VehicleRoutePlanModel:
     solver_manager.terminate_early(problem_id)
+    return plan_to_model(data_sets.get(problem_id))
 ```
 
 Returns the best solution found so far. Useful if the user is satisfied with current quality and doesn't want to wait for the full 30 seconds.
+
+#### POST /route-plans/recommendation
+
+Request recommendations for assigning a new visit to vehicles:
+
+**Request body:**
+```json
+{
+  "solution": { /* complete route plan */ },
+  "visitId": "new_visit_42"
+}
+```
+
+**Response:**
+```json
+[
+  {
+    "proposition": {
+      "vehicleId": "vehicle_2",
+      "index": 3
+    },
+    "scoreDiff": "0hard/-1234soft"
+  },
+  {
+    "proposition": {
+      "vehicleId": "vehicle_0",
+      "index": 5
+    },
+    "scoreDiff": "0hard/-2345soft"
+  }
+]
+```
+
+Returns up to 5 recommendations sorted by score impact. The first recommendation is the best option.
+
+#### POST /route-plans/recommendation/apply
+
+Apply a selected recommendation:
+
+**Request body:**
+```json
+{
+  "solution": { /* complete route plan */ },
+  "visitId": "new_visit_42",
+  "vehicleId": "vehicle_2",
+  "index": 3
+}
+```
+
+**Response:** Updated route plan with the visit inserted at the specified position.
 
 #### PUT /route-plans/analyze
 
@@ -1003,7 +1152,8 @@ For production use, make the limit configurable per vehicle:
 ```python
 @dataclass
 class Vehicle:
-    id: str
+    id: Annotated[str, PlanningId]
+    name: str
     capacity: int
     home_location: Location
     departure_time: datetime
@@ -1227,7 +1377,7 @@ Open `tests/test_constraints.py` to see examples:
 ```python
 from vehicle_routing.domain import Vehicle, Visit, Location, VehicleRoutePlan
 from vehicle_routing.constraints import define_constraints
-from solverforge_legacy.test import ConstraintVerifier
+from solverforge_legacy.solver.test import ConstraintVerifier
 
 # Create verifier with your constraints
 constraint_verifier = ConstraintVerifier.build(
@@ -1245,11 +1395,12 @@ def test_vehicle_capacity_unpenalized():
     """Capacity within limit should not penalize."""
     vehicle = Vehicle(
         id="v1",
+        name="Alpha",
         capacity=100,
         home_location=Location(0.0, 0.0),
         departure_time=datetime(2025, 11, 27, 8, 0)
     )
-    
+
     visit = Visit(
         id="visit1",
         name="Customer A",
@@ -1259,10 +1410,10 @@ def test_vehicle_capacity_unpenalized():
         max_end_time=datetime(2025, 11, 27, 18, 0),
         service_duration=timedelta(minutes=30)
     )
-    
+
     # Connect visit to vehicle (helper from tests)
     connect(vehicle, visit)
-    
+
     # Verify no penalty
     constraint_verifier.verify_that(vehicle_capacity) \
         .given(vehicle, visit) \
@@ -1270,13 +1421,13 @@ def test_vehicle_capacity_unpenalized():
 
 def test_vehicle_capacity_penalized():
     """Exceeding capacity should penalize by overage amount."""
-    vehicle = Vehicle(id="v1", capacity=100, ...)
-    
+    vehicle = Vehicle(id="v1", name="Alpha", capacity=100, ...)
+
     visit1 = Visit(id="v1", demand=80, ...)
     visit2 = Visit(id="v2", demand=40, ...)  # Total 120 > 100
-    
+
     connect(vehicle, visit1, visit2)
-    
+
     # Should penalize by 20 (overage amount)
     constraint_verifier.verify_that(vehicle_capacity) \
         .given(vehicle, visit1, visit2) \
@@ -1311,21 +1462,22 @@ def test_time_window_violation():
     """Finishing after deadline should penalize by delay minutes."""
     vehicle = Vehicle(
         id="v1",
+        name="Alpha",
         departure_time=datetime(2025, 11, 27, 7, 0),
         ...
     )
-    
+
     visit = Visit(
         id="visit1",
         max_end_time=datetime(2025, 11, 27, 12, 0),  # Noon deadline
         service_duration=timedelta(minutes=30),
         ...
     )
-    
+
     # Set arrival causing late finish
     visit.arrival_time = datetime(2025, 11, 27, 11, 45)  # Arrive 11:45
     # Service ends at 12:15 (30 min service) → 15 minutes late
-    
+
     constraint_verifier.verify_that(service_finished_after_max_end_time) \
         .given(visit) \
         .penalizes_by(15)
@@ -1440,6 +1592,12 @@ pytest tests/test_feasible.py -v
    - Click "Stop" after 10 seconds
    - Verify you get a partial solution (may be infeasible)
 
+8. **Test distance calculation modes:**
+   - Use the calculator dropdown (header) to switch to "Pre-computed matrix"
+   - Load FIRENZE dataset again
+   - Solve and compare performance with on-demand mode
+   - Pre-computed mode should solve faster (O(1) lookups vs repeated Haversine calculations)
+
 ---
 
 ## Production Considerations
@@ -1485,42 +1643,56 @@ def good_constraint(constraint_factory: ConstraintFactory):
 - **Avoid** loops and complex logic in lambda functions
 - **Use** efficient data structures (sets for membership, dicts for lookup)
 
-### Distance Calculation Accuracy
+### Distance Calculation: Built-in Performance Optimization
 
-The demo uses simplified Euclidean distance:
+SolverForge includes a **built-in distance mode selector** — no custom code required. Choose between:
+
+| Mode | When to Use |
+|------|-------------|
+| **On-demand** (default) | Development, small problems (< 50 locations), memory-constrained |
+| **Pre-computed** | Production, large problems, performance-critical deployments |
+
+**From the UI:** Use the calculator dropdown in the header to switch modes.
+
+**Programmatically:**
 
 ```python
-def driving_time_to(self, other: Location) -> int:
-    distance = math.sqrt(
-        (self.latitude - other.latitude) ** 2 +
-        (self.longitude - other.longitude) ** 2
-    )
-    return int(distance * 4000)
+from vehicle_routing.domain import init_driving_time_matrix, clear_driving_time_matrix
+from vehicle_routing.demo_data import generate_demo_data, DemoData
+
+# Option 1: Generate demo data with pre-computed matrix
+plan = generate_demo_data(DemoData.PHILADELPHIA, use_precomputed_matrix=True)
+
+# Option 2: Initialize matrix manually for custom data
+all_locations = [v.home_location for v in vehicles] + [v.location for v in visits]
+init_driving_time_matrix(all_locations)  # Pre-computes n² driving times
+
+# To switch back to on-demand
+clear_driving_time_matrix()
 ```
 
-**For production:**
+**Why this matters:**
 
-**Option 1: Pre-computed distance matrix**
+The solver evaluates distances **millions of times** during optimization. With 77 locations (FIRENZE dataset), pre-computing stores only 5,929 entries but eliminates repeated trigonometric calculations.
+
+### Real Road Network Data
+
+For production deployments requiring actual road distances (not straight-line approximations), pre-compute using a routing API **before** solving:
+
 ```python
-# Load once before solving
-distance_matrix = load_distance_matrix_from_file()
-
-class Location:
-    def driving_time_to(self, other: Location) -> int:
-        return distance_matrix[(self.id, other.id)]
-```
-
-**Option 2: Road network API (pre-compute)**
-```python
-# Compute all distances once before solving
-def build_distance_matrix(locations):
+def build_real_distance_matrix(locations):
+    """Fetch actual driving times from routing API (run once)."""
     matrix = {}
     for loc1 in locations:
         for loc2 in locations:
             if loc1 != loc2:
-                # Call Google Maps / Mapbox / OSRM once
-                matrix[(loc1.id, loc2.id)] = call_routing_api(loc1, loc2)
+                # Call Google Maps / Mapbox / OSRM once per pair
+                matrix[(loc1.lat, loc1.lng, loc2.lat, loc2.lng)] = call_routing_api(loc1, loc2)
     return matrix
+
+# Then inject into SolverForge's matrix
+from vehicle_routing.domain import _DRIVING_TIME_MATRIX
+_DRIVING_TIME_MATRIX.update(build_real_distance_matrix(all_locations))
 ```
 
 **Never** call external APIs during solving — pre-compute everything.
