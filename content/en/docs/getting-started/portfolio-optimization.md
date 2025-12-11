@@ -146,41 +146,20 @@ You have **$100,000** to invest and must select **20 stocks** from a pool of can
 **Soft constraints** (preferences to optimize):
 - Maximize total expected return (pick stocks with highest predictions)
 
-### Why This is Hard
+### Why Use a Constraint Solver?
 
-A naive **greedy algorithm** would sort stocks by predicted return and pick the top 20. But what happens when the top 8 stocks are all Technology?
+For this simplified quickstart (Boolean selection with sector limits), a well-implemented greedy algorithm can find near-optimal solutions. So why use a constraint solver?
 
-**Example scenario:**
-| Rank | Stock | Sector | Predicted Return |
-|------|-------|--------|------------------|
-| 1 | NVDA | Technology | 20% |
-| 2 | TSLA | Technology | 18% |
-| 3 | GOOGL | Technology | 15% |
-| 4 | AMD | Technology | 14% |
-| 5 | AAPL | Technology | 12% |
-| 6 | CRM | Technology | 11% |
-| 7 | MSFT | Technology | 10% |
-| 8 | ADBE | Technology | 9% |
-| ... | ... | ... | ... |
+**1. Declarative vs Imperative:** With constraints, you describe *what* you want, not *how* to achieve it. Adding a new rule is one function, not a rewrite of your algorithm.
 
-Greedy picks the top 8 Tech stocks = 40% in Technology. **Constraint violated!**
+**2. Constraint Interactions:** As constraints multiply, greedy logic becomes brittle. Consider adding:
+- Minimum 2 stocks per sector (diversification floor)
+- No more than 3 correlated stocks together
+- ESG score requirements
 
-The greedy algorithm must skip high-return Tech stocks to stay within the 25% sector limit. But which ones to skip? And which lower-return stocks from other sectors to include?
+Each new constraint in greedy code means more `if/else` branches and edge cases. In a constraint solver, you just add another constraint function.
 
-With 50 stocks across 5 sectors, there are **millions of valid combinations**. The constraint solver explores this space systematically to find the globally optimal portfolio.
-
-### See It For Yourself
-
-Run the comparison script to see how constraint solving beats greedy:
-
-```bash
-python scripts/comparison.py
-```
-
-Output shows:
-- Expected return difference (solver typically beats greedy by 1-3%)
-- Sector allocations (both respect limits)
-- Different stock selections (solver finds better combinations)
+**3. Real-World Complexity:** Production portfolios have weight optimization (not just in/out), correlation matrices, risk budgets, and regulatory requirements. These create solution spaces where greedy approaches fail.
 
 ---
 
@@ -336,11 +315,7 @@ Before diving into constraints, let's understand how the solver finds solutions.
 
 ### The Search Space
 
-For a portfolio problem with 50 candidate stocks selecting 20:
-- Each stock can be SELECTED or NOT_SELECTED (2 states)
-- Total combinations: 2^50 = **1 quadrillion possible portfolios**
-
-The solver doesn't try all of them — it uses smart heuristics to explore promising regions efficiently.
+For a portfolio problem with 50 candidate stocks selecting exactly 20, there are **trillions of valid combinations**. The solver explores this space using smart heuristics, not brute force.
 
 ### The Score: How "Good" is a Portfolio?
 
