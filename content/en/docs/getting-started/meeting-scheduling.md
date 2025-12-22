@@ -2,9 +2,9 @@
 title: "Meeting Scheduling"
 linkTitle: "Meeting Scheduling"
 icon: fa-brands fa-python
-date: 2025-11-26
+date: 2025-12-22
 weight: 20
-draft: true
+draft: false
 description: "A comprehensive quickstart guide to understanding and building intelligent meeting scheduling with SolverForge"
 categories: [Quickstarts]
 tags: [quickstart, python]
