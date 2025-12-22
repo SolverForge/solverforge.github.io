@@ -1,7 +1,7 @@
 ---
 title: "Concepts"
 linkTitle: "Concepts"
-weight: 10
+weight: 2
 tags: [concepts, python]
 description: >
   Understand the fundamental concepts of planning optimization and constraint solving.
