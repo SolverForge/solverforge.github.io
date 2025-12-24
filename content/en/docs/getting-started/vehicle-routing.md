@@ -72,9 +72,11 @@ This implementation includes several enhancements over the standard Timefold qui
 | Feature | Benefit |
 |---------|---------|
 | **Adaptive time windows** | Time windows dynamically scale based on problem area and visit count, ensuring feasible solutions |
-| **Haversine formula** | Realistic great-circle distances without external API dependencies |
+| **Haversine formula** | Fast great-circle distances without external API dependencies (default mode) |
+| **Real Roads mode** | Optional OSMnx integration for actual road network routing with visual route display |
+| **Real street addresses** | Demo data uses actual locations in Philadelphia, Hartford, and Florence for realistic routing |
 
-These features give you more control over the performance/memory tradeoff during development and production.
+These features give you more control over the performance/accuracy tradeoff during development and production.
 
 ---
 
@@ -119,6 +121,7 @@ src/vehicle_routing/
 ├── solver.py              # Solver configuration
 ├── demo_data.py           # Sample datasets (Philadelphia, Hartford, Florence)
 ├── rest_api.py            # HTTP API endpoints
+├── routing.py             # Distance matrix and OSMnx routing
 ├── converters.py          # REST ↔ Domain model conversion
 ├── json_serialization.py  # JSON helpers
 └── score_analysis.py      # Score breakdown DTOs
@@ -129,6 +132,7 @@ static/
 
 tests/
 ├── test_constraints.py    # Unit tests for constraints
+├── test_routing.py        # Unit tests for routing module
 └── test_feasible.py       # Integration tests
 ```
 
@@ -733,10 +737,11 @@ Returns a specific demo dataset:
 
 **Parameters:**
 - `demo_name`: Name of the demo dataset (PHILADELPHIA, HARTFORT, FIRENZE)
+- `routing` (query, optional): Routing mode - `haversine` (default) or `real_roads`
 
 **Request:**
 ```
-GET /demo-data/PHILADELPHIA
+GET /demo-data/PHILADELPHIA?routing=haversine
 ```
 
 **Response:**
@@ -788,6 +793,57 @@ GET /demo-data/PHILADELPHIA
 - **PHILADELPHIA**: 55 visits, 6 vehicles, moderate capacity (15-30)
 - **HARTFORT**: 50 visits, 6 vehicles, tighter capacity (20-30)
 - **FIRENZE**: 77 visits (largest), 6 vehicles, varied capacity (20-40)
+
+#### GET /demo-data/{demo_name}/stream
+
+Server-Sent Events (SSE) endpoint for loading demo data with progress updates. Use this when `routing=real_roads` to show download/computation progress.
+
+**Parameters:**
+- `demo_name`: Name of the demo dataset
+- `routing` (query, optional): `haversine` (default) or `real_roads`
+
+**Request:**
+```
+GET /demo-data/PHILADELPHIA/stream?routing=real_roads
+```
+
+**SSE Events:**
+
+Progress event (during computation):
+```json
+{"event": "progress", "phase": "network", "message": "Downloading OpenStreetMap road network...", "percent": 10, "detail": "Area: 0.08° × 0.12°"}
+```
+
+Complete event (when ready):
+```json
+{"event": "complete", "solution": {...}, "geometries": {"0": ["encodedPolyline1", "encodedPolyline2"], "1": [...]}}
+```
+
+Error event (on failure):
+```json
+{"event": "error", "message": "Demo data not found: INVALID"}
+```
+
+**Geometry format:** Each vehicle's geometries are an array of encoded polylines (Google polyline format), one per route segment:
+- First: depot → first visit
+- Middle: visit → visit
+- Last: last visit → depot
+
+#### GET /route-plans/{problem_id}/geometry
+
+Get route geometries for displaying actual road paths:
+
+**Response:**
+```json
+{
+  "geometries": {
+    "0": ["_p~iF~ps|U_ulLnnqC_mqNvxq`@", "afvkFnps|U~hbE~reK"],
+    "1": ["_izlFnps|U_ulLnnqC"]
+  }
+}
+```
+
+Decode polylines on the frontend to display actual road routes instead of straight lines.
 
 #### POST /route-plans
 
@@ -1593,15 +1649,45 @@ def good_constraint(constraint_factory: ConstraintFactory):
 - **Avoid** loops and complex logic in lambda functions
 - **Use** efficient data structures (sets for membership, dicts for lookup)
 
-### Distance Calculation: Built-in Performance Optimization
+### Distance Calculation: Two Modes
 
-SolverForge includes a **built-in distance mode selector** — no custom code required. Choose between:
+This quickstart supports two routing modes, selectable via the UI toggle or API parameter:
 
-This quickstart uses the Haversine formula for distance calculations, which provides realistic great-circle distances without external dependencies.
+#### Haversine Mode (Default)
 
-### Real Road Network Data
+Fast great-circle distance calculation using the Haversine formula:
+- No external dependencies or network calls
+- Assumes 50 km/h average driving speed
+- Routes display as straight lines on the map
+- Best for: development, testing, and quick iterations
 
-For production deployments requiring actual road distances (not straight-line approximations), you can replace the distance calculation in `Location.driving_time_to()` with a pre-computed matrix from a routing API:
+#### Real Roads Mode
+
+Actual road network routing using OpenStreetMap data via OSMnx:
+- Downloads and caches road network data locally
+- Computes shortest paths using Dijkstra's algorithm
+- Routes display as actual road paths on the map
+- Progress streaming via Server-Sent Events (SSE)
+
+**First-time use:** The initial load downloads ~5-15 MB of road network data for the demo area (cached for subsequent runs).
+
+**How it works:**
+1. Enable "Real Roads" toggle in the UI before loading demo data
+2. The system downloads/loads the OSM road network for the bounding box
+3. A distance matrix is precomputed for all location pairs
+4. The solver uses real driving times; the UI displays actual road routes
+
+```python
+# The Location class automatically uses the distance matrix when set
+Location.set_distance_matrix(matrix)
+
+# Solver calls driving_time_to() which checks for matrix first
+time = loc1.driving_time_to(loc2)  # Uses matrix if available, else haversine
+```
+
+### Custom Routing APIs
+
+For production with proprietary routing (Google Maps, Mapbox, OSRM), pre-compute a distance matrix before solving:
 
 ```python
 def build_real_distance_matrix(locations):
@@ -1819,7 +1905,8 @@ if solution.score and solution.score.hard_score < 0:
 | Add field to Vehicle | `src/vehicle_routing/domain.py` + `converters.py` |
 | Add field to Visit | `src/vehicle_routing/domain.py` + `converters.py` |
 | Change solve time | `src/vehicle_routing/solver.py` |
-| Change distance calculation | `src/vehicle_routing/domain.py` (Location class) |
+| Change distance calculation | `src/vehicle_routing/routing.py` |
+| Configure routing mode | `src/vehicle_routing/routing.py` |
 | Add REST endpoint | `src/vehicle_routing/rest_api.py` |
 | Change demo data | `src/vehicle_routing/demo_data.py` |
 | Change UI/map | `static/index.html`, `static/app.js` |

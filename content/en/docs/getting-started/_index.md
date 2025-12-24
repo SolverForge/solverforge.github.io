@@ -46,6 +46,19 @@ Schedule lessons to rooms and timeslots without teacher or room conflicts.
 
 [Start Tutorial →](school-timetabling/)
 {{< /card >}}
+{{< card header="**Portfolio Optimization**" >}}
+Select stocks for a diversified portfolio while maximizing expected returns.
+
+[Start Tutorial →](portfolio-optimization/)
+{{< /card >}}
+{{< card header="**VM Placement**" >}}
+Place virtual machines on servers respecting capacity, affinity, and consolidation goals.
+
+[Start Tutorial →](vm-placement/)
+{{< /card >}}
+{{< /cardpane >}}
+
+{{< cardpane >}}
 {{< card header="**Rust Quickstart**" footer="Experimental" >}}
 Build a solver using the core Rust library directly. For advanced users interested in the internals.
 
@@ -73,6 +86,8 @@ Common fast quickstarts available now:
 - `fast/meeting-scheduling-fast`
 - `fast/vehicle-routing-fast`
 - `fast/employee-scheduling-fast`
+- `fast/portfolio-optimization-fast`
+- `fast/vm-placement-fast`
 
 Each use case folder includes a README describing how to run the example, expected inputs, and any implementation-specific details.
 

@@ -2,9 +2,9 @@
 title: "Meeting Scheduling"
 linkTitle: "Meeting Scheduling"
 icon: fa-brands fa-python
-date: 2025-11-26
+date: 2025-12-22
 weight: 20
-draft: true
+draft: false
 description: "A comprehensive quickstart guide to understanding and building intelligent meeting scheduling with SolverForge"
 categories: [Quickstarts]
 tags: [quickstart, python]
@@ -2375,7 +2375,7 @@ Each quickstart teaches complementary optimization techniques.
 
 ### Additional Resources
 
-- [SolverForge Documentation](https://docs.solverforge.ai)
+- [SolverForge Documentation](https://www.solverforge.org/docs)
 - [Meeting Scheduling Problem Overview](https://en.wikipedia.org/wiki/Meeting_scheduling_problem)
 - [GitHub Repository](https://github.com/solverforge/solverforge-quickstarts)
 - [Calendar Scheduling Algorithms](https://www.cs.cmu.edu/~awm/papers/scheduling.pdf)

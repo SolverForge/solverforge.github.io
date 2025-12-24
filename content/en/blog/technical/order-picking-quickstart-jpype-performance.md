@@ -1,16 +1,17 @@
 ---
-title: "Order Picking Quickstart: When Good Architecture Reveals Infrastructure Limits"
+title: "Order Picking Quickstart: JPype Bridge Overhead in Constraint Solving"
 date: 2025-12-24
-tags: [quickstarts, python, performance]
+draft: false
+tags: [quickstart, python]
 description: >
-  Introducing the Order Picking quickstart with real-time 3D visualization—and an honest look at JPype performance bottlenecks.
+  Building an order picking quickstart with real-time 3D visualization deepened our understanding of JPype's performance characteristics in constraint-heavy workloads.
 ---
 
-We just shipped the final quickstart in our first iteration: [Order Picking](https://github.com/SolverForge/solverforge-quickstarts/tree/main/fast/order-picking-fast). It solves warehouse optimization with real-time isometric visualization showing trolleys dynamically routing through shelves to pick orders.
+Our current constraint solving quickstarts in Python are based on our stable, legacy fork of [Timefold](https://www.timefold.ai) for Python, which uses JPype to bridge to Timefold's Java solver engine. The latest example is [Order Picking](https://github.com/SolverForge/solverforge-quickstarts/tree/main/fast/order-picking-fast)—a warehouse optimization problem with real-time isometric visualization showing trolleys routing through shelves to pick orders.
 
-It works well. It's also slower than we'd like. That tension—between what works architecturally and what performs optimally—is worth examining.
+The implementation works and demonstrates the architectural patterns we've developed. It also exposes the inherent overhead of FFI (Foreign Function Interface) bridges in constraint-heavy workloads.
 
-## The Problem
+## The Problem Domain
 
 Order picking is the warehouse operation where workers (or trolleys) collect items from shelves to fulfill customer orders. The optimization challenge combines:
 
@@ -18,13 +19,13 @@ Order picking is the warehouse operation where workers (or trolleys) collect ite
 - **Routing constraints**: minimize travel distance, efficient sequencing
 - **Assignment constraints**: each item picked exactly once, balance load across trolleys
 
-This maps to vehicle routing with bin packing characteristics.
+This maps to vehicle routing with bin packing characteristics—a constraint-intensive problem domain.
 
 ## Real-Time Visualization
 
-The UI renders an isometric warehouse with five trolleys navigating between shelving units. Routes update live as the solver reassigns items, color-coded to show which trolley picks which items. The visualization polls solver state every 250ms and renders at 60fps using HTML5 Canvas.
+The UI renders an isometric warehouse with trolleys navigating between shelving units. Routes update live as the solver reassigns items, color-coded to show which trolley picks which items.
 
-Getting real-time updates working required solving a JPype-specific challenge. The solver runs in a Java thread and modifies domain objects that Python needs to read. We cache solutions in callbacks (`with_first_initialized_solution_consumer`, `with_best_solution_consumer`) so the API can serve them without crossing the Python-Java boundary on every poll:
+Not only solving itself, but merely getting real-time updates working required tackling JPype-specific challenges. The solver runs in a Java thread and modifies domain objects that Python needs to read. To avoid crossing the Python-Java boundary on every poll, solutions are cached in solver callbacks:
 
 ```python
 @app.get("/schedules/{problem_id}")
@@ -42,43 +43,24 @@ async def get_solution(problem_id: str) -> Dict[str, Any]:
     return result
 ```
 
-The frontend detects when paths change and smoothly transitions between routes:
+This pattern—caching solver state in callbacks, serving from cache—avoids *some* JPype overhead in the hot path of UI polling.
 
-```javascript
-function updateWarehouseAnimation(solution) {
-    if (!userRequestedSolving) return;
+## Performance Characteristics
 
-    for (const trolley of solution.trolleys || []) {
-        const stepIds = (trolley.steps || []).map(ref =>
-            typeof ref === 'string' ? ref : ref.id
-        );
-        const newSignature = stepIds.join(',');
+In spite of the above hack, the JPype bridge still introduces major overhead that becomes very significant in constraint-heavy problems like order picking. The overhead is expacted to grow exponentially with scale.
 
-        if (existingAnim && oldSignature !== newSignature) {
-            existingAnim.path = buildTrolleyPath(trolley, steps).path;
-            existingAnim.stepSignature = newSignature;
-            existingAnim.startTime = Date.now();
-        }
-    }
+The solver's work happens primarily in:
+- **Constraint evaluation**: Checking capacity limits, routing constraints, assignment rules
+- **Move generation**: Creating candidate solutions (reassigning items, reordering routes)
+- **Score calculation**: Computing solution quality after each move
+- **Shadow variable updates**: Cascading capacity calculations through trolley routes
 
-    renderWarehouse(solution);
-}
-```
+For order picking specifically, the overhead compounds from:
+- **List variable manipulation** (`PlanningListVariable`): Frequent reordering of trolley pick lists
+- **Shadow variable cascading**: Capacity changes ripple through entire routes
+- **Equality checks**: Object comparison during move validation
 
-## Performance Numbers
-
-Here's where we need to be honest: this is noticeably slower than Java.
-
-Running on the default problem (5 trolleys, 8 orders, ~40 steps):
-
-| Implementation | 30-second solve iterations | Score achieved |
-|----------------|---------------------------|----------------|
-| Java (Timefold) | ~500-600 | 0hard/-8000soft |
-| Python (dataclass) | ~200-250 | 0hard/-12000soft |
-
-Python completes roughly 40% of the iterations Java manages in the same timeframe, and reaches a less optimal score.
-
-The solver spends time in constraint evaluation, move generation, and score calculation. For order picking specifically, there's overhead from list variable manipulation (`PlanningListVariable`), shadow variable updates (cascading capacity calculations), and equality checks during move validation.
+Each of these operations crosses the Python-Java boundary through JPype, and these crossings happen millions of times during solving.
 
 ## Why JPype Specifically
 
@@ -93,15 +75,18 @@ def define_constraints(factory: ConstraintFactory):
     ]
 ```
 
-Every constraint evaluation triggers JPype conversions. Even with dataclass optimization (avoiding Pydantic overhead in hot paths), we can't eliminate the FFI cost.
+Every constraint evaluation triggers JPype conversions. Even with [dataclass optimization]((/blog/technical/python-constraint-solver-architecture/))(avoiding Pydantic overhead in hot paths), we can't eliminate the FFI cost.
 
-Some operations are more affected:
+The operations most affected by bridge overhead:
 
-- **List operations**: `PlanningListVariable` for trolley steps requires frequent list manipulation, each crossing to Java
-- **Shadow variables**: capacity calculations cascade through step lists, triggering Java calls
-- **Equality checks**: object comparison during move validation crosses the boundary
+- **List operations**: `PlanningListVariable` for trolley steps requires frequent list manipulation
+- **Shadow variables**: capacity calculations cascade through step lists
+- **Equality checks**: object comparison during move validation
 
-What actually helps: callback-based caching (storing serialized solutions), thread pool for analysis (running `solution_manager.analyze()` in ThreadPoolExecutor), and minimizing domain model complexity (fewer fields, fewer conversions).
+Mitigation strategies that help:
+- **Callback-based caching**: Store serialized solutions to avoid repeated boundary crossings
+- **Simplified domain models**: Fewer fields means fewer conversions
+- **Dataclass over Pydantic**: Skip validation overhead in solver hot paths (see [architecture comparison](/blog/technical/python-constraint-solver-architecture/))
 
 ## Why This Validates Rust
 
@@ -117,9 +102,9 @@ We're building a constraint solver framework in Rust with WASM + HTTP architectu
 
 With Rust/WASM, the order picking implementation would eliminate all JPype overhead and run constraint evaluation at native speed while keeping the same domain model structure. The architecture stays the same. The performance gap disappears.
 
-## Try It
+## Source Code
 
-**Live demo:** [Hugging Face Spaces](https://huggingface.co/spaces/solverforge/order-picking)
+**Repository:** [SolverForge Quickstarts](https://github.com/SolverForge/solverforge-quickstarts/tree/main/fast/order-picking-fast)
 
 **Run locally:**
 ```bash
@@ -131,24 +116,11 @@ pip install -e .
 run-app
 ```
 
-**Source:** All quickstarts follow the architectural pattern documented in [dataclasses vs Pydantic](/blog/technical/python-constraint-solver-architecture/).
+**Architecture:** All quickstarts follow the pattern documented in [dataclasses vs Pydantic](/blog/technical/python-constraint-solver-architecture/).
 
-## What's Next
+**Rust framework development:**
 
-Completed first iteration:
-- Employee Scheduling
-- Meeting Scheduling
-- Vehicle Routing
-- Order Picking
-
-Next iteration adds maintenance scheduling, school timetabling, task assignment, and resource allocation.
-
-The Rust framework is in active development:
-- Q1 2025: Alpha release with basic constraint types
-- Q2 2025: Feature parity with Python quickstarts
-- Q3 2025: Production-ready 1.0 with WASM compilation
-
-Follow progress at [github.com/SolverForge](https://github.com/SolverForge)
+The Rust/WASM framework is in early development. Follow progress at [github.com/SolverForge](https://github.com/SolverForge).
 
 ---
 
