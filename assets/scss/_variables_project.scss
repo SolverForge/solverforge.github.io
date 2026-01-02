@@ -78,6 +78,19 @@ $link-hover-color: $primary-dark;
   }
 }
 
+// Golden/yellow download button
+.btn-secondary {
+  background-color: #eab308 !important;
+  border-color: #eab308 !important;
+  color: #ffffff !important;
+
+  &:hover {
+    background-color: #ca8a04 !important;
+    border-color: #ca8a04 !important;
+    color: #ffffff !important;
+  }
+}
+
 a {
   color: $primary;
 
