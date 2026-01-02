@@ -10,9 +10,10 @@ weight: 2
 {{% pageinfo color="warning" %}}
 **🚧 Work in Progress**
 
-SolverForge is under active development. User-facing language bindings (Python, JavaScript, etc.) are not yet available.
+SolverForge is under active development. User-facing language bindings (Rust, Python, Go,  etc.) are not yet available.
 
-If you want to try SolverForge today, you'll need to write your own language bindings against the [SolverForge Core](../solverforge/) library. **This is not recommended for production use** — or even casual experimentation unless you're comfortable with low-level integration work.
+If you want to try SolverForge today, you'll need to write your own language bindings against the [SolverForge Core](../solverforge/) library. 
+**This is not recommended for production use** — or even casual experimentation unless you're comfortable with low-level integration work.
 
 We're working hard to deliver proper bindings. Stay tuned!
 {{% /pageinfo %}}

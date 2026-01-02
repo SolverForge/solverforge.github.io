@@ -130,15 +130,15 @@ SolverForge is under active development. The Python API shown above works today 
 
 | Component | Status | Description |
 |-----------|--------|-------------|
-| **solverforge-legacy** | ✅ Usable now | Pure Python solver — works today, great for learning and prototyping |
-| **solverforge-core** | ✅ Complete | High-performance Rust backend — foundation complete, not yet user-facing |
+| **solverforge-legacy** | ✅ Usable now | Python wrapper for [Timefold](https://timefold.ai) — works today, great for learning and prototyping |
+| **solverforge-core** | ✅ Complete | High-performance Rust backend — native Rust solver complete, not yet user-facing |
 | **Python bindings** | 🚧 In progress | PyO3-based bindings to the fast Rust core — coming Q1-Q2 2026 |
 
 **Want to try it today?** Start with the [Python quickstarts](/docs/getting-started/) using `solverforge-legacy`.
 
 ## Roadmap
 
-### Phase 1: Foundation ✅ Complete
+### Phase 1: Foundation ✅ 
 
 We've built the core solver infrastructure:
 - Complete constraint streams API (forEach, filter, join, groupBy, penalize, reward)
@@ -156,7 +156,7 @@ Making the fast Rust core available to Python developers:
 
 - Stable v1.0.0 release
 - Performance tuning guides
-- Advanced features (custom move selectors, real-time solving)
+- Advanced features
 
 ---
 
