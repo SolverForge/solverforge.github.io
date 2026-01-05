@@ -8,17 +8,19 @@ weight: 2
 ---
 
 {{% pageinfo color="warning" %}}
-**🚧 Work in Progress**
+**Legacy Implementation Guides**
 
-SolverForge is under active development. User-facing language bindings (Rust, Python, Go,  etc.) are not yet available.
+These quickstart guides use **solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is **already archived** and will no longer be maintained once SolverForge's native Python bindings are production-ready.
 
-If you want to try SolverForge today, you'll need to write your own language bindings against the [SolverForge Core](../solverforge/) library. 
-**This is not recommended for production use** — or even casual experimentation unless you're comfortable with low-level integration work.
+**SolverForge has been completely rewritten as a native constraint solver in Rust**, with its own solving engine built from scratch. These guides are preserved as:
+- Reference material for understanding constraint solving concepts
+- Educational examples of constraint modeling patterns
+- Demonstration of optimization problem domains
 
-We're working hard to deliver proper bindings. Stay tuned!
+The JPype bridge and Timefold-based architecture described in these guides **do not apply to current SolverForge**.
+
+Native Python bindings for the Rust implementation are under active development.
 {{% /pageinfo %}}
-
-The quickstart guides below demonstrate constraint-solver patterns using the legacy Python implementation. They serve as reference material for understanding SolverForge concepts while the new bindings are being developed.
 
 ## Choose a Quickstart
 
@@ -79,16 +81,15 @@ This page covers:
 
 The repository is organised so you can choose between pedagogical, reference implementations and optimized, performance-minded variants:
 
-- `legacy/` — Original quickstarts that use unified Pydantic models. Great for learning and understanding the domain modelling approach.
-- `fast/` — Refactored quickstarts that minimize runtime overhead by constraining Pydantic to the API boundary and using lighter-weight models during solver moves.
+- `legacy/` — Refactored quickstarts that minimize runtime overhead by constraining Pydantic to the API boundary and using lighter-weight models during solver moves.
 - `benchmarks/` — Benchmarks, results and a short performance report comparing implementations and use cases.
 
-Common fast quickstarts available now:
-- `fast/meeting-scheduling-fast`
-- `fast/vehicle-routing-fast`
-- `fast/employee-scheduling-fast`
-- `fast/portfolio-optimization-fast`
-- `fast/vm-placement-fast`
+Common quickstarts available now:
+- `legacy/meeting-scheduling-fast`
+- `legacy/vehicle-routing-fast`
+- `legacy/employee-scheduling-fast`
+- `legacy/portfolio-optimization-fast`
+- `legacy/vm-placement-fast`
 
 Each use case folder includes a README describing how to run the example, expected inputs, and any implementation-specific details.
 
@@ -132,16 +133,16 @@ Most quickstarts offer one or both run modes:
 - A CLI script that runs the solver on example data and outputs results.
 
 To try a quick example:
-1. Open the quickstart folder of interest (for example `fast/meeting-scheduling-fast`).
+1. Open the quickstart folder of interest (for example `legacy/meeting-scheduling-fast`).
 2. Follow the run instructions in that folder's README. Common commands are:
    - `python -m <module>` or `uvicorn` for FastAPI-based examples.
    - `python run_demo.py` or similar CLI entrypoints described in the README.
 
 Check these README files for concrete run commands:
 - `legacy/vehicle-routing/README.MD`
-- `fast/vehicle-routing-fast/README.MD`
-- `fast/meeting-scheduling-fast/README.adoc`
-- `fast/employee-scheduling-fast/README.MD`
+- `legacy/vehicle-routing-fast/README.MD`
+- `legacy/meeting-scheduling-fast/README.adoc`
+- `legacy/employee-scheduling-fast/README.MD`
 
 ## Benchmarks & performance
 
@@ -149,8 +150,6 @@ Performance-focused work and benchmark artifacts live in the `benchmarks/` folde
 - `benchmarks/results_meeting-scheduling.md`
 - `benchmarks/results_vehicle-routing.md`
 - `benchmarks/report.md`
-
-The `fast/` refactors prioritise reducing runtime overhead (limiting Pydantic to the API boundary, using compact domain models, etc.) to close the performance gap with Java/Kotlin implementations.
 
 ## Where to read more
 

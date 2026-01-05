@@ -6,6 +6,14 @@ description: >
   Architectural guidance for Python constraint solvers: when to use dataclasses vs Pydantic for optimal performance.
 ---
 
+{{< alert title="Historical Article" color="warning" >}}
+**This article describes solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is now archived.
+
+Since this article was written, **SolverForge has been completely rewritten as a native constraint solver in Rust**, with its own solving engine built from scratch.
+
+This article is preserved for historical context and the architectural insights it provides about Python domain modeling patterns, which remain relevant for constraint solver integrations.
+{{< /alert >}}
+
 When building constraint solvers in Python, one architectural decision shapes everything else: should domain models use Pydantic (convenient for APIs) or dataclasses (minimal overhead)?
 
 Both tools are excellent at what they're designed for. The question is which fits the specific demands of constraint solving—where the same objects get evaluated millions of times per solve.
