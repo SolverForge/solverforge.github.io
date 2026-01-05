@@ -7,7 +7,15 @@ description: >
   Building an order picking quickstart with real-time 3D visualization deepened our understanding of JPype's performance characteristics in constraint-heavy workloads.
 ---
 
-Our current constraint solving quickstarts in Python are based on our stable, legacy fork of [Timefold](https://www.timefold.ai) for Python, which uses JPype to bridge to Timefold's Java solver engine. The latest example is [Order Picking](https://github.com/SolverForge/solverforge-quickstarts/tree/main/fast/order-picking-fast)—a warehouse optimization problem with real-time isometric visualization showing trolleys routing through shelves to pick orders.
+{{< alert title="Historical Article" color="warning" >}}
+**This article describes solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is now archived.
+
+Since this article was written, **SolverForge has been completely rewritten as a native constraint solver in Rust**, with its own solving engine built from scratch. The JPype bridge overhead and Java interop challenges described here no longer apply to current SolverForge.
+
+This article is preserved for historical context and the architectural insights it provides about FFI performance in constraint solving.
+{{< /alert >}}
+
+Our current constraint solving quickstarts in Python are based on our stable, legacy fork of [Timefold](https://www.timefold.ai) for Python, which uses JPype to bridge to Timefold's Java solver engine. The latest example is [Order Picking](https://github.com/SolverForge/solverforge-quickstarts/tree/main/legacy/order-picking-fast)—a warehouse optimization problem with real-time isometric visualization showing trolleys routing through shelves to pick orders.
 
 The implementation works and demonstrates the architectural patterns we've developed. It also exposes the inherent overhead of FFI (Foreign Function Interface) bridges in constraint-heavy workloads.
 
@@ -104,12 +112,12 @@ With Rust/WASM, the order picking implementation would eliminate all JPype overh
 
 ## Source Code
 
-**Repository:** [SolverForge Quickstarts](https://github.com/SolverForge/solverforge-quickstarts/tree/main/fast/order-picking-fast)
+**Repository:** [SolverForge Quickstarts](https://github.com/SolverForge/solverforge-quickstarts/tree/main/legacy/order-picking-fast)
 
 **Run locally:**
 ```bash
 git clone https://github.com/SolverForge/solverforge-quickstarts.git
-cd solverforge-quickstarts/fast/order-picking-fast
+cd solverforge-quickstarts/legacy/order-picking-fast
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -127,5 +135,5 @@ The Rust/WASM framework is in early development. Follow progress at [github.com/
 **Further reading:**
 - [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/python-constraint-solver-architecture/)
 - [Vehicle Routing Quickstart](/docs/getting-started/vehicle-routing/)
-- [Order Picking README](https://github.com/SolverForge/solverforge-quickstarts/tree/main/fast/order-picking-fast)
+- [Order Picking README](https://github.com/SolverForge/solverforge-quickstarts/tree/main/legacy/order-picking-fast)
 - [SolverForge Docs](https://www.solverforge.org/docs/)

@@ -7,6 +7,14 @@ description: >
   Reflections on the challenges of bridging Rust and Java in constraint solving, and the hard lessons learned along the way.
 ---
 
+{{< alert title="Historical Article" color="warning" >}}
+**This article describes SolverForge's earlier WASM wrapper architecture** that attempted to bridge Rust and Java through HTTP and WebAssembly.
+
+Since this article was written, **SolverForge has been completely rewritten as a native constraint solver in Rust**, with its own solving engine built from scratch. The Java interop, WASM complexity, and score corruption challenges described here no longer apply to current SolverForge.
+
+This article is preserved for historical context, documenting the architectural challenges that led to the decision to build a fully native Rust implementation.
+{{< /alert >}}
+
 SolverForge Core is written in Rust. The constraint solving engine runs in Java (Timefold). Getting these two to talk to each other has been one of the more humbling engineering challenges we've faced.
 
 This post is a retrospective on what we've tried, what worked, what didn't, and what we've learned about the fundamental tensions in cross-language constraint solving architectures.

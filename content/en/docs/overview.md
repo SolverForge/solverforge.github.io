@@ -123,40 +123,63 @@ You define your domain model with standard Python dataclasses and type annotatio
 # Project Status & Roadmap
 
 {{% pageinfo %}}
-SolverForge is under active development. The Python API shown above works today via `solverforge-legacy`. We're building a new high-performance backend to make it faster.
+SolverForge is a **production-ready constraint solver** written in Rust. The Rust API is complete and stable. Python bindings are in development.
 {{% /pageinfo %}}
 
 ## Current Status
 
 | Component | Status | Description |
 |-----------|--------|-------------|
-| **solverforge-legacy** | ✅ Usable now | Python wrapper for [Timefold](https://timefold.ai) — works today, great for learning and prototyping |
-| **solverforge-core** | ✅ Complete | High-performance Rust backend — native Rust solver complete, not yet user-facing |
-| **Python bindings** | 🚧 In progress | PyO3-based bindings to the fast Rust core — coming Q1-Q2 2026 |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with complete feature set — v0.4+ |
+| **solverforge-legacy** | ✅ Usable now | Python wrapper for [Timefold](https://timefold.ai) — great for learning and prototyping |
+| **Python bindings** | 🚧 In progress | PyO3-based bindings to the Rust core — coming Q1-Q2 2026 |
 
-**Want to try it today?** Start with the [Python quickstarts](/docs/getting-started/) using `solverforge-legacy`.
+**Want to try it today?** 
+- **Rust developers**: Use the [Rust crate](https://crates.io/crates/solverforge) directly
+- **Python developers**: Start with [Python quickstarts](/docs/getting-started/) using `solverforge-legacy`
+
+## What's Complete
+
+SolverForge Rust is **feature-complete** as a production constraint solver:
+
+- **Constraint Streams API**: Declarative constraint definition with `for_each`, `filter`, `join`, `group_by`, `penalize`, `reward`
+- **Score Types**: SimpleScore, HardSoftScore, HardMediumSoftScore, BendableScore
+- **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
+- **Solver Phases**:
+  - Construction Heuristic (First Fit, Best Fit)
+  - Local Search (Hill Climbing, Simulated Annealing, Tabu Search, Late Acceptance)
+  - Exhaustive Search (Branch and Bound with DFS/BFS/Score-First)
+  - Partitioned Search (multi-threaded)
+  - VND (Variable Neighborhood Descent)
+- **Move System**: Zero-allocation typed moves with arena allocation
+- **SolverManager API**: Ergonomic builder pattern for solver configuration
+- **Configuration**: TOML/YAML support with builder API
 
 ## Roadmap
 
-### Phase 1: Foundation ✅ 
+### Phase 1: Native Solver ✅ Complete
 
-We've built the core solver infrastructure:
-- Complete constraint streams API (forEach, filter, join, groupBy, penalize, reward)
-- Support for all common score types (HardSoft, HardMediumSoft, Bendable)
-- End-to-end solving with employee scheduling, vehicle routing, and more
+Built a complete constraint solver in Rust from the ground up:
+- Full metaheuristic algorithm suite
+- Incremental scoring engine (SERIO)
+- Zero-cost abstractions with typed moves
+- Derive macros for ergonomic domain modeling
 
 ### Phase 2: Python Bindings (Q1-Q2 2026)
 
-Making the fast Rust core available to Python developers:
+Making the Rust solver available to Python developers:
 - PyO3-based native extension: `pip install solverforge`
 - Same Pythonic API you know from solverforge-legacy
 - Seamless migration path — change one import, keep your code
+- Native performance without JVM overhead
 
-### Phase 3: Production Ready (H2 2026)
+### Phase 3: Production Enhancements (H2 2026)
 
-- Stable v1.0.0 release
+- Multi-threaded move evaluation
+- Constraint strength system
+- Constraint match analysis and explanation
 - Performance tuning guides
-- Advanced features
+- Enterprise features
 
 ---
 
@@ -174,63 +197,95 @@ Making the fast Rust core available to Python developers:
 <details>
 <summary><strong>Architecture (for the curious)</strong></summary>
 
-SolverForge uses a unique architecture to achieve both developer ergonomics and performance:
+SolverForge is a **native Rust constraint solver** that delivers both developer ergonomics and high performance:
 
 ```
-┌────────────────────────────────────────────────────────┐
-│              Your Python/Rust Code                     │
-│     (Domain models, constraints, problem data)         │
-└────────────────────────────────────────────────────────┘
-                           │
-                      HTTP/JSON
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│            Solver Service (Java + Timefold)            │
-│                                                        │
-│   • Executes metaheuristic search algorithms           │
-│   • Runs WASM-compiled constraint predicates           │
-│   • Returns optimized solutions                        │
-└────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                         solverforge                             │
+│                    (facade + re-exports)                        │
+└─────────────────────────────────────────────────────────────────┘
+        │              │              │              │
+        ▼              ▼              ▼              ▼
+┌──────────────┬──────────────┬──────────────┬──────────────┐
+│solverforge-  │solverforge-  │solverforge-  │solverforge-  │
+│   solver     │   scoring    │   config     │  benchmark   │
+│              │              │              │              │
+│ • Phases     │ • Constraint │ • TOML/YAML  │ • Runner     │
+│ • Moves      │   Streams    │ • Builders   │ • Statistics │
+│ • Selectors  │ • Score      │              │ • Reports    │
+│ • Foragers   │   Directors  │              │              │
+│ • Acceptors  │ • SERIO      │              │              │
+│ • Termination│   Engine     │              │              │
+│ • Manager    │              │              │              │
+└──────────────┴──────────────┴──────────────┴──────────────┘
+        │              │
+        └──────┬───────┘
+               ▼
+        ┌──────────────────────────────┐
+        │       solverforge-core       │
+        │                              │
+        │ • Score types                │
+        │ • Domain traits              │
+        │ • Descriptors                │
+        │ • Variable system            │
+        └──────────────────────────────┘
+                       │
+                       ▼
+        ┌──────────────────────────────┐
+        │      solverforge-macros      │
+        │                              │
+        │ • #[derive(PlanningSolution)]│
+        │ • #[derive(PlanningEntity)]  │
+        │ • #[derive(ProblemFact)]     │
+        └──────────────────────────────┘
 ```
 
 **Why this design?**
 
-1. **Timefold's algorithms are battle-tested** — Rather than reimplementing 20+ years of metaheuristic research, we leverage Timefold's proven solver engine
+1. **Zero-cost abstractions** — Rust's type system eliminates runtime overhead. Constraint streams compile to efficient machine code with no dynamic dispatch.
 
-2. **WASM enables portable constraints** — Your constraint logic compiles to WebAssembly, which runs efficiently inside the JVM via the Chicory runtime
+2. **Incremental scoring (SERIO)** — The Scoring Engine for Real-time Incremental Optimization only recalculates affected constraints when moves are evaluated, delivering 10-100x speedups.
 
-3. **HTTP keeps things simple** — No JNI, no platform-specific native code, no complex build configurations
+3. **Type-safe moves** — `ChangeMove<S, V>` and `SwapMove<S, V>` store values inline without boxing or heap allocation. Arena allocation provides O(1) per-step cleanup.
 
-**The result:** You write clean Python code; we handle the complexity of making it run fast.
+4. **No garbage collection** — Predictable, low-latency performance without GC pauses.
+
+5. **Modular architecture** — Each crate has a single responsibility, making the codebase maintainable and testable.
+
+**The result:** You write declarative constraint logic that compiles to highly optimized native code.
 
 </details>
 
 <details>
-<summary><strong>Detailed achievements (Q4 2025)</strong></summary>
+<summary><strong>What's implemented (v0.4+)</strong></summary>
 
-**Repository**: [solverforge/solverforge](https://github.com/solverforge/solverforge) (v0.1.56)
+**Repository**: [solverforge/solverforge-rs](https://github.com/solverforge/solverforge-rs)
 
-**Rust core library (`solverforge-core`):**
-- Domain model definition with planning annotations
-- Comprehensive constraint streams API (forEach, filter, join, groupBy, complement, flattenLast)
-- Advanced collectors (count, countDistinct, loadBalance)
-- Full score type system with BigDecimal variants
-- Score analysis with constraint breakdown
+**Core solver features:**
+- **Score types**: SimpleScore, HardSoftScore, HardMediumSoftScore, BendableScore (all with BigDecimal variants)
+- **Domain model**: Derive macros for `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]`
+- **Variable types**: Genuine, shadow, list, and chained variables
+- **Constraint Streams API**: `for_each`, `filter`, `join`, `group_by`, `if_exists`, `if_not_exists`, `penalize`, `reward`
+- **Advanced collectors**: `count`, `count_distinct`, `sum`, `load_balance`
 
-**WASM module generation:**
-- Proper memory alignment for 32-bit and 64-bit types
-- Field accessors and constraint predicates
-- Support for temporal types (LocalDate, LocalDateTime)
+**Solver phases:**
+- **Construction heuristics**: First Fit, Best Fit with automatic phase factory
+- **Local search**: Hill Climbing, Simulated Annealing, Tabu Search, Late Acceptance
+- **Exhaustive search**: Branch and Bound (DFS, BFS, Score-First)
+- **Partitioned search**: Multi-threaded parallel solving
+- **VND**: Variable Neighborhood Descent
 
-**Java service (`timefold-wasm-service`):**
-- Chicory WASM runtime integration
-- Dynamic bytecode generation for domain classes
-- HTTP endpoints for solving and score analysis
+**Infrastructure:**
+- **SERIO**: Scoring Engine for Real-time Incremental Optimization
+- **SolverManager**: Ergonomic builder API for solver configuration
+- **Configuration**: TOML/YAML support with validation
+- **Benchmarking**: Statistical analysis framework with warmup, measurement, and reporting
+- **Termination**: Time limits, step counts, score targets, unimproved step detection
 
-**End-to-end validation:**
-- Employee scheduling with 5+ constraints
-- Load balancing with fair distribution
-- Comprehensive test suite
+**Performance:**
+- Zero-allocation move system with arena allocation
+- Type-safe moves without boxing (`ChangeMove<S, V>`, `SwapMove<S, V>`)
+- No garbage collection pauses
+- Incremental score calculation (10-100x faster than full recalculation)
 
 </details>

@@ -9,8 +9,12 @@ categories: [Quickstarts]
 tags: [quickstart, python]
 ---
 
-{{% pageinfo %}}
-A comprehensive quickstart guide to understanding and building intelligent virtual machine placement optimization with SolverForge. Learn optimization concepts while exploring a working codebase that demonstrates real-world datacenter resource management.
+{{% pageinfo color="warning" %}}
+**Legacy Implementation Guide**
+
+This guide uses **solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is **already archived** and will no longer be maintained once SolverForge's native Python bindings are production-ready.
+
+SolverForge has been **completely rewritten as a native constraint solver in Rust**. This guide is preserved for educational purposes and constraint modeling concepts.
 {{% /pageinfo %}}
 
 ---
@@ -81,7 +85,7 @@ Think of it like describing the ideal datacenter state and having a computer try
 1. **Download and navigate to the project directory:**
    ```bash
    git clone https://github.com/SolverForge/solverforge-quickstarts
-   cd ./solverforge-quickstarts/fast/vm-placement-fast
+   cd ./solverforge-quickstarts/legacy/vm-placement-fast
    ```
 
 2. **Create and activate virtual environment:**
@@ -110,7 +114,7 @@ You'll see a VM placement interface with server racks, VMs, and a "Solve" button
 ### File Structure Overview
 
 ```
-fast/vm-placement-fast/
+legacy/vm-placement-fast/
 ├── src/vm_placement/
 │   ├── domain.py              # Data classes (Server, VM, VMPlacementPlan)
 │   ├── constraints.py         # Business rules (90% of customization happens here)

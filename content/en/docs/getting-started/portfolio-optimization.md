@@ -9,8 +9,12 @@ categories: [Quickstarts]
 tags: [quickstart, python]
 ---
 
-{{% pageinfo %}}
-A comprehensive quickstart guide to understanding and building intelligent stock portfolio optimization with SolverForge. Learn optimization concepts while exploring a working codebase that demonstrates real-world finance applications.
+{{% pageinfo color="warning" %}}
+**Legacy Implementation Guide**
+
+This guide uses **solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is **already archived** and will no longer be maintained once SolverForge's native Python bindings are production-ready.
+
+SolverForge has been **completely rewritten as a native constraint solver in Rust**. This guide is preserved for educational purposes and constraint modeling concepts.
 {{% /pageinfo %}}
 
 ---
@@ -80,7 +84,7 @@ Think of it like describing the ideal portfolio characteristics and having a com
 1. **Download and navigate to the project directory:**
    ```bash
    git clone https://github.com/SolverForge/solverforge-quickstarts
-   cd ./solverforge-quickstarts/fast/portfolio-optimization-fast
+   cd ./solverforge-quickstarts/legacy/portfolio-optimization-fast
    ```
 
 2. **Create and activate virtual environment:**

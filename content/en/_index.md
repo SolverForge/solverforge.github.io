@@ -75,7 +75,7 @@ def desired_day_for_employee(constraint_factory: ConstraintFactory):
   </div>
   <div class="terminal-body">
     <pre><code><span class="command-line">git clone https://github.com/SolverForge/solverforge-quickstarts</span>
-<span class="command-line">cd solverforge-quickstarts/fast/employee-scheduling-fast</span>
+<span class="command-line">cd solverforge-quickstarts/legacy/employee-scheduling-fast</span>
 <span class="command-line">python -m venv .venv && source .venv/bin/activate</span>
 <span class="command-line">pip install -e .</span>
 <span class="command-line">run-app</span></code></pre>

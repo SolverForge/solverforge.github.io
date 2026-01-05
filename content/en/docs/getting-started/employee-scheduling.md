@@ -9,8 +9,12 @@ categories: [Quickstarts]
 tags: [quickstart, python]
 ---
 
-{{% pageinfo %}}
-A comprehensive quickstart guide to understanding and building intelligent employee scheduling with SolverForge. Learn optimization concepts while exploring a working codebase.
+{{% pageinfo color="warning" %}}
+**Legacy Implementation Guide**
+
+This guide uses **solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is **already archived** and will no longer be maintained once SolverForge's native Python bindings are production-ready.
+
+SolverForge has been **completely rewritten as a native constraint solver in Rust**. This guide is preserved for educational purposes and constraint modeling concepts.
 {{% /pageinfo %}}
 
 ---
@@ -70,7 +74,7 @@ Think of it like describing what puzzle pieces you have and what rules they must
 1. **Download and navigate to the project directory:**
    ```bash
    git clone https://github.com/SolverForge/solverforge-quickstarts
-   cd ./solverforge-quickstarts/fast/employee-scheduling-fast
+   cd ./solverforge-quickstarts/legacy/employee-scheduling-fast
    ```
 
 2. **Create and activate virtual environment:**
@@ -99,7 +103,7 @@ You'll see a scheduling interface with employees, shifts and a "Solve" button. C
 ### File Structure Overview
 
 ```
-fast/employee-scheduling-fast/
+legacy/employee-scheduling-fast/
 ├── src/employee_scheduling/
 │   ├── domain.py              # Data classes (Employee, Shift, Schedule)
 │   ├── constraints.py         # Business rules (90% of customization happens here)
@@ -1350,4 +1354,3 @@ Add print statements (remove in production):
 
 - [GitHub Repository](https://github.com/solverforge/solverforge-quickstarts)
 - [Constraint Optimization Primer](https://en.wikipedia.org/wiki/Constraint_satisfaction_problem)
-

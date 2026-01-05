@@ -10,8 +10,12 @@ categories: [Quickstarts]
 tags: [quickstart, python]
 ---
 
-{{% pageinfo %}}
-A comprehensive quickstart guide to understanding and building intelligent school timetabling with SolverForge. Learn optimization concepts while exploring a working codebase.
+{{% pageinfo color="warning" %}}
+**Legacy Implementation Guide**
+
+This guide uses **solverforge-legacy**, a fork of Timefold 1.24 that bridges Python to Java via JPype. This legacy implementation is **already archived** and will no longer be maintained once SolverForge's native Python bindings are production-ready.
+
+SolverForge has been **completely rewritten as a native constraint solver in Rust**. This guide is preserved for educational purposes and constraint modeling concepts.
 {{% /pageinfo %}}
 
 ---
