@@ -10,7 +10,7 @@ menu: {main: {weight: 10}}
 
 {{% blocks/lead color="primary" %}}
 
-[SolverForge](https://www.solverforge.org) is a free constraint programming framework for Python and Rust
+[SolverForge](https://www.solverforge.org) is a free constraint programming framework for Rust and Python
 
 <a class="td-link-down" href="#td-block-2"><i class="fas fa-chevron-down"></i></a>
 {{% /blocks/lead %}}
@@ -37,12 +37,12 @@ Schedule equipment maintenance to minimize downtime while meeting service requir
 
 {{% blocks/section type="row" %}}
 
-{{% blocks/feature icon="fab fa-python" title="Pythonic API" %}}
-Write constraints using familiar Python syntax. No domain-specific language to learn.
-{{% /blocks/feature %}}
-
 {{% blocks/feature icon="fab fa-rust" title="Rust Performance" %}}
 Lightning-fast solving powered by Rust. Get optimal solutions in milliseconds.
+{{% /blocks/feature %}}
+
+{{% blocks/feature icon="fab fa-python" title="Python Bindings" %}}
+Write constraints using familiar Python syntax. SolverForge still runs native, with near-zero overhead.
 {{% /blocks/feature %}}
 
 {{% blocks/feature icon="fab fa-github" title="100% Open Source" url="https://github.com/SolverForge" %}}
