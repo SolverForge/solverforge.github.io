@@ -27,26 +27,23 @@ Model your planning problems with an expressive, business-object oriented syntax
     <span class="terminal-btn close"></span>
     <span class="terminal-btn minimize"></span>
     <span class="terminal-btn maximize"></span>
-    <span class="terminal-title">constraints.py</span>
+    <span class="terminal-title">constraints.rs</span>
   </div>
   <div class="terminal-body">
 
-```python
-def desired_day_for_employee(constraint_factory: ConstraintFactory):
-    return (
-        constraint_factory.for_each(Shift)
-        .join(
-            Employee,
-            Joiners.equal(lambda shift: shift.employee, lambda employee: employee),
-        )
-        .flatten_last(lambda employee: employee.desired_dates)
-        .filter(lambda shift, desired_date: shift.is_overlapping_with_date(desired_date))
-        .reward(
-            HardSoftDecimalScore.ONE_SOFT,
-            lambda shift, desired_date: shift.get_overlapping_duration_in_minutes(desired_date),
-        )
-        .as_constraint("Desired day for employee")
+```rust
+// =========================================================================
+// HARD: One Shift Per Day
+// =========================================================================
+let one_per_day = factory
+    .clone()
+    .for_each_unique_pair(
+        |s: &EmployeeSchedule| s.shifts.as_slice(),
+        joiner::equal(|shift: &Shift| (shift.employee_idx, shift.date())),
     )
+    .filter(|a: &Shift, b: &Shift| a.employee_idx.is_some() && b.employee_idx.is_some())
+    .penalize(HardSoftDecimalScore::ONE_HARD)
+    .as_constraint("One shift per day");
 ```
 
   </div>
