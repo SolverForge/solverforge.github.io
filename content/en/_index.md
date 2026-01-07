@@ -72,10 +72,8 @@ let one_per_day = factory
   </div>
   <div class="terminal-body">
     <pre><code><span class="command-line">git clone https://github.com/SolverForge/solverforge-quickstarts</span>
-<span class="command-line">cd solverforge-quickstarts/legacy/employee-scheduling-fast</span>
-<span class="command-line">python -m venv .venv && source .venv/bin/activate</span>
-<span class="command-line">pip install -e .</span>
-<span class="command-line">run-app</span></code></pre>
+<span class="command-line">cd solverforge-quickstarts/rust/employee-scheduling</span>
+<span class="command-line">cargo run</span></code></pre>
   </div>
 </div>
 
