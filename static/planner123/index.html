@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planner123 — Your Week, Optimized</title>
+  <meta name="description" content="Personal task scheduling powered by constraint optimization. Native Rust. Runs offline. One binary.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Favicon (reuse SolverForge favicons) -->
+  <link rel="icon" href="/favicons/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/favicons/apple-touch-icon-180x180.png">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       1. HERO
+       ============================================================ -->
+  <section class="hero">
+    <div class="wrapper">
+      <h1 class="hero__title">Planner123</h1>
+      <p class="hero__sub">Your week, optimized. Personal task scheduling powered by constraint&nbsp;optimization. Native Rust. One&nbsp;binary.</p>
+    </div>
+    <a href="#pricing" class="hero__chevron" aria-label="Scroll to pricing">
+      <span class="hero__chevron-arrow">&#8595;</span>
+    </a>
+  </section>
+
+
+  <!-- ============================================================
+       2. PERFORMANCE
+       ============================================================ -->
+  <section class="perf">
+    <div class="wrapper reveal">
+      <div class="perf__grid">
+        <div class="perf__stat">
+          <div class="perf__number" data-counter="350000" data-suffix="+">0</div>
+          <div class="perf__label">moves / second</div>
+        </div>
+        <div class="perf__stat">
+          <div class="perf__number">0</div>
+          <div class="perf__label">GC pauses</div>
+        </div>
+        <div class="perf__stat">
+          <div class="perf__number">1</div>
+          <div class="perf__label">single binary</div>
+        </div>
+        <div class="perf__stat">
+          <div class="perf__number">8</div>
+          <div class="perf__label">constraints &middot; 6 hard + 2 soft</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       3. THE SIMPLE PART
+       ============================================================ -->
+  <section class="simple">
+    <div class="wrapper reveal">
+      <div class="section-num">01 &mdash;</div>
+      <h2 class="section__heading">The simple part.</h2>
+
+      <div class="simple__content">
+        <div class="simple__text">
+          <h3 class="simple__headline">8 constraints.<br>6 hard. 2 soft.</h3>
+          <p>Your tasks have deadlines, dependencies, and priorities. Your calendar has meetings you can&rsquo;t move. The engine finds the best arrangement&nbsp;&mdash; or tells you it can&rsquo;t.</p>
+          <p class="simple__punch">No AI hallucinations. No guessing. Math.</p>
+        </div>
+        <div class="simple__features">
+          <ul class="features__list">
+            <li>Multi-project management with dependency ordering</li>
+            <li>Constraint-optimized scheduling across calendars</li>
+            <li>Full task dependency and sequence preservation</li>
+            <li>Works around your existing events</li>
+            <li>Plan, Gantt, and Calendar views</li>
+            <li>Fully offline &mdash; Linux, macOS, Windows</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="simple__video">
+        <p class="video__label">See it solve.</p>
+        <div class="video__container" data-video-id="REPLACE_ME">
+          <!-- When you have a YouTube video ID, replace REPLACE_ME above.
+               The JS will auto-create the iframe. Until then, placeholder: -->
+          <div class="video__placeholder">
+            <div class="video__placeholder-icon"></div>
+            <span>Video coming soon</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       4. SCREENSHOTS — 3D card stack
+       ============================================================ -->
+  <section class="screens">
+    <div class="wrapper reveal">
+      <div class="section-num">02 &mdash;</div>
+      <h2 class="section__heading">The delightful part.</h2>
+      <div class="stage" id="stage" aria-label="Screenshot stage — click a side card to bring it forward">
+        <div class="stage__side" id="stage-side">
+          <div class="stage__thumb" data-idx="1">
+            <img src="gantt.png" alt="Planner123 — Gantt view" draggable="false">
+            <span class="stage__thumb-label">Gantt</span>
+          </div>
+          <div class="stage__thumb" data-idx="2">
+            <img src="calendar.png" alt="Planner123 — Calendar view" draggable="false">
+            <span class="stage__thumb-label">Calendar</span>
+          </div>
+        </div>
+        <div class="stage__main" id="stage-main">
+          <img src="plan.png" alt="Planner123 — Plan view" draggable="false" id="stage-main-img">
+          <span class="stage__main-label" id="stage-main-label">Plan</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       4. PRICING
+       ============================================================ -->
+  <section class="pricing" id="pricing">
+    <div class="wrapper reveal">
+      <div class="section-num">03 &mdash;</div>
+      <h2 class="section__heading">The honest part.</h2>
+
+      <div class="honest__manifesto">
+        <p>The engine underneath this &mdash; <strong><a href="https://github.com/SolverForge">SolverForge</a></strong> &mdash; is open source. <strong>Truly</strong> open source. You can read every line, fork it, build on it. That part is free and always will be.</p>
+        <p>But I can&rsquo;t make Planner123 free. I tried the math. <em>Rent isn&rsquo;t a soft constraint.</em></p>
+        <p>So here&rsquo;s what I did instead: <em>shareware.</em></p>
+        <p>Take the binary. Use it. It&rsquo;s yours &mdash; not &ldquo;yours until you stop paying,&rdquo; not &ldquo;yours on up to 3 devices,&rdquo; not &ldquo;yours according to section 14.2(b).&rdquo; Yours. If it makes your week better, come back and pay what it&rsquo;s worth. If it makes your business better, buy the source and build on&nbsp;it.</p>
+        <p>No subscriptions. No seat licenses. No enterprise negotiations. No tricks, no gates, no guilt. Just the oldest deal in software: <strong>a developer and a&nbsp;user.</strong></p>
+      </div>
+
+      <div class="pricing__grid">
+
+        <!-- SHAREWARE -->
+        <div class="pricing__card">
+          <div class="pricing__tier">Shareware</div>
+          <div class="pricing__price">&euro;0</div>
+          <div class="pricing__once">&nbsp;</div>
+          <p class="pricing__desc">
+            <li>Full binary</li>
+            <li>7 day scheduling horizon</li>
+            <li>Lifelong updates</li>
+            <li>Yours forever</li>
+          <a href="#" class="pricing__btn pricing__btn--ghost">Get</a>
+        </div>
+
+        <!-- SHAREWARE++ -->
+        <div class="pricing__card pricing__card--soon">
+          <div class="pricing__tier">Shareware++ <span class="pricing__soon">Coming soon</span></div>
+          <div class="pricing__price">&euro;29.90</div>
+          <div class="pricing__once">one-time &middot; waitlist price</div>
+          <p class="pricing__desc">
+            <li>Unlimited scheduling horizon</li>
+            <li>Excel, Markdown, CSV</li>
+            <li>REST, MCP, Agent Skill</li>
+            <li>Request your integration</li>
+            <li>Call it from your own code</li>
+          <a href="#" class="pricing__btn pricing__btn--solid">Join waitlist</a>
+        </div>
+
+        <!-- FREE -->
+        <div class="pricing__card pricing__card--highlight pricing__card--soon">
+          <div class="pricing__tier">Free <span class="pricing__soon">Coming soon</span></div>
+          <div class="pricing__price">&euro;4,360</div>
+          <div class="pricing__once">one-time &middot; full source</div>
+          <p class="pricing__desc">
+            <li>Full repo access</li>
+            <li>Use it in your SaaS</li>
+            <li>Web application (Rails + Rust)</li>
+              <li>Team support</li>
+              <li>Skills and fairness constraints</li>
+              <li>EU regulation compliance</li>
+            <li>Request custom features</li>
+          <a href="#" class="pricing__btn pricing__btn--solid">Contact us</a>
+        </div>
+
+      </div>
+
+      <p class="pricing__footnote">No subscriptions. No seat licenses. No enterprise negotiations.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       5. THE ENGINE
+       ============================================================ -->
+  <section class="engine">
+    <div class="wrapper reveal">
+      <p class="engine__text">
+        Planner123 is powered by <strong><a href="https://github.com/SolverForge">SolverForge</a></strong>,
+        an open-source constraint solver.
+      </p>
+      <p class="engine__punchline">
+        The engine is <span class="engine__open">open source</span>.
+        The product is <span class="engine__product">Planner123</span>.
+        Both stand for <span class="engine__freedom">freedom</span>.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       7. FOOTER
+       ============================================================ -->
+  <footer class="footer">
+    <div class="wrapper">
+      <div class="footer__inner">
+        <nav class="footer__links">
+          <a href="https://github.com/SolverForge">GitHub</a>
+          <a href="/blog/">Blog</a>
+          <a href="mailto:info@solverforge.org">info@solverforge.org</a>
+        </nav>
+        <span class="footer__tagline">Built in Italy.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
