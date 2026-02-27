@@ -78,3 +78,20 @@ let one_per_day = factory
 </div>
 
 {{% /blocks/section %}}
+
+{{% blocks/section %}}
+
+<div class="testimonial-section">
+  <h2 class="testimonial-heading">What people say</h2>
+  <div class="testimonial-card">
+    <img class="testimonial-photo" src="/images/testimonials/fawaz-halwani.jpeg" alt="Fawaz Halwani">
+    <blockquote class="testimonial-quote">
+      I have incorporated SolverForge in my new Rust application for staff scheduling and it's working like a charm, A+
+    </blockquote>
+    <div class="testimonial-author">Fawaz Halwani</div>
+    <div class="testimonial-title">Pathologist, The Ottawa Hospital</div>
+    <img class="testimonial-logo" src="/images/testimonials/ottawa-hospital.jpg" alt="The Ottawa Hospital">
+  </div>
+</div>
+
+{{% /blocks/section %}}
