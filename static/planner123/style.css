@@ -528,6 +528,194 @@ section + section {
 
 
 /* ============================================================
+   3b. SHOWCASE — annotated screenshot pairs (37signals-style)
+   ============================================================ */
+.showcase {
+  margin-top: 5rem;
+}
+
+.showcase__pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 4rem;
+}
+
+.showcase__pair:last-child {
+  margin-bottom: 0;
+}
+
+.showcase__item {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.showcase__frame {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-base);
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+}
+
+.showcase__item:hover .showcase__frame {
+  border-color: var(--accent-emerald);
+  box-shadow: var(--shadow-psyche);
+  transform: translateY(-3px);
+}
+
+.showcase__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+/* ── Callout label — positioned over the screenshot ── */
+.showcase__callout {
+  position: absolute;
+  max-width: 220px;
+  padding: 0.45rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.78);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  border-radius: 4px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: none;
+  z-index: 1;
+  /* Subtle entry animation */
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.35s ease 0.1s, transform 0.35s ease 0.1s;
+}
+
+/* Callout connector dot */
+.showcase__callout::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 16px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent-emerald);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+}
+
+/* Show callout when parent is visible (scroll-reveal) */
+.visible .showcase__callout,
+.showcase__item:hover .showcase__callout {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Caption below the screenshot ── */
+.showcase__caption {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.75rem 0.25rem 0;
+}
+
+.showcase__badge {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent-emerald);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.showcase__note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* ── Showcase responsive ── */
+@media (max-width: 640px) {
+  .showcase__pair {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .showcase__callout {
+    max-width: 180px;
+    font-size: 0.6rem;
+    padding: 0.35rem 0.6rem;
+  }
+}
+
+
+/* ============================================================
+   3c. LIGHTBOX — full-resolution image overlay
+   ============================================================ */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+  cursor: pointer;
+}
+
+.lightbox--open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox__img {
+  max-width: 94vw;
+  max-height: 92vh;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 0 60px rgba(16, 185, 129, 0.15), 0 0 60px rgba(206, 66, 43, 0.1);
+  transform: scale(0.95);
+  transition: transform 0.3s ease;
+}
+
+.lightbox--open .lightbox__img {
+  transform: scale(1);
+}
+
+.lightbox__close {
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 2.5rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.2s;
+  z-index: 1;
+}
+
+.lightbox__close:hover {
+  color: #fff;
+}
+
+
+/* ============================================================
    4. VIDEO
    ============================================================ */
 .video {

@@ -165,4 +165,42 @@
       videoContainer.appendChild(iframe);
     }
   }
+
+  // --- Lightbox for showcase screenshots ---
+  const lightbox  = document.getElementById('lightbox');
+  const lbImg     = document.getElementById('lightbox-img');
+
+  if (lightbox && lbImg) {
+    // Open: click any [data-lightbox] figure's image
+    document.querySelectorAll('[data-lightbox]').forEach(function (fig) {
+      fig.addEventListener('click', function () {
+        var img = fig.querySelector('.showcase__frame img');
+        if (!img) return;
+        lbImg.src = img.src;
+        lbImg.alt = img.alt;
+        lightbox.classList.add('lightbox--open');
+        lightbox.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      });
+    });
+
+    // Close: click backdrop, close button, or press Escape
+    function closeLightbox() {
+      lightbox.classList.remove('lightbox--open');
+      lightbox.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    lightbox.addEventListener('click', function (e) {
+      // Don't close when clicking the image itself (unless user wants to)
+      if (e.target === lbImg) return;
+      closeLightbox();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && lightbox.classList.contains('lightbox--open')) {
+        closeLightbox();
+      }
+    });
+  }
 })();

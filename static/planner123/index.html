@@ -103,12 +103,14 @@
 
 
   <!-- ============================================================
-       4. SCREENSHOTS — 3D card stack
+       4. SCREENSHOTS — Stage Manager + annotated showcase
        ============================================================ -->
   <section class="screens">
     <div class="wrapper reveal">
       <div class="section-num">02 &mdash;</div>
       <h2 class="section__heading">The delightful part.</h2>
+
+      <!-- Stage Manager — interactive 3-card switcher (overview)
       <div class="stage" id="stage" aria-label="Screenshot stage — click a side card to bring it forward">
         <div class="stage__side" id="stage-side">
           <div class="stage__thumb" data-idx="1">
@@ -124,9 +126,95 @@
           <img src="plan.png" alt="Planner123 — Plan view" draggable="false" id="stage-main-img">
           <span class="stage__main-label" id="stage-main-label">Plan</span>
         </div>
-      </div>
+      </div> -->
+
+      <!-- Annotated showcase — 6 screenshots, 2 per view -->
+      <div class="showcase">
+
+        <!-- ── Plan view ── -->
+        <div class="showcase__pair">
+          <figure class="showcase__item" data-lightbox>
+            <div class="showcase__frame">
+              <img src="plan-dependencies.png" alt="Planner123 — Plan view: dependency editor with predecessor dropdown" loading="lazy">
+              <span class="showcase__callout" style="top: 28%; left: 5%">Drag tasks to reorder. The solver re-optimizes instantly...</span>
+              <span class="showcase__callout" style="top: 55%; left: 65%">...or set predecessors and priorities to start tasks in parallel within a project.</span>
+            </div>
+            <figcaption class="showcase__caption">
+              <span class="showcase__badge">Plan</span>
+              <span class="showcase__note">Your tasks, ranked by priority. Drag to override the solver.</span>
+            </figcaption>
+          </figure>
+          <figure class="showcase__item" data-lightbox>
+            <div class="showcase__frame">
+              <img src="plan-context-menu.png" alt="Planner123 — Plan view: right-click context menu with pin and priority options" loading="lazy">
+              <span class="showcase__callout" style="top: 40%; left: 15%">Right-click any event to pin it in place.</span>
+            </div>
+            <figcaption class="showcase__caption">
+              <span class="showcase__badge">Plan</span>
+              <span class="showcase__note">Pin events the solver shouldn&rsquo;t move. Everything else adapts.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- ── Gantt view ── -->
+        <div class="showcase__pair">
+          <figure class="showcase__item" data-lightbox>
+            <div class="showcase__frame">
+              <img src="gantt.png" alt="Planner123 — Gantt view: overview" loading="lazy">
+              <span class="showcase__callout" style="top: 22%; left: 30%">Your existing calendar events are imported. The solver works around them.</span>
+            </div>
+            <figcaption class="showcase__caption">
+              <span class="showcase__badge">Gantt</span>
+              <span class="showcase__note">Optimized tasks slotted around meetings you can&rsquo;t move.</span>
+            </figcaption>
+          </figure>
+          <figure class="showcase__item" data-lightbox>
+            <div class="showcase__frame">
+              <img src="gantt-dependencies.png" alt="Planner123 — Gantt view: dependency chains with arrows across projects" loading="lazy">
+              <span class="showcase__callout" style="top: 70%; left: 45%">Dependencies draw themselves. No manual wiring.</span>
+            </div>
+            <figcaption class="showcase__caption">
+              <span class="showcase__badge">Gantt</span>
+              <span class="showcase__note">See every dependency chain across all your projects at once.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+        <!-- ── Calendar view ── -->
+        <div class="showcase__pair">
+          <figure class="showcase__item" data-lightbox>
+            <div class="showcase__frame">
+              <img src="plan-violation.png" alt="Planner123 — Plan view: constraint violation modal showing overlap conflicts" loading="lazy">
+              <span class="showcase__callout" style="top: 10%; left: 8%">Red means the solver found a conflict. Hover to see why.</span>
+              <span class="showcase__callout" style="top: 70%; left: 45%">Violations are clearly explained, in plain English.</span>
+            </div>
+            <figcaption class="showcase__caption">
+              <span class="showcase__badge">Calendar</span>
+              <span class="showcase__note">Conflicts aren&rsquo;t hidden. They&rsquo;re highlighted and explained.</span>
+            </figcaption>
+          </figure>
+          <figure class="showcase__item" data-lightbox>
+            <div class="showcase__frame">
+              <img src="calendar.png" alt="Planner123 — Calendar view: week layout" loading="lazy">
+              <span class="showcase__callout" style="top: 10%; left: 8%">Score is refreshed after each manual change.</span>
+              <span class="showcase__callout" style="top: 60%; left: 45%">Drag a task to a new slot. The solver reflows everything else.</span>
+            </div>
+            <figcaption class="showcase__caption">
+              <span class="showcase__badge">Calendar</span>
+              <span class="showcase__note">Play around with your schedule. Planner123 will realign and update your current score in real-time.</span>
+            </figcaption>
+          </figure>
+        </div>
+
+      </div><!-- .showcase -->
     </div>
   </section>
+
+  <!-- Lightbox overlay -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button class="lightbox__close" aria-label="Close lightbox">&times;</button>
+    <img class="lightbox__img" id="lightbox-img" src="" alt="">
+  </div>
 
 
   <!-- ============================================================
@@ -155,6 +243,7 @@
           <p class="pricing__desc">
             <li>Full binary</li>
             <li>7 day scheduling horizon</li>
+            <li>Supports Google Caleandar</li>
             <li>Lifelong updates</li>
             <li>Yours forever</li>
           <a href="#" class="pricing__btn pricing__btn--ghost">Get</a>
@@ -167,10 +256,9 @@
           <div class="pricing__once">one-time &middot; waitlist price</div>
           <p class="pricing__desc">
             <li>Unlimited scheduling horizon</li>
-            <li>Excel, Markdown, CSV</li>
-            <li>REST, MCP, Agent Skill</li>
-            <li>Request your integration</li>
-            <li>Call it from your own code</li>
+            <li>Markdown, CSV more data sources</li>
+            <li>AI Agent integration</li>
+            <li>Opan API: call it from your own code</li>
           <a href="#" class="pricing__btn pricing__btn--solid">Join waitlist</a>
         </div>
 
@@ -181,12 +269,11 @@
           <div class="pricing__once">one-time &middot; full source</div>
           <p class="pricing__desc">
             <li>Full repo access</li>
-            <li>Use it in your SaaS</li>
             <li>Web application (Rails + Rust)</li>
               <li>Team support</li>
               <li>Skills and fairness constraints</li>
-              <li>EU regulation compliance</li>
-            <li>Request custom features</li>
+            <li>Scale it, use it in your product</li>
+            <li>Custom features</li>
           <a href="#" class="pricing__btn pricing__btn--solid">Contact us</a>
         </div>
 
