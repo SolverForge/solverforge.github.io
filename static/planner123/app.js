@@ -141,31 +141,6 @@
     });
   }
 
-  // --- YouTube embed loader ---
-  // Replaces placeholder with iframe when a valid video ID is set
-  const videoContainer = document.querySelector('[data-video-id]');
-
-  if (videoContainer) {
-    const videoId = videoContainer.dataset.videoId;
-
-    if (videoId && videoId !== 'REPLACE_ME') {
-      const placeholder = videoContainer.querySelector('.video__placeholder');
-      if (placeholder) placeholder.remove();
-
-      const iframe = document.createElement('iframe');
-      iframe.src =
-        'https://www.youtube-nocookie.com/embed/' +
-        videoId +
-        '?rel=0&modestbranding=1';
-      iframe.allow =
-        'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-      iframe.allowFullscreen = true;
-      iframe.loading = 'lazy';
-      iframe.title = 'Planner123 demo';
-      videoContainer.appendChild(iframe);
-    }
-  }
-
   // --- Lightbox for showcase screenshots ---
   const lightbox  = document.getElementById('lightbox');
   const lbImg     = document.getElementById('lightbox-img');

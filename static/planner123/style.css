@@ -756,7 +756,8 @@ section + section {
   box-shadow: var(--shadow-psyche);
 }
 
-.video__container iframe {
+.video__container iframe,
+.video__container video {
   position: absolute;
   top: 0;
   left: 0;
@@ -1019,6 +1020,14 @@ section + section {
   box-shadow: var(--shadow-psyche);
   transform: translateY(-1px);
   color: #fff;
+}
+
+/* Disabled state — greyed out, ready to re-enable */
+.pricing__btn--disabled {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: default;
+  filter: grayscale(1);
 }
 
 .pricing__footnote {

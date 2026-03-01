@@ -89,13 +89,10 @@
 
       <div class="simple__video">
         <p class="video__label">See it solve.</p>
-        <div class="video__container" data-video-id="REPLACE_ME">
-          <!-- When you have a YouTube video ID, replace REPLACE_ME above.
-               The JS will auto-create the iframe. Until then, placeholder: -->
-          <div class="video__placeholder">
-            <div class="video__placeholder-icon"></div>
-            <span>Video coming soon</span>
-          </div>
+        <div class="video__container">
+          <video controls preload="metadata" playsinline poster="">
+            <source src="planner123.mp4" type="video/mp4">
+          </video>
         </div>
       </div>
     </div>
@@ -246,7 +243,7 @@
             <li>Supports Google Caleandar</li>
             <li>Lifelong updates</li>
             <li>Yours forever</li>
-          <a href="#" class="pricing__btn pricing__btn--ghost">Get</a>
+          <a href="https://github.com/SolverForge/Planner123" class="pricing__btn pricing__btn--solid" target="_blank" rel="noopener">Get</a>
         </div>
 
         <!-- SHAREWARE++ -->
@@ -257,9 +254,9 @@
           <p class="pricing__desc">
             <li>Unlimited scheduling horizon</li>
             <li>Markdown, CSV more data sources</li>
-            <li>AI Agent integration</li>
-            <li>Opan API: call it from your own code</li>
-          <a href="#" class="pricing__btn pricing__btn--solid">Join waitlist</a>
+            <li>AI Agent integration: call it from your agent</li>
+            <li>Full REST API: call it from your own code</li>
+          <a class="pricing__btn pricing__btn--solid pricing__btn--disabled">Join waitlist</a>
         </div>
 
         <!-- FREE -->
@@ -274,7 +271,7 @@
               <li>Skills and fairness constraints</li>
             <li>Scale it, use it in your product</li>
             <li>Custom features</li>
-          <a href="#" class="pricing__btn pricing__btn--solid">Contact us</a>
+          <a class="pricing__btn pricing__btn--solid pricing__btn--disabled">Contact us</a>
         </div>
 
       </div>
