@@ -6,7 +6,7 @@ description: >
   Choose the right score type for your optimization problem.
 ---
 
-The score represents the quality of a solution. SolverForge provides five score types with increasing granularity. Choose the simplest one that captures your constraint hierarchy.
+The score represents the quality of a solution. SolverForge provides several score types with increasing granularity. Choose the simplest one that captures your constraint hierarchy.
 
 ## Available Score Types
 
@@ -15,8 +15,8 @@ The score represents the quality of a solution. SolverForge provides five score 
 | `SoftScore` | 1 (soft) | All constraints are preferences, no hard rules |
 | `HardSoftScore` | 2 (hard, soft) | **Most common** — hard constraints must be satisfied, soft are optimized |
 | `HardMediumSoftScore` | 3 (hard, medium, soft) | Three priority tiers (e.g., must / should / nice-to-have) |
-| `HardSoftDecimalScore` | 2 (hard, soft) | Same as HardSoftScore but with decimal precision |
-| `BendableScore` | N | Custom number of hard and soft levels |
+| `HardSoftDecimalScore` | 2 (hard, soft) | Same as HardSoftScore but with decimal precision (i64 auto-scaled by 100,000) |
+| `BendableScore<H, S>` | N | Custom number of hard and soft levels (const generics) |
 
 ## HardSoftScore (Most Common)
 
@@ -25,8 +25,8 @@ use solverforge::prelude::*;
 
 // Constants for common impacts
 HardSoftScore::ZERO
-HardSoftScore::ONE_HARD        // -1 hard
-HardSoftScore::ONE_SOFT        // -1 soft
+HardSoftScore::ONE_HARD        // 1 hard, 0 soft
+HardSoftScore::ONE_SOFT        // 0 hard, 1 soft
 
 // Custom values
 HardSoftScore::of_hard(-5)
@@ -66,19 +66,25 @@ HardMediumSoftScore::of(-1, 0, -10)
 
 ## HardSoftDecimalScore
 
-Like HardSoftScore but uses floating-point values:
+Like HardSoftScore but with fixed-point decimal precision. Values are `i64` internally, auto-scaled by 100,000:
 
 ```rust
-HardSoftDecimalScore::of(-1.5, -3.7)
+HardSoftDecimalScore::ZERO
+HardSoftDecimalScore::ONE_HARD    // scaled to 100,000
+HardSoftDecimalScore::ONE_SOFT
+
+HardSoftDecimalScore::of(-1, -3)          // auto-scaled: -100000, -300000
+HardSoftDecimalScore::of_scaled(-150000, -370000)  // raw scaled values
 ```
 
 ## BendableScore
 
-Configurable number of hard and soft levels:
+Configurable number of hard and soft levels using const generics:
 
 ```rust
 // 2 hard levels, 3 soft levels
-BendableScore::of(vec![-1, 0], vec![-5, -3, -1])
+let score = BendableScore::<2, 3>::of([-1, 0], [-5, -3, -1]);
+let zero = BendableScore::<2, 3>::zero();
 ```
 
 Use when you need more than three priority tiers.
@@ -91,7 +97,6 @@ All score types support standard operations:
 let a = HardSoftScore::of(-1, -5);
 let b = HardSoftScore::of(0, -3);
 let sum = a + b;           // (-1, -8)
-let zero = HardSoftScore::zero();
 ```
 
 ## Choosing a Score Type

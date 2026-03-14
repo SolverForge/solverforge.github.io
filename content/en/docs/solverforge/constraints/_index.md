@@ -13,15 +13,18 @@ Constraints are the business rules that define what makes a good solution. Solve
 1. **Select** entities or facts from your solution using `for_each`
 2. **Filter, join, or group** to narrow down the matches
 3. **Penalize or reward** to affect the score
+4. **Name** the constraint with `.named()`
 
 ```rust
-factory.for_each::<Shift>()                              // Select all shifts
-    .filter(|s| s.employee.is_none())                    // Keep unassigned ones
-    .penalize("Unassigned shift", HardSoftScore::ONE_HARD)  // Penalize each
-    .as_constraint()
+let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+
+factory.for_each(|s: &Schedule| s.shifts.as_slice())    // Select all shifts
+    .filter(|s| s.employee_idx.is_none())                // Keep unassigned ones
+    .penalize(HardSoftScore::ONE_HARD)                   // Penalize each
+    .named("Unassigned shift")                           // Finalize
 ```
 
-Every constraint produces a `Constraint<S>` that the solver evaluates incrementally as it explores moves.
+Constraints are returned as a tuple implementing `ConstraintSet<S, Sc>`, which the solver evaluates incrementally as it explores moves.
 
 ## Sections
 

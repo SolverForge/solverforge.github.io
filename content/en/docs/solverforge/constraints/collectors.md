@@ -13,105 +13,57 @@ Collectors aggregate values within groups created by `group_by`. They transform 
 Pass a collector as the second argument to `group_by`:
 
 ```rust
-factory.for_each::<Shift>()
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
     .group_by(
-        |shift| shift.employee.clone(),  // grouping key
-        count(),                          // collector
+        |shift: &Shift| shift.employee_idx,   // grouping key
+        count::<Shift>(),                       // collector
     )
-    // Result: BiConstraintStream<Employee, i64>
+    // Result: grouped stream of (key, usize)
 ```
 
 ## Available Collectors
 
-### `count()`
+### `count::<A>()`
 
-Counts the number of matches in each group.
-
-```rust
-.group_by(|s| s.employee.clone(), count())
-// → (Employee, i64)
-```
-
-### `count_distinct()`
-
-Counts distinct values in each group.
+Counts the number of matches in each group. Returns `usize`.
 
 ```rust
-.group_by(|s| s.department.clone(), count_distinct(|s| s.employee.clone()))
-// → (Department, i64)
+.group_by(|s: &Shift| s.employee_idx, count::<Shift>())
+// → (key, usize)
 ```
 
-### `sum()`
+### `sum(mapper)`
 
-Sums numeric values in each group.
+Sums numeric values in each group. The mapper extracts the value to sum.
 
 ```rust
-.group_by(|s| s.employee.clone(), sum(|s| s.hours))
-// → (Employee, i64)
+.group_by(|s: &Shift| s.employee_idx, sum(|s: &Shift| s.hours))
+// → (key, i64)
 ```
 
-### `min()`
+### `load_balance(key_fn, metric_fn)`
 
-Finds the minimum value in each group.
-
-```rust
-.group_by(|s| s.employee.clone(), min(|s| s.start_time))
-// → (Employee, Option<Time>)
-```
-
-### `max()`
-
-Finds the maximum value in each group.
-
-```rust
-.group_by(|s| s.employee.clone(), max(|s| s.end_time))
-// → (Employee, Option<Time>)
-```
-
-### `to_list()`
-
-Collects all matches into a `Vec`.
-
-```rust
-.group_by(|s| s.employee.clone(), to_list())
-// → (Employee, Vec<Shift>)
-```
-
-### `to_set()`
-
-Collects unique matches into a set.
-
-```rust
-.group_by(|s| s.employee.clone(), to_set(|s| s.skill.clone()))
-// → (Employee, HashSet<String>)
-```
-
-## Balance Collector
-
-The `balance` collector measures load imbalance across a grouping key. It's useful for ensuring fair distribution of work.
-
-```rust
-// Penalize uneven shift distribution across employees
-factory.for_each::<Shift>()
-    .balance(|s| s.employee.clone())
-    .penalize_soft_with("Fair distribution", |imbalance| imbalance)
-    .as_constraint()
-```
-
-The balance collector calculates how far the distribution is from perfectly even, returning a penalty value proportional to the imbalance.
-
-## Multiple Collectors
-
-You can use multiple collectors in a single `group_by`:
+Measures load imbalance across a grouping key. Returns a `LoadBalance<K>` with unfairness metric.
 
 ```rust
 .group_by(
-    |s| s.employee.clone(),
-    count(),
-    sum(|s| s.hours),
+    |s: &Shift| s.department_idx,
+    load_balance(|s: &Shift| s.employee_idx, |s: &Shift| 1i64),
 )
-// → TriConstraintStream<Employee, i64, i64>
 ```
+
+## Balance Stream Operation
+
+For simple load balancing without `group_by`, use the `balance` stream operation directly:
+
+```rust
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .balance(|shift: &Shift| shift.employee_idx)
+    .penalize_soft()
+    .named("Fair distribution")
+```
+
+The key function returns `Option<K>` — `None` values (unassigned entities) are skipped.
 
 ## See Also
 

@@ -12,20 +12,27 @@ The solver runs phases in sequence. Each phase uses a different strategy to impr
 
 Builds an initial solution by assigning values to all planning variables. Runs first — local search then improves the result.
 
-### Forager Types
+### Construction Heuristic Types
 
-| Forager Type | Description |
+| Type | Description |
 |---|---|
 | `first_fit` | Assigns the first feasible value found. Fast. |
-| `best_fit` | Tries all values, picks the best. Better quality, slower. |
-| `first_feasible` | Assigns the first value that doesn't break hard constraints. |
+| `first_fit_decreasing` | First fit, processing entities by difficulty. |
 | `weakest_fit` | Assigns the value that leaves the most room for future assignments. |
+| `weakest_fit_decreasing` | Weakest fit, processing entities by difficulty. |
 | `strongest_fit` | Assigns the value that uses resources most aggressively. |
+| `strongest_fit_decreasing` | Strongest fit, processing entities by difficulty. |
+| `cheapest_insertion` | Greedy insertion for basic variables. |
+| `list_round_robin` | Distributes elements evenly across entities (list variables). |
+| `list_cheapest_insertion` | Inserts each element at the score-minimizing position (list variables). |
+| `list_regret_insertion` | Inserts elements in order of highest placement regret (list variables). |
+| `list_clarke_wright` | Greedy route merging by savings value (list variables). |
+| `list_k_opt` | Per-route k-opt polishing (list variables). |
 
 ```toml
-[[solver.phases]]
+[[phases]]
 type = "construction_heuristic"
-forager_type = "best_fit"
+construction_heuristic_type = "first_fit"
 ```
 
 ## Local Search
@@ -34,7 +41,7 @@ Iteratively improves the solution by applying moves and accepting improvements (
 
 ### Acceptors
 
-Local search uses an **acceptor** to decide whether to keep a move:
+Local search uses an **acceptor** to decide whether to keep a move. The acceptor is configured as a nested object:
 
 | Acceptor | Description |
 |---|---|
@@ -43,16 +50,15 @@ Local search uses an **acceptor** to decide whether to keep a move:
 | `tabu_search` | Remembers recent moves and forbids reversing them. Strong for many problems. |
 | `late_acceptance` | Accepts moves better than N steps ago. Simple and effective. |
 | `great_deluge` | Accepts moves above a rising water level. Steady improvement. |
-| `step_counting_hill_climbing` | Hill climbing with periodic restarts based on step count. |
-| `diversified_late_acceptance` | Late acceptance with diversification to escape plateaus. |
 
 ```toml
-[[solver.phases]]
+[[phases]]
 type = "local_search"
-acceptor = "late_acceptance"
+[phases.acceptor]
+type = "late_acceptance"
 late_acceptance_size = 400
 
-[solver.phases.termination]
+[phases.termination]
 unimproved_step_count_limit = 10000
 ```
 
@@ -60,29 +66,25 @@ unimproved_step_count_limit = 10000
 
 **Simulated Annealing:**
 ```toml
-acceptor = "simulated_annealing"
+[phases.acceptor]
+type = "simulated_annealing"
 starting_temperature = "0hard/500soft"
 ```
 
 **Tabu Search:**
 ```toml
-acceptor = "tabu_search"
+[phases.acceptor]
+type = "tabu_search"
 entity_tabu_size = 7
 # or value_tabu_size, move_tabu_size
 ```
 
 **Late Acceptance:**
 ```toml
-acceptor = "late_acceptance"
+[phases.acceptor]
+type = "late_acceptance"
 late_acceptance_size = 400
 ```
-
-### Forager Types (Local Search)
-
-| Forager Type | Description |
-|---|---|
-| `accepted_count` | Evaluate a fixed number of moves per step (default) |
-| `first_improving` | Accept the first improving move found |
 
 ## Exhaustive Search
 
@@ -91,16 +93,15 @@ Explores the entire search space systematically. Only practical for small proble
 ### Branch and Bound
 
 ```toml
-[[solver.phases]]
+[[phases]]
 type = "exhaustive_search"
-exploration_type = "depth_first"
+exhaustive_search_type = "branch_and_bound"
 ```
 
-| Exploration Type | Description |
+| Type | Description |
 |---|---|
-| `depth_first` | DFS — memory efficient, finds solutions quickly |
-| `breadth_first` | BFS — explores level by level |
-| `score_first` | Explores most promising branches first |
+| `branch_and_bound` | Prunes branches that can't improve — memory efficient, finds solutions quickly |
+| `brute_force` | Explores every possibility |
 
 ### Score Bounder
 
@@ -111,33 +112,25 @@ Use a `ScoreBounder` to prune branches that can't improve on the best known solu
 Splits the problem into independent partitions and solves them in parallel on separate threads.
 
 ```toml
-[[solver.phases]]
+[[phases]]
 type = "partitioned_search"
 ```
 
 Requires implementing the `SolutionPartitioner` trait to define how the problem is split.
-
-## VND (Variable Neighborhood Descent)
-
-Cycles through different move types, switching neighborhoods when no improvement is found.
-
-```toml
-[[solver.phases]]
-type = "vnd"
-```
 
 ## Typical Phase Configuration
 
 Most problems work well with construction heuristic + local search:
 
 ```toml
-[[solver.phases]]
+[[phases]]
 type = "construction_heuristic"
-forager_type = "first_fit"
+construction_heuristic_type = "first_fit"
 
-[[solver.phases]]
+[[phases]]
 type = "local_search"
-acceptor = "late_acceptance"
+[phases.acceptor]
+type = "late_acceptance"
 late_acceptance_size = 400
 ```
 

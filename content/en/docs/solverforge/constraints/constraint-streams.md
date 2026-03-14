@@ -8,110 +8,118 @@ description: >
 
 Constraint streams are the primary way to define constraints in SolverForge. They provide a pipeline-style API where you select entities, transform the stream, and terminate with a scoring impact.
 
-## Creating a Constraint Factory
+## Defining Constraints
+
+Constraints are defined as a function that returns a tuple of constraint objects. The `#[planning_solution]` macro wires this up automatically.
 
 ```rust
 use solverforge::prelude::*;
 
-fn define_constraints(factory: &ConstraintFactory<Schedule>) -> Vec<Constraint<Schedule>> {
-    vec![
-        // constraints go here
-    ]
+fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+
+    (
+        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+            .filter(|shift| shift.employee_idx.is_none())
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unassigned shift"),
+    )
 }
 ```
+
+Each constraint builder chain produces an `IncrementalUniConstraint` (or similar) via `.named()`. Return them as a tuple — SolverForge implements `ConstraintSet` for tuples of up to 16 constraints.
 
 ## Source Operations
 
 ### `for_each`
 
-Selects all instances of a type from the solution.
+Selects all items from a collection in the solution, using a closure extractor.
 
 ```rust
-factory.for_each::<Shift>()   // UniConstraintStream<Shift>
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
 ```
-
-### `for_each_unique_pair`
-
-Selects all unique pairs of a type, avoiding duplicate combinations.
-
-```rust
-factory.for_each_unique_pair::<Shift>()   // BiConstraintStream<Shift, Shift>
-```
-
-## Stream Types
-
-Streams are typed by how many elements they carry:
-
-| Stream Type | Elements | Created By |
-|---|---|---|
-| `UniConstraintStream<A>` | 1 | `for_each` |
-| `BiConstraintStream<A, B>` | 2 | `join`, `for_each_unique_pair` |
-| `TriConstraintStream<A, B, C>` | 3 | `join` on Bi |
-| `QuadConstraintStream<A, B, C, D>` | 4 | `join` on Tri |
-| `PentaConstraintStream<A, B, C, D, E>` | 5 | `join` on Quad |
 
 ## Intermediate Operations
 
 ### `filter`
 
-Keeps only tuples that match a predicate.
+Keeps only elements that match a predicate.
 
 ```rust
-factory.for_each::<Shift>()
-    .filter(|shift| shift.employee.is_none())
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .filter(|shift| shift.employee_idx.is_none())
 ```
 
 ### `join`
 
-Combines two streams. Use [joiners](../joiners/) to control which pairs are created.
+Combines elements from the same or different collections. The join target determines the behavior:
+
+**Self-join** — pairs from the same collection, using an `equal` joiner:
 
 ```rust
-factory.for_each::<Shift>()
-    .join(
-        factory.for_each::<Shift>(),
-        joiner::equal(|s| &s.employee),
-        joiner::less_than(|s| s.id),  // avoid duplicate pairs
-    )
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .join(equal(|shift: &Shift| shift.employee_idx))
 ```
+
+**Cross-join** — pairs from two different collections, using an `equal_bi` joiner:
+
+```rust
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .join((
+        |s: &Schedule| s.unavailability.as_slice(),
+        equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
+    ))
+```
+
+See [Joiners](../joiners/) for all available joiner types.
 
 ### `flatten_last`
 
-Flattens a collection in the last element of the tuple into individual elements.
+Flattens a collection in the last element into individual elements. Takes three arguments: a slice extractor, a key function for the flattened items, and a lookup function for matching.
 
 ```rust
-factory.for_each::<Employee>()
-    .flatten_last(|e| &e.skills)   // Employee → (Employee, Skill)
+factory.for_each(|s: &Schedule| s.employees.as_slice())
+    .join((
+        |s: &Schedule| s.shifts.as_slice(),
+        equal_bi(|e: &Employee| e.id, |s: &Shift| s.employee_idx),
+    ))
+    .flatten_last(
+        |e: &Employee| e.available_days.as_slice(),  // slice extractor
+        |d| *d,                                       // key for flattened item
+        |s: &Shift| s.date(),                         // lookup from A
+    )
 ```
 
 ### `group_by`
 
-Groups tuples and applies [collectors](../collectors/) to aggregate.
+Groups elements and applies a [collector](../collectors/) to aggregate.
 
 ```rust
-factory.for_each::<Shift>()
-    .group_by(|s| s.employee.clone(), count())
-    // BiConstraintStream<Employee, i64>
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .group_by(
+        |shift: &Shift| shift.employee_idx,   // grouping key
+        count::<Shift>(),                       // collector
+    )
 ```
 
 ### `balance`
 
-Calculates load balance across a grouping key using the [balance collector](../collectors/).
+Calculates load imbalance across a grouping key. The key function returns `Option<K>` — `None` values are skipped (useful for unassigned entities).
 
 ```rust
-factory.for_each::<Shift>()
-    .balance(|s| s.employee.clone())
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .balance(|shift: &Shift| shift.employee_idx)
 ```
 
-### `if_exists` / `if_not_exists`
+### `if_exists_filtered` / `if_not_exists_filtered`
 
-Filters based on the existence (or absence) of matching entities.
+Filters based on the existence (or absence) of matching entities in another collection.
 
 ```rust
-factory.for_each::<Shift>()
-    .if_exists(
-        factory.for_each::<Unavailability>(),
-        joiner::equal(|s| &s.employee, |u| &u.employee),
-        joiner::equal(|s| &s.date, |u| &u.date),
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .if_exists_filtered(
+        |s: &Schedule| s.unavailability.clone(),
+        equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
     )
 ```
 
@@ -119,57 +127,74 @@ factory.for_each::<Shift>()
 
 ### `penalize` / `reward`
 
-Apply a fixed score impact per match.
+Apply a fixed score impact per match, then finalize with `.named()`.
 
 ```rust
-.penalize("Constraint name", HardSoftScore::ONE_HARD)
-.reward("Constraint name", HardSoftScore::ONE_SOFT)
+.penalize(HardSoftScore::ONE_HARD)
+    .named("Constraint name")
+
+.reward(HardSoftScore::ONE_SOFT)
+    .named("Preference bonus")
 ```
 
-### `penalize_hard_with` / `penalize_soft_with` / `reward_soft`
+### `penalize_hard` / `penalize_soft` / `reward_hard` / `reward_soft`
 
-Apply a dynamic score impact based on the matched elements.
+Convenience methods that use the score type's unit hard or soft value.
 
 ```rust
-.penalize_hard_with("Overtime", |shift| shift.overtime_hours())
-.penalize_soft_with("Preference", |shift| shift.preference_penalty())
-.reward_soft("Bonus", |shift| shift.skill_match_score())
+.penalize_hard()
+    .named("Hard violation")
+
+.penalize_soft()
+    .named("Soft preference")
 ```
 
-### `as_constraint`
+### `penalize_hard_with` / `penalize_soft_with` / `reward_hard_with`
 
-Finalizes the stream into a `Constraint<S>`.
+Apply a dynamic score impact based on the matched element.
 
 ```rust
-factory.for_each::<Shift>()
-    .filter(|s| s.employee.is_none())
-    .penalize("Unassigned", HardSoftScore::ONE_HARD)
-    .as_constraint()
+.penalize_hard_with(|shift: &Shift| HardSoftScore::of(1, shift.overtime_hours() as i64))
+    .named("Overtime")
+```
+
+### `penalize_with` / `reward_with`
+
+Apply a fully custom score impact.
+
+```rust
+.penalize_with(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
+    .named("Preference")
 ```
 
 ## Full Example
 
 ```rust
-fn define_constraints(factory: &ConstraintFactory<Schedule>) -> Vec<Constraint<Schedule>> {
-    vec![
+use solverforge::prelude::*;
+
+fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+
+    (
         // Hard: every shift must be assigned
-        factory.for_each::<Shift>()
-            .filter(|s| s.employee.is_none())
-            .penalize("Unassigned shift", HardSoftScore::ONE_HARD)
-            .as_constraint(),
+        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+            .filter(|shift| shift.employee_idx.is_none())
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unassigned shift"),
 
         // Hard: no employee works two overlapping shifts
-        factory.for_each_unique_pair::<Shift>()
-            .filter(|(a, b)| a.overlaps(b) && a.employee == b.employee)
-            .penalize("Overlap", HardSoftScore::ONE_HARD)
-            .as_constraint(),
+        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+            .join(equal(|shift: &Shift| shift.employee_idx))
+            .filter(|(a, b)| a.overlaps(b))
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Overlap"),
 
         // Soft: prefer assigning employees to their preferred shifts
-        factory.for_each::<Shift>()
-            .filter(|s| s.is_preferred_by_employee())
-            .reward("Preference", HardSoftScore::ONE_SOFT)
-            .as_constraint(),
-    ]
+        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+            .filter(|shift| shift.is_preferred_by_employee())
+            .reward(HardSoftScore::ONE_SOFT)
+            .named("Preference"),
+    )
 }
 ```
 

@@ -13,13 +13,19 @@ The solver takes your domain model and constraints, then searches for the best s
 ```rust
 use solverforge::prelude::*;
 
+static MANAGER: SolverManager<Schedule> = SolverManager::new();
+
 let config = SolverConfig::from_toml_str(r#"
-    [solver]
-    termination.seconds_spent_limit = 30
+    [termination]
+    seconds_spent_limit = 30
 "#).unwrap();
 
-let manager = SolverManager::new(config);
-let solution = manager.solve(problem).unwrap();
+let (job_id, rx) = MANAGER.solve(problem);
+
+// Receive improving solutions via channel
+for (solution, score) in rx {
+    println!("New best score: {:?}", score);
+}
 ```
 
 ## Sections

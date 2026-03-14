@@ -67,7 +67,7 @@ Controls which moves are generated from selected entities and values.
 For large problems, nearby selection restricts move generation to entities/values that are "close" to each other according to a distance measure. This focuses the search on promising neighborhoods.
 
 ```toml
-[[solver.phases]]
+[[phases]]
 type = "local_search"
 nearby_selection = true
 nearby_distance_type = "euclidean"

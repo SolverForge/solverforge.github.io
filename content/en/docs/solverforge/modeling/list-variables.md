@@ -46,8 +46,7 @@ pub struct Vehicle {
     pub stops: Vec<Stop>,
 }
 
-#[planning_solution]
-#[derive(Clone, Debug)]
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct VehicleRoutePlan {
     #[problem_fact_collection]
     pub stops: Vec<Stop>,
@@ -99,19 +98,23 @@ The solver uses specialized moves for list variables:
 ## Example: Vehicle Routing
 
 ```rust
-fn define_constraints(factory: &ConstraintFactory<VehicleRoutePlan>) -> Vec<Constraint<VehicleRoutePlan>> {
-    vec![
+fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
+    let factory = ConstraintFactory::<VehicleRoutePlan, HardSoftScore>::new();
+
+    (
         // Hard: don't exceed vehicle capacity
-        factory.for_each::<Vehicle>()
+        factory.for_each(|s: &VehicleRoutePlan| s.vehicles.as_slice())
             .filter(|v| v.total_demand() > v.capacity)
-            .penalize_hard_with("Capacity", |v| v.total_demand() - v.capacity)
-            .as_constraint(),
+            .penalize_hard_with(|v: &Vehicle| {
+                HardSoftScore::of_hard((v.total_demand() - v.capacity) as i64)
+            })
+            .named("Capacity"),
 
         // Soft: minimize total driving distance
-        factory.for_each::<Vehicle>()
-            .penalize_soft_with("Distance", |v| v.total_distance())
-            .as_constraint(),
-    ]
+        factory.for_each(|s: &VehicleRoutePlan| s.vehicles.as_slice())
+            .penalize_with(|v: &Vehicle| HardSoftScore::of_soft(v.total_distance()))
+            .named("Distance"),
+    )
 }
 ```
 

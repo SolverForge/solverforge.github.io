@@ -6,64 +6,79 @@ description: >
   Run and manage solver instances with channel-based streaming.
 ---
 
-`SolverManager` is the main entry point for running the solver. It manages solver lifecycle, provides status updates, and supports early termination.
+`SolverManager` is the main entry point for running the solver. It manages solver lifecycle, provides streaming updates via channels, and supports early termination.
 
-## Basic Usage
+## Creating a SolverManager
+
+`SolverManager::new()` is a `const fn` that takes no arguments. It's designed to be used as a static:
 
 ```rust
 use solverforge::prelude::*;
 
-let config = SolverConfig::from_toml_str(r#"
-    [solver]
-    termination.seconds_spent_limit = 30
-"#).unwrap();
-
-let manager = SolverManager::new(config);
-let solution = manager.solve(problem).unwrap();
-
-println!("Score: {:?}", solution.score);
+static MANAGER: SolverManager<Schedule> = SolverManager::new();
 ```
 
-## Channel-Based Streaming
+## Solving
 
-For real-time updates during solving, use the channel-based pattern:
+Call `.solve()` with your planning solution. It returns a `(job_id, Receiver)` tuple:
 
 ```rust
-let (tx, rx) = std::sync::mpsc::channel();
+let (job_id, rx) = MANAGER.solve(solution);
+```
 
-let manager = SolverManager::new(config);
-manager.solve_with_updates(problem, move |update| {
-    tx.send(update.best_solution().clone()).ok();
-});
+The receiver yields `(S, S::Score)` tuples — each is an improving solution found during solving. Consume them in a loop or spawn a thread:
 
-// Receive updates in another thread
-for solution in rx {
-    println!("New best score: {:?}", solution.score);
+```rust
+let (job_id, rx) = MANAGER.solve(solution);
+
+for (best_solution, score) in rx {
+    println!("New best score: {:?}", score);
+    // Update UI, save to database, etc.
 }
 ```
 
 ## Solver Status
 
-Check the current state of the solver:
+Check the current state of a job:
 
 ```rust
-let status = manager.get_status();
+let status = MANAGER.get_status(job_id);
 match status {
-    SolverStatus::NotStarted => println!("Not started"),
+    SolverStatus::NotSolving => println!("Not solving"),
     SolverStatus::Solving => println!("Currently solving"),
-    SolverStatus::Terminated => println!("Done"),
 }
 ```
 
+The two variants are:
+- `SolverStatus::NotSolving` — the job is idle or finished
+- `SolverStatus::Solving` — the job is actively running
+
 ## Early Termination
 
-Stop the solver before the configured termination condition:
+Stop a job before its configured termination condition:
 
 ```rust
-manager.terminate_early();
+let terminated = MANAGER.terminate_early(job_id);
+// Returns true if the job was found and was currently solving
 ```
 
-The solver finishes its current step and returns the best solution found so far.
+The solver finishes its current step and sends the best solution found so far through the channel.
+
+## Freeing Slots
+
+After a job completes and you've consumed the results, free the slot:
+
+```rust
+MANAGER.free_slot(job_id);
+```
+
+## Active Jobs
+
+Check how many jobs are currently running:
+
+```rust
+let count = MANAGER.active_job_count();
+```
 
 ## The `Solvable` Trait
 

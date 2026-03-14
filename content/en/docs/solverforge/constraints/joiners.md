@@ -10,79 +10,79 @@ Joiners define the matching criteria when two streams are joined. Without joiner
 
 ## Available Joiners
 
-### `joiner::equal`
+### `equal`
 
-Matches when two values are equal.
+For self-joins (pairing items from the same collection), takes a single key extractor:
 
 ```rust
-joiner::equal(|shift| &shift.employee, |other| &other.employee)
+equal(|shift: &Shift| shift.employee_idx)
 ```
 
-For self-joins (same type on both sides):
+### `equal_bi`
+
+For cross-joins (pairing items from two different collections), takes two key extractors:
 
 ```rust
-joiner::equal(|shift| &shift.employee)
+equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx)
 ```
 
-### `joiner::equal_bi`
+### `less_than`
 
-Matches when a value from one stream equals a value from a bi-stream.
+Matches when the left value is less than the right. Takes two extractors.
 
 ```rust
-joiner::equal_bi(|shift| &shift.date, |(a, b)| &a.date)
+less_than(|a: &Shift| a.id, |b: &Shift| b.id)
 ```
 
-### `joiner::less_than`
+### `greater_than`
 
-Matches when the left value is less than the right. Useful for avoiding duplicate pairs in self-joins.
+Matches when the left value is greater than the right. Takes two extractors.
 
 ```rust
-joiner::less_than(|shift| shift.id)
+greater_than(|a: &Shift| a.priority, |b: &Shift| b.priority)
 ```
 
-### `joiner::greater_than`
+### `overlapping`
 
-Matches when the left value is greater than the right.
-
-```rust
-joiner::greater_than(|shift| shift.priority)
-```
-
-### `joiner::overlapping`
-
-Matches when two ranges overlap. Takes a start and end extractor.
+Matches when two ranges overlap. Takes four extractors: start and end for each side.
 
 ```rust
-joiner::overlapping(
-    |shift| shift.start_time, |shift| shift.end_time,
-    |other| other.start_time, |other| other.end_time,
+overlapping(
+    |a: &Shift| a.start_time, |a: &Shift| a.end_time,
+    |b: &Shift| b.start_time, |b: &Shift| b.end_time,
 )
 ```
 
-### `joiner::filtering`
+### `filtering`
 
-A general-purpose joiner that uses a predicate.
+A general-purpose joiner that uses a predicate over both elements.
 
 ```rust
-joiner::filtering(|shift, other| shift.location.distance_to(&other.location) < 50.0)
+filtering(|a: &Shift, b: &Shift| a.location.distance_to(&b.location) < 50.0)
 ```
 
-## Combining Joiners
+## Using Joiners with `join`
 
-Use `.and()` to combine multiple joiners:
+**Self-join** — pass a single `equal` joiner directly:
 
 ```rust
-factory.for_each::<Shift>()
-    .join(
-        factory.for_each::<Shift>(),
-        joiner::equal(|s| &s.employee)
-            .and(joiner::less_than(|s| s.id)),
-    )
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .join(equal(|shift: &Shift| shift.employee_idx))
+```
+
+**Cross-join** — pass a tuple of (extractor, joiner):
+
+```rust
+factory.for_each(|s: &Schedule| s.shifts.as_slice())
+    .join((
+        |s: &Schedule| s.unavailability.as_slice(),
+        equal_bi(|shift: &Shift| shift.date, |u: &Unavailability| u.date),
+    ))
 ```
 
 ## Performance Note
 
-Indexed joiners (`equal`, `less_than`, `greater_than`, `overlapping`) are much faster than `filtering` because they use index lookups instead of iterating all pairs. Prefer indexed joiners where possible and only use `filtering` for conditions that can't be expressed with indexed joiners.
+Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`) are much faster than `filtering` because they use index lookups instead of iterating all pairs. Prefer indexed joiners where possible and only use `filtering` for conditions that can't be expressed with indexed joiners.
 
 ## See Also
 

@@ -13,8 +13,7 @@ A **planning solution** is the root struct that represents your entire problem a
 ```rust
 use solverforge::prelude::*;
 
-#[planning_solution]
-#[derive(Clone, Debug)]
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct Schedule {
     #[problem_fact_collection]
     #[value_range_provider]
@@ -30,6 +29,8 @@ pub struct Schedule {
     pub score: Option<HardSoftScore>,
 }
 ```
+
+The `constraints` parameter specifies the module path to the constraint provider function.
 
 ## Field Attributes
 
@@ -74,20 +75,9 @@ pub score: Option<HardSoftScore>,
 
 Supported score types: `SoftScore`, `HardSoftScore`, `HardMediumSoftScore`, `HardSoftDecimalScore`, `BendableScore`.
 
-### `#[solverforge_constraints_path]`
-
-Specifies the module path to the constraint provider function.
-
-```rust
-#[planning_solution]
-#[solverforge_constraints_path(crate::constraints::define_constraints)]
-#[derive(Clone, Debug)]
-pub struct Schedule { /* ... */ }
-```
-
 ## Requirements
 
-- Must derive `Clone` and `Debug`
+- Must derive `Clone` and `Debug` (added automatically by the macro)
 - Must have exactly one `#[planning_score]` field
 - Must have at least one `#[planning_entity_collection]` field
 - Must have at least one `#[value_range_provider]` field
