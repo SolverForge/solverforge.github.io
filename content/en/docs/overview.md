@@ -56,17 +56,28 @@ This is a common question. **SolverForge and mathematical programming solvers (G
 ```rust
 use solverforge::prelude::*;
 
-fn define_constraints(factory: &ConstraintFactory<Schedule>) -> Vec<Constraint<Schedule>> {
-    vec![
-        factory.for_each::<Shift>()
-            .filter(|s| s.employee.is_none())
-            .penalize("Unassigned shift", HardSoftScore::ONE_HARD)
-            .as_constraint(),
-        factory.for_each::<Shift>()
-            .filter(|s| !s.employee_has_skill(s.required_skill))
-            .penalize("Missing skill", HardSoftScore::ONE_HARD)
-            .as_constraint(),
-    ]
+fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+
+    let unassigned = factory.clone()
+        .for_each(|s: &Schedule| s.shifts.as_slice())
+        .filter(|s: &Shift| s.employee.is_none())
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("Unassigned shift");
+
+    let missing_skill = factory
+        .for_each(|s: &Schedule| s.shifts.as_slice())
+        .join(
+            |s: &Schedule| s.employees.as_slice(),
+            equal_bi(|shift: &Shift| shift.employee_idx, |emp: &Employee| Some(emp.index)),
+        )
+        .filter(|shift: &Shift, emp: &Employee| {
+            shift.employee_idx.is_some() && !emp.skills.contains(&shift.required_skill)
+        })
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("Missing skill");
+
+    (unassigned, missing_skill)
 }
 ```
 {{% /tab %}}
@@ -132,14 +143,14 @@ You define your domain model with derive macros and attribute annotations. The s
 # Project Status & Roadmap
 
 {{% pageinfo %}}
-SolverForge is a **production-ready constraint solver** written in Rust. The API is complete and stable at v0.5.17.
+SolverForge is a **production-ready constraint solver** written in Rust. The API is complete and stable at v0.5.18.
 {{% /pageinfo %}}
 
 ## Current Status
 
 | Component | Status | Description |
 |-----------|--------|-------------|
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with complete feature set — v0.5.17 |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with complete feature set — v0.5.18 |
 
 **Want to try it today?**
 - Install via `cargo add solverforge` or try a [quickstart](/docs/getting-started/)
@@ -265,7 +276,7 @@ SolverForge is a **native Rust constraint solver** that delivers both developer 
 </details>
 
 <details>
-<summary><strong>What's implemented (v0.5.17)</strong></summary>
+<summary><strong>What's implemented (v0.5.18)</strong></summary>
 
 **Repository**: [solverforge/solverforge](https://github.com/solverforge/solverforge)
 

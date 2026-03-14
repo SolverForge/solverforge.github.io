@@ -261,14 +261,13 @@ Using `usize` indices instead of employee names provides:
 ### The EmployeeSchedule Struct (Planning Solution)
 
 ```rust
-#[planning_solution]
+#[planning_solution(constraints = "crate::constraints::create_fluent_constraints")]
 #[basic_variable_config(
     entity_collection = "shifts",
     variable_field = "employee_idx",
     variable_type = "usize",
     value_range = "employees"
 )]
-#[solverforge_constraints_path = "crate::constraints::create_fluent_constraints"]
 #[derive(Serialize, Deserialize)]
 pub struct EmployeeSchedule {
     #[problem_fact_collection]
@@ -285,13 +284,12 @@ pub struct EmployeeSchedule {
 **What it represents:** The complete problem and its solution.
 
 **Annotations explained:**
-- `#[planning_solution]`: Top-level problem definition
+- `#[planning_solution(constraints = "...")]`: Top-level problem definition with constraint function path
 - `#[basic_variable_config(...)]`: Declarative configuration specifying:
   - Which collection contains planning entities (`shifts`)
   - Which field is the planning variable (`employee_idx`)
   - The variable's type (`usize`)
   - Where valid values come from (`employees`)
-- `#[solverforge_constraints_path]`: Points to the constraint factory function
 - `#[problem_fact_collection]`: Immutable data (doesn't change during solving)
 - `#[planning_entity_collection]`: Entities being optimized
 - `#[planning_score]`: Where the solver stores the calculated score
@@ -392,7 +390,7 @@ let required_skill = factory
         shift.employee_idx.is_some() && !emp.skills.contains(&shift.required_skill)
     })
     .penalize(HardSoftDecimalScore::ONE_HARD)
-    .as_constraint("Required skill");
+    .named("Required skill");
 ```
 
 **How to read this:**
@@ -400,7 +398,7 @@ let required_skill = factory
 2. `.join(..., equal_bi(...))`: Join with employees where `shift.employee_idx == Some(emp.index)`
 3. `.filter(...)`: Keep only where employee lacks the required skill
 4. `.penalize(ONE_HARD)`: Each violation subtracts 1 from hard score
-5. `.as_constraint(...)`: Name for debugging
+5. `.named(...)`: Name for debugging
 
 **Key Rust adaptation — `equal_bi` joiner:**
 
@@ -430,7 +428,7 @@ let no_overlap = factory
     .penalize_hard_with(|a: &Shift, b: &Shift| {
         HardSoftDecimalScore::of_hard_scaled(overlap_minutes(a, b) * 100000)
     })
-    .as_constraint("Overlapping shift");
+    .named("Overlapping shift");
 ```
 
 **How to read this:**
@@ -456,7 +454,7 @@ let at_least_10_hours = factory
     .penalize_hard_with(|a: &Shift, b: &Shift| {
         HardSoftDecimalScore::of_hard_scaled(gap_penalty_minutes(a, b) * 100000)
     })
-    .as_constraint("At least 10 hours between 2 shifts");
+    .named("At least 10 hours between 2 shifts");
 ```
 
 **Helper function:**
@@ -496,7 +494,7 @@ let one_per_day = factory
     )
     .filter(|a: &Shift, b: &Shift| a.employee_idx.is_some() && b.employee_idx.is_some())
     .penalize(HardSoftDecimalScore::ONE_HARD)
-    .as_constraint("One shift per day");
+    .named("One shift per day");
 ```
 
 **Key pattern — tuple joiner:**
@@ -532,7 +530,7 @@ let unavailable = factory
     .penalize_hard_with(|shift: &Shift, date: &NaiveDate| {
         HardSoftDecimalScore::of_hard_scaled(shift_date_overlap_minutes(shift, *date) * 100000)
     })
-    .as_constraint("Unavailable employee");
+    .named("Unavailable employee");
 ```
 
 **The `flatten_last` Operation:**
@@ -576,7 +574,7 @@ let undesired = factory
     )
     .filter(|shift: &Shift, _date: &NaiveDate| shift.employee_idx.is_some())
     .penalize(HardSoftDecimalScore::ONE_SOFT)
-    .as_constraint("Undesired day for employee");
+    .named("Undesired day for employee");
 ```
 
 **Key difference:** Uses `ONE_SOFT` instead of `ONE_HARD`. The solver will try to avoid undesired days but may violate this if necessary.
@@ -603,7 +601,7 @@ let desired = factory
     )
     .filter(|shift: &Shift, _date: &NaiveDate| shift.employee_idx.is_some())
     .reward(HardSoftDecimalScore::ONE_SOFT)
-    .as_constraint("Desired day for employee");
+    .named("Desired day for employee");
 ```
 
 **Key difference:** Uses `.reward()` instead of `.penalize()`. Rewards **increase** the score.
@@ -617,7 +615,7 @@ let balanced = factory
     .for_each(|s: &EmployeeSchedule| s.shifts.as_slice())
     .balance(|shift: &Shift| shift.employee_idx)
     .penalize(HardSoftDecimalScore::of_soft(1))
-    .as_constraint("Balance employee assignments");
+    .named("Balance employee assignments");
 ```
 
 **The `balance()` Operation:**
@@ -642,14 +640,13 @@ Unlike manual `group_by` + `count` + math, the `balance()` operation:
 Unlike configuration files, SolverForge uses compile-time configuration through derive macros:
 
 ```rust
-#[planning_solution]
+#[planning_solution(constraints = "crate::constraints::create_fluent_constraints")]
 #[basic_variable_config(
     entity_collection = "shifts",
     variable_field = "employee_idx",
     variable_type = "usize",
     value_range = "employees"
 )]
-#[solverforge_constraints_path = "crate::constraints::create_fluent_constraints"]
 pub struct EmployeeSchedule { ... }
 ```
 
@@ -720,7 +717,7 @@ async fn create_schedule(
 - Async Axum handler for non-blocking HTTP
 - `parking_lot::RwLock` for thread-safe state access
 
-### TypedScoreDirector for Analysis
+### ScoreDirector for Analysis
 
 For score breakdown without solving:
 
@@ -728,7 +725,7 @@ For score breakdown without solving:
 async fn analyze_schedule(Json(dto): Json<ScheduleDto>) -> Json<AnalyzeResponse> {
     let schedule = dto.to_domain();
     let constraints = create_fluent_constraints();
-    let director = TypedScoreDirector::new(schedule, constraints);
+    let director = ScoreDirector::new(schedule, constraints);
 
     let score = director.get_score();
     let analyses = director
@@ -739,7 +736,7 @@ async fn analyze_schedule(Json(dto): Json<ScheduleDto>) -> Json<AnalyzeResponse>
 }
 ```
 
-The `TypedScoreDirector`:
+The `ScoreDirector`:
 - Evaluates all constraints against a solution
 - Returns detailed match information per constraint
 - No actual solving — just score calculation
@@ -899,7 +896,7 @@ let balanced = factory
     .for_each(|s: &EmployeeSchedule| s.shifts.as_slice())
     .balance(|shift: &Shift| shift.employee_idx)
     .penalize(HardSoftDecimalScore::of_soft(1))  // Weight: 1
-    .as_constraint("Balance employee assignments");
+    .named("Balance employee assignments");
 ```
 
 To make fairness more important relative to other soft constraints:
@@ -932,7 +929,7 @@ let max_shifts = factory
             HardSoftDecimalScore::ZERO
         }
     })
-    .as_constraint("Max 5 shifts per employee");
+    .named("Max 5 shifts per employee");
 ```
 
 Then add it to the return tuple:

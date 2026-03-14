@@ -4,7 +4,7 @@ linkTitle: "SolverForge"
 icon: fa-brands fa-rust
 weight: 10
 description: >
-  Native Rust constraint solver — production-ready at v0.5.17.
+  Native Rust constraint solver — production-ready at v0.5.18.
 ---
 
 SolverForge is a native Rust constraint solver for planning and scheduling problems. It uses derive macros for domain modeling, constraint streams for declarative rule definition, and metaheuristic algorithms for optimization.
@@ -52,32 +52,29 @@ pub struct Schedule {
 }
 
 // 2. Define constraints
-#[solverforge_constraints_path(crate::constraints)]
-fn define_constraints(factory: &ConstraintFactory<Schedule>) -> Vec<Constraint<Schedule>> {
-    vec![
-        factory.for_each::<Shift>()
-            .filter(|s| s.employee.is_none())
-            .penalize("Unassigned shift", HardSoftScore::ONE_HARD)
-            .as_constraint(),
-    ]
+fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+
+    let unassigned = factory
+        .for_each(|s: &Schedule| s.shifts.as_slice())
+        .filter(|s: &Shift| s.employee.is_none())
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("Unassigned shift");
+
+    (unassigned,)
 }
 
 // 3. Solve
 fn main() {
-    let config = SolverConfig::from_toml_str(r#"
-        [solver]
-        termination.seconds_spent_limit = 30
-    "#).unwrap();
-
     let problem = Schedule {
         employees: vec![/* ... */],
         shifts: vec![/* ... */],
         score: None,
     };
 
-    let manager = SolverManager::new(config);
-    let solution = manager.solve(problem).unwrap();
-    println!("Score: {:?}", solution.score);
+    let mut director = ScoreDirector::new(problem, define_constraints());
+    let score = director.calculate_score();
+    println!("Score: {:?}", score);
 }
 ```
 
