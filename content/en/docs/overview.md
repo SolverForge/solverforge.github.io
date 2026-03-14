@@ -52,19 +52,22 @@ This is a common question. **SolverForge and mathematical programming solvers (G
 ### A Concrete Example
 
 {{< tabpane text=true >}}
-{{% tab header="SolverForge" %}}
-```python
-# You describe rules about your business objects directly
-@constraint_provider
-def define_constraints(factory):
-    return [
-        factory.for_each(Shift)
-            .filter(lambda s: s.employee is None)
-            .penalize("Unassigned shift", HardSoftScore.ONE_HARD),
-        factory.for_each(Shift)
-            .filter(lambda s: s.required_skill not in s.employee.skills)
-            .penalize("Missing skill", HardSoftScore.ONE_HARD),
+{{% tab header="SolverForge (Rust)" %}}
+```rust
+use solverforge::prelude::*;
+
+fn define_constraints(factory: &ConstraintFactory<Schedule>) -> Vec<Constraint<Schedule>> {
+    vec![
+        factory.for_each::<Shift>()
+            .filter(|s| s.employee.is_none())
+            .penalize("Unassigned shift", HardSoftScore::ONE_HARD)
+            .as_constraint(),
+        factory.for_each::<Shift>()
+            .filter(|s| !s.employee_has_skill(s.required_skill))
+            .penalize("Missing skill", HardSoftScore::ONE_HARD)
+            .as_constraint(),
     ]
+}
 ```
 {{% /tab %}}
 {{% tab header="Gurobi/CVXPY" %}}
@@ -94,66 +97,73 @@ model.addConstrs(sum(x[e,s] for s in shifts) <= max_shifts for e in employees)
 
 ## The Developer Experience
 
-SolverForge provides a **Pythonic, business-object-oriented API**:
+SolverForge provides a **Rust derive-macro API** for ergonomic domain modeling:
 
-```python
-from dataclasses import dataclass
-from typing import Annotated
-from solverforge import planning_entity, planning_solution, PlanningVariable
+```rust
+use solverforge::prelude::*;
 
-@planning_entity
-@dataclass
-class Shift:
-    id: str
-    required_skill: str
-    employee: Annotated[Employee | None, PlanningVariable] = None  # Solver fills this in
+#[planning_entity]
+#[derive(Clone, Debug)]
+pub struct Shift {
+    #[planning_id]
+    pub id: String,
+    pub required_skill: String,
+    #[planning_variable(allows_unassigned = true)]
+    pub employee: Option<Employee>,  // Solver fills this in
+}
 
-@planning_solution
-@dataclass
-class Schedule:
-    employees: list[Employee]
-    shifts: list[Shift]
-    score: HardSoftScore = None
+#[planning_solution]
+#[derive(Clone, Debug)]
+pub struct Schedule {
+    #[problem_fact_collection]
+    #[value_range_provider]
+    pub employees: Vec<Employee>,
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
 ```
 
-You define your domain model with standard Python dataclasses and type annotations. The solver figures out how to assign employees to shifts while respecting your constraints.
+You define your domain model with derive macros and attribute annotations. The solver figures out how to assign employees to shifts while respecting your constraints.
 
 ---
 
 # Project Status & Roadmap
 
 {{% pageinfo %}}
-SolverForge is a **production-ready constraint solver** written in Rust. The Rust API is complete and stable. Python bindings are in development.
+SolverForge is a **production-ready constraint solver** written in Rust. The API is complete and stable at v0.5.17.
 {{% /pageinfo %}}
 
 ## Current Status
 
 | Component | Status | Description |
 |-----------|--------|-------------|
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with complete feature set — v0.4+ |
-| **solverforge-legacy** | ✅ Usable now | Python wrapper for [Timefold](https://timefold.ai) — great for learning and prototyping |
-| **Python bindings** | 🚧 In progress | PyO3-based bindings to the Rust core — coming Q1-Q2 2026 |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with complete feature set — v0.5.17 |
 
-**Want to try it today?** 
-- **Rust developers**: Use the [Rust crate](https://crates.io/crates/solverforge) directly
-- **Python developers**: Start with [Python quickstarts](/docs/getting-started/) using `solverforge-legacy`
+**Want to try it today?**
+- Install via `cargo add solverforge` or try a [quickstart](/docs/getting-started/)
 
 ## What's Complete
 
 SolverForge Rust is **feature-complete** as a production constraint solver:
 
-- **Constraint Streams API**: Declarative constraint definition with `for_each`, `filter`, `join`, `group_by`, `penalize`, `reward`
-- **Score Types**: SimpleScore, HardSoftScore, HardMediumSoftScore, BendableScore
+- **Constraint Streams API**: Declarative constraint definition with `for_each`, `for_each_unique_pair`, `filter`, `join`, `flatten_last`, `group_by`, `balance`, `if_exists`, `if_not_exists`, `penalize`, `reward`
+- **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore, HardSoftDecimalScore, BendableScore
+- **Score Analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`, `IndictmentMap`
 - **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
 - **Solver Phases**:
-  - Construction Heuristic (First Fit, Best Fit)
-  - Local Search (Hill Climbing, Simulated Annealing, Tabu Search, Late Acceptance)
+  - Construction Heuristic (First Fit, Best Fit, First Feasible, Weakest Fit, Strongest Fit)
+  - Local Search with 7 acceptors: Hill Climbing, Simulated Annealing, Tabu Search, Late Acceptance, Great Deluge, Step Counting Hill Climbing, Diversified Late Acceptance
   - Exhaustive Search (Branch and Bound with DFS/BFS/Score-First)
   - Partitioned Search (multi-threaded)
   - VND (Variable Neighborhood Descent)
-- **Move System**: Zero-allocation typed moves with arena allocation
-- **SolverManager API**: Ergonomic builder pattern for solver configuration
-- **Configuration**: TOML/YAML support with builder API
+- **Move System**: Zero-allocation typed moves with arena allocation — Change, Swap, Composite, ListChange, ListSwap, ListReverse, SubListChange, SubListSwap, KOpt, Ruin, PillarChange, PillarSwap
+- **List Variables**: Full support for sequencing/routing problems
+- **Nearby Selection**: Distance-based move selection for large problems
+- **Balance Collector**: Load balancing constraint support
+- **SolverManager API**: Channel-based streaming with `solve()`, `terminate_early()`, `get_status()`
+- **Configuration**: TOML-based with `SolverConfig::load()` / `from_toml_str()`
 
 ## Roadmap
 
@@ -165,21 +175,19 @@ Built a complete constraint solver in Rust from the ground up:
 - Zero-cost abstractions with typed moves
 - Derive macros for ergonomic domain modeling
 
-### Phase 2: Python Bindings (Q1-Q2 2026)
-
-Making the Rust solver available to Python developers:
-- PyO3-based native extension: `pip install solverforge`
-- Same Pythonic API you know from solverforge-legacy
-- Seamless migration path — change one import, keep your code
-- Native performance without JVM overhead
-
-### Phase 3: Production Enhancements (H2 2026)
+### Phase 2: Rust API Refinement & Production Enhancements (H1 2026)
 
 - Multi-threaded move evaluation
 - Constraint strength system
-- Constraint match analysis and explanation
 - Performance tuning guides
 - Enterprise features
+
+### Phase 3: Python Bindings (H2 2026)
+
+Bringing the Rust solver to Python developers via PyO3:
+- Native extension: `pip install solverforge`
+- Pythonic API backed by the Rust core
+- Native performance without JVM overhead
 
 ---
 
@@ -187,7 +195,7 @@ Making the Rust solver available to Python developers:
 
 - **Try the quickstarts** — [Try a quickstart](/docs/getting-started/) and share feedback
 - **Report issues** — Found a bug or have a suggestion? [Open an issue](https://github.com/solverforge/solverforge/issues)
-- **Contribute** — We're actively developing Python bindings. PRs welcome!
+- **Contribute** — PRs welcome! Check the [issue tracker](https://github.com/solverforge/solverforge/issues) for good first issues
 - **Spread the word** — Star the [GitHub repo](https://github.com/solverforge/solverforge) and share with colleagues
 
 ---
@@ -204,20 +212,20 @@ SolverForge is a **native Rust constraint solver** that delivers both developer 
 │                         solverforge                             │
 │                    (facade + re-exports)                        │
 └─────────────────────────────────────────────────────────────────┘
-        │              │              │              │
-        ▼              ▼              ▼              ▼
-┌──────────────┬──────────────┬──────────────┬──────────────┐
-│solverforge-  │solverforge-  │solverforge-  │solverforge-  │
-│   solver     │   scoring    │   config     │  benchmark   │
-│              │              │              │              │
-│ • Phases     │ • Constraint │ • TOML/YAML  │ • Runner     │
-│ • Moves      │   Streams    │ • Builders   │ • Statistics │
-│ • Selectors  │ • Score      │              │ • Reports    │
-│ • Foragers   │   Directors  │              │              │
-│ • Acceptors  │ • SERIO      │              │              │
-│ • Termination│   Engine     │              │              │
-│ • Manager    │              │              │              │
-└──────────────┴──────────────┴──────────────┴──────────────┘
+        │              │              │
+        ▼              ▼              ▼
+┌──────────────┬──────────────┬──────────────┐
+│solverforge-  │solverforge-  │solverforge-  │
+│   solver     │   scoring    │   config     │
+│              │              │              │
+│ • Phases     │ • Constraint │ • TOML       │
+│ • Moves      │   Streams    │ • Builders   │
+│ • Selectors  │ • Score      │              │
+│ • Foragers   │   Directors  │              │
+│ • Acceptors  │ • SERIO      │              │
+│ • Termination│   Engine     │              │
+│ • Manager    │              │              │
+└──────────────┴──────────────┴──────────────┘
         │              │
         └──────┬───────┘
                ▼
@@ -234,9 +242,9 @@ SolverForge is a **native Rust constraint solver** that delivers both developer 
         ┌──────────────────────────────┐
         │      solverforge-macros      │
         │                              │
-        │ • #[derive(PlanningSolution)]│
-        │ • #[derive(PlanningEntity)]  │
-        │ • #[derive(ProblemFact)]     │
+        │ • #[planning_solution]       │
+        │ • #[planning_entity]         │
+        │ • #[problem_fact]            │
         └──────────────────────────────┘
 ```
 
@@ -257,30 +265,38 @@ SolverForge is a **native Rust constraint solver** that delivers both developer 
 </details>
 
 <details>
-<summary><strong>What's implemented (v0.4+)</strong></summary>
+<summary><strong>What's implemented (v0.5.17)</strong></summary>
 
-**Repository**: [solverforge/solverforge-rs](https://github.com/solverforge/solverforge-rs)
+**Repository**: [solverforge/solverforge](https://github.com/solverforge/solverforge)
 
 **Core solver features:**
-- **Score types**: SimpleScore, HardSoftScore, HardMediumSoftScore, BendableScore (all with BigDecimal variants)
+- **Score types**: SoftScore, HardSoftScore, HardMediumSoftScore, HardSoftDecimalScore, BendableScore
 - **Domain model**: Derive macros for `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]`
-- **Variable types**: Genuine, shadow, list, and chained variables
-- **Constraint Streams API**: `for_each`, `filter`, `join`, `group_by`, `if_exists`, `if_not_exists`, `penalize`, `reward`
-- **Advanced collectors**: `count`, `count_distinct`, `sum`, `load_balance`
+- **Variable types**: Genuine, shadow, list variables
+- **Shadow variables**: `#[inverse_relation_shadow_variable]`, `#[previous_element_shadow_variable]`, `#[next_element_shadow_variable]`
+- **Constraint Streams API**: `for_each`, `for_each_unique_pair`, `filter`, `join`, `flatten_last`, `group_by`, `balance`, `if_exists`, `if_not_exists`, `penalize`, `reward`
+- **Advanced collectors**: `count`, `count_distinct`, `sum`, `min`, `max`, `to_list`, `to_set`, `balance`
+- **Score analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`, `IndictmentMap`
 
 **Solver phases:**
-- **Construction heuristics**: First Fit, Best Fit with automatic phase factory
-- **Local search**: Hill Climbing, Simulated Annealing, Tabu Search, Late Acceptance
+- **Construction heuristics**: First Fit, Best Fit, First Feasible, Weakest Fit, Strongest Fit
+- **Local search**: Hill Climbing, Simulated Annealing, Tabu Search, Late Acceptance, Great Deluge, Step Counting Hill Climbing, Diversified Late Acceptance
 - **Exhaustive search**: Branch and Bound (DFS, BFS, Score-First)
 - **Partitioned search**: Multi-threaded parallel solving
 - **VND**: Variable Neighborhood Descent
 
+**Move system:**
+- Basic: ChangeMove, SwapMove, CompositeMove
+- List: ListChangeMove, ListSwapMove, ListReverseMove, SubListChangeMove, SubListSwapMove
+- Advanced: KOptMove, RuinMove, PillarChangeMove, PillarSwapMove
+- MoveArena: Zero-allocation move storage
+
 **Infrastructure:**
 - **SERIO**: Scoring Engine for Real-time Incremental Optimization
-- **SolverManager**: Ergonomic builder API for solver configuration
-- **Configuration**: TOML/YAML support with validation
-- **Benchmarking**: Statistical analysis framework with warmup, measurement, and reporting
-- **Termination**: Time limits, step counts, score targets, unimproved step detection
+- **SolverManager**: Channel-based streaming API
+- **Configuration**: TOML-based with `SolverConfig::load()` / `from_toml_str()`
+- **Termination**: Time limits, step counts, score targets, unimproved step detection, composites (And/Or)
+- **Nearby selection**: Distance-based move selection
 
 **Performance:**
 - Zero-allocation move system with arena allocation

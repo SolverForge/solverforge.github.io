@@ -1,6 +1,6 @@
 ---
-title: "Employee Scheduling (Rust)"
-linkTitle: "Employee Scheduling (Rust)"
+title: "Employee Scheduling"
+linkTitle: "Employee Scheduling"
 icon: fa-brands fa-rust
 date: 2026-01-21
 weight: 5
@@ -10,11 +10,7 @@ tags: [quickstart, rust]
 ---
 
 {{% pageinfo color="primary" %}}
-**Native Rust Implementation**
-
-This guide uses **SolverForge's native Rust constraint solver** — a fully monomorphized, zero-erasure implementation with no JVM bridge. All constraints compile to concrete types at build time, enabling aggressive compiler optimizations and true native performance.
-
-If you're looking for the Python implementation (legacy JPype bridge), see [Employee Scheduling (Python)](/docs/getting-started/employee-scheduling/).
+This guide uses **SolverForge's native Rust constraint solver** — a fully monomorphized, zero-erasure implementation. All constraints compile to concrete types at build time, enabling aggressive compiler optimizations and true native performance.
 {{% /pageinfo %}}
 
 ---
@@ -1143,4 +1139,3 @@ curl -X PUT http://localhost:7860/schedules/analyze \
 
 - [GitHub Repository](https://github.com/solverforge/solverforge-quickstarts)
 - [SolverForge Rust API Documentation](/docs/api/rust/)
-- [Employee Scheduling (Python)](/docs/getting-started/employee-scheduling/) — Legacy implementation for comparison
