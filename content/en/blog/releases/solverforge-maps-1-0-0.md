@@ -2,7 +2,7 @@
 title: "solverforge-maps 1.0: Routing Infrastructure for VRP Solvers"
 date: 2026-01-24
 draft: false
-tags: [rust, release, maps, vrp]
+tags: [rust, release]
 description: >
   solverforge-maps 1.0 provides zero-erasure road network and routing infrastructure for VRP solvers, with OSM data, R-tree indexing, and 3-tier caching.
 ---

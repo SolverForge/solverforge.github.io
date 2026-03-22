@@ -2,7 +2,7 @@
 title: "Why Java Interop is Difficult in SolverForge Core"
 date: 2025-12-30
 draft: false
-tags: [python, rust, java]
+tags: [python, rust]
 description: >
   Reflections on the challenges of bridging Rust and Java in constraint solving, and the hard lessons learned along the way.
 ---

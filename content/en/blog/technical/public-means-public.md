@@ -2,7 +2,7 @@
 title: "Public Means Public"
 date: 2026-03-10
 draft: false
-tags: [rust, architecture]
+tags: [rust]
 description: >
   In SolverForge, visibility is a contract enforced by the compiler. What's public is public. What's internal is internal. This will never change.
 ---

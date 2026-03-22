@@ -2,7 +2,7 @@
 title: "Planner123 1.0: Your Week, Optimized"
 date: 2026-03-04
 draft: false
-tags: [rust, release, planner123, tauri]
+tags: [rust, release]
 description: >
   Planner123 1.0 is a personal task scheduler that models your week as a constraint satisfaction problem and solves it with SolverForge. Native Rust. Tauri desktop app. One binary.
 ---
