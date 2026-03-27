@@ -1,20 +1,22 @@
 ---
-title: "From Quickstarts to Scaffolds: Rails-Style Onboarding for SolverForge"
+title: 'From Quickstarts to Scaffolds: Rails-Style Onboarding for SolverForge'
 date: 2026-03-27
 draft: false
 tags: [rust, quickstart, release]
 description: >
-  SolverForge is moving from clone-and-edit quickstarts to scaffolded project generation with solverforge-cli, aligning onboarding with the same zero-erasure and explicit-code philosophy described in The Future of Constraint Programming in Rust.
+  SolverForge is moving from clone-and-edit quickstarts to scaffolded project
+  generation with solverforge-cli, aligning onboarding with the same
+  zero-erasure and explicit-code philosophy described in The Future of
+  Constraint Programming in Rust.
 ---
 
-{{< alert title="Transition in progress" color="info" >}}
-SolverForge 0.6.0 is technically out. The core release has landed, and the CLI
-work is now visible in the public repositories.
+{{< alert title="Transition in progress" color="info" >}} SolverForge 0.6.0 is
+technically out. The core release has landed, and the CLI work is now visible in
+the public repositories.
 
 At the same time, `solverforge-cli` should still be read as alpha/beta: the code
 is on `main`, the command surface is taking shape, but we have not done the
-formal standalone CLI announcement or release yet.
-{{< /alert >}}
+formal standalone CLI announcement or release yet. {{< /alert >}}
 
 For the last phase of SolverForge, our default onboarding story was the
 quickstart.
@@ -52,9 +54,9 @@ architecture. A user could open an employee scheduling app, run it locally,
 inspect the constraints, and understand how the solver behaved in a real
 service.
 
-That educational value does not go away. We still believe in worked examples.
-We still believe in sample applications. We still believe in showing the full
-path from domain model to running UI.
+That educational value does not go away. We still believe in worked examples. We
+still believe in sample applications. We still believe in showing the full path
+from domain model to running UI.
 
 What changes is where that material sits in the developer journey.
 
@@ -64,8 +66,7 @@ own.
 ## Where Quickstarts Stop Scaling as the Default
 
 The problem with clone-and-edit onboarding is that it asks users to begin from
-someone else's application structure and then delete their way toward their
-own.
+someone else's application structure and then delete their way toward their own.
 
 That works when the example is very close to the target domain. It breaks down
 when it is not.
@@ -235,9 +236,10 @@ engineering which parts matter.
 A status note is important here, because this transition is real but not yet
 fully productized.
 
-SolverForge 0.6.0 is technically out. The core project changelog already
-records the CLI scaffolding and code generation work in the 0.6.0 line. In
-other words, this is not hypothetical roadmap copy. The migration is already
+SolverForge 0.6.0 is technically out. The core project changelog already records
+the CLI scaffolding and code generation work in
+[SolverForge 0.6.0: Scaffolding and Codegen](/blog/releases/solverforge-0-6-0/).
+In other words, this is not hypothetical roadmap copy. The migration is already
 reflected in the codebase.
 
 At the same time, the dedicated `solverforge-cli` repository is still best
@@ -312,6 +314,7 @@ then, the code on `main` shows exactly where SolverForge is heading.
 
 - [The Future of Constraint Programming in Rust](/blog/vision-for-rust-constraint-programming/)
 - [How We Build Frontends: jQuery in 2026](/blog/technical/how-we-build-frontends/)
+- [SolverForge 0.6.0: Scaffolding and Codegen](/blog/releases/solverforge-0-6-0/)
 - [SolverForge 0.5.0: Zero-Erasure Constraint Solving](/blog/releases/solverforge-0-5-0/)
 
 ## Source
