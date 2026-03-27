@@ -1,17 +1,20 @@
 ---
-title: "Employee Scheduling"
-linkTitle: "Employee Scheduling"
+title: 'Employee Scheduling'
+linkTitle: 'Employee Scheduling'
 icon: fa-brands fa-rust
-date: 2026-01-21
+date: 2026-03-27
 weight: 5
-description: "Build efficient employee scheduling with SolverForge's native Rust constraint solver"
+description:
+  "Build efficient employee scheduling with SolverForge's native Rust constraint
+  solver"
 categories: [Quickstarts]
 tags: [quickstart, rust]
 ---
 
-{{% pageinfo color="primary" %}}
-This guide uses **SolverForge's native Rust constraint solver** — a fully monomorphized, zero-erasure implementation. All constraints compile to concrete types at build time, enabling aggressive compiler optimizations and true native performance.
-{{% /pageinfo %}}
+{{% pageinfo color="primary" %}} This guide uses **SolverForge's native Rust
+constraint solver** — a fully monomorphized, zero-erasure implementation. All
+constraints compile to concrete types at build time, enabling aggressive
+compiler optimizations and true native performance. {{% /pageinfo %}}
 
 ---
 
@@ -35,14 +38,18 @@ This guide uses **SolverForge's native Rust constraint solver** — a fully mono
 
 ### What You'll Learn
 
-This guide walks you through a complete employee scheduling application built with **SolverForge**, a native Rust constraint-based optimization framework. You'll learn:
+This guide walks you through a complete employee scheduling application built
+with **SolverForge**, a native Rust constraint-based optimization framework.
+You'll learn:
 
-- How to model real-world scheduling problems as **optimization problems** using Rust's type system
+- How to model real-world scheduling problems as **optimization problems** using
+  Rust's type system
 - How to express business rules as **constraints** using a fluent API
 - How SolverForge's zero-erasure architecture enables native performance
 - How to customize the system for your specific needs
 
-**No optimization background required** — we'll explain concepts as we encounter them in the code.
+**No optimization background required** — we'll explain concepts as we encounter
+them in the code.
 
 ### Prerequisites
 
@@ -52,18 +59,24 @@ This guide walks you through a complete employee scheduling application built wi
 
 ### What is Constraint-Based Optimization?
 
-Traditional programming: You write explicit logic that says "do this, then that."
+Traditional programming: You write explicit logic that says "do this, then
+that."
 
-**Constraint-based optimization**: You describe what a good solution looks like and the solver figures out how to achieve it.
+**Constraint-based optimization**: You describe what a good solution looks like
+and the solver figures out how to achieve it.
 
-Think of it like describing what puzzle pieces you have and what rules they must follow — then having a computer try millions of arrangements per second to find the best fit.
+Think of it like describing what puzzle pieces you have and what rules they must
+follow — then having a computer try millions of arrangements per second to find
+the best fit.
 
 ### Why Native Rust?
 
 SolverForge's Rust implementation offers key advantages:
 
-- **Zero-erasure architecture**: All generic types resolve at compile time — no `Box<dyn Trait>`, no `Arc`, no runtime dispatch
-- **Full monomorphization**: Each constraint compiles to specialized machine code
+- **Zero-erasure architecture**: All generic types resolve at compile time — no
+  `Box<dyn Trait>`, no `Arc`, no runtime dispatch
+- **Full monomorphization**: Each constraint compiles to specialized machine
+  code
 - **Memory efficiency**: Index-based references instead of string cloning
 - **True parallelism**: No GIL, no JVM pause, native threading
 
@@ -73,18 +86,22 @@ SolverForge's Rust implementation offers key advantages:
 
 ### Running the Application
 
-1. **Clone the quickstarts repository:**
+1. **Create a new Rust project:**
+
    ```bash
-   git clone https://github.com/SolverForge/solverforge-quickstarts
-   cd ./solverforge-quickstarts/rust/employee-scheduling
+   cargo new employee-scheduling
+   cd employee-scheduling
+   cargo add solverforge
    ```
 
 2. **Build the project:**
+
    ```bash
    cargo build --release
    ```
 
 3. **Run the server:**
+
    ```bash
    cargo run --release
    ```
@@ -94,12 +111,14 @@ SolverForge's Rust implementation offers key advantages:
    http://localhost:7860
    ```
 
-You'll see a scheduling interface with employees, shifts and a "Solve" button. Click it and watch the solver automatically assign employees to shifts while respecting business rules.
+You'll see a scheduling interface with employees, shifts and a "Solve" button.
+Click it and watch the solver automatically assign employees to shifts while
+respecting business rules.
 
 ### File Structure Overview
 
 ```
-rust/employee-scheduling/
+employee-scheduling/
 ├── src/
 │   ├── main.rs           # Axum server entry point
 │   ├── lib.rs            # Library crate root
@@ -114,7 +133,8 @@ rust/employee-scheduling/
 └── Cargo.toml            # Dependencies
 ```
 
-**Key insight:** Most business customization happens in `constraints.rs` alone. You rarely need to modify other files.
+**Key insight:** Most business customization happens in `constraints.rs` alone.
+You rarely need to modify other files.
 
 ---
 
@@ -125,6 +145,7 @@ rust/employee-scheduling/
 You need to assign **employees** to **shifts** while satisfying rules like:
 
 **Hard constraints** (must be satisfied):
+
 - Employee must have the required skill for the shift
 - Employee can't work overlapping shifts
 - Employee needs 10 hours rest between shifts
@@ -132,21 +153,26 @@ You need to assign **employees** to **shifts** while satisfying rules like:
 - Employee can't work on days they're unavailable
 
 **Soft constraints** (preferences to optimize):
+
 - Avoid scheduling on days the employee marked as "undesired"
 - Prefer scheduling on days the employee marked as "desired"
 - Balance workload fairly across all employees
 
 ### Why This is Hard
 
-For even 20 shifts and 10 employees, there are **10^20 possible assignments** (100 quintillion). A human can't evaluate them all. Even a computer trying random assignments would take years.
+For even 20 shifts and 10 employees, there are **10^20 possible assignments**
+(100 quintillion). A human can't evaluate them all. Even a computer trying
+random assignments would take years.
 
-**Optimization algorithms** use smart strategies to explore this space efficiently, finding high-quality solutions in seconds.
+**Optimization algorithms** use smart strategies to explore this space
+efficiently, finding high-quality solutions in seconds.
 
 ---
 
 ## Understanding the Data Model
 
-Let's examine the three core structs that model our problem. Open `src/domain.rs`:
+Let's examine the three core structs that model our problem. Open
+`src/domain.rs`:
 
 ### The Employee Struct (Problem Fact)
 
@@ -177,13 +203,18 @@ pub struct Employee {
 **What it represents:** A person who can be assigned to shifts.
 
 **Key fields:**
-- `index`: Position in the employees array — enables O(1) lookups without string comparison
+
+- `index`: Position in the employees array — enables O(1) lookups without string
+  comparison
 - `name`: Human-readable identifier
-- `skills`: What skills this employee possesses (e.g., `{"Doctor", "Cardiology"}`)
-- `unavailable_dates`: Days the employee absolutely cannot work (hard constraint)
+- `skills`: What skills this employee possesses (e.g.,
+  `{"Doctor", "Cardiology"}`)
+- `unavailable_dates`: Days the employee absolutely cannot work (hard
+  constraint)
 - `undesired_dates` / `desired_dates`: Soft preference fields
 
 **Rust-specific design:**
+
 - `#[problem_fact]`: Derive macro that marks this as immutable solver data
 - `HashSet<NaiveDate>` for O(1) membership testing during JSON deserialization
 - `Vec<NaiveDate>` sorted copies for `flatten_last` stream compatibility
@@ -218,7 +249,9 @@ impl Employee {
 }
 ```
 
-**Why `finalize()`?** The constraint stream API's `flatten_last` operation requires sorted slices for O(1) index-based lookups. After JSON deserialization or programmatic construction, `finalize()` converts HashSets to sorted Vecs.
+**Why `finalize()`?** The constraint stream API's `flatten_last` operation
+requires sorted slices for O(1) index-based lookups. After JSON deserialization
+or programmatic construction, `finalize()` converts HashSets to sorted Vecs.
 
 ### The Shift Struct (Planning Entity)
 
@@ -242,9 +275,12 @@ pub struct Shift {
 **What it represents:** A time slot that needs an employee assignment.
 
 **Key annotations:**
-- `#[planning_entity]`: Derive macro marking this as containing decisions to optimize
+
+- `#[planning_entity]`: Derive macro marking this as containing decisions to
+  optimize
 - `#[planning_id]`: Marks `id` as the unique identifier
-- `#[planning_variable(allows_unassigned = true)]`: The decision variable — what the solver assigns
+- `#[planning_variable(allows_unassigned = true)]`: The decision variable — what
+  the solver assigns
 
 **Critical design choice — index-based references:**
 
@@ -254,6 +290,7 @@ pub employee_idx: Option<usize>  // ✓ O(1) lookup, no allocation
 ```
 
 Using `usize` indices instead of employee names provides:
+
 - O(1) lookups via `schedule.employees[idx]`
 - Zero allocations during constraint evaluation
 - Direct equality comparison (integer vs string)
@@ -284,7 +321,9 @@ pub struct EmployeeSchedule {
 **What it represents:** The complete problem and its solution.
 
 **Annotations explained:**
-- `#[planning_solution(constraints = "...")]`: Top-level problem definition with constraint function path
+
+- `#[planning_solution(constraints = "...")]`: Top-level problem definition with
+  constraint function path
 - `#[basic_variable_config(...)]`: Declarative configuration specifying:
   - Which collection contains planning entities (`shifts`)
   - Which field is the planning variable (`employee_idx`)
@@ -306,7 +345,8 @@ Before diving into constraints, let's understand how the solver finds solutions.
 2. **Evaluate the score** using your constraint functions
 3. **Make a small change** (assign a different employee to one shift)
 4. **Evaluate the new score**
-5. **Keep the change if it improves the score** (with some controlled randomness)
+5. **Keep the change if it improves the score** (with some controlled
+   randomness)
 6. **Repeat millions of times** in seconds
 7. **Return the best solution found**
 
@@ -315,10 +355,13 @@ Before diving into constraints, let's understand how the solver finds solutions.
 SolverForge uses sophisticated **metaheuristic algorithms** like:
 
 - **Tabu Search**: Remembers recent moves to avoid cycling
-- **Simulated Annealing**: Occasionally accepts worse solutions to escape local optima
-- **Late Acceptance**: Compares current solution to recent history, not just the immediate previous
+- **Simulated Annealing**: Occasionally accepts worse solutions to escape local
+  optima
+- **Late Acceptance**: Compares current solution to recent history, not just the
+  immediate previous
 
-These techniques efficiently explore the massive solution space without getting stuck.
+These techniques efficiently explore the massive solution space without getting
+stuck.
 
 ### The Score: How "Good" is a Solution?
 
@@ -328,10 +371,12 @@ Every solution gets a score with two parts:
 0hard/-45soft
 ```
 
-- **Hard score**: Counts hard constraint violations (must be 0 for a valid solution)
+- **Hard score**: Counts hard constraint violations (must be 0 for a valid
+  solution)
 - **Soft score**: Counts soft constraint violations/rewards (higher is better)
 
 **Scoring rules:**
+
 - Hard score must be 0 or positive (negative = invalid/infeasible)
 - Among valid solutions (hard score = 0), highest soft score wins
 - Hard score always takes priority over soft score
@@ -369,11 +414,13 @@ pub fn create_fluent_constraints() -> impl ConstraintSet<EmployeeSchedule, HardS
 }
 ```
 
-The function returns `impl ConstraintSet` — a trait implemented for tuples of constraints. Each constraint is fully typed with no runtime dispatch.
+The function returns `impl ConstraintSet` — a trait implemented for tuples of
+constraints. Each constraint is fully typed with no runtime dispatch.
 
 ### Hard Constraint: Required Skill
 
-**Business rule:** "An employee assigned to a shift must have the required skill."
+**Business rule:** "An employee assigned to a shift must have the required
+skill."
 
 ```rust
 let required_skill = factory
@@ -394,8 +441,10 @@ let required_skill = factory
 ```
 
 **How to read this:**
+
 1. `for_each(|s| s.shifts.as_slice())`: Stream over all shifts
-2. `.join(..., equal_bi(...))`: Join with employees where `shift.employee_idx == Some(emp.index)`
+2. `.join(..., equal_bi(...))`: Join with employees where
+   `shift.employee_idx == Some(emp.index)`
 3. `.filter(...)`: Keep only where employee lacks the required skill
 4. `.penalize(ONE_HARD)`: Each violation subtracts 1 from hard score
 5. `.named(...)`: Name for debugging
@@ -409,7 +458,8 @@ equal_bi(
 )
 ```
 
-The `equal_bi` joiner takes two closures — one for each side of the join. This enables joining different types with potentially different key extraction logic.
+The `equal_bi` joiner takes two closures — one for each side of the join. This
+enables joining different types with potentially different key extraction logic.
 
 ### Hard Constraint: No Overlapping Shifts
 
@@ -432,12 +482,16 @@ let no_overlap = factory
 ```
 
 **How to read this:**
+
 1. `for_each_unique_pair(...)`: Create pairs of shifts from the same collection
-2. `joiner::equal(|shift| shift.employee_idx)`: Only pair shifts with the same employee
+2. `joiner::equal(|shift| shift.employee_idx)`: Only pair shifts with the same
+   employee
 3. `.filter(...)`: Check time overlap with interval comparison
 4. `.penalize_hard_with(...)`: Variable penalty based on overlap duration
 
-**Optimization concept:** `for_each_unique_pair` ensures we don't count violations twice (A,B vs B,A). The joiner uses hash indexing for O(1) pair matching.
+**Optimization concept:** `for_each_unique_pair` ensures we don't count
+violations twice (A,B vs B,A). The joiner uses hash indexing for O(1) pair
+matching.
 
 ### Hard Constraint: Rest Between Shifts
 
@@ -458,6 +512,7 @@ let at_least_10_hours = factory
 ```
 
 **Helper function:**
+
 ```rust
 fn gap_penalty_minutes(a: &Shift, b: &Shift) -> i64 {
     const MIN_GAP_MINUTES: i64 = 600;  // 10 hours
@@ -479,7 +534,8 @@ fn gap_penalty_minutes(a: &Shift, b: &Shift) -> i64 {
 }
 ```
 
-**Optimization concept:** The penalty `600 - actual_gap` creates **incremental guidance**. 9 hours rest (penalty 60) is better than 5 hours rest (penalty 300).
+**Optimization concept:** The penalty `600 - actual_gap` creates **incremental
+guidance**. 9 hours rest (penalty 60) is better than 5 hours rest (penalty 300).
 
 ### Hard Constraint: One Shift Per Day
 
@@ -498,11 +554,13 @@ let one_per_day = factory
 ```
 
 **Key pattern — tuple joiner:**
+
 ```rust
 joiner::equal(|shift: &Shift| (shift.employee_idx, shift.date()))
 ```
 
-The joiner matches on a tuple `(Option<usize>, NaiveDate)` — same employee AND same date.
+The joiner matches on a tuple `(Option<usize>, NaiveDate)` — same employee AND
+same date.
 
 ### Hard Constraint: Unavailable Employee
 
@@ -550,11 +608,14 @@ This is a powerful pattern unique to SolverForge's fluent API:
 3. Pre-indexes by the date key
 4. On lookup, finds matching dates in O(1) using the shift's date
 
-**Why sorted Vecs?** The `flatten_last` operation uses binary search internally, requiring sorted input. That's why `Employee::finalize()` sorts the date vectors.
+**Why sorted Vecs?** The `flatten_last` operation uses binary search internally,
+requiring sorted input. That's why `Employee::finalize()` sorts the date
+vectors.
 
 ### Soft Constraint: Undesired Days
 
-**Business rule:** "Prefer not to schedule employees on days they marked as undesired."
+**Business rule:** "Prefer not to schedule employees on days they marked as
+undesired."
 
 ```rust
 let undesired = factory
@@ -577,11 +638,13 @@ let undesired = factory
     .named("Undesired day for employee");
 ```
 
-**Key difference:** Uses `ONE_SOFT` instead of `ONE_HARD`. The solver will try to avoid undesired days but may violate this if necessary.
+**Key difference:** Uses `ONE_SOFT` instead of `ONE_HARD`. The solver will try
+to avoid undesired days but may violate this if necessary.
 
 ### Soft Constraint: Desired Days (Reward)
 
-**Business rule:** "Prefer to schedule employees on days they marked as desired."
+**Business rule:** "Prefer to schedule employees on days they marked as
+desired."
 
 ```rust
 let desired = factory
@@ -604,7 +667,8 @@ let desired = factory
     .named("Desired day for employee");
 ```
 
-**Key difference:** Uses `.reward()` instead of `.penalize()`. Rewards **increase** the score.
+**Key difference:** Uses `.reward()` instead of `.penalize()`. Rewards
+**increase** the score.
 
 ### Soft Constraint: Load Balancing
 
@@ -627,6 +691,7 @@ This is the simplest and most powerful load balancing pattern:
 3. Penalizes based on unfairness metric
 
 Unlike manual `group_by` + `count` + math, the `balance()` operation:
+
 - Maintains O(1) incremental updates during solving
 - Handles edge cases (empty groups, single element)
 - Provides mathematically sound fairness calculation
@@ -637,7 +702,8 @@ Unlike manual `group_by` + `count` + math, the `balance()` operation:
 
 ### Configuration via Derive Macros
 
-Unlike configuration files, SolverForge uses compile-time configuration through derive macros:
+Unlike configuration files, SolverForge uses compile-time configuration through
+derive macros:
 
 ```rust
 #[planning_solution(constraints = "crate::constraints::create_fluent_constraints")]
@@ -651,6 +717,7 @@ pub struct EmployeeSchedule { ... }
 ```
 
 This generates:
+
 - The `Solvable` trait implementation
 - Variable descriptor metadata
 - Move selector configuration
@@ -712,6 +779,7 @@ async fn create_schedule(
 ```
 
 **Architecture notes:**
+
 - Solving runs on `rayon` thread pool (CPU-bound work)
 - Updates sent via `tokio::sync::mpsc` channel
 - Async Axum handler for non-blocking HTTP
@@ -737,6 +805,7 @@ async fn analyze_schedule(Json(dto): Json<ScheduleDto>) -> Json<AnalyzeResponse>
 ```
 
 The `ScoreDirector`:
+
 - Evaluates all constraints against a solution
 - Returns detailed match information per constraint
 - No actual solving — just score calculation
@@ -770,6 +839,7 @@ pub fn router(state: Arc<AppState>) -> Router {
 #### GET /demo-data
 
 Returns available demo datasets:
+
 ```json
 ["SMALL", "LARGE"]
 ```
@@ -777,6 +847,7 @@ Returns available demo datasets:
 #### GET /demo-data/{id}
 
 Generates and returns sample data:
+
 ```json
 {
   "employees": [
@@ -804,6 +875,7 @@ Generates and returns sample data:
 #### POST /schedules
 
 Submit a schedule to solve. Returns job ID:
+
 ```
 "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
 ```
@@ -811,6 +883,7 @@ Submit a schedule to solve. Returns job ID:
 #### GET /schedules/{id}
 
 Get current solution state:
+
 ```json
 {
   "employees": [...],
@@ -827,6 +900,7 @@ Stop solving early. Returns `204 No Content`.
 #### PUT /schedules/analyze
 
 Analyze a schedule without solving:
+
 ```json
 {
   "score": "-2hard/-45soft",
@@ -905,7 +979,8 @@ To make fairness more important relative to other soft constraints:
     .penalize(HardSoftDecimalScore::of_soft(10))  // Weight: 10
 ```
 
-Now each unit of imbalance costs 10 soft points instead of 1, making the solver prioritize fair distribution over other soft preferences.
+Now each unit of imbalance costs 10 soft points instead of 1, making the solver
+prioritize fair distribution over other soft preferences.
 
 ### Adding a New Hard Constraint
 
@@ -949,6 +1024,7 @@ Then add it to the return tuple:
 ```
 
 Rebuild and test:
+
 ```bash
 cargo build --release
 cargo run --release
@@ -960,7 +1036,8 @@ cargo run --release
 
 ### Zero-Erasure Architecture
 
-SolverForge's constraints are fully monomorphized — every generic parameter resolves to concrete types at compile time:
+SolverForge's constraints are fully monomorphized — every generic parameter
+resolves to concrete types at compile time:
 
 ```rust
 // This type is FULLY concrete at compile time:
@@ -972,7 +1049,9 @@ ConstraintStream<
 >
 ```
 
-**No `Box<dyn Constraint>`**, no `Arc<dyn Stream>`, no vtable dispatch. The compiler sees the entire constraint graph and can inline, vectorize, and optimize aggressively.
+**No `Box<dyn Constraint>`**, no `Arc<dyn Stream>`, no vtable dispatch. The
+compiler sees the entire constraint graph and can inline, vectorize, and
+optimize aggressively.
 
 ### Index-Based References
 
@@ -989,6 +1068,7 @@ pub employee_idx: Option<usize>  // Index into employees array
 ```
 
 Benefits:
+
 - Integer comparison vs string comparison
 - No allocation during constraint evaluation
 - Cache-friendly memory access patterns
@@ -1006,7 +1086,8 @@ For constraints involving collections on joined entities:
 )
 ```
 
-This creates an indexed structure during stream setup, enabling O(1) lookups during constraint evaluation.
+This creates an indexed structure during stream setup, enabling O(1) lookups
+during constraint evaluation.
 
 ### Custom Penalty Functions
 
@@ -1019,7 +1100,8 @@ Variable penalties guide the solver more effectively:
 })
 ```
 
-The `100000` multiplier ensures minute-level granularity affects the score meaningfully compared to unit penalties.
+The `100000` multiplier ensures minute-level granularity affects the score
+meaningfully compared to unit penalties.
 
 ---
 
@@ -1027,17 +1109,18 @@ The `100000` multiplier ensures minute-level granularity affects the score meani
 
 ### File Locations
 
-| Need to... | Edit this file |
-|------------|----------------|
-| Add/change business rule | `src/constraints.rs` |
-| Add field to Employee/Shift | `src/domain.rs` + `src/dto.rs` |
-| Change API endpoints | `src/api.rs` |
-| Change demo data | `src/demo_data.rs` |
-| Change UI | `static/index.html`, `static/app.js` |
+| Need to...                  | Edit this file                       |
+| --------------------------- | ------------------------------------ |
+| Add/change business rule    | `src/constraints.rs`                 |
+| Add field to Employee/Shift | `src/domain.rs` + `src/dto.rs`       |
+| Change API endpoints        | `src/api.rs`                         |
+| Change demo data            | `src/demo_data.rs`                   |
+| Change UI                   | `static/index.html`, `static/app.js` |
 
 ### Common Constraint Patterns
 
 **Unary constraint (examine one entity):**
+
 ```rust
 factory.for_each(|s| s.shifts.as_slice())
     .filter(|shift| /* condition */)
@@ -1045,6 +1128,7 @@ factory.for_each(|s| s.shifts.as_slice())
 ```
 
 **Binary constraint with join:**
+
 ```rust
 factory.for_each(|s| s.shifts.as_slice())
     .join(|s| s.employees.as_slice(), equal_bi(...))
@@ -1053,6 +1137,7 @@ factory.for_each(|s| s.shifts.as_slice())
 ```
 
 **Unique pairs (same collection):**
+
 ```rust
 factory.for_each_unique_pair(
     |s| s.shifts.as_slice(),
@@ -1061,6 +1146,7 @@ factory.for_each_unique_pair(
 ```
 
 **Flatten collections:**
+
 ```rust
 .flatten_last(
     |emp| emp.dates.as_slice(),
@@ -1070,6 +1156,7 @@ factory.for_each_unique_pair(
 ```
 
 **Load balancing:**
+
 ```rust
 factory.for_each(|s| s.shifts.as_slice())
     .balance(|shift| shift.employee_idx)
@@ -1078,27 +1165,29 @@ factory.for_each(|s| s.shifts.as_slice())
 
 ### Python → Rust Translation
 
-| Python | Rust |
-|--------|------|
-| `@dataclass` | `#[derive(...)]` struct |
-| `@planning_entity` decorator | `#[planning_entity]` derive macro |
-| `PlanningId` annotation | `#[planning_id]` attribute |
-| `PlanningVariable` annotation | `#[planning_variable]` attribute |
+| Python                               | Rust                                          |
+| ------------------------------------ | --------------------------------------------- |
+| `@dataclass`                         | `#[derive(...)]` struct                       |
+| `@planning_entity` decorator         | `#[planning_entity]` derive macro             |
+| `PlanningId` annotation              | `#[planning_id]` attribute                    |
+| `PlanningVariable` annotation        | `#[planning_variable]` attribute              |
 | `constraint_factory.for_each(Shift)` | `factory.for_each(\|s\| s.shifts.as_slice())` |
-| `Joiners.equal(lambda: ...)` | `joiner::equal(\|x\| x.field)` |
-| `lambda shift: shift.employee` | `\|shift: &Shift\| shift.employee_idx` |
-| FastAPI server | Axum server |
-| `pip install` | `cargo build` |
+| `Joiners.equal(lambda: ...)`         | `joiner::equal(\|x\| x.field)`                |
+| `lambda shift: shift.employee`       | `\|shift: &Shift\| shift.employee_idx`        |
+| FastAPI server                       | Axum server                                   |
+| `pip install`                        | `cargo build`                                 |
 
 ### Debugging Tips
 
 **Enable verbose logging:**
+
 ```rust
 // In Cargo.toml
 solverforge = { ..., features = ["verbose-logging"] }
 ```
 
 **Print in constraints (debug only):**
+
 ```rust
 .filter(|shift: &Shift, emp: &Employee| {
     eprintln!("Checking shift {} with {}", shift.id, emp.name);
@@ -1107,6 +1196,7 @@ solverforge = { ..., features = ["verbose-logging"] }
 ```
 
 **Use the analyze endpoint:**
+
 ```bash
 curl -X PUT http://localhost:7860/schedules/analyze \
   -H "Content-Type: application/json" \
@@ -1134,5 +1224,5 @@ curl -X PUT http://localhost:7860/schedules/analyze \
 
 ### Additional Resources
 
-- [GitHub Repository](https://github.com/solverforge/solverforge-quickstarts)
+- [GitHub Repository](https://github.com/solverforge/solverforge)
 - [SolverForge Rust API Documentation](/docs/api/rust/)

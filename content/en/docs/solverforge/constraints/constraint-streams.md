@@ -1,16 +1,19 @@
 ---
-title: "Constraint Streams"
-linkTitle: "Constraint Streams"
+title: 'Constraint Streams'
+linkTitle: 'Constraint Streams'
 weight: 10
 description: >
   Declarative constraint definition using the stream API.
 ---
 
-Constraint streams are the primary way to define constraints in SolverForge. They provide a pipeline-style API where you select entities, transform the stream, and terminate with a scoring impact.
+Constraint streams are the primary way to define constraints in SolverForge.
+They provide a pipeline-style API where you select entities, transform the
+stream, and terminate with a scoring impact.
 
 ## Defining Constraints
 
-Constraints are defined as a function that returns a tuple of constraint objects. The `#[planning_solution]` macro wires this up automatically.
+Constraints are defined as a function that returns a tuple of constraint
+objects. The `#[planning_solution]` macro wires this up automatically.
 
 ```rust
 use solverforge::prelude::*;
@@ -19,7 +22,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
 
     (
-        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+        factory.shifts()
             .filter(|shift| shift.employee_idx.is_none())
             .penalize(HardSoftScore::ONE_HARD)
             .named("Unassigned shift"),
@@ -27,7 +30,9 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-Each constraint builder chain produces an `IncrementalUniConstraint` (or similar) via `.named()`. Return them as a tuple — SolverForge implements `ConstraintSet` for tuples of up to 16 constraints.
+Each constraint builder chain produces an `IncrementalUniConstraint` (or
+similar) via `.named()`. Return them as a tuple — SolverForge implements
+`ConstraintSet` for tuples of up to 16 constraints.
 
 ## Source Operations
 
@@ -36,7 +41,7 @@ Each constraint builder chain produces an `IncrementalUniConstraint` (or similar
 Selects all items from a collection in the solution, using a closure extractor.
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
 ```
 
 ## Intermediate Operations
@@ -46,25 +51,27 @@ factory.for_each(|s: &Schedule| s.shifts.as_slice())
 Keeps only elements that match a predicate.
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .filter(|shift| shift.employee_idx.is_none())
 ```
 
 ### `join`
 
-Combines elements from the same or different collections. The join target determines the behavior:
+Combines elements from the same or different collections. The join target
+determines the behavior:
 
 **Self-join** — pairs from the same collection, using an `equal` joiner:
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .join(equal(|shift: &Shift| shift.employee_idx))
 ```
 
-**Cross-join** — pairs from two different collections, using an `equal_bi` joiner:
+**Cross-join** — pairs from two different collections, using an `equal_bi`
+joiner:
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .join((
         |s: &Schedule| s.unavailability.as_slice(),
         equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
@@ -75,7 +82,9 @@ See [Joiners](../joiners/) for all available joiner types.
 
 ### `flatten_last`
 
-Flattens a collection in the last element into individual elements. Takes three arguments: a slice extractor, a key function for the flattened items, and a lookup function for matching.
+Flattens a collection in the last element into individual elements. Takes three
+arguments: a slice extractor, a key function for the flattened items, and a
+lookup function for matching.
 
 ```rust
 factory.for_each(|s: &Schedule| s.employees.as_slice())
@@ -95,7 +104,7 @@ factory.for_each(|s: &Schedule| s.employees.as_slice())
 Groups elements and applies a [collector](../collectors/) to aggregate.
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .group_by(
         |shift: &Shift| shift.employee_idx,   // grouping key
         count::<Shift>(),                       // collector
@@ -104,16 +113,18 @@ factory.for_each(|s: &Schedule| s.shifts.as_slice())
 
 ### `balance`
 
-Calculates load imbalance across a grouping key. The key function returns `Option<K>` — `None` values are skipped (useful for unassigned entities).
+Calculates load imbalance across a grouping key. The key function returns
+`Option<K>` — `None` values are skipped (useful for unassigned entities).
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .balance(|shift: &Shift| shift.employee_idx)
 ```
 
 ### `if_exists_filtered` / `if_not_exists_filtered`
 
-Filters based on the existence (or absence) of matching entities in another collection.
+Filters based on the existence (or absence) of matching entities in another
+collection.
 
 ```rust
 factory.for_each(|s: &Schedule| s.shifts.as_slice())
@@ -177,20 +188,20 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
     (
         // Hard: every shift must be assigned
-        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+        factory.shifts()
             .filter(|shift| shift.employee_idx.is_none())
             .penalize(HardSoftScore::ONE_HARD)
             .named("Unassigned shift"),
 
         // Hard: no employee works two overlapping shifts
-        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+        factory.shifts()
             .join(equal(|shift: &Shift| shift.employee_idx))
             .filter(|(a, b)| a.overlaps(b))
             .penalize(HardSoftScore::ONE_HARD)
             .named("Overlap"),
 
         // Soft: prefer assigning employees to their preferred shifts
-        factory.for_each(|s: &Schedule| s.shifts.as_slice())
+        factory.shifts()
             .filter(|shift| shift.is_preferred_by_employee())
             .reward(HardSoftScore::ONE_SOFT)
             .named("Preference"),
