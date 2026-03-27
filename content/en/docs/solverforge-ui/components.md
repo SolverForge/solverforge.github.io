@@ -1,144 +1,93 @@
 ---
 title: Components
-description: Build pages with the shipped solverforge-ui base components and helpers.
+description: >
+  Core factories, return values, and helpers in the shipped solverforge-ui
+  surface.
 weight: 2
 ---
 
 # Components
 
-`solverforge-ui` ships a base component surface for common scheduling and operations UIs.
+`solverforge-ui` ships a verified component surface for common scheduling and
+operations UIs.
 
-## Core Factory Functions
+## Core Factories
 
-### Header
+The current public API documents these factories:
 
-Use `SF.createHeader` for page titles, subtitle context, and top-level action areas.
+| Factory                       | Returns                                                                         | Description                                                              |
+| ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `SF.createHeader(config)`     | `HTMLElement`                                                                   | Sticky header with logo, title, nav tabs, and solve/stop/analyze actions |
+| `SF.createStatusBar(config)`  | `{el, bindHeader, updateScore, setSolving, updateMoves, colorDotsFromAnalysis}` | Score display with constraint indicators                                 |
+| `SF.createButton(config)`     | `HTMLButtonElement`                                                             | Button with variant, size, icon, and shape modifiers                     |
+| `SF.createModal(config)`      | `{el, body, open, close, setBody}`                                              | Dialog with backdrop and header                                          |
+| `SF.createTable(config)`      | `HTMLElement`                                                                   | Data table with headers and row click support                            |
+| `SF.createTabs(config)`       | `{el, show}`                                                                    | Tab panel container with instance-scoped tab switching                   |
+| `SF.createFooter(config)`     | `HTMLElement`                                                                   | Footer with links and version                                            |
+| `SF.createApiGuide(config)`   | `HTMLElement`                                                                   | REST API documentation panel                                             |
+| `SF.showToast(config)`        | `void`                                                                          | Auto-dismissing toast notification                                       |
+| `SF.showError(title, detail)` | `void`                                                                          | Error toast shorthand                                                    |
+| `SF.showTab(tabId, root?)`    | `void`                                                                          | Activate tab panels globally or within one root                          |
 
-```js
-SF.createHeader(document.getElementById('header'), {
-  title: 'Plant Schedule',
-  subtitle: 'Line 3 · Morning Shift'
-});
-```
-
-### Status Bar
-
-Use `SF.createStatusBar` for run state, sync state, and user-facing health messages.
-
-```js
-const status = SF.createStatusBar(document.getElementById('status'));
-status.setStatus('ok', 'Data loaded');
-```
-
-### Button
-
-Use `SF.createButton` for standardized button rendering and behavior.
+## Composition Example
 
 ```js
-const runBtn = SF.createButton({
-  label: 'Run Solver',
-  icon: 'fa-solid fa-play',
-  onClick: () => runSolver()
-});
-document.getElementById('actions').append(runBtn);
-```
-
-### Modal
-
-Use `SF.createModal` for confirmations, detail panes, and error drill-downs.
-
-```js
-const modal = SF.createModal({ title: 'Schedule Details' });
-modal.setBody('<p>Batch A starts at 08:00.</p>');
-modal.open();
-```
-
-### Table
-
-Use `SF.createTable` to render structured rows with consistent styles.
-
-```js
-SF.createTable(document.getElementById('table'), {
-  columns: ['Job', 'Line', 'Start', 'End'],
-  rows: [
-    ['J-102', 'L3', '08:00', '09:20'],
-    ['J-103', 'L2', '08:15', '10:00']
-  ]
-});
-```
-
-### Tabs
-
-Use `SF.createTabs` for view switching and section organization.
-
-```js
-SF.createTabs(document.getElementById('tabs'), {
+var tabs = SF.createTabs({
   tabs: [
-    { id: 'overview', label: 'Overview', active: true },
-    { id: 'timeline', label: 'Timeline' },
-    { id: 'analysis', label: 'Analysis' }
-  ]
+    { id: 'plan', content: '<div>Plan view</div>', active: true },
+    { id: 'gantt', content: '<div>Gantt view</div>' },
+  ],
 });
-```
+document.body.appendChild(tabs.el);
 
-### Footer
-
-Use `SF.createFooter` for build/version info and support links.
-
-```js
-SF.createFooter(document.getElementById('footer'), {
-  text: 'SolverForge UI · Production'
+var header = SF.createHeader({
+  title: 'My Scheduler',
+  subtitle: 'by SolverForge',
+  tabs: [
+    { id: 'plan', label: 'Plan', active: true },
+    { id: 'gantt', label: 'Gantt' },
+  ],
+  onTabChange: function (id) {
+    tabs.show(id);
+  },
 });
-```
+document.body.prepend(header);
 
-### API Guide
-
-Use `SF.createApiGuide` for built-in API reference panels in operator tools.
-
-```js
-SF.createApiGuide(document.getElementById('api-guide'), {
-  title: 'Scheduler API',
-  sections: []
-});
-```
-
-### Toasts and Error Helpers
-
-Use `SF.showToast` for transient notifications and `SF.showError` for consistent error presentation.
-
-```js
-SF.showToast('Schedule queued');
-
-try {
-  await doWork();
-} catch (err) {
-  SF.showError(err);
-}
-```
-
-### Tab Switching
-
-Use `SF.showTab` to activate a tab and its related content region.
-
-```js
-SF.showTab('timeline');
+var statusBar = SF.createStatusBar({ header: header, constraints: [] });
+header.after(statusBar.el);
 ```
 
 ## Unsafe HTML APIs
 
-Some component APIs accept HTML strings (for example, custom modal body content). Treat untrusted user data as unsafe.
+Default content is text-rendered. These opt-ins accept trusted HTML:
 
-- Escape user-provided text before injecting into HTML.
-- Prefer text-only rendering paths when possible.
-- Only pass trusted HTML if it is sanitized.
+| Factory                   | Unsafe HTML field                                      |
+| ------------------------- | ------------------------------------------------------ |
+| `SF.el(tag, attrs, ...)`  | `unsafeHtml`                                           |
+| `SF.createModal(config)`  | `unsafeBody`                                           |
+| `SF.createTabs(config)`   | `tabs[].content.unsafeHtml`                            |
+| `SF.createTable(config)`  | `cells[].unsafeHtml`                                   |
+| `SF.gantt.create(config)` | `unsafePopupHtml`, `columns[].render(task).unsafeHtml` |
 
-A practical helper pattern is `SF.escHtml` before interpolation.
+Escape user-provided content before interpolation. `SF.escHtml(...)` is the
+shipped helper for that.
+
+## Button Variants
+
+```js
+SF.createButton({ text: 'Solve', variant: 'success' });
+SF.createButton({ text: 'Stop', variant: 'danger' });
+SF.createButton({ text: 'Save', variant: 'primary' });
+SF.createButton({ text: 'Cancel', variant: 'default' });
+SF.createButton({ icon: 'fa-gear', variant: 'ghost', circle: true });
+```
 
 ## Useful Helpers
 
-The following helpers are optional but often useful in real pages:
+These helpers are documented in the current public API:
 
-- `SF.score.*` for score formatting and display helpers
-- `SF.colors.*` for consistent palette usage
-- `SF.escHtml` for HTML escaping
-- `SF.el` for lightweight DOM element creation
+- `SF.score.parseHard`, `parseSoft`, `parseMedium`, `getComponents`,
+  `colorClass`
+- `SF.colors.pick`, `project`, `reset`
+- `SF.escHtml(...)` for safe HTML escaping
+- `SF.el(tag, attrs, ...children)` for lightweight DOM element creation

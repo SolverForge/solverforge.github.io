@@ -1,25 +1,26 @@
 ---
 title: Getting Started
-description: Add solverforge-ui to an Axum app and mount a minimal interactive page.
+description: >
+  Mount the bundled assets and wire verified solverforge-ui primitives into an
+  Axum app.
 weight: 1
 ---
 
 # Getting Started with solverforge-ui
 
-This guide shows the normal Axum integration path:
+This guide covers the verified integration path:
 
 1. add the crate
-2. mount UI asset routes with `.merge(solverforge_ui::routes())`
-3. include the required CSS and JS assets
-4. render basic components and connect a solver backend
+2. mount `/sf/*` assets with `.merge(solverforge_ui::routes())`
+3. include the bundled CSS and JS
+4. instantiate components plus the backend and solver helpers
 
 ## Add the Dependency
 
 ```toml
 [dependencies]
 axum = "0.8"
-solverforge-ui = "0.3"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+solverforge-ui = "0.3.1"
 ```
 
 ## Mount `/sf/*` Routes in Axum
@@ -38,7 +39,8 @@ fn app() -> Router {
 }
 ```
 
-The `.merge(solverforge_ui::routes())` integration serves UI assets under `/sf/*`.
+`solverforge_ui::routes()` serves the embedded `/sf/*` assets. Your application
+still owns its HTML pages and any schedule/solver API routes.
 
 ## Include Required Assets in HTML
 
@@ -50,54 +52,66 @@ The `.merge(solverforge_ui::routes())` integration serves UI assets under `/sf/*
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>solverforge-ui quickstart</title>
 
-    <link rel="stylesheet" href="/sf/vendor/fontawesome/css/fontawesome.min.css" />
+    <link
+      rel="stylesheet"
+      href="/sf/vendor/fontawesome/css/fontawesome.min.css"
+    />
     <link rel="stylesheet" href="/sf/vendor/fontawesome/css/solid.min.css" />
     <link rel="stylesheet" href="/sf/sf.css" />
   </head>
-  <body>
-    <div id="header"></div>
-    <div id="status"></div>
-    <div id="tabs"></div>
+  <body class="sf-app">
     <script src="/sf/sf.js"></script>
     <script>
-      const tabs = SF.createTabs(document.getElementById('tabs'), {
+      var tabs = SF.createTabs({
         tabs: [
-          { id: 'run', label: 'Run Solver', active: true },
-          { id: 'results', label: 'Results' }
-        ]
+          { id: 'plan', content: '<div>Plan view</div>', active: true },
+          { id: 'gantt', content: '<div>Gantt view</div>' },
+        ],
       });
+      document.body.appendChild(tabs.el);
 
-      SF.createHeader(document.getElementById('header'), {
+      var backend = SF.createBackend({ type: 'axum' });
+
+      var header = SF.createHeader({
         title: 'SolverForge Scheduler',
-        subtitle: 'Quickstart'
+        subtitle: 'by SolverForge',
+        tabs: [
+          { id: 'plan', label: 'Plan', active: true },
+          { id: 'gantt', label: 'Gantt' },
+        ],
+        onTabChange: function (id) {
+          tabs.show(id);
+        },
       });
+      document.body.prepend(header);
 
-      const status = SF.createStatusBar(document.getElementById('status'));
-      status.setStatus('ready', 'Ready to run solver');
+      var statusBar = SF.createStatusBar({ header: header, constraints: [] });
+      header.after(statusBar.el);
 
-      const backend = SF.createBackend({ type: 'axum' });
-      const solver = SF.createSolver({ backend });
-
-      // Example hook; shape depends on your API payloads.
-      async function run() {
-        status.setStatus('working', 'Solving...');
-        try {
-          const result = await solver.solve({ jobs: [], resources: [] });
-          status.setStatus('ok', `Solved: ${result?.id ?? 'done'}`);
-        } catch (err) {
-          SF.showError(err);
-          status.setStatus('error', 'Solve failed');
-        }
-      }
-
-      window.runSolver = run;
+      var solver = SF.createSolver({
+        backend: backend,
+        statusBar: statusBar,
+        onUpdate: function (schedule) {
+          console.log('updated schedule', schedule);
+        },
+      });
     </script>
   </body>
 </html>
 ```
 
+## Application Routes
+
+`solverforge-ui` does not generate your scheduling API. The crate ships the UI
+surface and a set of backend helpers. If you use
+`SF.createBackend({ type: 'axum' })`, follow the default adapter contract
+documented in [Integration & Assets](../integration-assets/), or add an
+application-side compatibility layer while your routes are still in transition.
+
 ## Next Steps
 
 - Read [Components](../components/) to build richer page layouts.
-- Read [Scheduling Views](../scheduling-views/) for timeline rail and Gantt examples.
-- Read [Integration & Assets](../integration-assets/) for backend endpoint expectations and asset versioning.
+- Read [Scheduling Views](../scheduling-views/) for timeline rail and Gantt
+  examples.
+- Read [Integration & Assets](../integration-assets/) for backend adapters,
+  asset serving, and versioned bundle behavior.

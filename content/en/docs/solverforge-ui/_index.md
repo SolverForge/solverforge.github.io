@@ -1,66 +1,85 @@
 ---
-title: "solverforge-ui"
-linkTitle: "solverforge-ui"
+title: 'solverforge-ui'
+linkTitle: 'solverforge-ui'
 icon: fa-solid fa-display
 weight: 21
 description: >
-  Embedded frontend components, scheduling views, backend adapters, and asset delivery for SolverForge web applications.
+  Embedded frontend components, scheduling views, backend adapters, and asset
+  serving for SolverForge web applications.
 ---
 
-`solverforge-ui` is SolverForge's UI toolkit for web-based scheduling and optimization applications. It ships ready-to-use frontend components, timeline and Gantt views, backend adapters, and static assets that integrate cleanly with Rust backends.
+`solverforge-ui` is SolverForge's frontend component library for
+constraint-optimization applications. It ships embedded assets, UI primitives,
+solver lifecycle helpers, and scheduling views without requiring npm in the
+runtime integration path.
 
 ## What It Provides
 
-- **Drop-in frontend components** for headers, status bars, tabs, tables, modals, footers, and API guides
-- **Scheduling-focused views** with both timeline rail and Gantt primitives
-- **Backend adapters** for Axum, Tauri, and generic fetch-based APIs
-- **Static asset delivery** under `/sf/*`, including stable and versioned bundles
-- **Optional map module** (`SF.map.*`) for map-enabled pages
+- **Drop-in components** for headers, status bars, buttons, modals, tabs,
+  tables, footers, API guides, and toasts
+- **Scheduling views** with both timeline rail and split-pane Gantt primitives
+- **Solver lifecycle helpers** via `SF.createBackend(...)` and
+  `SF.createSolver(...)`
+- **Embedded asset serving** under `/sf/*` via
+  `.merge(solverforge_ui::routes())`
+- **Stable and versioned bundles** for compatibility and cache-friendly
+  production deployments
 
 ## Installation
 
 ```toml
 [dependencies]
-solverforge-ui = "0.3"
+solverforge-ui = "0.3.1"
 ```
 
 ## Minimal Workflow
 
 ```rust
-use axum::{routing::get, Router};
-
-fn app() -> Router {
-    Router::new()
-        .route("/", get(index))
-        .merge(solverforge_ui::routes()) // serves /sf/*
-}
+let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
 ```
 
 ```html
 <link rel="stylesheet" href="/sf/sf.css" />
 <script src="/sf/sf.js"></script>
 <script>
-  const tabs = SF.createTabs(document.getElementById('tabs'));
-  SF.createHeader(document.getElementById('header'), { title: 'SolverForge UI' });
+  var tabs = SF.createTabs({
+    tabs: [{ id: 'plan', content: '<div>Plan view</div>', active: true }],
+  });
+  document.body.appendChild(tabs.el);
+
+  var header = SF.createHeader({
+    title: 'SolverForge UI',
+    tabs: [{ id: 'plan', label: 'Plan', active: true }],
+    onTabChange: function (id) {
+      tabs.show(id);
+    },
+  });
+  document.body.prepend(header);
 </script>
 ```
 
 ## When To Use It
 
-Use `solverforge-ui` when you want to deliver SolverForge-backed web interfaces quickly without building every UI primitive from scratch.
+Use `solverforge-ui` when you want to ship SolverForge-backed web interfaces
+quickly without rebuilding common UI primitives or bundling your own asset
+pipeline.
 
 It is a strong fit for:
 
 - operations dashboards and schedule review screens
 - solver result exploration and troubleshooting tools
-- embedded admin UIs in Axum- or Tauri-based applications
+- embedded admin UIs in Axum-, Tauri-, or static-asset-served applications
 
 ## Sections
 
-- **[Getting Started](getting-started/)** — Wire up Axum routes, assets, and a minimal page
-- **[Components](components/)** — Base component API for common UI building blocks
-- **[Scheduling Views](scheduling-views/)** — Timeline rail and Gantt construction patterns
-- **[Integration & Assets](integration-assets/)** — Backend adapters, REST expectations, and asset strategy
+- **[Getting Started](getting-started/)** — Mount `/sf/*`, include the bundled
+  assets, and wire the verified primitives into an app
+- **[Components](components/)** — Core factories, return values, and unsafe HTML
+  opt-ins
+- **[Scheduling Views](scheduling-views/)** — Timeline rail and Gantt APIs with
+  shipped examples
+- **[Integration & Assets](integration-assets/)** — Backend adapters, asset
+  serving, cache behavior, and example route contracts
 
 ## External References
 
