@@ -428,7 +428,7 @@ GET  /demo-data/{id}         → Generate sample problem
 POST /schedules              → Submit problem, start solving
 GET  /schedules/{id}         → Get current solution
 GET  /schedules/{id}/status  → Lightweight status check
-PUT  /schedules/{id}/analyze → Score breakdown
+PUT  /schedules/analyze      → Score breakdown
 DELETE /schedules/{id}       → Stop solving
 ```
 

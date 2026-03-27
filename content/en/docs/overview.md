@@ -157,8 +157,8 @@ in Rust. The API is complete and stable at v0.6.0. {{% /pageinfo %}}
 
 **Want to try it today?**
 
-- Install via `cargo add solverforge` and follow
-  [Getting Started](/docs/getting-started/)
+- Follow [Getting Started](/docs/getting-started/) to run the current employee
+  scheduling quickstart locally
 
 ## What's Complete
 
