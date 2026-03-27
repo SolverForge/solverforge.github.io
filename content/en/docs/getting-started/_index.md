@@ -27,15 +27,19 @@ domain modeling, constraint streams, and a complete web application.
 ## Getting the Code
 
 ```bash
-cargo new employee-scheduling
-cd employee-scheduling
-cargo add solverforge
+git clone https://github.com/SolverForge/solverforge-quickstarts
+cd solverforge-quickstarts/rust/employee-scheduling
+cargo build --release
+cargo run --release
 ```
 
-Then follow the [Employee Scheduling tutorial](employee-scheduling-rust/) to add
-the domain model, constraints, and runnable web UI.
+This is the current runnable onboarding path while the scaffolded app workflow
+is still evolving. Follow the
+[Employee Scheduling tutorial](employee-scheduling-rust/) to understand the
+domain model, constraints, and web UI implementation.
 
 ## Where to Read More
 
+- [Quickstarts repository](https://github.com/solverforge/solverforge-quickstarts)
 - [SolverForge API documentation](https://docs.rs/solverforge)
-- [GitHub repository](https://github.com/solverforge/solverforge)
+- [Core GitHub repository](https://github.com/solverforge/solverforge)

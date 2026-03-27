@@ -68,9 +68,9 @@ let one_per_day = factory
     <span class="terminal-title">bash - solverforge</span>
   </div>
   <div class="terminal-body">
-    <pre><code><span class="command-line">cargo new employee-scheduling</span>
-<span class="command-line">cd employee-scheduling</span>
-<span class="command-line">cargo add solverforge</span></code></pre>
+    <pre><code><span class="command-line">git clone https://github.com/SolverForge/solverforge-quickstarts</span>
+<span class="command-line">cd solverforge-quickstarts/rust/employee-scheduling</span>
+<span class="command-line">cargo run</span></code></pre>
   </div>
 </div>
 

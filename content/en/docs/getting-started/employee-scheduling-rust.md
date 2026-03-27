@@ -86,12 +86,14 @@ SolverForge's Rust implementation offers key advantages:
 
 ### Running the Application
 
-1. **Create a new Rust project:**
+This walkthrough follows the current employee scheduling example from the
+`solverforge-quickstarts` repository.
+
+1. **Clone the quickstarts repository:**
 
    ```bash
-   cargo new employee-scheduling
-   cd employee-scheduling
-   cargo add solverforge
+   git clone https://github.com/SolverForge/solverforge-quickstarts
+   cd ./solverforge-quickstarts/rust/employee-scheduling
    ```
 
 2. **Build the project:**
@@ -118,7 +120,7 @@ respecting business rules.
 ### File Structure Overview
 
 ```
-employee-scheduling/
+solverforge-quickstarts/rust/employee-scheduling/
 ├── src/
 │   ├── main.rs           # Axum server entry point
 │   ├── lib.rs            # Library crate root
@@ -1206,15 +1208,19 @@ curl -X PUT http://localhost:7860/schedules/analyze \
 ### Common Gotchas
 
 1. **Forgot to call `finalize()`** on employees after construction
+
    - Symptom: `flatten_last` constraints don't match anything
 
 2. **Index out of sync** — employee indices don't match array positions
+
    - Always use `enumerate()` when constructing employees
 
 3. **Missing `factory.clone()`** — factory is consumed by each constraint
+
    - Clone before each constraint chain
 
 4. **Forgot to add constraint to return tuple**
+
    - Constraint silently not evaluated
 
 5. **Using `String` instead of `usize` for references**
@@ -1224,5 +1230,6 @@ curl -X PUT http://localhost:7860/schedules/analyze \
 
 ### Additional Resources
 
-- [GitHub Repository](https://github.com/solverforge/solverforge)
+- [Quickstarts Repository](https://github.com/solverforge/solverforge-quickstarts)
+- [Core GitHub Repository](https://github.com/solverforge/solverforge)
 - [SolverForge Rust API Documentation](/docs/api/rust/)
