@@ -1,45 +1,59 @@
 ---
 title: Integration & Assets
-description: Backend adapters, expected endpoints, and solverforge-ui asset delivery patterns.
+description: >
+  Backend adapters, asset serving, cache behavior, and example route contracts
+  for solverforge-ui.
 weight: 4
 ---
 
 # Integration & Assets
 
-This page summarizes how `solverforge-ui` connects frontend code to backend APIs and how static assets are delivered.
+This page summarizes how `solverforge-ui` connects frontend code to backend APIs
+and how static assets are delivered.
 
 ## Backend Adapters
 
-Create adapters with `SF.createBackend({ type })` and then pass the backend into `SF.createSolver(...)`.
+Create adapters with `SF.createBackend(...)` and pass the result into
+`SF.createSolver(...)`.
 
-### Axum Adapter
+### Axum (default)
 
 ```js
-const backend = SF.createBackend({ type: 'axum' });
-const solver = SF.createSolver({ backend });
+var backend = SF.createBackend({ type: 'axum', baseUrl: '' });
 ```
 
-Use this when your backend is an Axum service exposing SolverForge scheduling endpoints.
+Use this when your backend exposes the default `solverforge-ui` scheduling
+contract.
 
 ### Tauri Adapter
 
 ```js
-const backend = SF.createBackend({ type: 'tauri' });
+var backend = SF.createBackend({
+  type: 'tauri',
+  invoke: window.__TAURI__.core.invoke,
+  listen: window.__TAURI__.event.listen,
+  eventName: 'solver-update',
+});
 ```
 
-Use this for desktop packaging where solver calls are bridged through Tauri.
+Use this when solver traffic is bridged through Tauri IPC.
 
 ### Generic Fetch Adapter
 
 ```js
-const backend = SF.createBackend({ type: 'fetch' });
+var backend = SF.createBackend({
+  type: 'fetch',
+  baseUrl: '/api/v1',
+  headers: { 'X-CSRF-Token': csrfToken },
+});
 ```
 
-Use this when you need to call a custom HTTP API shape with standard browser fetch semantics.
+Use this when your app needs a custom HTTP shape, extra headers, or a
+compatibility layer during a route transition.
 
-## Expected Axum REST Endpoints
+## Default Axum Adapter Contract
 
-The standard Axum integration expects these routes:
+The default Axum adapter expects these routes:
 
 - `POST /schedules`
 - `GET /schedules/{id}`
@@ -48,11 +62,37 @@ The standard Axum integration expects these routes:
 - `DELETE /schedules/{id}`
 - `GET /demo-data/{name}`
 
-If your backend uses different paths, map or proxy routes so the UI adapter can call a compatible surface.
+The adapter also expects `createSchedule()` to resolve to either:
+
+- a plain schedule/job id string, or
+- an object containing one of `id`, `jobId`, `job_id`, `scheduleId`, or
+  `schedule_id`
+
+If your current app still uses a legacy quickstart route shape, add an
+application-side compatibility layer or use the generic `fetch` adapter until
+the routes converge.
+
+## Solver Lifecycle
+
+`SF.createSolver(...)` builds the client-side solver state machine on top of the
+backend adapter.
+
+```js
+var solver = SF.createSolver({
+  backend: backend,
+  statusBar: statusBar,
+  onUpdate: function (schedule) {
+    render(schedule);
+  },
+});
+```
+
+The shipped solver helper exposes `start`, `stop`, `isRunning`, and `getJobId`.
 
 ## Asset Serving Under `/sf/*`
 
-When you merge `solverforge_ui::routes()`, the crate serves its static files from `/sf/*`.
+`solverforge_ui::routes()` serves `GET /sf/{*path}` from the crate's embedded
+asset directory.
 
 Common assets include:
 
@@ -61,24 +101,39 @@ Common assets include:
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 
-## Stable vs Versioned Asset URLs
+## Cache Behavior and Versioned Bundles
 
-`solverforge-ui` provides both stable and versioned bundle URLs:
+The crate emits both stable and versioned bundle filenames:
 
 - stable: `/sf/sf.css`, `/sf/sf.js`
 - versioned: `/sf/sf.<crate-version>.css`, `/sf/sf.<crate-version>.js`
 
-A practical strategy is:
+`src/lib.rs` serves them with different cache policies:
 
-- use stable URLs for simple development environments
-- use versioned URLs for stronger cache busting in production/CDN environments
+- stable bundles use `Cache-Control: public, max-age=3600`
+- versioned bundles use `Cache-Control: public, max-age=31536000, immutable`
+- `fonts/`, `vendor/`, and `img/` assets are also served as immutable
 
-## Optional Leaflet Map Module
+A practical strategy is to use stable URLs during development and versioned
+bundles in production or CDN environments.
 
-`SF.map.*` is optional and can be enabled for map-enhanced pages.
+## Optional Modules
 
-For route geometry, travel-time, and map-data pipeline details, see the existing `solverforge-maps` docs, especially [Routing & Matrices](/docs/solverforge-maps/routing/) and [Caching & Operations](/docs/solverforge-maps/caching/).
+When the optional map module is shipped in `static/sf/modules/`, include it
+alongside Leaflet:
+
+```html
+<link rel="stylesheet" href="/sf/vendor/leaflet/leaflet.css" />
+<script src="/sf/vendor/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="/sf/modules/sf-map.css" />
+<script src="/sf/modules/sf-map.js"></script>
+```
+
+For route geometry, travel-time, and map-data pipeline details, see the existing
+[solverforge-maps](/docs/solverforge-maps/) docs.
 
 ## Non-Rust Integration Path
 
-If you are not serving assets from Rust, copy or symlink `static/sf/` into your web server's static-files directory so `/sf/*` URLs resolve the same way in production.
+`static/sf/` is self-contained. If you are not serving assets from Rust, copy,
+submodule, or symlink it into your static-files directory so `/sf/*` resolves
+the same way in production.
