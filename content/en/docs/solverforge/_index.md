@@ -1,13 +1,15 @@
 ---
-title: "SolverForge"
-linkTitle: "SolverForge"
+title: 'SolverForge'
+linkTitle: 'SolverForge'
 icon: fa-brands fa-rust
 weight: 10
 description: >
-  Native Rust constraint solver — production-ready at v0.5.18.
+  Native Rust constraint solver — production-ready at v0.6.0.
 ---
 
-SolverForge is a native Rust constraint solver for planning and scheduling problems. It uses derive macros for domain modeling, constraint streams for declarative rule definition, and metaheuristic algorithms for optimization.
+SolverForge is a native Rust constraint solver for planning and scheduling
+problems. It uses derive macros for domain modeling, constraint streams for
+declarative rule definition, and metaheuristic algorithms for optimization.
 
 ## Installation
 
@@ -80,10 +82,14 @@ fn main() {
 
 ## API Reference
 
-Full API documentation is available on [docs.rs/solverforge](https://docs.rs/solverforge).
+Full API documentation is available on
+[docs.rs/solverforge](https://docs.rs/solverforge).
 
 ## Sections
 
-- **[Domain Modeling](modeling/)** — Derive macros for solutions, entities, and problem facts
-- **[Constraints](constraints/)** — Constraint streams, joiners, collectors, and score types
-- **[Solver](solver/)** — Configuration, phases, moves, termination, and SolverManager
+- **[Domain Modeling](modeling/)** — Derive macros for solutions, entities, and
+  problem facts
+- **[Constraints](constraints/)** — Constraint streams, joiners, collectors, and
+  score types
+- **[Solver](solver/)** — Configuration, phases, moves, termination, and
+  SolverManager
