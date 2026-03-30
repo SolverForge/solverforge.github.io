@@ -4,17 +4,19 @@ date: 2025-12-08
 ---
 
 {{< blocks/cover title="SolverForge" image_anchor="top" height="full" >}}
-<a class="btn btn-lg btn-primary me-3 mb-4" href="/docs/"> Learn More
-<i class="fas fa-arrow-alt-circle-right ms-2"></i> </a>
+<p class="lead mt-3 mb-3">Build planning and optimization systems with code.</p>
+<p class="lead mt-4">SolverForge gives developers the tools to model business constraints explicitly, solve complex decision problems, and ship production-grade optimization systems for real products and operations.</p>
+<a class="btn btn-lg btn-primary me-3 mb-4" href="/docs/">
+  Learn More <i class="fas fa-arrow-alt-circle-right ms-2"></i>
+</a>
 <a class="btn btn-lg btn-secondary me-3 mb-4" href="https://github.com/SolverForge">
-Download <i class="fab fa-github ms-2 "></i> </a>
-
-<p class="lead mt-5">Write constraints like you write code.</p>
+  View on GitHub <i class="fab fa-github ms-2 "></i>
+</a>
 {{< blocks/link-down color="info" >}}
 {{< /blocks/cover >}}
 
-{{% blocks/lead %}} Model your planning problems with an expressive,
-business-object oriented syntax
+{{% blocks/lead %}}
+Write constraints like you write code. SolverForge is designed for developers building planning, scheduling, routing, and resource allocation systems with explicit models and programmable rules.
 
 <a class="td-link-down" href="#td-block-2"><i class="fas fa-chevron-down"></i></a>
 {{% /blocks/lead %}}
