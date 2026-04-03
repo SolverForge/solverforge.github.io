@@ -157,8 +157,8 @@ in Rust. The API is complete and stable at v0.6.0. {{% /pageinfo %}}
 
 **Want to try it today?**
 
-- Follow [Getting Started](/docs/getting-started/) to run the current employee
-  scheduling quickstart locally
+- Follow [Getting Started](/docs/getting-started/) for the CLI-first onboarding
+  path and the full employee scheduling tutorial
 
 ## What's Complete
 

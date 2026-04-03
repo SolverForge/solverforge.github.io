@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 linkTitle: 'Getting Started'
-description:
+description: >
   Quickstart guides for building constraint solving applications with
   SolverForge.
 categories: [Quickstarts]
@@ -9,37 +9,51 @@ tags: [quickstart]
 weight: 2
 ---
 
-## Quickstart
+{{% pageinfo color="primary" %}}
+The default onboarding path is now **`solverforge-cli`**. Start with a generated project, then use the longer tutorials when you want a domain-specific walkthrough.
+{{% /pageinfo %}}
 
-{{< cardpane >}} {{< card header="**Employee Scheduling**" >}} Build efficient
-employee scheduling with SolverForge's native Rust constraint solver. Covers
-domain modeling, constraint streams, and a complete web application.
+## Start Here
 
-[Start Tutorial →](employee-scheduling-rust/) {{< /card >}} {{< /cardpane >}}
+{{< cardpane >}}
+{{< card header="**CLI Quickstart**" >}}
+Install `solverforge-cli`, scaffold a new project, run the server, and grow the app incrementally.
+
+[Start with solverforge-cli →](../solverforge-cli/getting-started/)
+{{< /card >}}
+{{< card header="**Employee Scheduling Tutorial**" >}}
+Follow a longer Rust walkthrough that explains domain modeling, constraints, and the web application in more detail.
+
+[Open tutorial →](employee-scheduling-rust/)
+{{< /card >}}
+{{< /cardpane >}}
 
 ## Prerequisites
 
-- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable
-  channel)
+- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable channel)
 - **Cargo**: Included with the Rust toolchain
 - Familiarity with Rust basics (structs, traits, closures, derive macros)
 
-## Getting the Code
+## Fastest Path to a Running App
 
 ```bash
-git clone https://github.com/SolverForge/solverforge-quickstarts
-cd solverforge-quickstarts/rust/employee-scheduling
-cargo build --release
-cargo run --release
+cargo install solverforge-cli
+solverforge new my-scheduler --standard
+cd my-scheduler
+solverforge server
 ```
 
-This is the current runnable onboarding path while the scaffolded app workflow
-is still evolving. Follow the
-[Employee Scheduling tutorial](employee-scheduling-rust/) to understand the
-domain model, constraints, and web UI implementation.
+Open `http://localhost:7860` to see the generated app.
+
+Use `--list` instead of `--standard` when your model is sequence-based rather than assignment-based:
+
+```bash
+solverforge new my-router --list
+```
 
 ## Where to Read More
 
-- [Quickstarts repository](https://github.com/solverforge/solverforge-quickstarts)
+- [CLI onboarding guide](../solverforge-cli/getting-started/)
+- [Employee Scheduling tutorial](employee-scheduling-rust/)
 - [SolverForge API documentation](https://docs.rs/solverforge)
 - [Core GitHub repository](https://github.com/solverforge/solverforge)
