@@ -22,7 +22,7 @@ For end-to-end app scaffolding, prefer the standalone
 
 ```bash
 cargo install solverforge-cli
-solverforge new my-scheduler --standard
+solverforge new my-scheduler
 cd my-scheduler
 solverforge server
 ```

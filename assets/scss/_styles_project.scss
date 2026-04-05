@@ -5,7 +5,7 @@
 @import "syntax";
 
 // Snake scale green shades for page sections
-$scale-dark: #063b30;    // darkest green
+$scale-dark: #064e3b;    // darkest green, aligned with About cover green
 $scale-medium: #0b5a47;  // medium green
 $scale-light: #0d6852;   // softened section green
 $scale-pale: #edf4ef;    // light neutral green
@@ -21,6 +21,12 @@ $scale-pale: #edf4ef;    // light neutral green
   --sf-accent-border: rgba(255, 255, 255, 0.1);
   --sf-accent-strong: rgba(255, 255, 255, 0.9);
   --sf-radius: 8px;
+  --terminal-glow: 0 0 20px rgba(16, 185, 129, 0.12);
+  --accent-bright: #34d399;
+  --border-chunky: 1px;
+  --radius-sharp: 8px;
+  --editorial-gold: #eab308;
+  --editorial-line: rgba(255, 255, 255, 0.14);
 }
 
 .td-cover-block,
@@ -741,3 +747,8 @@ a.sf-feature-card:hover .sf-card-link {
     border-radius: 16px;
   }
 }
+
+// Bold Emerald Terminal - Aesthetic Overhaul
+// Comment out these imports to revert to original styling
+@import "typography_bold";
+@import "amiga_components";

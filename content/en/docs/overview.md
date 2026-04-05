@@ -162,8 +162,8 @@ in Rust. This documentation set is aligned with **SolverForge 0.7.1**. {{% /page
 
 **Want to try it today?**
 
-- Follow [Getting Started](/docs/getting-started/) to run the current employee
-  scheduling quickstart locally
+- Follow [Getting Started](/docs/getting-started/) for the CLI-first onboarding
+  path and the full employee scheduling tutorial
 
 ## What's Complete
 

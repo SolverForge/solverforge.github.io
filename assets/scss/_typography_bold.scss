@@ -1,0 +1,105 @@
+// Typography convergence pass
+// Swiss-leaning hierarchy for .org while preserving technical character
+
+html {
+  font-size: 17px;
+}
+
+.sf-home-hero,
+.sf-about-hero {
+  h1 {
+    font-size: clamp(2.2rem, 5.1vw, 3.5rem);
+    letter-spacing: -0.03em;
+    line-height: 1.04;
+    margin-bottom: 1.35rem;
+    font-weight: 800;
+    text-wrap: balance;
+  }
+}
+
+.sf-section-heading,
+.sf-copy-block {
+  h2 {
+    font-size: clamp(1.6rem, 2.7vw, 2.05rem);
+    letter-spacing: -0.03em;
+    line-height: 1.08;
+    margin-bottom: 1.15rem;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: clamp(1.08rem, 1.75vw, 1.3rem);
+    letter-spacing: -0.02em;
+    line-height: 1.16;
+  }
+}
+
+.sf-feature-card h3 {
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
+.sf-kicker,
+.sf-section-label {
+  color: var(--editorial-gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-family: "Source Sans 3", "Segoe UI", sans-serif;
+}
+
+.sf-hero-summary {
+  font-size: clamp(1.04rem, 1.28vw, 1.16rem);
+  line-height: 1.78;
+  max-width: 41rem;
+}
+
+.sf-copy-block p,
+.sf-section-heading p,
+.sf-feature-card p {
+  font-size: 0.98rem;
+  line-height: 1.78;
+}
+
+.sf-quote-card blockquote {
+  font-size: clamp(1.03rem, 1.3vw, 1.22rem);
+  line-height: 1.75;
+}
+
+.sf-status-card h2,
+.sf-callout-card h2 {
+  font-size: clamp(1.3rem, 2.15vw, 1.72rem);
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.sf-copy-block,
+.sf-section-heading {
+  max-width: 46rem;
+}
+
+.sf-home-hero,
+.sf-about-hero,
+.sf-hero-summary {
+  max-width: 41rem;
+}
+
+.sf-card-link,
+.sf-inline-links {
+  font-size: 0.82rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.sf-quote-attribution {
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+}
+
+code {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
+}

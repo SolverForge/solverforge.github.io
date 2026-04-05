@@ -28,18 +28,16 @@ It walks through the current runtime surface:
 3. Run the solver and consume `SolverEvent` updates
 4. Tune the search in `solver.toml`
 
-If you want a prebuilt starting repository instead of building along with the
-docs, the archived quickstarts repository remains the standard reference surface
-for worked examples.
+If you want the fastest path to a runnable project instead of building along
+with the docs, use the standalone `solverforge-cli` scaffold.
 
-## Preview scaffold path
+## Scaffolded starting point
 
-If you want to try the newer scaffolding workflow, the standalone CLI is
-available in public preview:
+The standalone CLI is now the default onboarding path:
 
 ```bash
 cargo install solverforge-cli
-solverforge new clinic-scheduler --standard
+solverforge new clinic-scheduler
 cd clinic-scheduler
 solverforge server
 ```
@@ -47,15 +45,12 @@ solverforge server
 That scaffold gives you the current application shape:
 
 - A project that depends on the `solverforge` facade crate
+- A neutral shell you can extend with generator commands
 - Domain modules for entities, facts, and DTOs
-- Constraint modules wired into `#[planning_solution(...)]`
 - A `solver.toml` file loaded automatically by the stock runtime
 - A service layer built around `SolverManager`
 
 The rest of this guide explains the runtime concepts behind that scaffold.
-
-Treat `solverforge-cli` as a preview path for early adopters until the
-standalone CLI has its formal release and announcement.
 
 ## The Domain Model
 

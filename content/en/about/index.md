@@ -7,8 +7,8 @@ menu: {main: {weight: 10}}
 
 {{< blocks/cover title="About SolverForge" image_anchor="bottom" height="auto" >}}
 <div class="sf-about-landing sf-about-hero">
-  <p class="sf-kicker">Constraint solving for operations software</p>
-  <p class="sf-hero-summary">SolverForge is a Rust-native constraint solving ecosystem for planning, scheduling, routing, and allocation systems. It combines typed domain models, Constraint Streams, incremental scoring, and companion crates for real optimization workflows.</p>
+  <p class="sf-kicker">AI Optimization Framework</p>
+  <p class="sf-hero-summary">Rust-native optimization infrastructure for real planning systems.</p>
 </div>
 {{< /blocks/cover >}}
 
@@ -72,6 +72,10 @@ menu: {main: {weight: 10}}
         <li>Routing and dispatch with travel-time-aware scoring</li>
         <li>Interactive planning applications that need solver feedback in the UI</li>
       </ul>
+      <p class="sf-inline-links">
+        <a href="/docs/getting-started/employee-scheduling-rust/">Scheduling walkthrough</a>
+        <a href="/docs/solverforge-maps/">Routing surface</a>
+      </p>
     </div>
   </div>
 </div>
@@ -80,12 +84,13 @@ menu: {main: {weight: 10}}
 {{< blocks/section >}}
 <div class="sf-about-landing sf-about-section sf-home-closing">
   <div class="sf-status-card">
-    <p class="sf-section-label">Open source foundation</p>
-    <h2>Built in public</h2>
+    <p class="sf-section-label">Public surface</p>
+    <h2>Built in public, inspectable from the start</h2>
     <p>SolverForge ships as open source Rust crates, examples, and documentation on GitHub. Teams can audit the solver, study the reference implementations, and extend the stack for their own operational domains.</p>
     <p class="sf-inline-links">
       <a href="https://github.com/SolverForge">GitHub organization</a>
       <a href="/docs/overview/">Project overview</a>
+      <a href="/docs/">Docs</a>
     </p>
   </div>
 

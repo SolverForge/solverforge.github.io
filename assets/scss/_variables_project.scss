@@ -13,7 +13,7 @@ $primary-dark: #059669;
 // Typography
 $font-family-sans-serif: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 $font-family-monospace: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
-$headings-font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+$headings-font-family: "Inter Tight", "Avenir Next", "Segoe UI", sans-serif;
 $headings-font-weight: 700;
 $display-font-family: $headings-font-family;
 $display-font-weight: 700;
@@ -119,7 +119,7 @@ body.td-home {
   }
 
   .td-cover-block {
-    background-color: $primary !important;
+    background-color: #064e3b !important;
     color: #ffffff !important;
   }
 

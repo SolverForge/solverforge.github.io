@@ -1,7 +1,7 @@
 ---
 title: Getting Started
 linkTitle: 'Getting Started'
-description:
+description: >
   Quickstart guides for building constraint solving applications with
   SolverForge.
 categories: [Quickstarts]
@@ -9,47 +9,56 @@ tags: [quickstart]
 weight: 2
 ---
 
-## Official starting point
+{{% pageinfo color="primary" %}}
+The default onboarding path is now **`solverforge-cli`**. Start with a neutral generated project shell, then shape the domain with generator commands or move into a deeper tutorial.
+{{% /pageinfo %}}
 
-Start with the Employee Scheduling tutorial for the most stable, fully
-explained introduction to SolverForge.
+## Start Here
 
-{{< cardpane >}} {{< card header="**Employee Scheduling**" >}} Build efficient
-employee scheduling with SolverForge's native Rust constraint solver. Covers
-domain modeling, constraint streams, `solver.toml`, and the current event-based
-solve loop.
+{{< cardpane >}}
+{{< card header="**CLI Quickstart**" >}}
+Install `solverforge-cli`, scaffold a new project, run the server, and extend the domain incrementally.
 
-[Start Tutorial →](employee-scheduling-rust/) {{< /card >}} {{< /cardpane >}}
+[Start with solverforge-cli →](../solverforge-cli/getting-started/)
+{{< /card >}}
+{{< card header="**Employee Scheduling Tutorial**" >}}
+Follow a longer Rust walkthrough that explains domain modeling, constraints, and the web application in more detail.
 
-The archived quickstarts repository remains the standard reference surface for
-worked examples while the standalone CLI rollout is still in progress.
+[Open tutorial →](employee-scheduling-rust/)
+{{< /card >}}
+{{< /cardpane >}}
 
-## Preview: `solverforge-cli`
+## Prerequisites
 
-If you want to explore the newer scaffolding workflow, `solverforge-cli` is
-available in public preview.
+- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable channel)
+- **Cargo**: Included with the Rust toolchain
+- Familiarity with Rust basics (structs, traits, closures, derive macros)
+
+## Fastest Path to a Running App
 
 ```bash
 cargo install solverforge-cli
-solverforge new my-scheduler --standard
+solverforge new my-scheduler
 cd my-scheduler
 solverforge server
 ```
 
-`solverforge-cli` reflects the direction of SolverForge onboarding, but it is
-still evolving and has not yet had its formal standalone release announcement.
+Open `http://localhost:7860` to see the generated app shell.
 
-## Prerequisites
+## Shaping the Model After Scaffolding
 
-- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable
-  channel)
-- **Cargo**: Included with the Rust toolchain
-- Familiarity with Rust basics (structs, traits, closures, derive macros)
+```bash
+solverforge generate fact resource --field category:String --field load:i32
+solverforge generate entity task --field label:String --field priority:i32
+solverforge generate variable resource_idx --entity Task --kind standard --range resources --allows-unassigned
+solverforge generate data --size large
+```
+
+The current CLI no longer asks you to pick a modeling shape up front. Standard-variable, list-variable, and mixed modeling are introduced through generation and `solverforge.app.toml` after scaffolding.
 
 ## Where to Read More
 
+- [CLI onboarding guide](../solverforge-cli/getting-started/)
 - [Employee Scheduling tutorial](employee-scheduling-rust/)
-- [Quickstarts repository](https://github.com/solverforge/solverforge-quickstarts)
-- [solverforge-cli repository](https://github.com/solverforge/solverforge-cli)
 - [SolverForge API documentation](https://docs.rs/solverforge)
 - [Core GitHub repository](https://github.com/solverforge/solverforge)

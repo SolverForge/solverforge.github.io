@@ -10,14 +10,10 @@ description: >
   Constraint Programming in Rust.
 ---
 
-{{< alert title="Transition in progress" color="info" >}} SolverForge 0.6.0 is
-technically out. The core release has landed, and the CLI work is now visible in
-the public repositories.
-
-This article explains the direction of SolverForge onboarding, not the current
-recommended first-stop docs path. For day-one onboarding, start with the
-Getting Started tutorial pages. Treat `solverforge-cli` as a public preview
-until the standalone CLI has its formal announcement and release. {{< /alert >}}
+{{< alert title="Historical transition note" color="info" >}} This article captures
+a transition moment in SolverForge onboarding. For the current recommended
+first-stop path, start with the Getting Started tutorial pages and the current
+`solverforge-cli` documentation. {{< /alert >}}
 
 For the last phase of SolverForge, our default onboarding story was the
 quickstart.
@@ -181,7 +177,7 @@ Second, it treats project growth as a generator problem, not as copy-paste. The
 CLI on `main` already exposes commands in the shape of:
 
 ```bash
-solverforge new my-scheduler --standard
+solverforge new my-scheduler
 cd my-scheduler
 
 solverforge generate fact employee --field "skill:String"
@@ -243,16 +239,16 @@ the CLI scaffolding and code generation work in
 In other words, this is not hypothetical roadmap copy. The migration is already
 reflected in the codebase.
 
-At the same time, the dedicated `solverforge-cli` repository is still best
-treated as a public preview. The repository is live on `main`. The package
-manifest is already versioned 0.6.0. The command surface is there. But we have
-not yet done the formal standalone CLI release and announcement cycle.
+At the time this article was written, the dedicated `solverforge-cli`
+repository represented the public transition toward scaffolded onboarding.
+The direction was already visible in the codebase even while the product surface
+was still evolving.
 
-So the right way to read the current moment is:
+So the right way to read that moment was:
 
-- the direction is set,
-- the implementation is underway in public,
-- 0.6.0 contains the transition technically,
+- the direction was set,
+- the implementation was underway in public,
+- 0.6.0 contained the transition technically,
 - and the polished CLI release is still ahead of us.
 
 That is why we are describing the CLI today as alpha/beta.
