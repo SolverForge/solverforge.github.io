@@ -4,9 +4,20 @@ Add styles or override variables from the theme here.
 
 */
 
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Source+Sans+3:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap");
+
 // Primary green colors from logo
 $primary: #10b981;
 $primary-dark: #059669;
+
+// Typography
+$font-family-sans-serif: "Source Sans 3", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+$font-family-monospace: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+$headings-font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+$headings-font-weight: 700;
+$display-font-family: $headings-font-family;
+$display-font-weight: 700;
+$lead-font-size: 1.25rem;
 
 // Override Bootstrap color variables to use our green theme
 $teal: $primary;
@@ -100,7 +111,7 @@ a {
 }
 
 // Green inverted backgrounds for home page
-body.home {
+body.td-home {
   .td-content,
   .td-main {
     background-color: $primary !important;
@@ -133,3 +144,8 @@ body.home {
   }
 }
 
+.display-1,
+.display-2,
+.display-3 {
+  letter-spacing: -0.04em;
+}

@@ -10,10 +10,57 @@ $scale-medium: #047857;  // medium green
 $scale-light: #10b981;   // primary green
 $scale-pale: #34d399;    // lighter green
 
+:root {
+  --sf-ink: #ffffff;
+  --sf-ink-muted: rgba(236, 253, 245, 0.82);
+  --sf-ink-label: #a7f3d0;
+  --sf-panel-bg: rgba(2, 44, 34, 0.28);
+  --sf-panel-border: rgba(236, 253, 245, 0.14);
+  --sf-panel-shadow: 0 28px 60px rgba(2, 44, 34, 0.2);
+}
+
+.td-cover-block,
+.td-box--1,
+.td-box--2,
+.td-box--4,
+.td-box--primary,
+.td-box--dark {
+  --sf-ink: #ffffff;
+  --sf-ink-muted: rgba(236, 253, 245, 0.82);
+  --sf-ink-label: #a7f3d0;
+  --sf-panel-bg: rgba(2, 44, 34, 0.28);
+  --sf-panel-border: rgba(236, 253, 245, 0.14);
+  --sf-panel-shadow: 0 28px 60px rgba(2, 44, 34, 0.2);
+}
+
+.td-box--3 {
+  --sf-ink: #052e26;
+  --sf-ink-muted: rgba(6, 78, 59, 0.86);
+  --sf-ink-label: #065f46;
+  --sf-panel-bg: rgba(255, 255, 255, 0.5);
+  --sf-panel-border: rgba(6, 95, 70, 0.12);
+  --sf-panel-shadow: 0 24px 52px rgba(4, 120, 87, 0.16);
+}
+
 // Cover block - darkest scale
 .td-cover-block {
   background-color: $scale-dark !important;
   color: #ffffff !important;
+}
+
+body.td-home .td-cover-block {
+  padding-top: clamp(5rem, 7vw, 7rem);
+  padding-bottom: clamp(3.5rem, 6vw, 5rem);
+}
+
+body.td-home .td-box {
+  padding-top: clamp(3rem, 6vw, 4.5rem);
+  padding-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+main > section:has(.sf-about-landing) {
+  padding-top: clamp(3rem, 5vw, 4.25rem);
+  padding-bottom: clamp(3rem, 5vw, 4.25rem);
 }
 
 // Box sections with snake scale colors (only numbered boxes)
@@ -145,26 +192,264 @@ code {
   border-radius: 4px;
 }
 
+.sf-home-landing,
+.sf-about-landing {
+  max-width: 1120px;
+  margin: 0 auto;
+  color: var(--sf-ink);
+}
+
+.sf-kicker,
+.sf-section-label {
+  display: inline-block;
+  margin: 0 0 1rem 0;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--sf-ink-label) !important;
+}
+
+.sf-home-hero,
+.sf-about-hero {
+  max-width: 860px;
+  text-align: center;
+}
+
+.sf-home-hero .sf-kicker,
+.sf-about-hero .sf-kicker {
+  margin-bottom: 1.25rem;
+}
+
+.sf-hero-summary {
+  max-width: 52rem;
+  margin: 0 auto;
+  font-size: clamp(1.2rem, calc(1rem + 0.9vw), 1.55rem);
+  line-height: 1.5;
+  color: var(--sf-ink-muted) !important;
+}
+
+.sf-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.sf-proof-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+
+  span {
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--sf-panel-border);
+    border-radius: 999px;
+    background: var(--sf-panel-bg);
+    box-shadow: var(--sf-panel-shadow);
+    color: var(--sf-ink-muted);
+    font-size: 0.98rem;
+    line-height: 1.4;
+  }
+}
+
+.sf-home-section,
+.sf-about-section {
+  display: grid;
+  gap: 2rem;
+}
+
+.sf-home-code,
+.sf-about-layout,
+.sf-home-closing {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.75rem, 4vw, 3rem);
+  align-items: start;
+}
+
+.sf-copy-block,
+.sf-section-heading {
+  max-width: 42rem;
+
+  h2 {
+    margin-bottom: 1rem;
+    color: var(--sf-ink) !important;
+  }
+
+  p {
+    color: var(--sf-ink-muted) !important;
+    font-size: 1.08rem;
+    line-height: 1.65;
+  }
+}
+
+.sf-section-heading {
+  margin-bottom: 0.5rem;
+}
+
+.sf-feature-list {
+  list-style: none;
+  margin: 1.35rem 0 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.9rem;
+
+  li {
+    position: relative;
+    padding-left: 1.45rem;
+    color: var(--sf-ink-muted) !important;
+    line-height: 1.55;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0.62rem;
+      left: 0;
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 999px;
+      background: $scale-light;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+    }
+  }
+}
+
+.sf-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.4rem;
+}
+
+.sf-card-grid--two-up {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sf-feature-card,
+.sf-quote-card,
+.sf-status-card,
+.sf-callout-card {
+  padding: 1.5rem;
+  border-radius: 20px;
+  background: var(--sf-panel-bg);
+  border: 1px solid var(--sf-panel-border);
+  box-shadow: var(--sf-panel-shadow);
+  color: inherit;
+}
+
+a.sf-feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  text-decoration: none !important;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    border-color: rgba(167, 243, 208, 0.32);
+    box-shadow: 0 32px 60px rgba(2, 44, 34, 0.24);
+  }
+}
+
+.sf-feature-card--static {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.sf-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.16);
+  color: $scale-light;
+  font-size: 1.2rem;
+}
+
+.sf-feature-card h3,
+.sf-quote-card h2,
+.sf-status-card h2,
+.sf-callout-card h2 {
+  margin: 0;
+  color: var(--sf-ink) !important;
+}
+
+.sf-feature-card p,
+.sf-quote-card p,
+.sf-status-card p,
+.sf-callout-card p {
+  margin: 0;
+  color: var(--sf-ink-muted) !important;
+  line-height: 1.6;
+}
+
+.sf-card-link,
+.sf-inline-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: auto;
+  font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+  font-size: 0.94rem;
+  font-weight: 700;
+}
+
+.sf-card-link,
+.sf-card-link a,
+.sf-inline-links a {
+  color: var(--sf-ink) !important;
+  text-decoration: none !important;
+}
+
+.sf-card-link a:hover,
+.sf-inline-links a:hover,
+a.sf-feature-card:hover .sf-card-link {
+  color: $scale-light !important;
+}
+
+.sf-quote-card blockquote {
+  margin: 0;
+  font-size: clamp(1.2rem, calc(1rem + 0.5vw), 1.45rem);
+  line-height: 1.55;
+  color: var(--sf-ink) !important;
+}
+
+.sf-quote-attribution {
+  margin-top: 1rem !important;
+  font-size: 0.95rem;
+}
+
 // Modern terminal card for installation (home page only)
 .terminal-card {
-  background: linear-gradient(145deg, #0a0a0a 0%, #1a1a2e 100%);
-  border-radius: 12px;
+  background: linear-gradient(145deg, #022c22 0%, #064e3b 100%);
+  border-radius: 18px;
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(16, 185, 129, 0.1),
+    0 0 0 1px rgba(16, 185, 129, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  max-width: 700px;
-  margin: 2rem auto;
+  max-width: none;
+  margin: 0;
   overflow: hidden;
 
   // macOS-style window header
   .terminal-header {
-    background: linear-gradient(180deg, #2d2d2d 0%, #1f1f1f 100%);
+    background: linear-gradient(180deg, #14532d 0%, #0f3f2c 100%);
     padding: 12px 16px;
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid rgba(167, 243, 208, 0.12);
 
     .terminal-btn {
       width: 12px;
@@ -179,15 +464,15 @@ code {
     .terminal-title {
       flex: 1;
       text-align: center;
-      color: #888;
+      color: rgba(236, 253, 245, 0.72);
       font-size: 0.75rem;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+      font-family: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
       margin-right: 52px; // offset for buttons
     }
   }
 
   .terminal-body {
-    padding: 1.5rem;
+    padding: 1.35rem 1.5rem 1.5rem;
 
     pre {
       background: transparent !important;
@@ -197,9 +482,9 @@ code {
       max-width: 100%;
 
       code {
-        font-size: 0.85rem;
-        line-height: 1.8;
-        color: #e2e8f0;
+        font-size: 0.92rem;
+        line-height: 1.75;
+        color: #ecfdf5;
       }
     }
 
@@ -227,10 +512,14 @@ code {
 .terminal-card:hover {
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(16, 185, 129, 0.2),
+    0 0 0 1px rgba(16, 185, 129, 0.28),
     0 0 40px rgba(16, 185, 129, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition: box-shadow 0.3s ease;
+}
+
+.sf-code-card {
+  align-self: stretch;
 }
 
 // Badge styles
@@ -399,4 +688,46 @@ code {
   }
 }
 
+@media (max-width: 991.98px) {
+  .sf-home-code,
+  .sf-about-layout,
+  .sf-home-closing,
+  .sf-card-grid,
+  .sf-card-grid--two-up {
+    grid-template-columns: 1fr;
+  }
 
+  .sf-home-landing,
+  .sf-about-landing {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  body.td-home .td-cover-block {
+    padding-top: 4.5rem;
+    padding-bottom: 3rem;
+  }
+
+  body.td-home .td-box,
+  main > section:has(.sf-about-landing) {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .sf-hero-summary {
+    font-size: 1.08rem;
+  }
+
+  .sf-feature-card,
+  .sf-quote-card,
+  .sf-status-card,
+  .sf-callout-card {
+    padding: 1.2rem;
+  }
+
+  .sf-proof-strip span {
+    width: 100%;
+    border-radius: 16px;
+  }
+}
