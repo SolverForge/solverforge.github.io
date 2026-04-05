@@ -9,7 +9,10 @@ tags: [quickstart]
 weight: 2
 ---
 
-## Quickstart
+## Official starting point
+
+Start with the Employee Scheduling tutorial for the most stable, fully
+explained introduction to SolverForge.
 
 {{< cardpane >}} {{< card header="**Employee Scheduling**" >}} Build efficient
 employee scheduling with SolverForge's native Rust constraint solver. Covers
@@ -18,14 +21,13 @@ solve loop.
 
 [Start Tutorial →](employee-scheduling-rust/) {{< /card >}} {{< /cardpane >}}
 
-## Prerequisites
+The archived quickstarts repository remains the standard reference surface for
+worked examples while the standalone CLI rollout is still in progress.
 
-- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable
-  channel)
-- **Cargo**: Included with the Rust toolchain
-- Familiarity with Rust basics (structs, traits, closures, derive macros)
+## Preview: `solverforge-cli`
 
-## Fastest Path
+If you want to explore the newer scaffolding workflow, `solverforge-cli` is
+available in public preview.
 
 ```bash
 cargo install solverforge-cli
@@ -34,16 +36,20 @@ cd my-scheduler
 solverforge server
 ```
 
-The standalone CLI scaffolds the current `0.7.x` application shape, including a
-runtime crate dependency, generated domain modules, and `solver.toml`.
+`solverforge-cli` reflects the direction of SolverForge onboarding, but it is
+still evolving and has not yet had its formal standalone release announcement.
 
-Follow the [Employee Scheduling tutorial](employee-scheduling-rust/) for a
-guided walkthrough of the runtime concepts behind that scaffold: planning
-entities, constraint streams, and `SolverEvent`-based solving.
+## Prerequisites
+
+- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable
+  channel)
+- **Cargo**: Included with the Rust toolchain
+- Familiarity with Rust basics (structs, traits, closures, derive macros)
 
 ## Where to Read More
 
-- [solverforge-cli repository](https://github.com/solverforge/solverforge-cli)
+- [Employee Scheduling tutorial](employee-scheduling-rust/)
 - [Quickstarts repository](https://github.com/solverforge/solverforge-quickstarts)
+- [solverforge-cli repository](https://github.com/solverforge/solverforge-cli)
 - [SolverForge API documentation](https://docs.rs/solverforge)
 - [Core GitHub repository](https://github.com/solverforge/solverforge)

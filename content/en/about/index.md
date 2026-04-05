@@ -30,9 +30,9 @@ menu: {main: {weight: 10}}
 
     <div class="sf-feature-card sf-feature-card--static">
       <span class="sf-card-icon"><i class="fa-solid fa-calendar-days"></i></span>
-      <h3>Employee Scheduling Quickstart</h3>
-      <p>A reference implementation for modeling shifts, employee skills, preferences, and solver-driven updates end to end.</p>
-      <span class="sf-card-link"><a href="/docs/getting-started/employee-scheduling-rust/">Open the quickstart</a></span>
+      <h3>Employee Scheduling Tutorial</h3>
+      <p>A worked example for modeling shifts, employee skills, preferences, and solver-driven updates end to end.</p>
+      <span class="sf-card-link"><a href="/docs/getting-started/employee-scheduling-rust/">Open the tutorial</a></span>
     </div>
 
     <div class="sf-feature-card sf-feature-card--static">

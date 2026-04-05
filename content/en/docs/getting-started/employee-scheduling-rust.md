@@ -18,17 +18,24 @@ tags: [quickstart, rust]
 
 ## Overview
 
-This guide shows the current stock path for a Rust employee-scheduling app:
+This guide is the recommended first tutorial for a Rust employee-scheduling
+application with SolverForge.
 
-1. Scaffold a project with `solverforge-cli`
-2. Model employees as problem facts and shifts as planning entities
-3. Write constraints with generated `ConstraintFactory` accessors
-4. Run the solver and consume `SolverEvent` updates
-5. Tune the search in `solver.toml`
+It walks through the current runtime surface:
 
-## Fastest Path
+1. Model employees as problem facts and shifts as planning entities
+2. Write constraints with generated `ConstraintFactory` accessors
+3. Run the solver and consume `SolverEvent` updates
+4. Tune the search in `solver.toml`
 
-The quickest way to get a runnable app is the standalone CLI:
+If you want a prebuilt starting repository instead of building along with the
+docs, the archived quickstarts repository remains the standard reference surface
+for worked examples.
+
+## Preview scaffold path
+
+If you want to try the newer scaffolding workflow, the standalone CLI is
+available in public preview:
 
 ```bash
 cargo install solverforge-cli
@@ -46,6 +53,9 @@ That scaffold gives you the current application shape:
 - A service layer built around `SolverManager`
 
 The rest of this guide explains the runtime concepts behind that scaffold.
+
+Treat `solverforge-cli` as a preview path for early adopters until the
+standalone CLI has its formal release and announcement.
 
 ## The Domain Model
 

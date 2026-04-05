@@ -14,9 +14,10 @@ description: >
 technically out. The core release has landed, and the CLI work is now visible in
 the public repositories.
 
-At the same time, `solverforge-cli` should still be read as alpha/beta: the code
-is on `main`, the command surface is taking shape, but we have not done the
-formal standalone CLI announcement or release yet. {{< /alert >}}
+This article explains the direction of SolverForge onboarding, not the current
+recommended first-stop docs path. For day-one onboarding, start with the
+Getting Started tutorial pages. Treat `solverforge-cli` as a public preview
+until the standalone CLI has its formal announcement and release. {{< /alert >}}
 
 For the last phase of SolverForge, our default onboarding story was the
 quickstart.
@@ -26,7 +27,7 @@ modifying it until it looked like your problem. That model helped us prove the
 architecture, teach constraint modeling, and ship complete end-to-end demos
 quickly. It was the right move for a project that was changing fast.
 
-But it is no longer the right default.
+Long term, we do not think it is the right default.
 
 We are moving SolverForge from a quickstart-based onboarding model to a
 scaffold-based one built around `solverforge-cli`. The inspiration here is
@@ -292,9 +293,10 @@ Quickstarts helped SolverForge get here. They proved the architecture, taught
 the model, and gave the project a concrete surface while the native Rust solver
 matured.
 
-But the next phase needs a better default.
+The next phase likely needs a better long-term default, and we think that
+future default is scaffold-based onboarding.
 
-The default should be:
+That future default looks like:
 
 - create a project,
 - declare the problem class,
@@ -303,12 +305,16 @@ The default should be:
 
 That is what `solverforge-cli` is for.
 
+For now, though, the right public reading is simpler: quickstarts and tutorials
+remain the recommended starting point, while the CLI shows where SolverForge is
+heading.
+
 This is the onboarding counterpart to the same idea behind the Rust core: move
 repeated machinery into tooling, keep user code explicit, and make the system
 feel concrete from the first edit.
 
 We will announce the standalone CLI release properly when it is ready. Until
-then, the code on `main` shows exactly where SolverForge is heading.
+then, the code on `main` shows the direction, not yet the final default.
 
 ## Related
 

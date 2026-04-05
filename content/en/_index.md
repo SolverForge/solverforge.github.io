@@ -18,7 +18,7 @@ date: 2025-12-08
   </div>
   <div class="sf-proof-strip">
     <span>Constraint Streams and incremental scoring</span>
-    <span>Employee scheduling quickstart</span>
+    <span>Employee scheduling tutorial</span>
     <span>UI and routing companion crates</span>
   </div>
 </div>
