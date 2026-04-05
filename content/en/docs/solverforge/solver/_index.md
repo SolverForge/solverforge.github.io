@@ -12,26 +12,38 @@ The solver takes your domain model and constraints, then searches for the best s
 
 ```rust
 use solverforge::prelude::*;
+use solverforge::{SolverEvent, SolverManager};
 
 static MANAGER: SolverManager<Schedule> = SolverManager::new();
 
-let config = SolverConfig::from_toml_str(r#"
-    [termination]
-    seconds_spent_limit = 30
-"#).unwrap();
+let (job_id, mut rx) = MANAGER.solve(problem);
 
-let (job_id, rx) = MANAGER.solve(problem);
-
-// Receive improving solutions via channel
-for (solution, score) in rx {
-    println!("New best score: {:?}", score);
+while let Some(event) = rx.blocking_recv() {
+    match event {
+        SolverEvent::Progress { best_score, .. } => {
+            println!("best so far: {:?}", best_score);
+        }
+        SolverEvent::BestSolution { score, .. } => {
+            println!("new best: {score}");
+        }
+        SolverEvent::Finished { score, .. } => {
+            println!("finished: {score}");
+            break;
+        }
+    }
 }
+
+MANAGER.free_slot(job_id);
 ```
+
+The stock generated solve path loads `solver.toml` automatically from the
+current working directory. `solverforge-config` also exposes parsing APIs when
+you want to inspect or construct configs directly.
 
 ## Sections
 
-- **[Configuration](configuration/)** — TOML-based solver configuration
-- **[Phases](phases/)** — Construction heuristic, local search, exhaustive search
+- **[Configuration](configuration/)** — `SolverConfig`, `solver.toml`, and YAML parsing
+- **[Phases](phases/)** — Construction heuristic, local search, exhaustive search, and VND
 - **[Moves](moves/)** — Move types and selectors
 - **[Termination](termination/)** — When to stop solving
 - **[SolverManager](solver-manager/)** — Running and managing solver instances

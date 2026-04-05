@@ -6,7 +6,9 @@ description: >
   Immutable input data that constraints reference but the solver doesn't modify.
 ---
 
-A **problem fact** is an immutable struct that represents input data. The solver reads problem facts when evaluating constraints but never modifies them. Examples include employees, timeslots, rooms, and skills.
+A **problem fact** is immutable input data. The solver reads problem facts when
+evaluating constraints but never modifies them. Examples include employees,
+rooms, timeslots, and vehicle visits.
 
 ## The `#[problem_fact]` Macro
 
@@ -14,19 +16,17 @@ A **problem fact** is an immutable struct that represents input data. The solver
 use solverforge::prelude::*;
 
 #[problem_fact]
-#[derive(Clone, Debug)]
 pub struct Employee {
     #[planning_id]
-    pub id: i64,
+    pub id: usize,
     pub name: String,
     pub skills: Vec<String>,
 }
 
 #[problem_fact]
-#[derive(Clone, Debug)]
 pub struct Timeslot {
     #[planning_id]
-    pub id: i64,
+    pub id: usize,
     pub day_of_week: String,
     pub start_time: String,
     pub end_time: String,
@@ -37,11 +37,12 @@ pub struct Timeslot {
 
 ### `#[planning_id]`
 
-Uniquely identifies the problem fact. Required.
+Provides stable identity for the fact. This is recommended whenever the fact is
+referenced by a planning variable or appears in analysis output.
 
 ```rust
 #[planning_id]
-pub id: i64,
+pub id: usize,
 ```
 
 ## When to Use Problem Facts vs Planning Entities
@@ -53,24 +54,34 @@ pub id: i64,
 | **Example** | `Employee`, `Room`, `Timeslot` | `Shift`, `Lesson`, `Visit` |
 | **Role** | Input data / possible values | Things being assigned |
 
-A common pattern: problem facts serve as the value range for planning variables.
+A common pattern is to use a problem-fact collection as the named value range
+for a planning variable:
 
 ```rust
+#[planning_entity]
+pub struct Shift {
+    #[planning_id]
+    pub id: usize,
+
+    #[planning_variable(value_range = "employees", allows_unassigned = true)]
+    pub employee_id: Option<usize>,
+}
+
 #[planning_solution]
 pub struct Schedule {
     #[problem_fact_collection]
-    #[value_range_provider]       // Employees are possible values...
     pub employees: Vec<Employee>,
 
     #[planning_entity_collection]
-    pub shifts: Vec<Shift>,       // ...assigned to shift.employee
+    pub shifts: Vec<Shift>,
 }
 ```
 
 ## Requirements
 
-- Must derive `Clone` and `Debug`
-- Must have exactly one `#[planning_id]` field
+- Must be a named Rust struct
+
+The macro provides the standard derives and trait impls automatically.
 
 ## See Also
 

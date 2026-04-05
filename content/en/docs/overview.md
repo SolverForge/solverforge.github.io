@@ -52,26 +52,34 @@ different approaches.**
 
 ```rust
 use solverforge::prelude::*;
+use solverforge::stream::{joiner::*, ConstraintFactory};
 
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    use ScheduleConstraintStreams;
+    use ShiftUnassignedFilter;
+
     let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
 
     let unassigned = factory.clone()
-        .for_each(|s: &Schedule| s.shifts.as_slice())
-        .filter(|s: &Shift| s.employee.is_none())
-        .penalize(HardSoftScore::ONE_HARD)
+        .shifts()
+        .unassigned()
+        .penalize_hard()
         .named("Unassigned shift");
 
     let missing_skill = factory
-        .for_each(|s: &Schedule| s.shifts.as_slice())
-        .join(
-            |s: &Schedule| s.employees.as_slice(),
-            equal_bi(|shift: &Shift| shift.employee_idx, |emp: &Employee| Some(emp.index)),
-        )
+        .shifts()
+        .filter(|shift: &Shift| shift.employee_id.is_some())
+        .join((
+            |s: &Schedule| &s.employees,
+            equal_bi(
+                |shift: &Shift| shift.employee_id,
+                |emp: &Employee| Some(emp.id),
+            ),
+        ))
         .filter(|shift: &Shift, emp: &Employee| {
-            shift.employee_idx.is_some() && !emp.skills.contains(&shift.required_skill)
+            !emp.skills.contains(&shift.required_skill)
         })
-        .penalize(HardSoftScore::ONE_HARD)
+        .penalize_hard()
         .named("Missing skill");
 
     (unassigned, missing_skill)
@@ -116,20 +124,17 @@ SolverForge provides a **Rust derive-macro API** for ergonomic domain modeling:
 use solverforge::prelude::*;
 
 #[planning_entity]
-#[derive(Clone, Debug)]
 pub struct Shift {
     #[planning_id]
-    pub id: String,
+    pub id: usize,
     pub required_skill: String,
-    #[planning_variable(allows_unassigned = true)]
-    pub employee: Option<Employee>,  // Solver fills this in
+    #[planning_variable(value_range = "employees", allows_unassigned = true)]
+    pub employee_id: Option<usize>,
 }
 
-#[planning_solution]
-#[derive(Clone, Debug)]
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct Schedule {
     #[problem_fact_collection]
-    #[value_range_provider]
     pub employees: Vec<Employee>,
     #[planning_entity_collection]
     pub shifts: Vec<Shift>,
@@ -147,13 +152,13 @@ constraints.
 # Project Status & Roadmap
 
 {{% pageinfo %}} SolverForge is a **production-ready constraint solver** written
-in Rust. The API is complete and stable at v0.6.0. {{% /pageinfo %}}
+in Rust. This documentation set is aligned with **SolverForge 0.7.1**. {{% /pageinfo %}}
 
 ## Current Status
 
 | Component     | Status              | Description                                                      |
 | ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with complete feature set — v0.6.0 |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.7.1` runtime surface |
 
 **Want to try it today?**
 
@@ -165,31 +170,32 @@ in Rust. The API is complete and stable at v0.6.0. {{% /pageinfo %}}
 SolverForge Rust is **feature-complete** as a production constraint solver:
 
 - **Constraint Streams API**: Declarative constraint definition with `for_each`,
-  `for_each_unique_pair`, `filter`, `join`, `flatten_last`, `group_by`,
-  `balance`, `if_exists`, `if_not_exists`, `penalize`, `reward`
+  generated collection accessors, `filter`, unified `join(...)`,
+  `flatten_last`, `group_by`, `balance`, `if_exists_filtered`,
+  `if_not_exists_filtered`, `penalize`, `reward`, and `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
   HardSoftDecimalScore, BendableScore
 - **Score Analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`,
   `IndictmentMap`
 - **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
 - **Solver Phases**:
-  - Construction Heuristic (First Fit, Best Fit, First Feasible, Weakest Fit,
-    Strongest Fit)
-  - Local Search with 7 acceptors: Hill Climbing, Simulated Annealing, Tabu
-    Search, Late Acceptance, Great Deluge, Step Counting Hill Climbing,
-    Diversified Late Acceptance
-  - Exhaustive Search (Branch and Bound with DFS/BFS/Score-First)
+  - Construction Heuristics for standard and list-variable models
+  - Local Search with Hill Climbing, Simulated Annealing, Tabu Search, Late
+    Acceptance, and Great Deluge in the stock config surface
+  - Exhaustive Search (`branch_and_bound`, `brute_force`)
   - Partitioned Search (multi-threaded)
   - VND (Variable Neighborhood Descent)
 - **Move System**: Zero-allocation typed moves with arena allocation — Change,
   Swap, Composite, ListChange, ListSwap, ListReverse, SubListChange,
-  SubListSwap, KOpt, Ruin, PillarChange, PillarSwap
+  SubListSwap, KOpt, ListRuin, Ruin, PillarChange, PillarSwap
 - **List Variables**: Full support for sequencing/routing problems
 - **Nearby Selection**: Distance-based move selection for large problems
 - **Balance Collector**: Load balancing constraint support
-- **SolverManager API**: Channel-based streaming with `solve()`,
-  `terminate_early()`, `get_status()`
-- **Configuration**: TOML-based with `SolverConfig::load()` / `from_toml_str()`
+- **SolverManager API**: Channel-based streaming with
+  `SolverEvent::{Progress, BestSolution, Finished}`, `terminate_early()`,
+  `get_status()`, and `free_slot()`
+- **Configuration**: stock `solver.toml` loading plus
+  `SolverConfig::load()`, `from_toml_str()`, and `from_yaml_str()`
 
 ## Roadmap
 
@@ -254,8 +260,8 @@ ergonomics and high performance:
 │   solver     │   scoring    │   config     │
 │              │              │              │
 │ • Phases     │ • Constraint │ • TOML       │
-│ • Moves      │   Streams    │ • Builders   │
-│ • Selectors  │ • Score      │              │
+│ • Moves      │   Streams    │ • YAML       │
+│ • Selectors  │ • Score      │ • Builders   │
 │ • Foragers   │   Directors  │              │
 │ • Acceptors  │ • SERIO      │              │
 │ • Termination│   Engine     │              │
@@ -309,7 +315,7 @@ optimized native code.
 </details>
 
 <details>
-<summary><strong>What's implemented (v0.6.0)</strong></summary>
+<summary><strong>What's implemented (0.7.1)</strong></summary>
 
 **Repository**:
 [solverforge/solverforge](https://github.com/solverforge/solverforge)
@@ -323,22 +329,22 @@ optimized native code.
 - **Variable types**: Genuine, shadow, list variables
 - **Shadow variables**: `#[inverse_relation_shadow_variable]`,
   `#[previous_element_shadow_variable]`, `#[next_element_shadow_variable]`
-- **Constraint Streams API**: `for_each`, `for_each_unique_pair`, `filter`,
-  `join`, `flatten_last`, `group_by`, `balance`, `if_exists`, `if_not_exists`,
-  `penalize`, `reward`
+- **Constraint Streams API**: `for_each`, generated collection accessors,
+  unified `join`, `flatten_last`, `group_by`, `balance`,
+  `if_exists_filtered`, `if_not_exists_filtered`, `penalize`, `reward`,
+  and `.named()`
 - **Advanced collectors**: `count`, `count_distinct`, `sum`, `min`, `max`,
   `to_list`, `to_set`, `balance`
 - **Score analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`,
   `IndictmentMap`
 
-**Solver phases:**
+**Solver phases and runtime:**
 
-- **Construction heuristics**: First Fit, Best Fit, First Feasible, Weakest Fit,
-  Strongest Fit
-- **Local search**: Hill Climbing, Simulated Annealing, Tabu Search, Late
-  Acceptance, Great Deluge, Step Counting Hill Climbing, Diversified Late
-  Acceptance
-- **Exhaustive search**: Branch and Bound (DFS, BFS, Score-First)
+- **Construction heuristics**: first fit, weakest fit, strongest fit, queue
+  allocators, cheapest insertion, and list-specific constructors
+- **Local search**: hill climbing, simulated annealing, tabu search, late
+  acceptance, great deluge
+- **Exhaustive search**: branch and bound and brute force
 - **Partitioned search**: Multi-threaded parallel solving
 - **VND**: Variable Neighborhood Descent
 
@@ -353,8 +359,8 @@ optimized native code.
 **Infrastructure:**
 
 - **SERIO**: Scoring Engine for Real-time Incremental Optimization
-- **SolverManager**: Channel-based streaming API
-- **Configuration**: TOML-based with `SolverConfig::load()` / `from_toml_str()`
+- **SolverManager**: Channel-based streaming API with `SolverEvent`
+- **Configuration**: stock `solver.toml` loading plus TOML/YAML parsing APIs
 - **Termination**: Time limits, step counts, score targets, unimproved step
   detection, composites (And/Or)
 - **Nearby selection**: Distance-based move selection

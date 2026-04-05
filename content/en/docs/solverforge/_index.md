@@ -4,7 +4,7 @@ linkTitle: 'SolverForge'
 icon: fa-brands fa-rust
 weight: 10
 description: >
-  Native Rust constraint solver — production-ready at v0.6.0.
+  Native Rust constraint solver — aligned with the 0.7.1 runtime surface.
 ---
 
 SolverForge is a native Rust constraint solver for planning and scheduling
@@ -17,66 +17,91 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
+For end-to-end app scaffolding, prefer the standalone
+[`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
+
+```bash
+cargo install solverforge-cli
+solverforge new my-scheduler --standard
+cd my-scheduler
+solverforge server
+```
+
 ## Minimal Example
 
 ```rust
 use solverforge::prelude::*;
+use solverforge::{SolverEvent, SolverManager};
+use solverforge::stream::ConstraintFactory;
 
-// 1. Define your domain
 #[problem_fact]
-#[derive(Clone, Debug)]
-pub struct Employee {
+pub struct Worker {
     #[planning_id]
-    pub id: i64,
+    pub id: usize,
     pub name: String,
 }
 
 #[planning_entity]
-#[derive(Clone, Debug)]
-pub struct Shift {
+pub struct Task {
     #[planning_id]
-    pub id: i64,
-    pub required_skill: String,
-    #[planning_variable(allows_unassigned = true)]
-    pub employee: Option<Employee>,
+    pub id: usize,
+
+    #[planning_variable(value_range = "workers", allows_unassigned = true)]
+    pub worker: Option<usize>,
 }
 
-#[planning_solution]
-#[derive(Clone, Debug)]
-pub struct Schedule {
+#[planning_solution(constraints = "define_constraints")]
+pub struct Plan {
     #[problem_fact_collection]
-    #[value_range_provider]
-    pub employees: Vec<Employee>,
+    pub workers: Vec<Worker>,
+
     #[planning_entity_collection]
-    pub shifts: Vec<Shift>,
+    pub tasks: Vec<Task>,
+
     #[planning_score]
     pub score: Option<HardSoftScore>,
 }
 
-// 2. Define constraints
-fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
-    let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+fn define_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
+    use PlanConstraintStreams;
+    use TaskUnassignedFilter;
 
-    let unassigned = factory
-        .for_each(|s: &Schedule| s.shifts.as_slice())
-        .filter(|s: &Shift| s.employee.is_none())
-        .penalize(HardSoftScore::ONE_HARD)
-        .named("Unassigned shift");
-
-    (unassigned,)
+    (
+        ConstraintFactory::<Plan, HardSoftScore>::new()
+            .tasks()
+            .unassigned()
+            .penalize_hard()
+            .named("Unassigned task"),
+    )
 }
 
-// 3. Solve
+static MANAGER: SolverManager<Plan> = SolverManager::new();
+
 fn main() {
-    let problem = Schedule {
-        employees: vec![/* ... */],
-        shifts: vec![/* ... */],
+    let problem = Plan {
+        workers: vec![],
+        tasks: vec![],
         score: None,
     };
 
-    let mut director = ScoreDirector::new(problem, define_constraints());
-    let score = director.calculate_score();
-    println!("Score: {:?}", score);
+    let (job_id, mut rx) = MANAGER.solve(problem);
+
+    while let Some(event) = rx.blocking_recv() {
+        match event {
+            SolverEvent::Progress { best_score, .. } => {
+                println!("best so far: {:?}", best_score);
+            }
+            SolverEvent::BestSolution { score, .. } => {
+                println!("new best: {score}");
+            }
+            SolverEvent::Finished { score, .. } => {
+                println!("finished: {score}");
+                break;
+            }
+        }
+    }
+
+    MANAGER.free_slot(job_id);
 }
 ```
 

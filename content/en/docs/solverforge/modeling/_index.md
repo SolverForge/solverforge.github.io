@@ -18,8 +18,10 @@ SolverForge uses derive macros to turn your Rust structs into a planning domain.
 Planning Solution
 ├── problem_fact_collection  → Vec<ProblemFact>   (inputs)
 ├── planning_entity_collection → Vec<Entity>      (solver changes these)
-├── value_range_provider     → Vec<Value>          (possible values)
 └── planning_score           → Option<ScoreType>   (current quality)
+
+Planning Entity
+└── planning_variable(value_range = "facts")       (decision field)
 ```
 
 ## How It Works
@@ -28,7 +30,11 @@ Planning Solution
 2. Mark fields with attribute macros to tell the solver their role
 3. The macros generate trait implementations that the solver uses at runtime
 
-The derive macros generate implementations of `PlanningSolution`, `PlanningEntity`, and `ProblemFact` traits automatically — you never implement these traits by hand.
+The derive macros generate implementations of `PlanningSolution`,
+`PlanningEntity`, and `ProblemFact` automatically. In the common stock runtime,
+planning variables name their value source with `value_range = "solution_field"`
+and `#[planning_solution]` generates typed stream accessors such as
+`factory.shifts()`.
 
 ## Sections
 

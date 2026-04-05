@@ -3,10 +3,12 @@ title: "Configuration"
 linkTitle: "Configuration"
 weight: 10
 description: >
-  TOML-based solver configuration with SolverConfig.
+  Runtime configuration with SolverConfig, solver.toml, and parsing helpers.
 ---
 
-SolverForge uses TOML for solver configuration. You can load configuration from a file or build it from a string.
+The stock generated runtime loads `solver.toml` automatically when you call
+`SolverManager::solve(...)`. The `solverforge-config` crate also exposes parsing
+helpers for TOML and YAML when you want to inspect or build configs directly.
 
 ## Loading Configuration
 
@@ -38,6 +40,19 @@ let config = SolverConfig::from_toml_str(r#"
 "#).unwrap();
 ```
 
+### From YAML
+
+```rust
+let config = SolverConfig::from_yaml_str(r#"
+environment_mode: reproducible
+termination:
+  seconds_spent_limit: 120
+phases:
+  - type: construction_heuristic
+    construction_heuristic_type: first_fit
+"#).unwrap();
+```
+
 ## Example TOML File
 
 ```toml
@@ -58,6 +73,10 @@ type = "local_search"
 [phases.acceptor]
 type = "simulated_annealing"
 starting_temperature = "0hard/500soft"
+
+[phases.move_selector]
+type = "change_move_selector"
+variable_name = "employee_id"
 
 [phases.termination]
 step_count_limit = 100000
@@ -90,9 +109,18 @@ move_thread_count = "auto"   # Use available cores
 move_thread_count = "none"   # Single-threaded (default)
 ```
 
+### Random Seed
+
+Set a fixed seed when you want reproducible runs:
+
+```toml
+random_seed = 42
+```
+
 ### Phases
 
-Phases run in sequence. A typical configuration uses construction heuristic followed by local search:
+Phases run in sequence. A typical configuration uses a construction heuristic
+followed by local search:
 
 ```toml
 [[phases]]
@@ -108,6 +136,21 @@ entity_tabu_size = 7
 
 See [Phases](../phases/) for all phase types and their options.
 
+### Move Selectors
+
+For config-driven local search, move selection lives under
+`[phases.move_selector]`.
+
+```toml
+[phases.move_selector]
+type = "nearby_list_change_move_selector"
+max_nearby = 12
+variable_name = "visits"
+```
+
+Nearby selection is configured by choosing a nearby selector variant, not by
+top-level `nearby_selection = true` flags.
+
 ### Termination
 
 Controls when the solver stops. See [Termination](../termination/) for all options.
@@ -115,6 +158,16 @@ Controls when the solver stops. See [Termination](../termination/) for all optio
 ```toml
 [termination]
 seconds_spent_limit = 300
+```
+
+### Programmatic Builders
+
+`SolverConfig` also exposes simple builder helpers:
+
+```rust
+let config = SolverConfig::new()
+    .with_random_seed(42)
+    .with_termination_seconds(30);
 ```
 
 ## See Also

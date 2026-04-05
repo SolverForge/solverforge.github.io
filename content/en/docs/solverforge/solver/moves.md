@@ -64,18 +64,30 @@ Controls which moves are generated from selected entities and values.
 
 ### Nearby Selection
 
-For large problems, nearby selection restricts move generation to entities/values that are "close" to each other according to a distance measure. This focuses the search on promising neighborhoods.
+For large problems, nearby selection restricts move generation to destinations
+that are "close" according to a distance measure. In the config-driven runtime,
+you enable this by choosing a nearby selector variant.
 
 ```toml
 [[phases]]
 type = "local_search"
-nearby_selection = true
-nearby_distance_type = "euclidean"
+
+[phases.move_selector]
+type = "nearby_list_change_move_selector"
+max_nearby = 10
+variable_name = "visits"
 ```
+
+Other selector variants include `change_move_selector`, `swap_move_selector`,
+`list_change_move_selector`, `list_swap_move_selector`,
+`sub_list_change_move_selector`, `sub_list_swap_move_selector`,
+`k_opt_move_selector`, `list_ruin_move_selector`, `union_move_selector`, and
+`cartesian_product_move_selector`.
 
 ### Pillar Selector
 
-Groups related entities (e.g., all shifts for the same employee) for pillar moves.
+Groups related entities for pillar-based moves. This is an advanced lower-level
+solver concept rather than part of the stock config-driven selector surface.
 
 ### Mimic Selector
 

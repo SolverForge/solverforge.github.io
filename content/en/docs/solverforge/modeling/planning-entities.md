@@ -6,7 +6,9 @@ description: >
   Structs with planning variables that the solver assigns during optimization.
 ---
 
-A **planning entity** is a struct that contains one or more **planning variables** — fields the solver changes to find a good solution. In employee scheduling, a `Shift` is an entity because the solver assigns an `Employee` to each shift.
+A **planning entity** is a struct that contains one or more **planning
+variables**. These are the fields the solver changes while searching for a good
+solution.
 
 ## The `#[planning_entity]` Macro
 
@@ -14,14 +16,12 @@ A **planning entity** is a struct that contains one or more **planning variables
 use solverforge::prelude::*;
 
 #[planning_entity]
-#[derive(Clone, Debug)]
 pub struct Shift {
     #[planning_id]
-    pub id: i64,
+    pub id: usize,
     pub required_skill: String,
-    pub timeslot: Timeslot,
-    #[planning_variable(allows_unassigned = true)]
-    pub employee: Option<Employee>,
+    #[planning_variable(value_range = "employees", allows_unassigned = true)]
+    pub employee_id: Option<usize>,
 }
 ```
 
@@ -29,11 +29,12 @@ pub struct Shift {
 
 ### `#[planning_id]`
 
-Uniquely identifies the entity. Required on every planning entity.
+Provides stable identity for the entity. This is strongly recommended for joins,
+analysis, and readable telemetry.
 
 ```rust
 #[planning_id]
-pub id: i64,
+pub id: usize,
 ```
 
 ### `#[planning_variable]`
@@ -41,16 +42,32 @@ pub id: i64,
 Marks a field as a planning variable — the solver assigns values to this field.
 
 ```rust
-// Nullable variable (solver can leave unassigned)
-#[planning_variable(allows_unassigned = true)]
-pub employee: Option<Employee>,
+#[planning_variable(value_range = "employees", allows_unassigned = true)]
+pub employee_id: Option<usize>,
 
-// Non-nullable variable (solver must assign a value)
-#[planning_variable]
-pub timeslot: Timeslot,
+#[planning_variable(countable_range = "0..10")]
+pub priority_bucket: i32,
 ```
 
-**`allows_unassigned = true`**: The variable can be `None`, meaning the solver may leave some entities unassigned. Use this when not every entity must be assigned (e.g., optional shifts). The field type must be `Option<T>`.
+Common parameters:
+
+- `value_range = "employees"` or `value_range_provider = "employees"`:
+  references a field on the planning solution that supplies possible values
+- `allows_unassigned = true`: permits `None` for `Option<T>` variables
+- `countable_range = "0..10"`: declares an integer range directly on the field
+
+The macro also generates an `.unassigned()` stream helper when the entity has
+exactly one `Option<_>` planning variable.
+
+### `#[planning_list_variable]`
+
+Declares a stock list variable for routing or sequencing. In the current runtime
+this is represented as `Vec<usize>` plus an `element_collection` name.
+
+```rust
+#[planning_list_variable(element_collection = "visits")]
+pub visits: Vec<usize>,
+```
 
 ### `#[planning_pin]`
 
@@ -65,21 +82,16 @@ When `pinned` is `true`, the solver treats the entity as immovable.
 
 ## Shadow Variables
 
-Shadow variables are automatically calculated from genuine planning variables. They are derived values that the solver maintains — you never assign them directly.
+Shadow variables are derived fields maintained from genuine planning variables.
+They are advanced modeling features; you do not assign them directly.
 
 ### `#[inverse_relation_shadow_variable]`
 
-Automatically tracks which entities are assigned to a value. For example, tracking which shifts an employee has:
+Tracks an inverse relationship from a source variable.
 
 ```rust
-#[planning_entity]
-#[derive(Clone, Debug)]
-pub struct Employee {
-    #[planning_id]
-    pub id: i64,
-    #[inverse_relation_shadow_variable(source_variable = "employee")]
-    pub assigned_shifts: Vec<Shift>,
-}
+#[inverse_relation_shadow_variable(source_variable_name = "visits")]
+pub vehicle: Option<usize>,
 ```
 
 ### `#[previous_element_shadow_variable]`
@@ -87,7 +99,7 @@ pub struct Employee {
 For list variables — automatically tracks the previous element in the list.
 
 ```rust
-#[previous_element_shadow_variable(source_variable = "stops")]
+#[previous_element_shadow_variable(source_variable_name = "visits")]
 pub previous_stop: Option<Stop>,
 ```
 
@@ -96,15 +108,18 @@ pub previous_stop: Option<Stop>,
 For list variables — automatically tracks the next element in the list.
 
 ```rust
-#[next_element_shadow_variable(source_variable = "stops")]
+#[next_element_shadow_variable(source_variable_name = "visits")]
 pub next_stop: Option<Stop>,
 ```
 
 ## Requirements
 
-- Must derive `Clone` and `Debug`
-- Must have exactly one `#[planning_id]` field
-- Must have at least one `#[planning_variable]` or list variable field
+- Must be a named Rust struct
+- Must have at least one `#[planning_variable]` or `#[planning_list_variable]`
+  field
+
+The macro adds the standard derives and trait implementations for you; you do
+not need to duplicate `Clone` or `Debug` manually in the common case.
 
 ## See Also
 

@@ -3,10 +3,12 @@ title: "Planning Solutions"
 linkTitle: "Planning Solutions"
 weight: 10
 description: >
-  The top-level container that holds entities, problem facts, value ranges, and the score.
+  The top-level container that holds entities, facts, and the current score.
 ---
 
-A **planning solution** is the root struct that represents your entire problem and its current solution state. It holds all entities, problem facts, available values, and the score.
+A **planning solution** is the root struct that represents your entire problem
+and its current solution state. It owns your entity collections, problem facts,
+and score field.
 
 ## The `#[planning_solution]` Macro
 
@@ -16,7 +18,6 @@ use solverforge::prelude::*;
 #[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct Schedule {
     #[problem_fact_collection]
-    #[value_range_provider]
     pub employees: Vec<Employee>,
 
     #[problem_fact_collection]
@@ -30,13 +31,15 @@ pub struct Schedule {
 }
 ```
 
-The `constraints` parameter specifies the module path to the constraint provider function.
+The `constraints` parameter is optional, but it is what enables the generated
+`Solvable` and `Analyzable` implementations used by the stock runtime.
 
 ## Field Attributes
 
 ### `#[planning_entity_collection]`
 
-Marks a `Vec<T>` field containing planning entities. The solver iterates these to find variables to change.
+Marks a `Vec<T>` field containing planning entities. The solver iterates these
+collections to find variables to change.
 
 ```rust
 #[planning_entity_collection]
@@ -52,18 +55,6 @@ Marks a `Vec<T>` field containing immutable problem facts. Used by constraints b
 pub employees: Vec<Employee>,
 ```
 
-### `#[value_range_provider]`
-
-Marks a collection as providing possible values for planning variables. Usually combined with `#[problem_fact_collection]`.
-
-```rust
-#[problem_fact_collection]
-#[value_range_provider]
-pub timeslots: Vec<Timeslot>,
-```
-
-The solver draws from this collection when trying assignments for any `#[planning_variable]` field whose type matches.
-
 ### `#[planning_score]`
 
 Marks the field that holds the current solution quality. Must be `Option<ScoreType>`.
@@ -75,12 +66,27 @@ pub score: Option<HardSoftScore>,
 
 Supported score types: `SoftScore`, `HardSoftScore`, `HardMediumSoftScore`, `HardSoftDecimalScore`, `BendableScore`.
 
+## Generated Helpers
+
+When `constraints = "..."` is present, `#[planning_solution]` also generates:
+
+- A `{Name}ConstraintStreams<Sc>` trait implemented on `ConstraintFactory`, so
+  you can write `factory.shifts()` instead of repeating `for_each(...)`
+- `Solvable` for channel-based solving through `SolverManager`
+- `Analyzable` for score breakdowns via `analyze()`
+
+For advanced list-shadow workflows, the struct can also carry
+`#[shadow_variable_updates(...)]`, but stock standard-variable solving does not
+require that attribute.
+
 ## Requirements
 
-- Must derive `Clone` and `Debug` (added automatically by the macro)
+- Must be a named Rust struct
 - Must have exactly one `#[planning_score]` field
-- Must have at least one `#[planning_entity_collection]` field
-- Must have at least one `#[value_range_provider]` field
+- Must have at least one `#[planning_entity_collection]` field for stock solving
+
+Common value-range setup lives on the entity side, for example
+`#[planning_variable(value_range = "employees")]`.
 
 ## See Also
 

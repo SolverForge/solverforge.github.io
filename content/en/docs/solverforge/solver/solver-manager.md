@@ -20,22 +20,48 @@ static MANAGER: SolverManager<Schedule> = SolverManager::new();
 
 ## Solving
 
-Call `.solve()` with your planning solution. It returns a `(job_id, Receiver)` tuple:
+Call `.solve()` with your planning solution. It returns a `(job_id, Receiver)`
+tuple:
 
 ```rust
 let (job_id, rx) = MANAGER.solve(solution);
 ```
 
-The receiver yields `(S, S::Score)` tuples — each is an improving solution found during solving. Consume them in a loop or spawn a thread:
+The receiver yields `SolverEvent<S>` values, not raw `(solution, score)` tuples.
+Consume them in a loop:
 
 ```rust
-let (job_id, rx) = MANAGER.solve(solution);
+use solverforge::SolverEvent;
 
-for (best_solution, score) in rx {
-    println!("New best score: {:?}", score);
-    // Update UI, save to database, etc.
+let (job_id, mut rx) = MANAGER.solve(solution);
+
+while let Some(event) = rx.blocking_recv() {
+    match event {
+        SolverEvent::Progress {
+            current_score,
+            best_score,
+            ..
+        } => {
+            println!("current: {:?}, best: {:?}", current_score, best_score);
+        }
+        SolverEvent::BestSolution { solution, score, .. } => {
+            println!("new best: {:?}", score);
+            drop(solution);
+        }
+        SolverEvent::Finished { solution, score, .. } => {
+            println!("finished: {:?}", score);
+            drop(solution);
+            break;
+        }
+    }
 }
 ```
+
+The event variants are:
+
+- `Progress` — telemetry plus current and best scores
+- `BestSolution` — an owned improving solution
+- `Finished` — the final owned best solution
 
 ## Solver Status
 
@@ -82,7 +108,9 @@ let count = MANAGER.active_job_count();
 
 ## The `Solvable` Trait
 
-Your planning solution must implement the `Solvable` trait (derived automatically by the `#[planning_solution]` macro) to be used with `SolverManager`.
+Your planning solution must implement `Solvable` to be used with
+`SolverManager`. This is generated automatically when `#[planning_solution]`
+includes a `constraints = "..."` path.
 
 ## See Also
 

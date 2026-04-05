@@ -22,7 +22,9 @@ Builds an initial solution by assigning values to all planning variables. Runs f
 | `weakest_fit_decreasing` | Weakest fit, processing entities by difficulty. |
 | `strongest_fit` | Assigns the value that uses resources most aggressively. |
 | `strongest_fit_decreasing` | Strongest fit, processing entities by difficulty. |
-| `cheapest_insertion` | Greedy insertion for basic variables. |
+| `cheapest_insertion` | Greedy insertion for standard variables. |
+| `allocate_entity_from_queue` | Queue-driven entity allocation. |
+| `allocate_to_value_from_queue` | Queue-driven value allocation. |
 | `list_round_robin` | Distributes elements evenly across entities (list variables). |
 | `list_cheapest_insertion` | Inserts each element at the score-minimizing position (list variables). |
 | `list_regret_insertion` | Inserts elements in order of highest placement regret (list variables). |
@@ -41,7 +43,8 @@ Iteratively improves the solution by applying moves and accepting improvements (
 
 ### Acceptors
 
-Local search uses an **acceptor** to decide whether to keep a move. The acceptor is configured as a nested object:
+Local search uses an **acceptor** to decide whether to keep a move. In the
+stock config surface, the acceptor is configured as a nested object:
 
 | Acceptor | Description |
 |---|---|
@@ -60,6 +63,27 @@ late_acceptance_size = 400
 
 [phases.termination]
 unimproved_step_count_limit = 10000
+```
+
+### Move Selector and Forager
+
+Local search phases can also specify a selector and forager:
+
+```toml
+[[phases]]
+type = "local_search"
+
+[phases.acceptor]
+type = "late_acceptance"
+late_acceptance_size = 400
+
+[phases.move_selector]
+type = "change_move_selector"
+variable_name = "employee_id"
+
+[phases.forager]
+accepted_count_limit = 32
+pick_early_type = "never"
 ```
 
 ### Acceptor-Specific Configuration
@@ -84,6 +108,24 @@ entity_tabu_size = 7
 [phases.acceptor]
 type = "late_acceptance"
 late_acceptance_size = 400
+```
+
+## Variable Neighborhood Descent
+
+VND runs several neighborhoods in sequence and restarts from the first
+neighborhood whenever an improvement is found.
+
+```toml
+[[phases]]
+type = "vnd"
+
+[[phases.neighborhoods]]
+type = "change_move_selector"
+variable_name = "employee_id"
+
+[[phases.neighborhoods]]
+type = "swap_move_selector"
+variable_name = "employee_id"
 ```
 
 ## Exhaustive Search
@@ -114,9 +156,11 @@ Splits the problem into independent partitions and solves them in parallel on se
 ```toml
 [[phases]]
 type = "partitioned_search"
+partition_count = 8
 ```
 
-Requires implementing the `SolutionPartitioner` trait to define how the problem is split.
+The stock config surface lets you choose the partition count. Custom
+partitioning strategies live in lower-level solver APIs.
 
 ## Typical Phase Configuration
 
@@ -140,4 +184,4 @@ For better results, try tabu search or simulated annealing as the acceptor.
 
 - [Moves](../moves/) — Move types used by local search
 - [Termination](../termination/) — Stopping conditions for phases
-- [Configuration](../configuration/) — TOML configuration format
+- [Configuration](../configuration/) — Runtime configuration format
