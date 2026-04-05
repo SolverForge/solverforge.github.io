@@ -1,13 +1,13 @@
 ---
 title: SolverForge
-description: Native Rust constraint solving for scheduling, routing, and operations software.
+description: Rust constraint solving for scheduling, routing, and allocation software.
 date: 2025-12-08
 ---
 
 {{< blocks/cover title="SolverForge" image_anchor="top" height="min" >}}
 <div class="sf-home-landing sf-home-hero">
   <p class="sf-kicker">Native Rust constraint solving for planning and optimization</p>
-  <p class="sf-hero-summary">Model scheduling, routing, and allocation problems with explicit domain types, inspect score behavior, and ship optimization workflows without hiding the rules in a separate math DSL.</p>
+  <p class="sf-hero-summary">Model shifts, routes, visits, and assignments with ordinary Rust types, then optimize them with Constraint Streams, incremental scoring, and solver events that fit application code.</p>
   <div class="sf-hero-actions">
     <a class="btn btn-lg btn-primary" href="/docs/">
       Read the docs <i class="fas fa-arrow-alt-circle-right ms-2"></i>
@@ -17,9 +17,9 @@ date: 2025-12-08
     </a>
   </div>
   <div class="sf-proof-strip">
-    <span>Production-ready Rust core</span>
-    <span>Published employee scheduling quickstart</span>
-    <span>UI and maps docs live now</span>
+    <span>Constraint Streams and incremental scoring</span>
+    <span>Employee scheduling quickstart</span>
+    <span>UI and routing companion crates</span>
   </div>
 </div>
 {{< /blocks/cover >}}
@@ -47,17 +47,14 @@ date: 2025-12-08
     <div class="terminal-body">
 
 ```rust
-let one_per_day = factory
-    .clone()
+let no_overlap = factory
     .shifts()
-    .for_each_unique_pair(joiner::equal(|shift: &Shift| {
-        (shift.employee_idx, shift.date())
-    }))
+    .join(equal(|shift: &Shift| shift.employee))
     .filter(|a: &Shift, b: &Shift| {
-        a.employee_idx.is_some() && b.employee_idx.is_some()
+        a.employee.is_some() && a.start < b.end && b.start < a.end
     })
-    .penalize(HardSoftDecimalScore::ONE_HARD)
-    .named("One shift per day");
+    .penalize_hard()
+    .named("No overlap");
 ```
 
     </div>
@@ -68,30 +65,30 @@ let one_per_day = factory
 {{< blocks/section >}}
 <div class="sf-home-landing sf-home-section">
   <div class="sf-section-heading">
-    <p class="sf-section-label">Published examples and modules</p>
-    <h2>Start from what already ships</h2>
-    <p>The current public surface is Rust-first. These are the pages and modules that already have runnable or documented workflows behind them.</p>
+    <p class="sf-section-label">Examples and companion crates</p>
+    <h2>Start with scheduling, extend into UI and routing</h2>
+    <p>Learn the solver through a complete employee scheduling example, embed scheduling views with <code>solverforge-ui</code>, or add travel-time and route modeling with <code>solverforge-maps</code>.</p>
   </div>
 
   <div class="sf-card-grid">
     <a class="sf-feature-card" href="/docs/getting-started/employee-scheduling-rust/">
       <span class="sf-card-icon"><i class="fa-solid fa-calendar-days"></i></span>
       <h3>Employee Scheduling</h3>
-      <p>The current onboarding path: a complete quickstart with domain modeling, constraints, and a web app.</p>
+      <p>A full walkthrough covering employees, shifts, hard rules, soft preferences, and a live application loop.</p>
       <span class="sf-card-link">Open the quickstart</span>
     </a>
 
     <a class="sf-feature-card" href="/docs/solverforge-ui/">
       <span class="sf-card-icon"><i class="fa-solid fa-display"></i></span>
       <h3><code>solverforge-ui</code></h3>
-      <p>Embedded scheduling views, UI primitives, and solver lifecycle helpers for SolverForge-backed web applications.</p>
+      <p>Scheduling views, frontend primitives, and integration helpers for operational applications built on SolverForge.</p>
       <span class="sf-card-link">Browse the UI docs</span>
     </a>
 
     <a class="sf-feature-card" href="/docs/solverforge-maps/">
       <span class="sf-card-icon"><i class="fa-solid fa-route"></i></span>
       <h3><code>solverforge-maps</code></h3>
-      <p>Road-network loading, travel-time matrices, and route geometry utilities for vehicle routing workflows.</p>
+      <p>Road-network loading, travel-time matrices, and route geometry utilities for routing and dispatch workflows.</p>
       <span class="sf-card-link">Read the maps docs</span>
     </a>
   </div>
@@ -109,10 +106,10 @@ let one_per_day = factory
   </div>
 
   <div class="sf-status-card">
-    <p class="sf-section-label">Current posture</p>
-    <h2>Rust is the public path today</h2>
-    <p>The site should lead with what is ready: the Rust solver, the published quickstart, and the supporting crates around it.</p>
-    <p>Python remains a future track. When there is a real public onboarding path for it, it can return as a primary message instead of a roadmap note.</p>
+    <p class="sf-section-label">Open source foundation</p>
+    <h2>Inspect, test, and extend the solver</h2>
+    <p>Constraint models, score calculations, and solving behavior stay visible in code, which makes it easier to debug planners, write targeted tests, and evolve domain rules over time.</p>
+    <p>Start with the project overview or dive straight into the APIs and examples.</p>
     <p class="sf-inline-links">
       <a href="/about/">About SolverForge</a>
       <a href="/docs/overview/">Project overview</a>

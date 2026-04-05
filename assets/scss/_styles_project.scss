@@ -5,18 +5,22 @@
 @import "syntax";
 
 // Snake scale green shades for page sections
-$scale-dark: #064e3b;    // darkest green
-$scale-medium: #047857;  // medium green
-$scale-light: #10b981;   // primary green
-$scale-pale: #34d399;    // lighter green
+$scale-dark: #063b30;    // darkest green
+$scale-medium: #0b5a47;  // medium green
+$scale-light: #0d6852;   // softened section green
+$scale-pale: #edf4ef;    // light neutral green
 
 :root {
   --sf-ink: #ffffff;
-  --sf-ink-muted: rgba(236, 253, 245, 0.82);
-  --sf-ink-label: #a7f3d0;
-  --sf-panel-bg: rgba(2, 44, 34, 0.28);
-  --sf-panel-border: rgba(236, 253, 245, 0.14);
+  --sf-ink-muted: rgba(255, 255, 255, 0.82);
+  --sf-ink-label: rgba(255, 255, 255, 0.7);
+  --sf-panel-bg: rgba(2, 44, 34, 0.24);
+  --sf-panel-border: rgba(255, 255, 255, 0.08);
   --sf-panel-shadow: 0 28px 60px rgba(2, 44, 34, 0.2);
+  --sf-accent-soft: rgba(2, 44, 34, 0.34);
+  --sf-accent-border: rgba(255, 255, 255, 0.1);
+  --sf-accent-strong: rgba(255, 255, 255, 0.9);
+  --sf-radius: 8px;
 }
 
 .td-cover-block,
@@ -26,20 +30,26 @@ $scale-pale: #34d399;    // lighter green
 .td-box--primary,
 .td-box--dark {
   --sf-ink: #ffffff;
-  --sf-ink-muted: rgba(236, 253, 245, 0.82);
-  --sf-ink-label: #a7f3d0;
-  --sf-panel-bg: rgba(2, 44, 34, 0.28);
-  --sf-panel-border: rgba(236, 253, 245, 0.14);
+  --sf-ink-muted: rgba(255, 255, 255, 0.82);
+  --sf-ink-label: rgba(255, 255, 255, 0.7);
+  --sf-panel-bg: rgba(2, 44, 34, 0.24);
+  --sf-panel-border: rgba(255, 255, 255, 0.08);
   --sf-panel-shadow: 0 28px 60px rgba(2, 44, 34, 0.2);
+  --sf-accent-soft: rgba(2, 44, 34, 0.34);
+  --sf-accent-border: rgba(255, 255, 255, 0.1);
+  --sf-accent-strong: rgba(255, 255, 255, 0.9);
 }
 
 .td-box--3 {
-  --sf-ink: #052e26;
-  --sf-ink-muted: rgba(6, 78, 59, 0.86);
-  --sf-ink-label: #065f46;
-  --sf-panel-bg: rgba(255, 255, 255, 0.5);
-  --sf-panel-border: rgba(6, 95, 70, 0.12);
-  --sf-panel-shadow: 0 24px 52px rgba(4, 120, 87, 0.16);
+  --sf-ink: #14352b;
+  --sf-ink-muted: rgba(20, 53, 43, 0.8);
+  --sf-ink-label: #0b5a47;
+  --sf-panel-bg: rgba(255, 255, 255, 0.76);
+  --sf-panel-border: rgba(11, 90, 71, 0.1);
+  --sf-panel-shadow: 0 24px 52px rgba(6, 59, 48, 0.1);
+  --sf-accent-soft: rgba(11, 90, 71, 0.08);
+  --sf-accent-border: rgba(11, 90, 71, 0.14);
+  --sf-accent-strong: #0b5a47;
 }
 
 // Cover block - darkest scale
@@ -129,7 +139,7 @@ main > section:has(.sf-about-landing) {
 }
 
 .td-box--dark {
-  background-color: $scale-light !important;
+  background-color: $scale-dark !important;
   color: #ffffff !important;
 
   h1, h2, h3, h4, h5, h6, p, li, td, th {
@@ -248,11 +258,11 @@ code {
 
   span {
     padding: 0.7rem 1rem;
-    border: 1px solid var(--sf-panel-border);
-    border-radius: 999px;
-    background: var(--sf-panel-bg);
+    border: 1px solid var(--sf-accent-border);
+    border-radius: var(--sf-radius);
+    background: var(--sf-accent-soft);
     box-shadow: var(--sf-panel-shadow);
-    color: var(--sf-ink-muted);
+    color: rgba(255, 255, 255, 0.92);
     font-size: 0.98rem;
     line-height: 1.4;
   }
@@ -314,8 +324,8 @@ code {
       width: 0.5rem;
       height: 0.5rem;
       border-radius: 999px;
-      background: $scale-light;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.18);
+      background: $scale-medium;
+      box-shadow: 0 0 0 3px rgba(11, 90, 71, 0.12);
     }
   }
 }
@@ -335,7 +345,7 @@ code {
 .sf-status-card,
 .sf-callout-card {
   padding: 1.5rem;
-  border-radius: 20px;
+  border-radius: var(--sf-radius);
   background: var(--sf-panel-bg);
   border: 1px solid var(--sf-panel-border);
   box-shadow: var(--sf-panel-shadow);
@@ -354,8 +364,8 @@ a.sf-feature-card {
 
   &:hover {
     transform: translateY(-3px);
-    border-color: rgba(167, 243, 208, 0.32);
-    box-shadow: 0 32px 60px rgba(2, 44, 34, 0.24);
+    border-color: var(--sf-accent-border);
+    box-shadow: 0 24px 44px rgba(2, 44, 34, 0.2);
   }
 }
 
@@ -371,9 +381,9 @@ a.sf-feature-card {
   justify-content: center;
   width: 3rem;
   height: 3rem;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.16);
-  color: $scale-light;
+  border-radius: var(--sf-radius);
+  background: var(--sf-accent-soft);
+  color: var(--sf-accent-strong);
   font-size: 1.2rem;
 }
 
@@ -433,10 +443,10 @@ a.sf-feature-card:hover .sf-card-link {
 // Modern terminal card for installation (home page only)
 .terminal-card {
   background: linear-gradient(145deg, #022c22 0%, #064e3b 100%);
-  border-radius: 18px;
+  border-radius: var(--sf-radius);
   box-shadow:
     0 25px 50px -12px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(16, 185, 129, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   max-width: none;
   margin: 0;
@@ -449,7 +459,7 @@ a.sf-feature-card:hover .sf-card-link {
     display: flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 1px solid rgba(167, 243, 208, 0.12);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
     .terminal-btn {
       width: 12px;
