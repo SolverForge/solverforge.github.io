@@ -7,7 +7,7 @@ date: 2025-12-08
 {{< blocks/cover title="SolverForge" image_anchor="top" height="min" >}}
 <div class="sf-home-landing sf-home-hero">
   <p class="sf-kicker">Write constraints like you write code</p>
-  <p class="sf-hero-summary">Build planning software in Rust. Model the domain with ordinary types, express the rules in code, and ship optimization systems without disappearing into solver ceremony.</p>
+  <p class="sf-hero-summary">Build planning software in Rust. Model the domain with ordinary types, express the rules in code, and ship optimization systems without switching to a separate solver language.</p>
   <div class="sf-hero-actions">
     <a class="btn btn-lg btn-primary" href="/docs/solverforge-cli/getting-started/">
       Start with solverforge-cli <i class="fas fa-arrow-alt-circle-right ms-2"></i>
@@ -33,7 +33,7 @@ date: 2025-12-08
     <ul class="sf-feature-list">
       <li>Constraint Streams for composable rules and score analysis</li>
       <li>Typed Rust models that stay recognizable as application code</li>
-      <li>Optimization infrastructure that can power real product workflows</li>
+      <li>Solver components you can embed in real applications</li>
     </ul>
   </div>
 
@@ -79,7 +79,7 @@ let required_skill = factory
 {{< blocks/section >}}
 <div class="sf-home-landing sf-home-section">
   <div class="sf-section-heading">
-    <p class="sf-section-label">Examples and ecosystem surface</p>
+    <p class="sf-section-label">Examples and companion libraries</p>
     <h2>Start with a working planner. Extend into product and routing.</h2>
     <p>Begin with employee scheduling, then add scheduling interfaces through <code>solverforge-ui</code> or travel-time and route modeling through <code>solverforge-maps</code>.</p>
   </div>
@@ -102,7 +102,7 @@ let required_skill = factory
     <a class="sf-feature-card" href="/docs/solverforge-maps/">
       <span class="sf-card-icon"><i class="fa-solid fa-route"></i></span>
       <h3>Model routes and travel time</h3>
-      <p>Use <code>solverforge-maps</code> for road-network loading, travel-time matrices, and route geometry in dispatch workflows.</p>
+      <p>Use <code>solverforge-maps</code> for road-network loading, travel-time matrices, and route geometry in dispatch systems.</p>
       <span class="sf-card-link">Read maps docs</span>
     </a>
   </div>
@@ -113,7 +113,7 @@ let required_skill = factory
 {{< blocks/section >}}
 <div class="sf-home-landing sf-home-section sf-home-closing">
   <div class="sf-quote-card">
-    <p class="sf-section-label">Field signal</p>
+    <p class="sf-section-label">In practice</p>
     <blockquote>
       I have incorporated SolverForge in my new Rust application for staff scheduling and it's working like a charm, A+
     </blockquote>
@@ -121,13 +121,13 @@ let required_skill = factory
   </div>
 
   <div class="sf-status-card">
-    <p class="sf-section-label">Public technical surface</p>
+    <p class="sf-section-label">Public docs and code</p>
     <h2>Everything important is visible</h2>
-    <p>The docs, APIs, tutorials, and source are public, so you can evaluate SolverForge from the technical surface itself.</p>
+    <p>The docs, APIs, tutorials, and source are public, so you can inspect SolverForge directly before deciding whether it fits your system.</p>
     <ul class="sf-feature-list">
-      <li>CLI-first onboarding with generated project scaffolds</li>
-      <li>Reference walkthroughs for scheduling and routing-adjacent workflows</li>
-      <li>Open-source crates and reference docs you can verify directly</li>
+      <li>CLI-first setup with generated project scaffolds</li>
+      <li>Reference tutorials for scheduling and routing problems</li>
+      <li>Open-source crates and docs you can verify directly</li>
     </ul>
     <p class="sf-inline-links">
       <a href="/docs/overview/">Project overview</a>

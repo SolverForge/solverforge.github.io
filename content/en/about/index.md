@@ -45,7 +45,7 @@ menu: {main: {weight: 10}}
     <div class="sf-feature-card sf-feature-card--static">
       <span class="sf-card-icon"><i class="fa-solid fa-route"></i></span>
       <h3><code>solverforge-maps</code></h3>
-      <p>Routing primitives, cached road-network data, and travel metrics for map-backed optimization workflows.</p>
+      <p>Routing primitives, cached road-network data, and travel metrics for map-backed planning and dispatch systems.</p>
       <span class="sf-card-link"><a href="/docs/solverforge-maps/">Read the maps docs</a></span>
     </div>
   </div>
@@ -63,11 +63,11 @@ menu: {main: {weight: 10}}
   <div class="sf-about-layout">
     <div class="sf-copy-block">
       <p>A SolverForge application starts with a planning solution and entities represented as ordinary Rust structs. Constraint Streams define what must be satisfied and what should be optimized, while score analysis helps explain tradeoffs.</p>
-      <p>The solver searches for better solutions and emits progress, best-solution, and finished events that application code can consume.</p><p><code>solverforge-ui</code> and <code>solverforge-maps</code> extend that core into interactive scheduling and routing workflows.</p>
+      <p>The solver searches for better solutions and emits progress, best-solution, and finished events that application code can consume.</p><p><code>solverforge-ui</code> and <code>solverforge-maps</code> extend that core into interactive scheduling and routing applications.</p>
     </div>
 
     <div class="sf-callout-card">
-      <p class="sf-section-label">Typical workflows</p>
+      <p class="sf-section-label">Common uses</p>
       <ul class="sf-feature-list">
         <li>Workforce scheduling with hard compliance rules and soft preferences</li>
         <li>Routing and dispatch with travel-time-aware scoring</li>
@@ -75,7 +75,7 @@ menu: {main: {weight: 10}}
       </ul>
       <p class="sf-inline-links">
         <a href="/docs/getting-started/employee-scheduling-rust/">Scheduling walkthrough</a>
-        <a href="/docs/solverforge-maps/">Routing surface</a>
+        <a href="/docs/solverforge-maps/">Routing docs</a>
       </p>
     </div>
   </div>
@@ -86,9 +86,9 @@ menu: {main: {weight: 10}}
 {{< blocks/section >}}
 <div class="sf-about-landing sf-about-section sf-home-closing">
   <div class="sf-status-card">
-    <p class="sf-section-label">Public surface</p>
+    <p class="sf-section-label">Open source</p>
     <h2>Built in public, inspectable from the start</h2>
-    <p>SolverForge ships as open source Rust crates, examples, and documentation on GitHub. Teams can audit the solver, study the reference implementations, and extend the stack for their own operational domains.</p>
+    <p>SolverForge ships as open source Rust crates, examples, and documentation on GitHub. Teams can audit the solver, study the reference implementations, and extend it for their own domains.</p>
     <p class="sf-inline-links">
       <a href="https://github.com/SolverForge">GitHub organization</a>
       <a href="/docs/overview/">Project overview</a>
