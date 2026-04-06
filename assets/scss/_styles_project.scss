@@ -585,6 +585,12 @@ a.sf-feature-card:hover .sf-card-link {
   border-color: $scale-light transparent transparent transparent !important;
 }
 
+// On the homepage, the second content band transitions into the pale section.
+// Make that divider explicitly pale so it doesn't drift with theme/domain quirks.
+body.td-home .td-box--2 .text-center.td-arrow-down::before {
+  border-color: $scale-pale transparent transparent transparent !important;
+}
+
 .td-box--dark .text-center.td-arrow-down::before {
   border-color: $scale-dark transparent transparent transparent !important;
 }

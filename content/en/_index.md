@@ -122,12 +122,12 @@ let required_skill = factory
 
   <div class="sf-status-card">
     <p class="sf-section-label">Public technical surface</p>
-    <h2>Proof before pitch</h2>
-    <p>The library surface stays visible: docs, APIs, tutorials, companion crates, and open source code you can inspect before you commit to anything.</p>
+    <h2>Everything important is visible</h2>
+    <p>The docs, APIs, tutorials, and source are public, so you can evaluate SolverForge from the technical surface itself.</p>
     <ul class="sf-feature-list">
       <li>CLI-first onboarding with generated project scaffolds</li>
       <li>Reference walkthroughs for scheduling and routing-adjacent workflows</li>
-      <li>Open code, public docs, and ecosystem crates that make the surface legible</li>
+      <li>Open-source crates and reference docs you can verify directly</li>
     </ul>
     <p class="sf-inline-links">
       <a href="/docs/overview/">Project overview</a>
