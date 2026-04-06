@@ -47,6 +47,7 @@ date: 2025-12-08
     <div class="terminal-body">
 
 ```rust
+// Prevent assigning overlapping shifts to the same employee.
 let no_overlap = factory
     .shifts()
     .join(equal(|shift: &Shift| shift.employee))
@@ -55,9 +56,21 @@ let no_overlap = factory
     })
     .penalize_hard()
     .named("No overlap");
-```
 
-    </div>
+// Require every assigned employee to satisfy the shift's required skill.
+let required_skill = factory
+    .shifts()
+    .join(equal(|shift: &Shift| shift.employee))
+    .filter(|shift: &Shift, other: &Shift| {
+        shift.employee == other.employee
+            && shift.required_skill.is_some()
+            && !shift.employee
+                .as_ref()
+                .is_some_and(|employee| employee.skills.contains(&shift.required_skill.unwrap()))
+    })
+    .penalize_hard()
+    .named("Employee skill match");
+```
   </div>
 </div>
 <div class="text-center td-arrow-down"></div>

@@ -50,6 +50,7 @@ menu: {main: {weight: 10}}
     </div>
   </div>
 </div>
+<div class="text-center td-arrow-down"></div>
 {{< /blocks/section >}}
 
 {{< blocks/section color="dark" >}}
@@ -62,7 +63,7 @@ menu: {main: {weight: 10}}
   <div class="sf-about-layout">
     <div class="sf-copy-block">
       <p>A SolverForge application starts with a planning solution and entities represented as ordinary Rust structs. Constraint Streams define what must be satisfied and what should be optimized, while score analysis helps explain tradeoffs.</p>
-      <p>The solver searches for better solutions and emits progress, best-solution, and finished events that application code can consume. <code>solverforge-ui</code> and <code>solverforge-maps</code> extend that core into interactive scheduling and routing workflows.</p>
+      <p>The solver searches for better solutions and emits progress, best-solution, and finished events that application code can consume.</p><p><code>solverforge-ui</code> and <code>solverforge-maps</code> extend that core into interactive scheduling and routing workflows.</p>
     </div>
 
     <div class="sf-callout-card">
@@ -79,6 +80,7 @@ menu: {main: {weight: 10}}
     </div>
   </div>
 </div>
+<div class="text-center td-arrow-down"></div>
 {{< /blocks/section >}}
 
 {{< blocks/section >}}
@@ -101,7 +103,7 @@ menu: {main: {weight: 10}}
     <p class="sf-inline-links">
       <a href="/docs/getting-started/employee-scheduling-rust/">Employee scheduling</a>
       <a href="/docs/solverforge-maps/">Routing tools</a>
-      <a href="/blog/">Engineering blog</a>
+      <a href="/blog/">Blog</a>
     </p>
   </div>
 </div>

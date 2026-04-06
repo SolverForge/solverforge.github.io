@@ -210,7 +210,7 @@ code {
 
 .sf-home-landing,
 .sf-about-landing {
-  max-width: 1120px;
+  max-width: 1180px;
   margin: 0 auto;
   color: var(--sf-ink);
 }
@@ -489,6 +489,7 @@ a.sf-feature-card:hover .sf-card-link {
 
   .terminal-body {
     padding: 1.35rem 1.5rem 1.5rem;
+    overflow-x: hidden;
 
     pre {
       background: transparent !important;
@@ -496,11 +497,18 @@ a.sf-feature-card:hover .sf-card-link {
       padding: 0;
       box-shadow: none;
       max-width: 100%;
+      overflow-x: hidden;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
 
       code {
         font-size: 0.92rem;
         line-height: 1.75;
         color: #ecfdf5;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        word-break: break-word;
       }
     }
 
@@ -573,9 +581,12 @@ a.sf-feature-card:hover .sf-card-link {
 }
 
 // Arrow colors for standalone arrows in each box
-.td-box--2 .text-center.td-arrow-down::before,
-.td-box--dark .text-center.td-arrow-down::before {
+.td-box--2 .text-center.td-arrow-down::before {
   border-color: $scale-light transparent transparent transparent !important;
+}
+
+.td-box--dark .text-center.td-arrow-down::before {
+  border-color: $scale-dark transparent transparent transparent !important;
 }
 
 .td-box--3 .text-center.td-arrow-down::before {
