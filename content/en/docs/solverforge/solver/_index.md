@@ -16,29 +16,37 @@ use solverforge::{SolverEvent, SolverManager};
 
 static MANAGER: SolverManager<Schedule> = SolverManager::new();
 
-let (job_id, mut rx) = MANAGER.solve(problem);
+let (job_id, mut rx) = MANAGER.solve(problem).expect("solver job should start");
 
 while let Some(event) = rx.blocking_recv() {
     match event {
-        SolverEvent::Progress { best_score, .. } => {
-            println!("best so far: {:?}", best_score);
+        SolverEvent::Progress { metadata } => {
+            println!("best so far: {:?}", metadata.best_score);
         }
-        SolverEvent::BestSolution { score, .. } => {
-            println!("new best: {score}");
+        SolverEvent::BestSolution { metadata, .. } => {
+            println!("new best at snapshot {:?}", metadata.snapshot_revision);
         }
-        SolverEvent::Finished { score, .. } => {
-            println!("finished: {score}");
+        SolverEvent::Completed { metadata, .. } => {
+            println!("finished with reason {:?}", metadata.terminal_reason);
             break;
         }
+        SolverEvent::Cancelled { .. } | SolverEvent::Failed { .. } => break,
+        SolverEvent::PauseRequested { .. } | SolverEvent::Paused { .. } | SolverEvent::Resumed { .. } => {}
     }
 }
 
-MANAGER.free_slot(job_id);
+MANAGER.delete(job_id).expect("delete retained job");
 ```
 
 The stock generated solve path loads `solver.toml` automatically from the
 current working directory. `solverforge-config` also exposes parsing APIs when
 you want to inspect or construct configs directly.
+
+`SolverManager` now exposes a retained job lifecycle rather than a fire-and-forget
+channel. In addition to `Progress` and `BestSolution`, you can observe
+`PauseRequested`, `Paused`, `Resumed`, `Completed`, `Cancelled`, and `Failed`,
+inspect `SolverStatus`, and fetch or analyze retained snapshots by
+`snapshot_revision`.
 
 ## Sections
 

@@ -84,24 +84,31 @@ fn main() {
         score: None,
     };
 
-    let (job_id, mut rx) = MANAGER.solve(problem);
+    let (job_id, mut rx) = MANAGER.solve(problem).expect("solver job should start");
 
     while let Some(event) = rx.blocking_recv() {
         match event {
-            SolverEvent::Progress { best_score, .. } => {
-                println!("best so far: {:?}", best_score);
+            SolverEvent::Progress { metadata } => {
+                println!("best so far: {:?}", metadata.best_score);
             }
-            SolverEvent::BestSolution { score, .. } => {
-                println!("new best: {score}");
+            SolverEvent::BestSolution { metadata, .. } => {
+                println!("new best at snapshot {:?}", metadata.snapshot_revision);
             }
-            SolverEvent::Finished { score, .. } => {
-                println!("finished: {score}");
+            SolverEvent::Completed { metadata, .. } => {
+                println!("finished with reason {:?}", metadata.terminal_reason);
                 break;
             }
+            SolverEvent::Cancelled { .. } | SolverEvent::Failed { .. } => break,
+            SolverEvent::PauseRequested { .. } | SolverEvent::Paused { .. } | SolverEvent::Resumed { .. } => {}
         }
     }
 
-    MANAGER.free_slot(job_id);
+    let snapshot = MANAGER
+        .get_snapshot(job_id, None)
+        .expect("latest snapshot should exist");
+    println!("latest snapshot revision {}", snapshot.snapshot_revision);
+
+    MANAGER.delete(job_id).expect("delete retained job");
 }
 ```
 

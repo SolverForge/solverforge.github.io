@@ -3,10 +3,12 @@ title: "SolverManager"
 linkTitle: "SolverManager"
 weight: 50
 description: >
-  Run and manage solver instances with channel-based streaming.
+  Run retained solver jobs with lifecycle-complete streaming, snapshots, and exact pause/resume.
 ---
 
-`SolverManager` is the main entry point for running the solver. It manages solver lifecycle, provides streaming updates via channels, and supports early termination.
+`SolverManager` is the retained runtime API for running solver jobs. It owns the
+authoritative lifecycle state, streams `SolverEvent` values, retains snapshots
+for later inspection, and exposes exact in-process pause/resume.
 
 ## Creating a SolverManager
 
@@ -20,37 +22,69 @@ static MANAGER: SolverManager<Schedule> = SolverManager::new();
 
 ## Solving
 
-Call `.solve()` with your planning solution. It returns a `(job_id, Receiver)`
-tuple:
+Call `.solve()` with your planning solution. It returns a `Result` containing a
+`(job_id, Receiver)` tuple:
 
 ```rust
-let (job_id, rx) = MANAGER.solve(solution);
+let (job_id, rx) = MANAGER.solve(solution).expect("solver job should start");
 ```
 
 The receiver yields `SolverEvent<S>` values, not raw `(solution, score)` tuples.
+Each event carries `SolverEventMetadata` with the job id, event sequence,
+lifecycle state, telemetry, current/best score, and the latest
+`snapshot_revision` when one exists.
+
 Consume them in a loop:
 
 ```rust
 use solverforge::SolverEvent;
 
-let (job_id, mut rx) = MANAGER.solve(solution);
+let (job_id, mut rx) = MANAGER.solve(solution).expect("solver job should start");
 
 while let Some(event) = rx.blocking_recv() {
     match event {
-        SolverEvent::Progress {
-            current_score,
-            best_score,
-            ..
-        } => {
-            println!("current: {:?}, best: {:?}", current_score, best_score);
+        SolverEvent::Progress { metadata } => {
+            println!(
+                "job {} state {:?} current {:?} best {:?}",
+                metadata.job_id,
+                metadata.lifecycle_state,
+                metadata.current_score,
+                metadata.best_score
+            );
         }
-        SolverEvent::BestSolution { solution, score, .. } => {
-            println!("new best: {:?}", score);
-            drop(solution);
+        SolverEvent::BestSolution { metadata, .. } => {
+            println!(
+                "new best at snapshot {:?}",
+                metadata.snapshot_revision
+            );
         }
-        SolverEvent::Finished { solution, score, .. } => {
-            println!("finished: {:?}", score);
-            drop(solution);
+        SolverEvent::PauseRequested { metadata } => {
+            println!("pause requested for job {}", metadata.job_id);
+        }
+        SolverEvent::Paused { metadata } => {
+            println!(
+                "job {} paused at snapshot {:?}",
+                metadata.job_id,
+                metadata.snapshot_revision
+            );
+        }
+        SolverEvent::Resumed { metadata } => {
+            println!("job {} resumed", metadata.job_id);
+        }
+        SolverEvent::Completed { metadata, .. } => {
+            println!(
+                "job {} completed with reason {:?}",
+                metadata.job_id,
+                metadata.terminal_reason
+            );
+            break;
+        }
+        SolverEvent::Cancelled { metadata } => {
+            println!("job {} cancelled", metadata.job_id);
+            break;
+        }
+        SolverEvent::Failed { metadata, error } => {
+            println!("job {} failed: {}", metadata.job_id, error);
             break;
         }
     }
@@ -59,44 +93,99 @@ while let Some(event) = rx.blocking_recv() {
 
 The event variants are:
 
-- `Progress` — telemetry plus current and best scores
-- `BestSolution` — an owned improving solution
-- `Finished` — the final owned best solution
+- `Progress` — telemetry plus lifecycle metadata
+- `BestSolution` — an owned improving solution plus a retained snapshot
+- `PauseRequested` — pause has been requested but not yet settled
+- `Paused` — the runtime reached a safe checkpoint and retained a resumable snapshot
+- `Resumed` — a paused job continued from its retained checkpoint
+- `Completed` — the final owned best solution
+- `Cancelled` — the job was explicitly cancelled
+- `Failed` — the runtime aborted with an error
 
 ## Solver Status
 
 Check the current state of a job:
 
 ```rust
-let status = MANAGER.get_status(job_id);
-match status {
-    SolverStatus::NotSolving => println!("Not solving"),
-    SolverStatus::Solving => println!("Currently solving"),
-}
+let status = MANAGER.get_status(job_id).expect("job should exist");
+
+println!("state: {:?}", status.lifecycle_state);
+println!("terminal reason: {:?}", status.terminal_reason);
+println!("checkpoint available: {}", status.checkpoint_available);
+println!("event sequence: {}", status.event_sequence);
+println!("latest snapshot: {:?}", status.latest_snapshot_revision);
 ```
 
-The two variants are:
-- `SolverStatus::NotSolving` — the job is idle or finished
-- `SolverStatus::Solving` — the job is actively running
+`SolverStatus` is a struct, not a two-state enum. The lifecycle state is one
+of:
 
-## Early Termination
+- `Solving`
+- `PauseRequested`
+- `Paused`
+- `Completed`
+- `Cancelled`
+- `Failed`
 
-Stop a job before its configured termination condition:
+Terminal jobs also expose a separate `terminal_reason`:
+
+- `Completed`
+- `TerminatedByConfig`
+- `Cancelled`
+- `Failed`
+
+This distinction matters because a job can be `Completed` for a normal solve end
+or for a configured termination condition.
+
+## Pause, Resume, and Cancel
+
+Use lifecycle controls when you need interactive job management:
 
 ```rust
-let terminated = MANAGER.terminate_early(job_id);
-// Returns true if the job was found and was currently solving
+MANAGER.pause(job_id).expect("pause should be accepted");
+MANAGER.resume(job_id).expect("resume should be accepted");
+MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
 
-The solver finishes its current step and sends the best solution found so far through the channel.
+`pause()` is not a best-effort hint. The runtime settles it at a safe boundary,
+retains a checkpoint-backed snapshot, emits `Paused`, and only then allows
+`resume()`.
 
-## Freeing Slots
+## Snapshots and Analysis
 
-After a job completes and you've consumed the results, free the slot:
+Every retained solution snapshot has a monotonic `snapshot_revision` within its
+job. Fetch the latest or a specific revision:
 
 ```rust
-MANAGER.free_slot(job_id);
+let latest = MANAGER.get_snapshot(job_id, None).expect("latest snapshot");
+let exact = MANAGER
+    .get_snapshot(job_id, Some(latest.snapshot_revision))
+    .expect("requested snapshot");
 ```
+
+If your planning solution is `Analyzable`, you can request score analysis for a
+specific snapshot revision:
+
+```rust
+let analysis = MANAGER
+    .analyze_snapshot(job_id, Some(latest.snapshot_revision))
+    .expect("snapshot analysis");
+
+println!("analysis score: {:?}", analysis.analysis.score);
+```
+
+Analysis is snapshot-bound. You do not analyze the live mutable job directly.
+
+## Delete and Slot Reuse
+
+Jobs remain retained after `Completed`, `Cancelled`, or `Failed` so you can read
+their final status, snapshots, and analysis. Delete the terminal job when you
+are done with it:
+
+```rust
+MANAGER.delete(job_id).expect("delete terminal job");
+```
+
+Deleting a retained terminal job is what frees the slot for reuse.
 
 ## Active Jobs
 
@@ -105,6 +194,9 @@ Check how many jobs are currently running:
 ```rust
 let count = MANAGER.active_job_count();
 ```
+
+This counts visible retained jobs, including paused and terminal jobs that have
+not been deleted yet.
 
 ## The `Solvable` Trait
 

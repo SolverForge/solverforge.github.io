@@ -76,16 +76,20 @@ unimproved_step_count_limit = 10000
 
 ## Programmatic Termination
 
-Use `SolverManager::terminate_early(job_id)` to stop a job from code:
+Use `SolverManager::cancel(job_id)` to stop a retained job from code:
 
 ```rust
 static MANAGER: SolverManager<Schedule> = SolverManager::new();
 
-let (job_id, rx) = MANAGER.solve(problem);
+let (job_id, rx) = MANAGER.solve(problem).expect("solver job should start");
 
 // Later...
-MANAGER.terminate_early(job_id);
+MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
+
+Configured limits still terminate through the normal solver path. In that case
+the terminal event is `SolverEvent::Completed` and the terminal reason is
+`SolverTerminalReason::TerminatedByConfig`.
 
 ## See Also
 

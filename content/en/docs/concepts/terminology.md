@@ -105,7 +105,10 @@ The search engine that applies phases, selectors, acceptors, and incremental sco
 Configuration object for runtime behavior such as termination, random seed, phases, and move-thread count.
 
 ### SolverManager
-Manages concurrent solve jobs and streams `SolverEvent` values through channels. Useful for services and web applications.
+Manages retained solve jobs, authoritative lifecycle state, streamed
+`SolverEvent` values, snapshots, and exact in-process pause/resume. Useful for
+services and web applications that need job ids, status polling, cancellation,
+or score analysis after the solve finishes.
 
 ### Analyzable
 Trait generated for `#[planning_solution]` types that specify a constraints path. It enables score analysis for a concrete solution instance.

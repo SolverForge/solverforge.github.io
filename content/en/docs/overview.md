@@ -191,9 +191,10 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
 - **List Variables**: Full support for sequencing/routing problems
 - **Nearby Selection**: Distance-based move selection for large problems
 - **Balance Collector**: Load balancing constraint support
-- **SolverManager API**: Channel-based streaming with
-  `SolverEvent::{Progress, BestSolution, Finished}`, `terminate_early()`,
-  `get_status()`, and `free_slot()`
+- **SolverManager API**: Retained job lifecycle with
+  `SolverEvent::{Progress, BestSolution, PauseRequested, Paused, Resumed, Completed, Cancelled, Failed}`,
+  `SolverStatus`, exact in-process pause/resume checkpoints, retained
+  snapshots, snapshot-bound analysis, and terminal-job deletion
 - **Configuration**: stock `solver.toml` loading plus
   `SolverConfig::load()`, `from_toml_str()`, and `from_yaml_str()`
 
@@ -359,7 +360,8 @@ optimized native code.
 **Infrastructure:**
 
 - **SERIO**: Scoring Engine for Real-time Incremental Optimization
-- **SolverManager**: Channel-based streaming API with `SolverEvent`
+- **SolverManager**: Retained job lifecycle API with event streaming, snapshots,
+  and pause/resume control
 - **Configuration**: stock `solver.toml` loading plus TOML/YAML parsing APIs
 - **Termination**: Time limits, step counts, score targets, unimproved step
   detection, composites (And/Or)

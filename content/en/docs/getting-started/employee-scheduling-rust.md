@@ -215,28 +215,33 @@ use solverforge::{SolverEvent, SolverManager};
 static MANAGER: SolverManager<EmployeeSchedule> = SolverManager::new();
 
 fn solve(problem: EmployeeSchedule) {
-    let (job_id, mut rx) = MANAGER.solve(problem);
+    let (job_id, mut rx) = MANAGER.solve(problem).expect("solver job should start");
 
     while let Some(event) = rx.blocking_recv() {
         match event {
-            SolverEvent::Progress {
-                current_score,
-                best_score,
-                ..
-            } => {
-                println!("current: {:?}, best: {:?}", current_score, best_score);
+            SolverEvent::Progress { metadata } => {
+                println!(
+                    "current: {:?}, best: {:?}",
+                    metadata.current_score,
+                    metadata.best_score
+                );
             }
-            SolverEvent::BestSolution { score, .. } => {
-                println!("new best: {score}");
+            SolverEvent::BestSolution { metadata, .. } => {
+                println!("new best at snapshot {:?}", metadata.snapshot_revision);
             }
-            SolverEvent::Finished { score, .. } => {
-                println!("finished: {score}");
+            SolverEvent::Completed { metadata, .. } => {
+                println!("finished with reason {:?}", metadata.terminal_reason);
                 break;
             }
+            SolverEvent::Cancelled { .. } => break,
+            SolverEvent::Failed { error, .. } => panic!("solve failed: {error}"),
+            SolverEvent::PauseRequested { .. }
+            | SolverEvent::Paused { .. }
+            | SolverEvent::Resumed { .. } => {}
         }
     }
 
-    MANAGER.free_slot(job_id);
+    MANAGER.delete(job_id).expect("delete retained job");
 }
 ```
 
@@ -244,8 +249,12 @@ Important details:
 
 - `solve()` returns immediately and runs the search on Rayon
 - The channel item type is `SolverEvent<EmployeeSchedule>`, not `(solution, score)`
-- `Finished` carries the final owned best solution
-- Call `free_slot(job_id)` after draining the receiver so the slot can be reused
+- `Completed` carries the final owned best solution; `Cancelled` and `Failed` are
+  terminal too
+- `PauseRequested`, `Paused`, and `Resumed` appear when you drive lifecycle
+  controls with `pause()` and `resume()`
+- Delete the retained terminal job with `delete(job_id)` when you are done with
+  its snapshots and analysis
 
 ## Tuning Search
 
@@ -300,7 +309,8 @@ That generated surface is the main reason the current docs prefer
 - Use `.join(equal(...))` for self-joins and `.join((extractor, equal_bi(...)))`
   for cross-joins
 - Use `.named("...")`, not `as_constraint`
-- Use `SolverEvent::{Progress, BestSolution, Finished}` when consuming solve output
+- Use `SolverEvent::{Progress, BestSolution, Completed}` as the main happy-path
+  events, and handle `Cancelled` / `Failed` for terminal cleanup
 - Tune search in `solver.toml`
 
 ## Next Steps
