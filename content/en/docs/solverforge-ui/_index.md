@@ -8,18 +8,23 @@ description: >
   serving for SolverForge web applications.
 ---
 
+{{% pageinfo color="primary" %}} This section tracks the current
+`solverforge-ui` **v0.4.2** API: retained jobs, typed lifecycle events, exact
+paused snapshots, and pause/resume/cancel controls.
+{{% /pageinfo %}}
+
 `solverforge-ui` is SolverForge's frontend component library for
 constraint-optimization applications. It ships embedded assets, UI primitives,
-solver lifecycle helpers, and scheduling views without requiring npm in the
-runtime integration path.
+retained-job lifecycle helpers, and scheduling views without requiring npm in
+the runtime integration path.
 
 ## What It Provides
 
 - **Drop-in components** for headers, status bars, buttons, modals, tabs,
   tables, footers, API guides, and toasts
 - **Scheduling views** with both timeline rail and split-pane Gantt primitives
-- **Solver lifecycle helpers** via `SF.createBackend(...)` and
-  `SF.createSolver(...)`
+- **Retained job lifecycle helpers** via `SF.createBackend(...)` and
+  `SF.createSolver(...)` with pause, resume, cancel, and snapshot sync
 - **Embedded asset serving** under `/sf/*` via
   `.merge(solverforge_ui::routes())`
 - **Stable and versioned bundles** for compatibility and cache-friendly
@@ -29,7 +34,10 @@ runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = "0.3.1"
+solverforge-ui = "0.4"
+
+# Pin the current GitHub release exactly when needed:
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.4.2" }
 ```
 
 ## Minimal Workflow
@@ -47,14 +55,52 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
   });
   document.body.appendChild(tabs.el);
 
+  var backend = SF.createBackend({ type: 'axum' });
+  var solver;
+
   var header = SF.createHeader({
     title: 'SolverForge UI',
+    subtitle: 'Retained job lifecycle',
     tabs: [{ id: 'plan', label: 'Plan', active: true }],
     onTabChange: function (id) {
       tabs.show(id);
     },
+    actions: {
+      onSolve: function () {
+        solver.start();
+      },
+      onPause: function () {
+        solver.pause();
+      },
+      onResume: function () {
+        solver.resume();
+      },
+      onCancel: function () {
+        solver.cancel();
+      },
+    },
   });
   document.body.prepend(header);
+
+  var statusBar = SF.createStatusBar({ header: header, constraints: [] });
+  header.after(statusBar.el);
+
+  solver = SF.createSolver({
+    backend: backend,
+    statusBar: statusBar,
+    onProgress: function (meta) {
+      console.log('progress', meta.currentScore);
+    },
+    onSolution: function (snapshot) {
+      console.log('solution', snapshot.solution);
+    },
+    onPaused: function (snapshot) {
+      console.log('paused', snapshot.solution);
+    },
+    onComplete: function (snapshot) {
+      console.log('complete', snapshot.solution);
+    },
+  });
 </script>
 ```
 

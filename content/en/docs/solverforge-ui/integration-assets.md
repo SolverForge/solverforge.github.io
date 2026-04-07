@@ -8,6 +8,12 @@ weight: 4
 
 # Integration & Assets
 
+{{% pageinfo color="primary" %}} The current `solverforge-ui` **v0.4.2**
+contract is job-oriented and lifecycle-typed. New integrations should expose
+retained jobs, explicit `eventType` payloads, and exact paused or terminal
+snapshots.
+{{% /pageinfo %}}
+
 This page summarizes how `solverforge-ui` connects frontend code to backend APIs
 and how static assets are delivered.
 
@@ -22,8 +28,9 @@ Create adapters with `SF.createBackend(...)` and pass the result into
 var backend = SF.createBackend({ type: 'axum', baseUrl: '' });
 ```
 
-Use this when your backend exposes the default `solverforge-ui` scheduling
-contract.
+Use this when your backend exposes the stock `solverforge-ui` lifecycle
+contract. New integrations should model retained jobs and snapshots rather than
+build around schedule-specific naming.
 
 ### Tauri Adapter
 
@@ -51,43 +58,119 @@ var backend = SF.createBackend({
 Use this when your app needs a custom HTTP shape, extra headers, or a
 compatibility layer during a route transition.
 
-## Default Axum Adapter Contract
+## Lifecycle Contract Expectations
 
-The default Axum adapter expects these routes:
+The shared lifecycle model is job-oriented:
 
-- `POST /schedules`
-- `GET /schedules/{id}`
-- `GET /schedules/{id}/events`
-- `GET /schedules/{id}/analyze`
-- `DELETE /schedules/{id}`
-- `GET /demo-data/{name}`
+- create job
+- get job
+- get job status
+- stream job events
+- get snapshot
+- analyze snapshot
+- pause job
+- resume job
+- cancel job
+- delete job
+- get demo data
 
-The adapter also expects `createSchedule()` to resolve to either:
+Some older quickstarts still expose legacy `/schedules/...` routes. Treat that
+shape as compatibility glue, not the canonical lifecycle vocabulary for new
+integrations.
 
-- a plain schedule/job id string, or
-- an object containing one of `id`, `jobId`, `job_id`, `scheduleId`, or
-  `schedule_id`
+The create operation may resolve to either:
 
-If your current app still uses a legacy quickstart route shape, add an
-application-side compatibility layer or use the generic `fetch` adapter until
-the routes converge.
+- a plain job id string, or
+- an object containing one of `id`, `jobId`, or `job_id`
+
+If your current app still uses a legacy route shape, add an application-side
+compatibility layer or use the generic `fetch` adapter until the routes
+converge.
+
+Current backend expectations are:
+
+- `getSnapshot()` and `analyzeSnapshot()` accept an optional
+  `snapshotRevision`
+- `pauseJob()` requests a pause, but `solver.pause()` resolves only after the
+  authoritative `paused` event and snapshot sync complete
+- `resumeJob()` settles on the authoritative `resumed` event
+- `cancelJob()` settles after the terminal lifecycle event has been
+  synchronized
+- `deleteJob()` is destructive cleanup for terminal retained jobs only
+- streamed events should use canonical camelCase fields:
+  `eventType`, `jobId`, `eventSequence`, `lifecycleState`,
+  `snapshotRevision`, `currentScore`, `bestScore`, `telemetry`, and
+  `solution` where required
+- supported `eventType` values are `progress`, `best_solution`,
+  `pause_requested`, `paused`, `resumed`, `completed`, `cancelled`, and
+  `failed`
+- raw score-only progress payloads and implicit completion heuristics are not
+  part of the supported stream contract
 
 ## Solver Lifecycle
 
-`SF.createSolver(...)` builds the client-side solver state machine on top of the
-backend adapter.
+`SF.createSolver(...)` builds the client-side retained-job state machine on top
+of the backend adapter.
 
 ```js
 var solver = SF.createSolver({
   backend: backend,
   statusBar: statusBar,
-  onUpdate: function (schedule) {
-    render(schedule);
+  onProgress: function (meta) {
+    renderTelemetry(meta);
+  },
+  onSolution: function (snapshot, meta) {
+    render(snapshot.solution, meta);
+  },
+  onPaused: function (snapshot, meta) {
+    render(snapshot.solution, meta);
+  },
+  onComplete: function (snapshot, meta) {
+    render(snapshot.solution, meta);
   },
 });
 ```
 
-The shipped solver helper exposes `start`, `stop`, `isRunning`, and `getJobId`.
+Treat the shipped solver helper as a lifecycle controller for one retained job:
+it starts work, observes authoritative lifecycle events, renders snapshots, and
+coordinates pause, resume, cancel, analysis, and terminal cleanup through the
+backend adapter.
+
+The current solver surface returns:
+
+- `start(data)`
+- `pause()`
+- `resume()`
+- `cancel()`
+- `delete()`
+- `getSnapshot(snapshotRevision?)`
+- `analyzeSnapshot(snapshotRevision?)`
+- `isRunning()`
+- `getJobId()`
+- `getLifecycleState()`
+- `getSnapshotRevision()`
+
+Supported callbacks are `onProgress`, `onSolution`, `onPauseRequested`,
+`onPaused`, `onResumed`, `onCancelled`, `onComplete`, `onFailure`,
+`onAnalysis`, and `onError`.
+
+### Startup Stream Contract
+
+Startup streams may begin with either a scored `progress` event or a scored
+`best_solution` event. Consumers must not require `progress` to arrive first.
+
+Runtime rules:
+
+- `progress` is metadata-only and must not carry the solution payload
+- `best_solution` must include both `solution` and `snapshotRevision`
+- `pause_requested` means the runtime accepted the request, not that the exact
+  checkpoint is already available
+- `paused`, `completed`, `cancelled`, and `failed` are authoritative lifecycle
+  events; `SF.createSolver()` synchronizes the retained snapshot before firing
+  the corresponding callbacks
+- the status bar uses `currentScore` as the live score during solving
+- missing or malformed typed lifecycle fields are ignored instead of being
+  silently normalized
 
 ## Asset Serving Under `/sf/*`
 

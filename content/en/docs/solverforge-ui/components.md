@@ -9,7 +9,8 @@ weight: 2
 # Components
 
 `solverforge-ui` ships a verified component surface for common scheduling and
-operations UIs.
+operations UIs, including header and status primitives that pair with the
+retained-job solver lifecycle.
 
 ## Core Factories
 
@@ -17,7 +18,7 @@ The current public API documents these factories:
 
 | Factory                       | Returns                                                                         | Description                                                              |
 | ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `SF.createHeader(config)`     | `HTMLElement`                                                                   | Sticky header with logo, title, nav tabs, and solve/stop/analyze actions |
+| `SF.createHeader(config)`     | `HTMLElement`                                                                   | Sticky header with logo, title, nav tabs, and optional solve/pause/resume/cancel/analyze actions |
 | `SF.createStatusBar(config)`  | `{el, bindHeader, updateScore, setSolving, updateMoves, colorDotsFromAnalysis}` | Score display with constraint indicators                                 |
 | `SF.createButton(config)`     | `HTMLButtonElement`                                                             | Button with variant, size, icon, and shape modifiers                     |
 | `SF.createModal(config)`      | `{el, body, open, close, setBody}`                                              | Dialog with backdrop and header                                          |

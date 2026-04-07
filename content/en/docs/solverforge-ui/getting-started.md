@@ -8,19 +8,27 @@ weight: 1
 
 # Getting Started with solverforge-ui
 
+{{% pageinfo color="primary" %}} This guide follows the current
+`solverforge-ui` **v0.4.2** surface: retained jobs, typed lifecycle events, and
+exact paused or terminal snapshot sync.
+{{% /pageinfo %}}
+
 This guide covers the verified integration path:
 
 1. add the crate
 2. mount `/sf/*` assets with `.merge(solverforge_ui::routes())`
 3. include the bundled CSS and JS
-4. instantiate components plus the backend and solver helpers
+4. instantiate components plus the retained-job backend and solver helpers
 
 ## Add the Dependency
 
 ```toml
 [dependencies]
 axum = "0.8"
-solverforge-ui = "0.3.1"
+solverforge-ui = "0.4"
+
+# Pin the current GitHub release exactly when needed:
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.4.2" }
 ```
 
 ## Mount `/sf/*` Routes in Axum
@@ -71,6 +79,7 @@ still owns its HTML pages and any schedule/solver API routes.
       document.body.appendChild(tabs.el);
 
       var backend = SF.createBackend({ type: 'axum' });
+      var solver;
 
       var header = SF.createHeader({
         title: 'SolverForge Scheduler',
@@ -82,17 +91,40 @@ still owns its HTML pages and any schedule/solver API routes.
         onTabChange: function (id) {
           tabs.show(id);
         },
+        actions: {
+          onSolve: function () {
+            solver.start();
+          },
+          onPause: function () {
+            solver.pause();
+          },
+          onResume: function () {
+            solver.resume();
+          },
+          onCancel: function () {
+            solver.cancel();
+          },
+        },
       });
       document.body.prepend(header);
 
       var statusBar = SF.createStatusBar({ header: header, constraints: [] });
       header.after(statusBar.el);
 
-      var solver = SF.createSolver({
+      solver = SF.createSolver({
         backend: backend,
         statusBar: statusBar,
-        onUpdate: function (schedule) {
-          console.log('updated schedule', schedule);
+        onProgress: function (meta) {
+          console.log('progress', meta.currentScore, meta.bestScore);
+        },
+        onSolution: function (snapshot) {
+          console.log('best solution', snapshot.solution);
+        },
+        onPaused: function (snapshot, meta) {
+          console.log('paused', meta.snapshotRevision, snapshot.solution);
+        },
+        onComplete: function (snapshot, meta) {
+          console.log('completed', meta.currentScore, snapshot.solution);
         },
       });
     </script>
@@ -100,13 +132,20 @@ still owns its HTML pages and any schedule/solver API routes.
 </html>
 ```
 
+`SF.createSolver(...)` now follows the retained-job lifecycle. Use
+`onProgress(...)` for score and telemetry updates, `onSolution(...)` for
+snapshot-bearing `best_solution` events, and `onPaused(...)` or
+`onComplete(...)` when you need the exact retained snapshot after the runtime
+reaches an authoritative lifecycle state.
+
 ## Application Routes
 
 `solverforge-ui` does not generate your scheduling API. The crate ships the UI
 surface and a set of backend helpers. If you use
-`SF.createBackend({ type: 'axum' })`, follow the default adapter contract
-documented in [Integration & Assets](../integration-assets/), or add an
-application-side compatibility layer while your routes are still in transition.
+`SF.createBackend({ type: 'axum' })`, follow the canonical retained-job
+contract documented in [Integration & Assets](../integration-assets/). Older
+`/schedules/...` route shapes should be treated as application-side
+compatibility shims while your backend converges on `/jobs/...`.
 
 ## Next Steps
 
