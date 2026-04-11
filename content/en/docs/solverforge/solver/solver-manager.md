@@ -150,6 +150,11 @@ MANAGER.cancel(job_id).expect("cancel should be accepted");
 retains a checkpoint-backed snapshot, emits `Paused`, and only then allows
 `resume()`.
 
+In `0.8.2`, the built-in construction, local-search, and retained phase flow
+poll control state during large neighborhood work more aggressively, so
+`pause()`, `cancel()`, and config termination unwind promptly without extra
+watchdog code in the application.
+
 ## Snapshots and Analysis
 
 Every retained solution snapshot has a monotonic `snapshot_revision` within its
@@ -174,6 +179,10 @@ println!("analysis score: {:?}", analysis.analysis.score);
 ```
 
 Analysis is snapshot-bound. You do not analyze the live mutable job directly.
+
+After `pause()` is accepted, `PauseRequested` is published before any later
+worker-side event already carrying `PauseRequested` state. Treat that ordering
+as authoritative when synchronizing UI or service-layer state.
 
 ## Delete and Slot Reuse
 

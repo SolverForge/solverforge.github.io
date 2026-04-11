@@ -58,7 +58,24 @@ pub struct VehicleRoutePlan {
 ```
 
 The list variable stores visit indices, not `Visit` structs directly. This keeps
-move generation and list manipulation aligned with the stock `0.7.1` runtime.
+move generation and list manipulation aligned with the stock `0.8.2` runtime.
+
+## Solution-Side Trait Bounds
+
+Some list-variable helpers, distance meters, or route utilities need more from
+the planning solution than the base `PlanningSolution` contract. In `0.8.2`,
+`#[planning_list_variable]` can express that directly:
+
+```rust
+#[planning_list_variable(
+    element_collection = "visits",
+    solution_trait = "crate::routing::RouteContext"
+)]
+pub visits: Vec<usize>,
+```
+
+Use `solution_trait` only when stock list-variable helpers must see an explicit
+extra trait on the solution type.
 
 ## Shadow Updates
 

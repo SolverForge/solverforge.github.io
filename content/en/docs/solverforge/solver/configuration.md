@@ -15,7 +15,7 @@ helpers for TOML and YAML when you want to inspect or build configs directly.
 ### From a TOML file
 
 ```rust
-let config = SolverConfig::load("solver-config.toml").unwrap();
+let config = SolverConfig::load("solver.toml").unwrap();
 ```
 
 ### From a TOML string
@@ -169,6 +169,30 @@ let config = SolverConfig::new()
     .with_random_seed(42)
     .with_termination_seconds(30);
 ```
+
+## Per-Solution Overlays
+
+Macro-generated retained solves can layer runtime policy on top of the loaded
+`solver.toml` by using `config = "..."` on `#[planning_solution]`:
+
+```rust
+#[planning_solution(
+    constraints = "define_constraints",
+    config = "solver_config_for_solution"
+)]
+pub struct Schedule {
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+    pub time_limit_secs: u64,
+}
+
+fn solver_config_for_solution(solution: &Schedule, config: SolverConfig) -> SolverConfig {
+    config.with_termination_seconds(solution.time_limit_secs)
+}
+```
+
+The callback receives the already loaded `solver.toml` config, so it should
+decorate that base config rather than replace it from scratch.
 
 ## See Also
 

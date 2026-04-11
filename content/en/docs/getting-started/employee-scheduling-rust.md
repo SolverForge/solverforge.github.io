@@ -5,14 +5,14 @@ icon: fa-brands fa-rust
 date: 2026-04-05
 weight: 5
 description:
-  "Build an employee scheduler with the current SolverForge 0.7.1 runtime
+  "Build an employee scheduler with the current SolverForge 0.8.2 runtime
   surface"
 categories: [Quickstarts]
 tags: [quickstart, rust]
 ---
 
 {{% pageinfo color="primary" %}} This guide is written against the current
-**SolverForge 0.7.1** runtime surface: generated constraint-stream accessors,
+**SolverForge 0.8.2** runtime surface: generated constraint-stream accessors,
 `solver.toml`, and `SolverEvent`-based solving through `SolverManager`.
 {{% /pageinfo %}}
 
@@ -287,6 +287,10 @@ For list-heavy models, nearby search is expressed by picking a nearby selector
 variant such as `nearby_list_change_move_selector` or
 `nearby_list_swap_move_selector`.
 
+When runtime policy needs per-problem tweaks, use
+`#[planning_solution(config = "...")]` to decorate the loaded `solver.toml`
+config instead of replacing it outright.
+
 ## Useful Generated Surface
 
 The macros generate several helpers that are worth leaning on:
@@ -306,6 +310,8 @@ That generated surface is the main reason the current docs prefer
   on standard variables
 - Use `#[planning_list_variable(element_collection = "visits")]` plus `Vec<usize>`
   for stock list variables
+- Add `config = "..."` on `#[planning_solution]` when a solve should layer
+  per-solution runtime policy on top of `solver.toml`
 - Use `.join(equal(...))` for self-joins and `.join((extractor, equal_bi(...)))`
   for cross-joins
 - Use `.named("...")`, not `as_constraint`

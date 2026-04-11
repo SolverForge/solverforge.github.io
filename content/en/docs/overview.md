@@ -152,13 +152,14 @@ constraints.
 # Project Status & Roadmap
 
 {{% pageinfo %}} SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation set is aligned with **SolverForge 0.7.1**. {{% /pageinfo %}}
+in Rust. This documentation set is aligned with **SolverForge 0.8.2** and the
+current crate line targets **Rust 1.92+**. {{% /pageinfo %}}
 
 ## Current Status
 
 | Component     | Status              | Description                                                      |
 | ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.7.1` runtime surface |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.2` runtime surface |
 
 **Want to try it today?**
 
@@ -196,7 +197,21 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   `SolverStatus`, exact in-process pause/resume checkpoints, retained
   snapshots, snapshot-bound analysis, and terminal-job deletion
 - **Configuration**: stock `solver.toml` loading plus
-  `SolverConfig::load()`, `from_toml_str()`, and `from_yaml_str()`
+  `SolverConfig::load()`, `from_toml_str()`, `from_yaml_str()`, and
+  `#[planning_solution(config = "...")]` overlays that decorate the loaded
+  runtime config
+
+## Latest Runtime Additions in 0.8.2
+
+- **Prompt retained-runtime controls**: built-in search phases now poll pause,
+  cancel, and config termination state during large neighborhood work so
+  interactive controls settle promptly without app-side watchdogs
+- **List-variable solution trait bounds**: `#[planning_list_variable]` can now
+  declare `solution_trait = "path::Trait"` when meters or helpers require extra
+  solution-side API
+- **Serialized pause lifecycle publication**: the retained event stream keeps
+  `PauseRequested` authoritative and ordered before later worker-side
+  pause-state events
 
 ## Roadmap
 
@@ -316,7 +331,7 @@ optimized native code.
 </details>
 
 <details>
-<summary><strong>What's implemented (0.7.1)</strong></summary>
+<summary><strong>What's implemented (0.8.2)</strong></summary>
 
 **Repository**:
 [solverforge/solverforge](https://github.com/solverforge/solverforge)

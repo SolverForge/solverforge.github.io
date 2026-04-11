@@ -69,6 +69,14 @@ this is represented as `Vec<usize>` plus an `element_collection` name.
 pub visits: Vec<usize>,
 ```
 
+Common parameters:
+
+- `element_collection = "visits"`: names the solution collection that contains
+  all list elements
+- `solution_trait = "path::Trait"`: adds an explicit solution-side trait bound
+  for generated stock list-variable helpers when meters or route utilities need
+  richer solution context
+
 ### `#[planning_pin]`
 
 Prevents the solver from changing an entity's variables. Useful for pre-assigned or locked entities.
