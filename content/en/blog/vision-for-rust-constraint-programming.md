@@ -147,7 +147,9 @@ Rust requires more syntax than Python for equivalent operations.
 
 ### Python Bindings: In Development
 
-We're not just theorizing. Python bindings for SolverForge are in active development. The same constraint in Python:
+Python bindings for SolverForge are in active development. The architecture follows the same pattern: a Python API that compiles to the zero-erasure Rust core via PyO3, with lambdas analyzed at constraint definition time and converted to native expression trees.
+
+The same constraint in Python:
 
 ```python
 @constraint_provider
@@ -156,13 +158,13 @@ def define_constraints(factory):
         factory.for_each(Shift)
             .filter(lambda shift: shift.employee is None)
             .penalize(HardSoftScore.ONE_HARD)
-            .as_constraint("All shifts assigned"),
+            .named("All shifts assigned"),
     ]
 ```
 
-Fewer characters. No type annotations. No `.clone()`. No `.as_slice()`.
+Fewer characters. No type annotations. No `.clone()`.
 
-We're addressing the difference from both directions—improving Rust ergonomics and providing Python bindings that compile to the same high-performance core.
+That said, the **current focus is on maturing the Rust API and developer experience**—ensuring the core is as ergonomic as possible before translating those patterns to Python. The better the Rust experience becomes, the better the Python bindings will be.
 
 ## Toward More Fluent Rust APIs
 
@@ -300,7 +302,7 @@ Rust doesn't have variadic generics, so you can't write `constraints!(c1, c2, c3
 
 ## The Python Bindings Approach
 
-While we work on Rust ergonomics, we're also building Python bindings via PyO3. The architecture:
+Python bindings are being built alongside the Rust core. The architecture follows this pattern:
 
 ```
 Python API (decorators, constraint streams, lambdas)
@@ -318,9 +320,9 @@ The key insight: Python lambdas are analyzed at constraint definition time, not 
 factory.for_each(Shift).filter(lambda s: s.employee is None)
 ```
 
-The lambda `lambda s: s.employee is None` is inspected via Python's AST, converted to a native `Expression` tree, and compiled. During solving, there's no Python interpreter in the hot path—just native Rust evaluation of the expression tree.
+The lambda is inspected via Python's AST, converted to a native `Expression` tree, and compiled. During solving, there's no Python interpreter in the hot path—just native Rust evaluation of the expression tree.
 
-This gives Python users the ergonomics they expect while preserving the performance characteristics of the Rust core. The same solver, two interfaces.
+This gives Python users the ergonomics they expect while preserving the performance characteristics of the Rust core. The timeline for release depends on Rust API stability—the better the Rust experience, the better the Python translation.
 
 ## Motivation
 
@@ -334,10 +336,9 @@ The solver internals require zero-cost abstractions. The user-facing API doesn't
 
 We chose Rust because constraint solving is computationally intensive. Every allocation matters. Every vtable lookup compounds across millions of move evaluations. Rust provides the performance ceiling we need.
 
-We're addressing the ergonomics difference two ways:
+Since this article was written, the focus has been on **Rust API improvements** via procedural macros that generate domain-aware helpers—generated collection accessors like `factory.shifts()`, the retained `SolverManager` lifecycle, and `solver.toml` configuration. These features have made the Rust experience significantly more ergonomic than what was possible in the 0.5.0 era.
 
-1. **Python bindings** that provide familiar syntax while compiling to native evaluation
-2. **Rust API improvements** via procedural macros that generate domain-aware helpers
+**Python bindings** are in development, with the architecture proven and work ongoing. The release timeline follows Rust API maturity—the better the Rust experience becomes, the better the Python bindings will be.
 
 Both approaches share the same zero-erasure solver core.
 
