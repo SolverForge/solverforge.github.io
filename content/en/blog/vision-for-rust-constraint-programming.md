@@ -131,6 +131,61 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
 Each method in the chain is generic, preserving full type information. The compiler generates specialized scoring code for your exact constraint structure. The generated accessors eliminate repetitive extractor closures and keep constraint code focused on the logic, not the plumbing.
 
+### Retained Runtime and Configuration
+
+Since this article was written, SolverForge has moved from a simple solve-and-return model to a **retained runtime** with explicit lifecycle management:
+
+```rust
+use solverforge::{SolverManager, SolverEvent};
+
+static MANAGER: SolverManager<Schedule> = SolverManager::new();
+
+let (job_id, mut receiver) = MANAGER.solve(schedule).unwrap();
+
+while let Some(event) = receiver.blocking_recv() {
+    match event {
+        SolverEvent::Progress { metadata } => {
+            println!("step {} score {:?}",
+                metadata.telemetry.step_count,
+                metadata.telemetry.best_score);
+        }
+        SolverEvent::BestSolution { metadata, .. } => {
+            if let Some(rev) = metadata.snapshot_revision {
+                let analysis = MANAGER.analyze_snapshot(job_id, Some(rev)).unwrap();
+                // Snapshot-bound analysis
+            }
+        }
+        SolverEvent::Paused { .. } => {
+            MANAGER.resume(job_id).unwrap();
+        }
+        SolverEvent::Completed { .. } => break,
+        _ => {}
+    }
+}
+```
+
+The runtime speaks in neutral terms: **jobs**, **snapshots**, and **checkpoints**. Every event carries `job_id`, monotonic `event_sequence`, and `snapshot_revision`. This enables:
+
+- **Exact pause/resume** with in-process checkpoints (not restart-from-best)
+- **Snapshot-bound analysis** of constraint breakdowns at specific revisions
+- **Interactive control** without watchdogs or polling
+
+Configuration is now file-driven via `solver.toml`:
+
+```toml
+[termination]
+seconds_spent_limit = 30
+unimproved_seconds_spent_limit = 5
+
+[[phases]]
+type = "construction_heuristic"
+
+[[phases]]
+type = "local_search"
+```
+
+The runtime loads this automatically. Per-solution overrides are possible via `#[planning_solution(config = "...")]` that decorates (not replaces) the loaded configuration.
+
 ## The Ergonomics Gap: Rust vs Python
 
 Rust requires more syntax than Python for equivalent operations.
