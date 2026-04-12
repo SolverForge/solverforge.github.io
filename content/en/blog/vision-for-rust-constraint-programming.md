@@ -146,9 +146,21 @@ Rust requires more syntax than Python for equivalent operations.
 | Collection access | Direct | `.as_slice()` |
 | Error messages | Runtime | Compile-time (but verbose) |
 
-### Python Bindings: In Development
+### Python Front-End: In Development
 
-Python bindings for SolverForge are in active development. The architecture follows the same pattern: a Python API that compiles to the zero-erasure Rust core via PyO3, with lambdas analyzed at constraint definition time and converted to native expression trees.
+SolverForge is developing a Python front-end that generates Rust code rather than wrapping a Rust library. The architecture:
+
+```
+Python domain models and constraints (typed IR)
+    ↓
+AST analysis and lowering (restricted Python predicates)
+    ↓
+Rust code generation (targets public solverforge 0.8.4 API)
+    ↓
+Compiled crate with generated Rust types
+    ↓
+Retained runtime (SolverManager, jobs, snapshots, events)
+```
 
 The same constraint in Python:
 
@@ -158,14 +170,27 @@ def define_constraints(factory):
     return [
         factory.for_each(Shift)
             .filter(lambda shift: shift.employee is None)
-            .penalize(HardSoftScore.ONE_HARD)
+            .penalize(HardScore.ONE)
             .named("All shifts assigned"),
     ]
 ```
 
-Fewer characters. No type annotations. No `.clone()`.
+Fewer characters. No type annotations. The Python front-end generates the Rust equivalent:
 
-That said, the **current focus is on maturing the Rust API and developer experience**—ensuring the core is as ergonomic as possible before translating those patterns to Python. The better the Rust experience becomes, the better the Python bindings will be.
+```rust
+factory.shifts()
+    .unassigned()
+    .penalize_hard()
+    .named("All shifts assigned")
+```
+
+Key constraints on the design:
+- **No second solver runtime** — Python is strictly a front-end; solving happens in the generated Rust code
+- **No runtime string DSL** — Predicates are analyzed at generation time, not interpreted
+- **No Python callbacks in hot loops** — All scoring happens in compiled Rust
+- **Targets only the public API** — Generated code uses the same stable surface as hand-written Rust
+
+The **current focus is on maturing the Rust API**—ensuring the public surface is ergonomic and complete before expanding the generation target. The better the Rust experience, the better the generated code.
 
 ## Toward More Fluent Rust APIs
 
@@ -177,9 +202,23 @@ That said, the **current focus is on maturing the Rust API and developer experie
 - DSL-style definitions that read like specifications
 - Less boilerplate between intent and implementation
 
+### Delivered: Incremental Improvements
+
+The improvements described below have been implemented since this article was written:
+
+**Generated accessors** — The `#[planning_solution]` macro now generates a `{Solution}ConstraintStreams` trait with typed methods like `factory.shifts()` and `factory.employees()` that eliminate manual extractor closures.
+
+**Unassigned filters** — Entities with `Option<_>` planning variables get a generated `{Entity}Unassigned` filter, enabling `.unassigned()` on matching streams.
+
+**Shorthand penalties** — `.penalize_hard()` and `.penalize_soft(by)` reduce boilerplate for common score types.
+
+**Unified join API** — Cross-collection and self-joins both use `.join(...)`, with `equal()` for self-joins and `equal_bi()` for cross-joins. The older `for_each_unique_pair` was removed in favor of this consistency.
+
+These changes are in the current SolverForge release and represent the direction of API refinement—reducing ceremony while maintaining full type safety.
+
 ### Hypothetical: A `constraints!` Macro DSL
 
-One possible direction:
+A declarative macro DSL remains a possible future direction:
 
 ```rust
 constraints! {
@@ -195,47 +234,10 @@ constraints! {
         where a.overlaps(&b)
         penalize HARD
     },
-
-    "Skill requirement" => {
-        for_each shift in shifts
-        join employee in employees on shift.employee == Some(employee.id)
-        where !employee.skills.contains(&shift.required_skill)
-        penalize HARD
-    },
-
-    "Preferred hours" => {
-        for_each shift in shifts
-        join employee in employees on shift.employee == Some(employee.id)
-        where !employee.preferred_hours.contains(&shift.start_time)
-        penalize SOFT by 10
-    },
 }
 ```
 
-This would compile down to the same zero-erasure code. The macro expands the declarative syntax into the full generic constraint definitions, with no additional runtime cost.
-
-### Incremental Improvements
-
-Before a full DSL, smaller changes can reduce boilerplate:
-
-```rust
-// Generated accessors from domain model
-let factory = ConstraintFactory::new();
-
-factory.shifts()           // Generated from #[planning_entity_collection]
-    .unassigned()          // Generated: filter where planning_variable is None
-    .penalize_hard()       // Shorthand for penalize(HardSoftScore::ONE_HARD)
-    .named("All assigned")
-
-// Inferred joiners from field relationships
-factory.shifts()
-    .join_employees()      // Inferred from Option<employee_id> field
-    .filter_skill_mismatch()  // Generated from domain knowledge
-    .penalize_hard()
-    .named("Skill match")
-```
-
-The macro already knows the domain model. It can generate helper methods that understand the specific problem structure.
+This would compile down to the same zero-erasure code. However, this is not currently in active development—the focus has been on the incremental improvements above, which achieve much of the same ergonomic benefit without a separate DSL syntax.
 
 ## Technical Challenges
 
@@ -301,29 +303,35 @@ Rust doesn't have variadic generics, so you can't write `constraints!(c1, c2, c3
 
 **Workaround:** Implement `ConstraintSet` for tuples up to some reasonable N. We currently support up to 12 constraints in a tuple. Beyond that, nest tuples or use a different pattern.
 
-## The Python Bindings Approach
+## The Python Front-End Architecture
 
-Python bindings are being built alongside the Rust core. The architecture follows this pattern:
+The Python front-end is being developed as a standalone code generation tool. Unlike traditional bindings that wrap a Rust library at runtime, Python serves as a **typed front-end that generates Rust code**:
 
 ```
-Python API (decorators, constraint streams, lambdas)
+Python models and constraints (typed, restricted subset)
     ↓
-Lambda Analysis (Python AST → Expression trees)
+IR definition and AST lowering
     ↓
-Native Evaluation (Rust constraint engine)
+Rust code generation (targets public solverforge API)
     ↓
-Zero-erasure solver core
+Compiled crate with full retained runtime
 ```
 
-The key insight: Python lambdas are analyzed at constraint definition time, not evaluation time. When you write:
+Python lambdas are analyzed at **generation time**, not runtime. When you write:
 
 ```python
-factory.for_each(Shift).filter(lambda s: s.employee is None)
+.filter(lambda s: s.employee is None)
 ```
 
-The lambda is inspected via Python's AST, converted to a native `Expression` tree, and compiled. During solving, there's no Python interpreter in the hot path—just native Rust evaluation of the expression tree.
+The front-end inspects the AST and generates the corresponding Rust constraint code, then compiles it into a native binary.
 
-This gives Python users the ergonomics they expect while preserving the performance characteristics of the Rust core. The timeline for release depends on Rust API stability—the better the Rust experience, the better the Python translation.
+Design constraints:
+- **No second solver runtime** — Python is strictly a front-end; solving happens in generated Rust
+- **No runtime string DSL** — Predicates are analyzed and compiled, not interpreted
+- **No Python callbacks in hot loops** — All scoring happens in compiled Rust
+- **Targets only the public API** — Generated code uses the same stable surface as hand-written Rust
+
+The retained runtime payloads (jobs, snapshots, events) mirror the Rust semantics exactly. The timeline follows Rust API maturity—the more complete the public surface, the more comprehensive the generation target.
 
 ## Motivation
 
@@ -339,7 +347,7 @@ We chose Rust because constraint solving is computationally intensive. Every all
 
 Since this article was written, the focus has been on **Rust API improvements** via procedural macros that generate domain-aware helpers—generated collection accessors like `factory.shifts()`, the retained `SolverManager` lifecycle, and `solver.toml` configuration. These features have made the Rust experience significantly more ergonomic than what was possible in the 0.5.0 era.
 
-**Python bindings** are in development, with the architecture proven and work ongoing. The release timeline follows Rust API maturity—the better the Rust experience becomes, the better the Python bindings will be.
+**Python front-end** development is ongoing in a standalone repository. The code-generation architecture is established: Python serves as a typed interface that generates Rust targeting the public solverforge API. The release timeline follows Rust API maturity—the more complete the public surface, the more comprehensive the generation target.
 
 Both approaches share the same zero-erasure solver core.
 
