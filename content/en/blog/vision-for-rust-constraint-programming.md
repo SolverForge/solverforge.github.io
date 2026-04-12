@@ -8,6 +8,14 @@ description: >
   and how we're addressing them with Python bindings and improved Rust APIs.
 ---
 
+{{< alert title="Historical Context" color="info" >}}
+This article was published in January 2026 during the SolverForge 0.5.0 era.
+The core philosophy—zero-erasure architecture, incremental scoring, and Rust's
+performance advantages—remains valid. However, specific APIs and timelines have
+evolved. For current documentation, see the [overview](/docs/overview/) and
+[employee scheduling tutorial](/docs/getting-started/employee-scheduling-rust/).
+{{< /alert >}}
+
 SolverForge is a constraint solver written in Rust. The goal: **write constraints like you write code**.
 
 This wasn't an obvious language choice. Python dominates the optimization space. Java has decades of established solvers. Why Rust?
