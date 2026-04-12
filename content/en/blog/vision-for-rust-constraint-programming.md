@@ -106,7 +106,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
         .for_each(|s: &Schedule| s.shifts.as_slice())
         .filter(|shift: &Shift| shift.employee.is_none())
         .penalize(HardSoftScore::ONE_HARD)
-        .as_constraint("All shifts assigned");
+        .named("All shifts assigned");
 
     let skill_match = factory
         .clone()
@@ -122,7 +122,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
             !emp.skills.contains(&shift.required_skill)
         })
         .penalize(HardSoftScore::ONE_HARD)
-        .as_constraint("Skill requirement");
+        .named("Skill requirement");
 
     (assigned, skill_match)
 }
