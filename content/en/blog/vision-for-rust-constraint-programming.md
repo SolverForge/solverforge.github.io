@@ -400,7 +400,16 @@ The solver internals require zero-cost abstractions. The user-facing API doesn't
 
 We chose Rust because constraint solving is computationally intensive. Every allocation matters. Every vtable lookup compounds across millions of move evaluations. Rust provides the performance ceiling we need.
 
-Since this article was written, the focus has been on **Rust API improvements** via procedural macros that generate domain-aware helpers—generated collection accessors like `factory.shifts()`, the retained `SolverManager` lifecycle, and `solver.toml` configuration. These features have made the Rust experience significantly more ergonomic than what was possible in the 0.5.0 era.
+Since this article was written, the focus has been on **Rust API improvements** via procedural macros that generate domain-aware helpers—generated collection accessors like `factory.shifts()`, the retained `SolverManager` lifecycle, `solver.toml` configuration, and **score analysis** (`ScoreAnalysis`, `ConstraintAnalysis`, `IndictmentMap`). These features have made the Rust experience significantly more ergonomic than what was possible in the 0.5.0 era.
+
+Onboarding has shifted from clone-and-edit quickstarts to **CLI-first scaffolding** with `solverforge-cli`. The workflow is now:
+
+```bash
+cargo install solverforge-cli
+solverforge new my-scheduler
+solverforge generate entity shift --planning-variable employee_idx
+solverforge server
+```
 
 **Python front-end** development is ongoing in a standalone repository. The code-generation architecture is established: Python serves as a typed interface that generates Rust targeting the public solverforge API. The release timeline follows Rust API maturity—the more complete the public surface, the more comprehensive the generation target.
 
@@ -408,7 +417,7 @@ Both approaches share the same zero-erasure solver core.
 
 ---
 
-**Try it now:** [Employee Scheduling in Rust](/docs/getting-started/employee-scheduling-rust/)
+**Get started:** [Install the CLI](/docs/solverforge-cli/getting-started/) or follow the [Employee Scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
 
 **Source:** [SolverForge on GitHub](https://github.com/SolverForge/solverforge)
 
