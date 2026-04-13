@@ -22,7 +22,7 @@ type system all the way through.
 CLI 1.1.2 ensures that the scaffolds you generate today target that converged
 runtime correctly:
 
-- Scaffolded projects now depend on **SolverForge 0.8.4**, **solverforge-ui
+- Scaffolded projects now depend on **SolverForge 0.8.5**, **solverforge-ui
   0.4.3**, and **solverforge-maps 2.1.3**
 - Generated code uses the retained `SolverManager` lifecycle introduced in 0.8.0
 - The same `solver.toml` configuration drives both scaffolded servers and custom
@@ -40,7 +40,7 @@ cargo install solverforge-cli
 solverforge new my-scheduler
 ```
 
-The generated `Cargo.toml` now correctly pins the 0.8.4 runtime line, ensuring
+The generated `Cargo.toml` now correctly pins the 0.8.5 runtime line, ensuring
 that new projects start from the converged API surface rather than intermediate
 versions.
 
@@ -55,8 +55,9 @@ to workspace layout variations and cross-platform differences.
 The 0.8.x releases were about bringing the pieces together:
 
 - **0.7.0** introduced CLI-first onboarding with `solverforge new`
-- **0.8.0** through **0.8.2** solidified the retained runtime with exact pause
-  semantics, snapshot-bound analysis, and the job/snapshot/checkpoint vocabulary
+- **0.8.0** through **0.8.5** solidified the retained runtime with exact pause
+  semantics, snapshot-bound analysis, the job/snapshot/checkpoint vocabulary,
+  and tracked existence streams for incremental constraint scoring
 
 CLI 1.1.x has been tracking that stabilization:
 
@@ -66,7 +67,7 @@ CLI 1.1.x has been tracking that stabilization:
 
 The result is that scaffolding now produces code that fits naturally into the
 converged runtime. The generated `SolverManager` setup, the event stream
-handling, and the configuration overlay pattern all match what the 0.8.4 runtime
+handling, and the configuration overlay pattern all match what the 0.8.5 runtime
 expects.
 
 ## Upgrade notes

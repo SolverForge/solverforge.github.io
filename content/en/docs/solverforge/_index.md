@@ -4,7 +4,7 @@ linkTitle: 'SolverForge'
 icon: fa-brands fa-rust
 weight: 10
 description: >
-  Native Rust constraint solver — aligned with the 0.8.2 runtime surface.
+  Native Rust constraint solver — aligned with the 0.8.5 runtime surface.
 ---
 
 SolverForge is a native Rust constraint solver for planning and scheduling
@@ -27,7 +27,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The current `0.8.2` crate line targets Rust `1.92+`.
+The current `0.8.5` crate line targets Rust `1.92+`.
 
 ## Minimal Example
 

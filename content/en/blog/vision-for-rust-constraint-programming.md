@@ -210,7 +210,7 @@ Python domain models and constraints (typed IR)
     ↓
 AST analysis and lowering (restricted Python predicates)
     ↓
-Rust code generation (targets public solverforge 0.8.4 API)
+Rust code generation (targets public solverforge 0.8.5 API)
     ↓
 Compiled crate with generated Rust types
     ↓

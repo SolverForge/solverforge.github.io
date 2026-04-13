@@ -37,8 +37,8 @@ cargo install solverforge-cli --force
 Use `solverforge --version` to see:
 
 - CLI version
-- Scaffold runtime target (currently SolverForge crate target 0.8.4)
-- Runtime source (crates.io: solverforge 0.8.4)
+- Scaffold runtime target (currently SolverForge crate target 0.8.5)
+- Runtime source (crates.io: solverforge 0.8.5)
 - UI source (crates.io: solverforge-ui 0.4.3)
 - Maps source (crates.io: solverforge-maps 2.1.3)
 

@@ -5,14 +5,14 @@ icon: fa-brands fa-rust
 date: 2026-04-05
 weight: 5
 description:
-  "Build an employee scheduler with the current SolverForge 0.8.2 runtime
+  "Build an employee scheduler with the current SolverForge 0.8.5 runtime
   surface"
 categories: [Quickstarts]
 tags: [quickstart, rust]
 ---
 
 {{% pageinfo color="primary" %}} This guide is written against the current
-**SolverForge 0.8.2** runtime surface: generated constraint-stream accessors,
+**SolverForge 0.8.5** runtime surface: generated constraint-stream accessors,
 `solver.toml`, and `SolverEvent`-based solving through `SolverManager`.
 {{% /pageinfo %}}
 

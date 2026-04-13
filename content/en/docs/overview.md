@@ -152,14 +152,14 @@ constraints.
 # Project Status & Roadmap
 
 {{% pageinfo %}} SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation set is aligned with **SolverForge 0.8.2** and the
+in Rust. This documentation set is aligned with **SolverForge 0.8.5** and the
 current crate line targets **Rust 1.92+**. {{% /pageinfo %}}
 
 ## Current Status
 
 | Component     | Status              | Description                                                      |
 | ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.2` runtime surface |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.5` runtime surface |
 
 **Want to try it today?**
 
@@ -201,8 +201,11 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   `#[planning_solution(config = "...")]` overlays that decorate the loaded
   runtime config
 
-## Latest Runtime Additions in 0.8.2
+## Latest Runtime Additions in 0.8.5
 
+- **Tracked existence streams**: `.if_exists()` and `.if_not_exists()` constraints
+  now work with direct collections and flattened (nested) collections, with
+  proper incremental scoring via `ChangeSource` metadata
 - **Prompt retained-runtime controls**: built-in search phases now poll pause,
   cancel, and config termination state during large neighborhood work so
   interactive controls settle promptly without app-side watchdogs
@@ -331,7 +334,7 @@ optimized native code.
 </details>
 
 <details>
-<summary><strong>What's implemented (0.8.2)</strong></summary>
+<summary><strong>What's implemented (0.8.5)</strong></summary>
 
 **Repository**:
 [solverforge/solverforge](https://github.com/solverforge/solverforge)

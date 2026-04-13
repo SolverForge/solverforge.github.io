@@ -58,7 +58,7 @@ pub struct VehicleRoutePlan {
 ```
 
 The list variable stores visit indices, not `Visit` structs directly. This keeps
-move generation and list manipulation aligned with the stock `0.8.2` runtime.
+move generation and list manipulation aligned with the stock `0.8.5` runtime.
 
 ## Solution-Side Trait Bounds
 
