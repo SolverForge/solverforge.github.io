@@ -76,8 +76,10 @@ When `constraints = "..."` is present, `#[planning_solution]` also generates:
 - `Analyzable` for score breakdowns via `analyze()`
 
 For advanced list-shadow workflows, the struct can also carry
-`#[shadow_variable_updates(...)]`, but stock standard-variable solving does not
-require that attribute.
+`#[shadow_variable_updates(...)]`. When present, the macro generates
+`PlanningSolution::update_entity_shadows(...)` and `update_all_shadows()`
+overrides directly on the solution type, and the stock `ScoreDirector` calls
+those hooks automatically during solving and score analysis.
 
 ## Requirements
 

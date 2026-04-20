@@ -9,8 +9,8 @@ description: >
 ---
 
 `solverforge-cli` is the default way to start a new SolverForge application. It
-scaffolds a runnable neutral app shell and provides generator commands so you can
-shape the domain incrementally.
+scaffolds a runnable neutral app shell and provides generator commands so you
+can shape the domain incrementally.
 
 ## What It Provides
 
@@ -37,8 +37,8 @@ cargo install solverforge-cli --force
 Use `solverforge --version` to see:
 
 - CLI version
-- Scaffold runtime target (currently SolverForge crate target 0.8.5)
-- Runtime source (crates.io: solverforge 0.8.5)
+- Scaffold runtime target (currently SolverForge crate target 0.8.9)
+- Runtime source (crates.io: solverforge 0.8.9)
 - UI source (crates.io: solverforge-ui 0.4.3)
 - Maps source (crates.io: solverforge-maps 2.1.3)
 
@@ -99,72 +99,72 @@ Dataset sizes: `small`, `standard`, `large`. Modes: `sample` (default), `stub`.
 
 ### Project Commands
 
-| Command | Description |
-|---------|-------------|
-| `solverforge new <name>` | Scaffold a new SolverForge project |
-| `solverforge server` | Start the development server (default port 7860) |
-| `solverforge info` | Show project summary: entities, facts, constraints, score type |
-| `solverforge check` | Validate project structure and configuration |
-| `solverforge test [args...]` | Run `cargo test` with optional passthrough arguments |
-| `solverforge routes` | List HTTP routes defined in `src/api/` |
+| Command                      | Description                                                    |
+| ---------------------------- | -------------------------------------------------------------- |
+| `solverforge new <name>`     | Scaffold a new SolverForge project                             |
+| `solverforge server`         | Start the development server (default port 7860)               |
+| `solverforge info`           | Show project summary: entities, facts, constraints, score type |
+| `solverforge check`          | Validate project structure and configuration                   |
+| `solverforge test [args...]` | Run `cargo test` with optional passthrough arguments           |
+| `solverforge routes`         | List HTTP routes defined in `src/api/`                         |
 
 ### Generate Commands
 
-| Command | Description |
-|---------|-------------|
-| `solverforge generate constraint <name>` | Add a constraint skeleton to `src/constraints/` |
-| `solverforge generate entity <name>` | Scaffold a planning entity in `src/domain/` |
-| `solverforge generate fact <name>` | Scaffold a problem fact in `src/domain/` |
-| `solverforge generate solution <name>` | Scaffold a planning solution in `src/domain/` |
-| `solverforge generate variable <field>` | Add a planning variable field to an existing entity |
-| `solverforge generate score <type>` | Change the score type in the existing solution |
-| `solverforge generate data` | Regenerate compiler-owned demo data |
-| `solverforge generate scaffold <name>` | Compound: entity + optional constraint + optional twin |
+| Command                                  | Description                                            |
+| ---------------------------------------- | ------------------------------------------------------ |
+| `solverforge generate constraint <name>` | Add a constraint skeleton to `src/constraints/`        |
+| `solverforge generate entity <name>`     | Scaffold a planning entity in `src/domain/`            |
+| `solverforge generate fact <name>`       | Scaffold a problem fact in `src/domain/`               |
+| `solverforge generate solution <name>`   | Scaffold a planning solution in `src/domain/`          |
+| `solverforge generate variable <field>`  | Add a planning variable field to an existing entity    |
+| `solverforge generate score <type>`      | Change the score type in the existing solution         |
+| `solverforge generate data`              | Regenerate compiler-owned demo data                    |
+| `solverforge generate scaffold <name>`   | Compound: entity + optional constraint + optional twin |
 
 ### Destroy Commands
 
-| Command | Description |
-|---------|-------------|
-| `solverforge destroy solution` | Remove the planning solution struct |
-| `solverforge destroy entity <name>` | Remove a planning entity |
-| `solverforge destroy variable --entity <E> <field>` | Remove a variable from an entity |
-| `solverforge destroy fact <name>` | Remove a problem fact |
-| `solverforge destroy constraint <name>` | Remove a constraint |
+| Command                                             | Description                         |
+| --------------------------------------------------- | ----------------------------------- |
+| `solverforge destroy solution`                      | Remove the planning solution struct |
+| `solverforge destroy entity <name>`                 | Remove a planning entity            |
+| `solverforge destroy variable --entity <E> <field>` | Remove a variable from an entity    |
+| `solverforge destroy fact <name>`                   | Remove a problem fact               |
+| `solverforge destroy constraint <name>`             | Remove a constraint                 |
 
 ### Configuration Commands
 
-| Command | Description |
-|---------|-------------|
-| `solverforge config show` | Print the contents of `solver.toml` |
+| Command                                | Description                                                            |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| `solverforge config show`              | Print the contents of `solver.toml`                                    |
 | `solverforge config set <key> <value>` | Set a key in `solver.toml` (e.g., `termination.time_spent_seconds 60`) |
 
 ### Utility Commands
 
-| Command | Description |
-|---------|-------------|
+| Command                           | Description                                  |
+| --------------------------------- | -------------------------------------------- |
 | `solverforge completions <shell>` | Generate shell completions (bash, zsh, fish) |
 
 ### Global Options
 
-| Option | Description |
-|--------|-------------|
-| `-q, --quiet` | Suppress all output except errors |
-| `-v, --verbose` | Show extra diagnostic output |
-| `--no-color` | Disable colored output (also respects `NO_COLOR` env var) |
+| Option          | Description                                               |
+| --------------- | --------------------------------------------------------- |
+| `-q, --quiet`   | Suppress all output except errors                         |
+| `-v, --verbose` | Show extra diagnostic output                              |
+| `--no-color`    | Disable colored output (also respects `NO_COLOR` env var) |
 
 ## Constraint Types
 
 When generating constraints, choose the pattern that matches your logic:
 
-| Flag | Pattern | Use Case |
-|------|---------|----------|
-| `--unary` | `for_each + filter + penalize` | Single entity violations |
-| `--pair` | `for_each_unique_pair` | Conflicting pairs of entities |
-| `--join` | `for_each + join` | Entity-fact mismatch |
-| `--balance` | Balance assignments | Distribute work evenly |
-| `--reward` | `for_each + filter + reward` | Reward matching entities |
-| `--hard` | Hard constraint (default) | Must be satisfied |
-| `--soft` | Soft constraint | Should be optimized |
+| Flag        | Pattern                                | Use Case                      |
+| ----------- | -------------------------------------- | ----------------------------- |
+| `--unary`   | `for_each + filter + penalize`         | Single entity violations      |
+| `--pair`    | `for_each + join(equal(...)) + filter` | Conflicting pairs of entities |
+| `--join`    | `for_each + join`                      | Entity-fact mismatch          |
+| `--balance` | Balance assignments                    | Distribute work evenly        |
+| `--reward`  | `for_each + filter + reward`           | Reward matching entities      |
+| `--hard`    | Hard constraint (default)              | Must be satisfied             |
+| `--soft`    | Soft constraint                        | Should be optimized           |
 
 ## When To Use It
 
@@ -173,8 +173,8 @@ SolverForge app and plan to evolve the generated project with your own model,
 constraints, and API surface.
 
 The generated shell is intentionally neutral. Standard-variable, list-variable,
-and mixed apps are shaped after scaffolding rather than chosen as separate starter
-families.
+and mixed apps are shaped after scaffolding rather than chosen as separate
+starter families.
 
 ## Sections
 

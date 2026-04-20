@@ -8,10 +8,9 @@ weight: 1
 
 # Getting Started with solverforge-ui
 
-{{% pageinfo color="primary" %}} This guide follows the current
-`solverforge-ui` **v0.4.2** surface: retained jobs, typed lifecycle events, and
-exact paused or terminal snapshot sync.
-{{% /pageinfo %}}
+{{% pageinfo color="primary" %}} This guide follows the current `solverforge-ui`
+**v0.5.0** surface: retained jobs, typed lifecycle events, and exact paused or
+terminal snapshot sync. {{% /pageinfo %}}
 
 This guide covers the verified integration path:
 
@@ -25,10 +24,10 @@ This guide covers the verified integration path:
 ```toml
 [dependencies]
 axum = "0.8"
-solverforge-ui = "0.4"
+solverforge-ui = "0.5"
 
 # Pin the current GitHub release exactly when needed:
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.4.2" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.5.0" }
 ```
 
 ## Mount `/sf/*` Routes in Axum
@@ -142,8 +141,8 @@ reaches an authoritative lifecycle state.
 
 `solverforge-ui` does not generate your scheduling API. The crate ships the UI
 surface and a set of backend helpers. If you use
-`SF.createBackend({ type: 'axum' })`, follow the canonical retained-job
-contract documented in [Integration & Assets](../integration-assets/). Older
+`SF.createBackend({ type: 'axum' })`, follow the canonical retained-job contract
+documented in [Integration & Assets](../integration-assets/). Older
 `/schedules/...` route shapes should be treated as application-side
 compatibility shims while your backend converges on `/jobs/...`.
 

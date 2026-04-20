@@ -6,7 +6,10 @@ description: >
   Aggregation functions for group_by operations in constraint streams.
 ---
 
-Collectors aggregate values within groups created by `group_by`. They transform a stream of individual matches into grouped summaries.
+Collectors aggregate values within groups created by `group_by(...)`. They
+transform a stream of individual matches into grouped summaries. For simple
+fairness rules, prefer `balance(...)`; use collectors when you need explicit
+counts, totals, or custom imbalance data.
 
 ## Using Collectors
 
@@ -16,19 +19,19 @@ Pass a collector as the second argument to `group_by`:
 factory.for_each(|s: &Schedule| s.shifts.as_slice())
     .group_by(
         |shift: &Shift| shift.employee_idx,   // grouping key
-        count::<Shift>(),                       // collector
+        count(),                              // collector
     )
     // Result: grouped stream of (key, usize)
 ```
 
 ## Available Collectors
 
-### `count::<A>()`
+### `count()`
 
 Counts the number of matches in each group. Returns `usize`.
 
 ```rust
-.group_by(|s: &Shift| s.employee_idx, count::<Shift>())
+.group_by(|s: &Shift| s.employee_idx, count())
 // → (key, usize)
 ```
 

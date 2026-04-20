@@ -6,7 +6,9 @@ description: >
   Understand why a solution received its score with ScoreAnalysis.
 ---
 
-Score analysis answers the question: **"Why does my solution have this score?"** It breaks down the total score by constraint, helping you debug constraints and explain results to users.
+Score analysis answers the question: **"Why does my solution have this score?"**
+It breaks down the total score by constraint, helping you debug constraints and
+explain results to users.
 
 ## ScoreAnalysis
 
@@ -22,7 +24,7 @@ println!("Total score: {:?}", analysis.score);
 for constraint in &analysis.constraints {
     println!(
         "{}: {:?} (count: {})",
-        constraint.constraint_ref.name,
+        constraint.name,
         constraint.score,
         constraint.match_count,
     );
@@ -35,29 +37,14 @@ Each `ConstraintAnalysis` contains:
 
 | Field | Description |
 |---|---|
-| `constraint_ref` | The `ConstraintRef` with package and name (from `.named()`) |
+| `name` | Human-readable constraint name (from `.named()`) |
+| `weight` | Constraint weight used when scoring |
 | `score` | Total score impact of this constraint |
 | `match_count` | Number of times the constraint matched |
-| `matches` | Individual `DetailedConstraintMatch` entries with justifications |
 
-## DetailedConstraintMatch
-
-Each match includes a `ConstraintJustification` with the entities involved:
-
-```rust
-for constraint in &analysis.constraints {
-    for m in &constraint.matches {
-        println!(
-            "  {} -> {:?} (entities: {:?})",
-            m.constraint_ref.name,
-            m.score,
-            m.justification.entities.iter()
-                .map(|e| e.short_type_name())
-                .collect::<Vec<_>>(),
-        );
-    }
-}
-```
+The stock `analyze(&solution)` helper returns this summarized view. If you need
+full per-match justifications and indictment maps, use the lower-level
+`solverforge-scoring` analysis APIs directly.
 
 ## Use Cases
 

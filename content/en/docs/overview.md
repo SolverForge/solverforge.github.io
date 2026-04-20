@@ -152,14 +152,14 @@ constraints.
 # Project Status & Roadmap
 
 {{% pageinfo %}} SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation set is aligned with **SolverForge 0.8.5** and the
+in Rust. This documentation set is aligned with **SolverForge 0.8.10** and the
 current crate line targets **Rust 1.92+**. {{% /pageinfo %}}
 
 ## Current Status
 
 | Component     | Status              | Description                                                      |
 | ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.5` runtime surface |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.10` runtime surface |
 
 **Want to try it today?**
 
@@ -172,8 +172,8 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
 
 - **Constraint Streams API**: Declarative constraint definition with `for_each`,
   generated collection accessors, `filter`, unified `join(...)`,
-  `flatten_last`, `group_by`, `balance`, `if_exists_filtered`,
-  `if_not_exists_filtered`, `penalize`, `reward`, and `.named(...)`
+  `flatten_last`, `group_by`, `balance`, `if_exists(...)`,
+  `if_not_exists(...)`, `penalize`, `reward`, and `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
   HardSoftDecimalScore, BendableScore
 - **Score Analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`,
@@ -191,30 +191,31 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   SubListSwap, KOpt, ListRuin, Ruin, PillarChange, PillarSwap
 - **List Variables**: Full support for sequencing/routing problems
 - **Nearby Selection**: Distance-based move selection for large problems
-- **Balance Collector**: Load balancing constraint support
+- **Balance stream**: Load-balancing constraint support without manual grouped
+  unfairness scoring
 - **SolverManager API**: Retained job lifecycle with
   `SolverEvent::{Progress, BestSolution, PauseRequested, Paused, Resumed, Completed, Cancelled, Failed}`,
   `SolverStatus`, exact in-process pause/resume checkpoints, retained
-  snapshots, snapshot-bound analysis, and terminal-job deletion
+  snapshots, snapshot-bound analysis, terminal-job deletion, and exact retained
+  telemetry
 - **Configuration**: stock `solver.toml` loading plus
   `SolverConfig::load()`, `from_toml_str()`, `from_yaml_str()`, and
   `#[planning_solution(config = "...")]` overlays that decorate the loaded
   runtime config
 
-## Latest Runtime Additions in 0.8.5
+## Runtime Notes for 0.8.10
 
-- **Tracked existence streams**: `.if_exists()` and `.if_not_exists()` constraints
-  now work with direct collections and flattened (nested) collections, with
-  proper incremental scoring via `ChangeSource` metadata
-- **Prompt retained-runtime controls**: built-in search phases now poll pause,
-  cancel, and config termination state during large neighborhood work so
-  interactive controls settle promptly without app-side watchdogs
-- **List-variable solution trait bounds**: `#[planning_list_variable]` can now
-  declare `solution_trait = "path::Trait"` when meters or helpers require extra
-  solution-side API
-- **Serialized pause lifecycle publication**: the retained event stream keeps
-  `PauseRequested` authoritative and ordered before later worker-side
-  pause-state events
+- **Canonical shadow lifecycle**: `PlanningSolution` now owns
+  `update_all_shadows()` and `update_entity_shadows(...)`, and the stock
+  `ScoreDirector` calls those hooks directly during initialization and after
+  variable changes. Shadow updates are no longer a separate scoring mode.
+- **Unified generated runtime**: macro-generated solving builds one runtime
+  model for scalar and list variables together, instead of maintaining separate
+  standard/list solve shapes.
+- **Exact retained telemetry**: retained status and events preserve generated,
+  evaluated, and accepted move counts plus generation and evaluation
+  `Duration`s through the solver pipeline. Human-facing `moves/s` remains a
+  derived display metric only.
 
 ## Roadmap
 
@@ -334,7 +335,7 @@ optimized native code.
 </details>
 
 <details>
-<summary><strong>What's implemented (0.8.5)</strong></summary>
+<summary><strong>What's implemented (0.8.10)</strong></summary>
 
 **Repository**:
 [solverforge/solverforge](https://github.com/solverforge/solverforge)
@@ -349,11 +350,9 @@ optimized native code.
 - **Shadow variables**: `#[inverse_relation_shadow_variable]`,
   `#[previous_element_shadow_variable]`, `#[next_element_shadow_variable]`
 - **Constraint Streams API**: `for_each`, generated collection accessors,
-  unified `join`, `flatten_last`, `group_by`, `balance`,
-  `if_exists_filtered`, `if_not_exists_filtered`, `penalize`, `reward`,
-  and `.named()`
-- **Advanced collectors**: `count`, `count_distinct`, `sum`, `min`, `max`,
-  `to_list`, `to_set`, `balance`
+  unified `join`, `flatten_last`, `group_by`, `balance`, `if_exists(...)`,
+  `if_not_exists(...)`, `penalize`, `reward`, and `.named()`
+- **Grouped helpers**: `count`, `sum`, and `load_balance`
 - **Score analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`,
   `IndictmentMap`
 

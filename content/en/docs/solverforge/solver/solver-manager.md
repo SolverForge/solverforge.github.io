@@ -34,6 +34,11 @@ Each event carries `SolverEventMetadata` with the job id, event sequence,
 lifecycle state, telemetry, current/best score, and the latest
 `snapshot_revision` when one exists.
 
+In `0.8.10`, retained telemetry keeps exact generated, evaluated, and accepted
+move counts together with generation and evaluation durations. Any displayed
+`moves/s` value is derived at the edge rather than stored as the canonical
+runtime metric.
+
 Consume them in a loop:
 
 ```rust
@@ -150,10 +155,10 @@ MANAGER.cancel(job_id).expect("cancel should be accepted");
 retains a checkpoint-backed snapshot, emits `Paused`, and only then allows
 `resume()`.
 
-In `0.8.5`, the built-in construction, local-search, and retained phase flow
-poll control state during large neighborhood work more aggressively, so
-`pause()`, `cancel()`, and config termination unwind promptly without extra
-watchdog code in the application.
+The built-in construction, local-search, and retained phase flow poll control
+state during large neighborhood work aggressively enough that `pause()`,
+`cancel()`, and config termination unwind promptly without extra watchdog code
+in the application.
 
 ## Snapshots and Analysis
 

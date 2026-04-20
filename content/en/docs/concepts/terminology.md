@@ -111,10 +111,15 @@ services and web applications that need job ids, status polling, cancellation,
 or score analysis after the solve finishes.
 
 ### Analyzable
-Trait generated for `#[planning_solution]` types that specify a constraints path. It enables score analysis for a concrete solution instance.
+Trait generated for `#[planning_solution]` types that specify a constraints
+path. It enables score analysis for a concrete solution instance and returns the
+stock `ScoreAnalysis` summary surface.
 
 ### ScoreDirector
-Internal component that calculates scores efficiently and powers score analysis.
+Internal component that maintains incremental scores efficiently and powers
+score analysis. In the current runtime it also calls
+`PlanningSolution::update_all_shadows()` before first initialization and
+`PlanningSolution::update_entity_shadows(...)` after each changed entity.
 
 ### ConstraintSet
 The trait implemented for tuples of finalized constraints returned by your constraint function.
@@ -148,11 +153,11 @@ Flatten the final element of a tuple stream into a child collection, then contin
 ### balance
 Compute load imbalance directly from a uni-stream without manually writing `group_by` aggregation code.
 
-### if_exists_filtered / if_not_exists_filtered
+### if_exists / if_not_exists
 Keep or reject items based on whether matching items exist in another collection.
 
 ### Collector
-Aggregation function (count, sum, min, max, toList, etc.).
+Aggregation function used with `group_by(...)`, such as `count`, `sum`, or `load_balance`.
 
 ### penalize / reward
 Apply score impact for matching items.

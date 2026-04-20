@@ -9,9 +9,8 @@ description: >
 ---
 
 {{% pageinfo color="primary" %}} This section tracks the current
-`solverforge-ui` **v0.4.2** API: retained jobs, typed lifecycle events, exact
-paused snapshots, and pause/resume/cancel controls.
-{{% /pageinfo %}}
+`solverforge-ui` **v0.5.0** API: retained jobs, typed lifecycle events, exact
+paused snapshots, and pause/resume/cancel controls. {{% /pageinfo %}}
 
 `solverforge-ui` is SolverForge's frontend component library for
 constraint-optimization applications. It ships embedded assets, UI primitives,
@@ -22,7 +21,8 @@ the runtime integration path.
 
 - **Drop-in components** for headers, status bars, buttons, modals, tabs,
   tables, footers, API guides, and toasts
-- **Scheduling views** with both timeline rail and split-pane Gantt primitives
+- **Scheduling views** with the canonical dense timeline surface plus low-level
+  rail primitives and split-pane Gantt
 - **Retained job lifecycle helpers** via `SF.createBackend(...)` and
   `SF.createSolver(...)` with pause, resume, cancel, and snapshot sync
 - **Embedded asset serving** under `/sf/*` via
@@ -34,10 +34,10 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = "0.4"
+solverforge-ui = "0.5"
 
 # Pin the current GitHub release exactly when needed:
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.4.2" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.5.0" }
 ```
 
 ## Minimal Workflow
@@ -122,8 +122,8 @@ It is a strong fit for:
   assets, and wire the verified primitives into an app
 - **[Components](components/)** — Core factories, return values, and unsafe HTML
   opt-ins
-- **[Scheduling Views](scheduling-views/)** — Timeline rail and Gantt APIs with
-  shipped examples
+- **[Scheduling Views](scheduling-views/)** — Canonical timeline, low-level rail
+  primitives, and Gantt APIs with shipped examples
 - **[Integration & Assets](integration-assets/)** — Backend adapters, asset
   serving, cache behavior, and example route contracts
 

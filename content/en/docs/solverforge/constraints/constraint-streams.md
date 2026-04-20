@@ -17,6 +17,8 @@ objects. The `#[planning_solution]` macro wires this up automatically.
 
 ```rust
 use solverforge::prelude::*;
+use solverforge::stream::{joiner::*, ConstraintFactory};
+use ScheduleConstraintStreams;
 
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
@@ -107,7 +109,7 @@ Groups elements and applies a [collector](../collectors/) to aggregate.
 factory.shifts()
     .group_by(
         |shift: &Shift| shift.employee_idx,   // grouping key
-        count::<Shift>(),                       // collector
+        count(),                              // collector
     )
 ```
 
@@ -121,17 +123,18 @@ factory.shifts()
     .balance(|shift: &Shift| shift.employee_idx)
 ```
 
-### `if_exists_filtered` / `if_not_exists_filtered`
+### `if_exists` / `if_not_exists`
 
 Filters based on the existence (or absence) of matching entities in another
 collection.
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
-    .if_exists_filtered(
-        |s: &Schedule| s.unavailability.clone(),
+factory.clone()
+    .shifts()
+    .if_exists((
+        factory.unavailability(),
         equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
-    )
+    ))
 ```
 
 ## Terminal Operations
@@ -165,7 +168,7 @@ Convenience methods that use the score type's unit hard or soft value.
 Apply a dynamic score impact based on the matched element.
 
 ```rust
-.penalize_hard_with(|shift: &Shift| HardSoftScore::of(1, shift.overtime_hours() as i64))
+.penalize_hard_with(|shift: &Shift| HardSoftScore::of_hard(shift.overtime_hours() as i64))
     .named("Overtime")
 ```
 
@@ -182,21 +185,23 @@ Apply a fully custom score impact.
 
 ```rust
 use solverforge::prelude::*;
+use solverforge::stream::{joiner::*, ConstraintFactory};
+use ScheduleConstraintStreams;
 
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
 
     (
         // Hard: every shift must be assigned
-        factory.shifts()
+        factory.clone().shifts()
             .filter(|shift| shift.employee_idx.is_none())
             .penalize(HardSoftScore::ONE_HARD)
             .named("Unassigned shift"),
 
         // Hard: no employee works two overlapping shifts
-        factory.shifts()
+        factory.clone().shifts()
             .join(equal(|shift: &Shift| shift.employee_idx))
-            .filter(|(a, b)| a.overlaps(b))
+            .filter(|a: &Shift, b: &Shift| a.employee_idx.is_some() && a.overlaps(b))
             .penalize(HardSoftScore::ONE_HARD)
             .named("Overlap"),
 

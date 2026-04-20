@@ -17,7 +17,7 @@ This guide covers the current onboarding path:
 
 ## Prerequisites
 
-- Rust stable toolchain (1.80+)
+- Rust stable toolchain (1.92+)
 - Cargo (included with Rust)
 
 ## Install the CLI
@@ -39,8 +39,8 @@ solverforge --version
 ```
 
 This shows the CLI version and the runtime/UI target versions baked into newly
-scaffolded projects (currently targeting SolverForge 0.8.5, solverforge-ui 0.4.3,
-and solverforge-maps 2.1.3).
+scaffolded projects (currently targeting SolverForge 0.8.9, solverforge-ui
+0.4.3, and solverforge-maps 2.1.3).
 
 ## Create a New Project
 
@@ -52,6 +52,7 @@ cd my-scheduler
 ```
 
 Options:
+
 - `--skip-git` — Skip running `git init` and initial commit
 - `--skip-readme` — Skip generating README.md
 
@@ -62,6 +63,7 @@ solverforge server
 ```
 
 Options:
+
 - `--port <PORT>` — Port to bind (default: 7860)
 - `--debug` — Run in debug mode (faster compilation, slower runtime)
 
@@ -77,6 +79,7 @@ solverforge generate fact employee --field name:String --field skill_level:i32
 ```
 
 Options:
+
 - `--field "name:Type"` — Add additional fields (repeatable)
 - `--force` — Overwrite if fact already exists
 - `--pretend` — Preview changes without writing files
@@ -89,6 +92,7 @@ solverforge generate entity shift --planning-variable employee_idx --field start
 ```
 
 Options:
+
 - `--planning-variable <FIELD>` — Add a planning variable field
 - `--field "name:Type"` — Add additional fields (repeatable)
 - `--force` — Overwrite if entity already exists
@@ -102,6 +106,7 @@ solverforge generate variable stops --entity Route --kind list --elements visits
 ```
 
 Options:
+
 - `--entity <TYPE>` — Entity struct name (required)
 - `--kind <standard|list>` — Variable kind (required)
 - `--range <COLLECTION>` — Standard-variable value range collection
@@ -128,6 +133,7 @@ solverforge generate constraint preferred_shift --reward
 ```
 
 Options:
+
 - `--hard` — Hard constraint (default, conflicts with --soft)
 - `--soft` — Soft constraint (conflicts with --hard)
 - `--unary` — Penalize matching entities
@@ -147,14 +153,15 @@ solverforge generate data --mode stub
 ```
 
 Options:
+
 - `--mode <sample|stub>` — Data generation mode (default: sample)
 - `--size <small|standard|large>` — Default dataset size
 
-The `solverforge generate data` command rewrites the compiler-owned sample builders
-in `src/generated/data_seed.rs`. The stable wrapper in `src/data/mod.rs` delegates
-to that generated seed file by default, so the command can keep regenerating
-sample data without clobbering user-owned entrypoints. Dataset size defaults are
-persisted in `solverforge.app.toml`.
+The `solverforge generate data` command rewrites the compiler-owned sample
+builders in `src/generated/data_seed.rs`. The stable wrapper in
+`src/data/mod.rs` delegates to that generated seed file by default, so the
+command can keep regenerating sample data without clobbering user-owned
+entrypoints. Dataset size defaults are persisted in `solverforge.app.toml`.
 
 ### Compound Scaffolding
 
@@ -168,6 +175,7 @@ The first field becomes the planning variable. Remaining fields are extra entity
 fields.
 
 Options:
+
 - `--entity` — Also generate a planning entity
 - `--constraint <NAME>` — Also generate a constraint with this name
 - `--pair` — Also generate a paired twin entity named `<name>_pair`
@@ -244,12 +252,15 @@ These options work with any command:
 
 - `-q, --quiet` — Suppress all output except errors
 - `-v, --verbose` — Show extra diagnostic output
-- `--no-color` — Disable colored output (also respects `NO_COLOR` environment variable)
+- `--no-color` — Disable colored output (also respects `NO_COLOR` environment
+  variable)
 
 ## Next Steps
 
-- Continue with [Getting Started](/docs/getting-started/) for a broader onboarding map.
-- Follow the [Employee Scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
+- Continue with [Getting Started](/docs/getting-started/) for a broader
+  onboarding map.
+- Follow the
+  [Employee Scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
   for a deeper domain-model walkthrough.
 - Explore [SolverForge](/docs/solverforge/) API-focused documentation for
   modeling and constraints.

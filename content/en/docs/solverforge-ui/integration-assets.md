@@ -8,11 +8,10 @@ weight: 4
 
 # Integration & Assets
 
-{{% pageinfo color="primary" %}} The current `solverforge-ui` **v0.4.2**
+{{% pageinfo color="primary" %}} The current `solverforge-ui` **v0.5.0**
 contract is job-oriented and lifecycle-typed. New integrations should expose
 retained jobs, explicit `eventType` payloads, and exact paused or terminal
-snapshots.
-{{% /pageinfo %}}
+snapshots. {{% /pageinfo %}}
 
 This page summarizes how `solverforge-ui` connects frontend code to backend APIs
 and how static assets are delivered.
@@ -89,21 +88,17 @@ converge.
 
 Current backend expectations are:
 
-- `getSnapshot()` and `analyzeSnapshot()` accept an optional
-  `snapshotRevision`
+- `getSnapshot()` and `analyzeSnapshot()` accept an optional `snapshotRevision`
 - `pauseJob()` requests a pause, but `solver.pause()` resolves only after the
   authoritative `paused` event and snapshot sync complete
 - `resumeJob()` settles on the authoritative `resumed` event
-- `cancelJob()` settles after the terminal lifecycle event has been
-  synchronized
+- `cancelJob()` settles after the terminal lifecycle event has been synchronized
 - `deleteJob()` is destructive cleanup for terminal retained jobs only
-- streamed events should use canonical camelCase fields:
-  `eventType`, `jobId`, `eventSequence`, `lifecycleState`,
-  `snapshotRevision`, `currentScore`, `bestScore`, `telemetry`, and
-  `solution` where required
+- streamed events should use canonical camelCase fields: `eventType`, `jobId`,
+  `eventSequence`, `lifecycleState`, `snapshotRevision`, `currentScore`,
+  `bestScore`, `telemetry`, and `solution` where required
 - supported `eventType` values are `progress`, `best_solution`,
-  `pause_requested`, `paused`, `resumed`, `completed`, `cancelled`, and
-  `failed`
+  `pause_requested`, `paused`, `resumed`, `completed`, `cancelled`, and `failed`
 - raw score-only progress payloads and implicit completion heuristics are not
   part of the supported stream contract
 
@@ -151,8 +146,8 @@ The current solver surface returns:
 - `getSnapshotRevision()`
 
 Supported callbacks are `onProgress`, `onSolution`, `onPauseRequested`,
-`onPaused`, `onResumed`, `onCancelled`, `onComplete`, `onFailure`,
-`onAnalysis`, and `onError`.
+`onPaused`, `onResumed`, `onCancelled`, `onComplete`, `onFailure`, `onAnalysis`,
+and `onError`.
 
 ### Startup Stream Contract
 

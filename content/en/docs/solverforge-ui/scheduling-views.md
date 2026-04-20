@@ -1,72 +1,143 @@
 ---
 title: Scheduling Views
 description: >
-  Build timeline-rail and split-pane Gantt views with the shipped solverforge-ui
-  APIs.
+  Build the canonical dense timeline, low-level rail primitives, and split-pane
+  Gantt views with the shipped solverforge-ui APIs.
 weight: 3
 ---
 
 # Scheduling Views
 
-`solverforge-ui` ships two complementary scheduling view styles:
+`solverforge-ui` ships one canonical dense scheduling surface and one
+complementary chart-first surface:
 
-- **Timeline rail** for compact, lane-by-lane operator workflows
+- **Timeline** for compact, lane-by-lane operator workflows with overview
+  clustering, inline expand/collapse, and packed detailed lanes
 - **Gantt** for dense, timeline-first planning and diagnostics
 
-## Timeline Rail API
+## Timeline API
 
-The shipped rail surface is built around:
+The shipped dense timeline surface is built around:
 
-- `SF.rail.createHeader(config)` → `HTMLElement`
-- `SF.rail.createCard(config)` → `{el, rail, addBlock, clearBlocks, setSolving}`
-- `SF.rail.addBlock(rail, config)` → `HTMLElement`
-- `SF.rail.addChangeover(rail, config)` → `HTMLElement`
+- `SF.rail.createTimeline(config)` →
+  `{el, setModel, setViewport, expandCluster, destroy}`
 
-### Rail Example
+Use this as the default scheduling surface when you need sticky time headers,
+sticky lane labels, synchronized scrolling, overview clustering, or packed
+detailed inspection.
+
+### Timeline Example
 
 ```js
-var header = SF.rail.createHeader({
-  label: 'Resource',
-  labelWidth: 200,
-  columns: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-});
-container.appendChild(header);
-
-var card = SF.rail.createCard({
-  id: 'furnace-1',
-  name: 'FORNO 1',
-  labelWidth: 200,
-  columns: 5,
-  type: 'CAMERA',
-  typeStyle: {
-    bg: 'rgba(59,130,246,0.15)',
-    color: '#1d4ed8',
-    border: '1px solid rgba(59,130,246,0.3)',
+var timeline = SF.rail.createTimeline({
+  label: 'Staffing lane',
+  labelWidth: 280,
+  model: {
+    axis: {
+      startMinute: 0,
+      endMinute: 28 * 1440,
+      days: buildDays(28),
+      ticks: buildSixHourTicks(28),
+      initialViewport: { startMinute: 0, endMinute: 14 * 1440 },
+    },
+    lanes: [
+      {
+        id: 'ward-east',
+        label: 'By location · Ward East',
+        mode: 'overview',
+        items: [
+          {
+            id: 'east-rush',
+            clusterId: 'east-rush',
+            startMinute: 360,
+            endMinute: 1080,
+            label: 'Monday intake surge',
+            tone: 'blue',
+            summary: {
+              primaryLabel: 'Monday intake surge',
+              secondaryLabel: 'ER intake · trauma hold · overflow beds',
+              count: 24,
+              openCount: 3,
+              toneSegments: [
+                { tone: 'blue', count: 15 },
+                { tone: 'amber', count: 6 },
+                { tone: 'rose', count: 3 },
+              ],
+            },
+            detailItems: [
+              {
+                id: 'east-1',
+                startMinute: 360,
+                endMinute: 840,
+                label: 'ER intake',
+                tone: 'blue',
+              },
+              {
+                id: 'east-2',
+                startMinute: 420,
+                endMinute: 960,
+                label: 'Trauma hold',
+                tone: 'amber',
+              },
+              {
+                id: 'east-3',
+                startMinute: 480,
+                endMinute: 1080,
+                label: 'Overflow beds',
+                tone: 'rose',
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: 'employee-ada',
+        label: 'By employee · Ada',
+        mode: 'detailed',
+        items: [
+          {
+            id: 'ada-1',
+            startMinute: 2 * 1440 + 360,
+            endMinute: 2 * 1440 + 840,
+            label: 'Primary shift',
+            tone: 'amber',
+          },
+          {
+            id: 'ada-2',
+            startMinute: 2 * 1440 + 660,
+            endMinute: 2 * 1440 + 1020,
+            label: 'Handoff overlap',
+            tone: 'amber',
+          },
+        ],
+      },
+    ],
   },
-  badges: ['TEMPRA'],
-  gauges: [{ label: 'Temp', pct: 85, style: 'heat', text: '850/1000°C' }],
-  stats: [{ label: 'Jobs', value: 12 }],
-});
-container.appendChild(card.el);
-
-card.addBlock({
-  start: 120,
-  end: 360,
-  horizon: 4800,
-  label: 'ODL-2847',
-  meta: 'Bianchi',
-  color: 'rgba(59,130,246,0.6)',
-  borderColor: '#3b82f6',
-  late: false,
 });
 
-SF.rail.addChangeover(card.rail, { start: 360, end: 400, horizon: 4800 });
-
-card.setSolving(true);
+container.appendChild(timeline.el);
+timeline.expandCluster('ward-east', 'east-rush');
 ```
 
-Gauge styles include `heat`, `load`, and `emerald`. `badges` accepts either
-plain strings or `{ label, style }` objects.
+Overview summaries are additive per field. If a summary item overrides aggregate
+`count` beyond the concrete items the library can inspect, provide
+`summary.openCount` and `summary.toneSegments` explicitly if you want those
+aggregate signals rendered.
+
+## Low-level Rail Primitives
+
+The original rail helpers remain shipped for custom primitive compositions:
+
+- `SF.rail.createHeader(config)` → `HTMLElement`
+- `SF.rail.createCard(config)` →
+  `{el, rail, addBlock, clearBlocks, setSolving, setUnassigned}`
+- `SF.rail.addBlock(rail, config)` → `HTMLElement`
+- `SF.rail.addChangeover(rail, config)` → `HTMLElement`
+- `SF.rail.createHeatmap(config)` → `HTMLElement | null`
+- `SF.rail.createUnassignedRail(tasks, onTaskClick)` → `HTMLElement`
+
+Use these when you need bespoke resource-card layouts rather than the canonical
+dense timeline surface.
 
 ## Gantt API
 
@@ -119,10 +190,13 @@ gantt.highlightTask('task-1');
 View modes include `Quarter Day`, `Half Day`, `Day`, `Week`, and `Month`.
 Sortable headers are opt-in per column.
 
-## Choosing Rail vs Gantt
+## Choosing Timeline, Rail, or Gantt
 
-Use **rail** when operators need readable resource cards, gauges, and
-changeover-aware lanes.
+Use **timeline** when operators need overview clustering, inline detail
+inspection, synchronized time navigation, and dense lane scanning.
+
+Use the **low-level rail primitives** when you are composing custom resource
+cards, gauges, and changeover-aware lanes by hand.
 
 Use **Gantt** when analysts need sortable task grids, dependency arrows, and
 high-density timeline review.

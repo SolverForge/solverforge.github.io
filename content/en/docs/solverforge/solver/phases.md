@@ -151,16 +151,14 @@ Use a `ScoreBounder` to prune branches that can't improve on the best known solu
 
 ## Partitioned Search
 
-Splits the problem into independent partitions and solves them in parallel on separate threads.
+Partitioned search exists in the lower-level solver API as
+`PartitionedSearchPhase`. It splits the problem into independent partitions and
+solves them in parallel, and the low-level phase now reuses the canonical
+scoring lifecycle for child scopes and merged results.
 
-```toml
-[[phases]]
-type = "partitioned_search"
-partition_count = 8
-```
-
-The stock config surface lets you choose the partition count. Custom
-partitioning strategies live in lower-level solver APIs.
+The stock `solver.toml` runtime does **not** expose `partitioned_search` as a
+declarative phase today. Use the lower-level Rust API when you need custom
+partitioning strategies or explicit partition-thread control.
 
 ## Typical Phase Configuration
 

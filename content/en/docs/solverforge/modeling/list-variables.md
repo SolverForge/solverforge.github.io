@@ -58,13 +58,13 @@ pub struct VehicleRoutePlan {
 ```
 
 The list variable stores visit indices, not `Visit` structs directly. This keeps
-move generation and list manipulation aligned with the stock `0.8.5` runtime.
+move generation and list manipulation aligned with the stock `0.8.10` runtime.
 
 ## Solution-Side Trait Bounds
 
 Some list-variable helpers, distance meters, or route utilities need more from
-the planning solution than the base `PlanningSolution` contract. In `0.8.2`,
-`#[planning_list_variable]` can express that directly:
+the planning solution than the base `PlanningSolution` contract. The current
+runtime lets `#[planning_list_variable]` express that directly:
 
 ```rust
 #[planning_list_variable(
@@ -85,7 +85,18 @@ shadow fields on the relevant entity types.
 
 Stock list solving does **not** require shadow updates. Add them only when your
 domain model needs derived state such as previous/next pointers or per-route
-aggregates.
+aggregates. When you do configure them, the canonical `ScoreDirector` invokes
+those solution hooks automatically.
+
+## Generated Helper Surface
+
+For single-list-owner solutions, the macro still generates flat convenience
+helpers such as `list_len_static()` and `element_count()`.
+
+For solutions with more than one list owner, prefer the owner-scoped helper
+surface such as `routes_list_len_static()` or `vehicles_element_count()`. Those
+methods are the unambiguous way to address a specific list owner in the current
+runtime surface.
 
 ## List Moves
 
