@@ -152,14 +152,14 @@ constraints.
 # Project Status & Roadmap
 
 {{% pageinfo %}} SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation set is aligned with **SolverForge 0.8.10** and the
-current crate line targets **Rust 1.92+**. {{% /pageinfo %}}
+in Rust. This documentation set is aligned with **SolverForge 0.8.12** and the
+current runtime line targets **Rust 1.92+**. {{% /pageinfo %}}
 
 ## Current Status
 
 | Component     | Status              | Description                                                      |
 | ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.10` runtime surface |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.12` runtime surface |
 
 **Want to try it today?**
 
@@ -180,7 +180,8 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   `IndictmentMap`
 - **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
 - **Solver Phases**:
-  - Construction Heuristics for standard and list-variable models
+  - Generic `first_fit` / `cheapest_insertion` over scalar, list, and mixed
+    planning models plus specialized scalar and list heuristics
   - Local Search with Hill Climbing, Simulated Annealing, Tabu Search, Late
     Acceptance, and Great Deluge in the stock config surface
   - Exhaustive Search (`branch_and_bound`, `brute_force`)
@@ -203,19 +204,20 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   `#[planning_solution(config = "...")]` overlays that decorate the loaded
   runtime config
 
-## Runtime Notes for 0.8.10
+## Runtime Notes for 0.8.12
 
-- **Canonical shadow lifecycle**: `PlanningSolution` now owns
-  `update_all_shadows()` and `update_entity_shadows(...)`, and the stock
-  `ScoreDirector` calls those hooks directly during initialization and after
-  variable changes. Shadow updates are no longer a separate scoring mode.
-- **Unified generated runtime**: macro-generated solving builds one runtime
-  model for scalar and list variables together, instead of maintaining separate
-  standard/list solve shapes.
-- **Exact retained telemetry**: retained status and events preserve generated,
-  evaluated, and accepted move counts plus generation and evaluation
-  `Duration`s through the solver pipeline. Human-facing `moves/s` remains a
-  derived display metric only.
+- **Optional scalar construction now treats `None` as a real baseline**:
+  for `#[planning_variable(..., allows_unassigned = true)]`, stock `first_fit`
+  can keep `None` when it is the best legal baseline, and revision-advancing
+  mutations reopen those slots for reconsideration later in the solve.
+- **Generic construction routing is now explicit**: `first_fit` and
+  `cheapest_insertion` run through the canonical mixed `ModelContext` path when
+  list work is present, while pure scalar matches reuse the descriptor-standard
+  scalar construction path. Specialized list phases remain explicit opt-ins.
+- **Accepted-count local search no longer implies early exit**:
+  `accepted_count_limit` now caps the retained accepted candidates for final
+  selection, while early neighborhood exit stays controlled by
+  `pick_early_type` and the explicit first-improving foragers.
 
 ## Roadmap
 
@@ -335,7 +337,7 @@ optimized native code.
 </details>
 
 <details>
-<summary><strong>What's implemented (0.8.10)</strong></summary>
+<summary><strong>What's implemented (0.8.12)</strong></summary>
 
 **Repository**:
 [solverforge/solverforge](https://github.com/solverforge/solverforge)
@@ -358,8 +360,9 @@ optimized native code.
 
 **Solver phases and runtime:**
 
-- **Construction heuristics**: first fit, weakest fit, strongest fit, queue
-  allocators, cheapest insertion, and list-specific constructors
+- **Construction heuristics**: generic first fit / cheapest insertion across
+  scalar, list, and mixed models; scalar-only fit and queue heuristics; and
+  list-specific constructors
 - **Local search**: hill climbing, simulated annealing, tabu search, late
   acceptance, great deluge
 - **Exhaustive search**: branch and bound and brute force

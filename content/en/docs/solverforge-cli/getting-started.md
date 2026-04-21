@@ -39,8 +39,11 @@ solverforge --version
 ```
 
 This shows the CLI version and the runtime/UI target versions baked into newly
-scaffolded projects (currently targeting SolverForge 0.8.9, solverforge-ui
+scaffolded projects (currently targeting SolverForge 0.8.5, solverforge-ui
 0.4.3, and solverforge-maps 2.1.3).
+
+The CLI has its own release cadence, so its scaffold target is intentionally
+separate from the newer core runtime line documented elsewhere on this site.
 
 ## Create a New Project
 

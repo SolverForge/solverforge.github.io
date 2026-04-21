@@ -34,7 +34,7 @@ Each event carries `SolverEventMetadata` with the job id, event sequence,
 lifecycle state, telemetry, current/best score, and the latest
 `snapshot_revision` when one exists.
 
-In `0.8.10`, retained telemetry keeps exact generated, evaluated, and accepted
+In the current runtime, retained telemetry keeps exact generated, evaluated, and accepted
 move counts together with generation and evaluation durations. Any displayed
 `moves/s` value is derived at the edge rather than stored as the canonical
 runtime metric.

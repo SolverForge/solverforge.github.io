@@ -53,7 +53,8 @@ Common parameters:
 
 - `value_range = "employees"` or `value_range_provider = "employees"`:
   references a field on the planning solution that supplies possible values
-- `allows_unassigned = true`: permits `None` for `Option<T>` variables
+- `allows_unassigned = true`: permits `None` for `Option<T>` variables, and the
+  stock construction/local-search runtime keeps that optional baseline legal
 - `countable_range = "0..10"`: declares an integer range directly on the field
 
 The macro also generates an `.unassigned()` stream helper when the entity has

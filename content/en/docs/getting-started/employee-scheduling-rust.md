@@ -4,13 +4,13 @@ linkTitle: "Employee Scheduling"
 icon: fa-brands fa-rust
 date: 2026-04-17
 weight: 5
-description: "A comprehensive quickstart guide to understanding and building intelligent employee scheduling with SolverForge 0.8.10 in Rust"
+description: "A comprehensive quickstart guide to understanding and building intelligent employee scheduling with SolverForge 0.8.12 in Rust"
 categories: [Quickstarts]
 tags: [quickstart, rust]
 ---
 
 {{% pageinfo color="primary" %}}
-This guide is written against **SolverForge 0.8.10**.
+This guide is written against **SolverForge 0.8.12**.
 
 The standard onboarding path is **`solverforge-cli`**. This page intentionally
 keeps the older employee scheduling tutorial shape and examples, but ports the
@@ -107,7 +107,7 @@ If your example uses `chrono` dates and times, add it to `Cargo.toml`:
 ```toml
 [dependencies]
 chrono = "0.4"
-solverforge = { version = "0.8.10", features = ["serde", "console", "verbose-logging"] }
+solverforge = { version = "0.8", features = ["serde", "console", "verbose-logging"] }
 ```
 
 Create a `solver.toml` so the runtime has an explicit search strategy:

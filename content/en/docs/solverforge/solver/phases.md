@@ -10,32 +10,42 @@ The solver runs phases in sequence. Each phase uses a different strategy to impr
 
 ## Construction Heuristic
 
-Builds an initial solution by assigning values to all planning variables. Runs first — local search then improves the result.
+Builds an initial solution by assigning values across scalar, list, or mixed
+planning models. Runs first — local search then improves the result.
 
 ### Construction Heuristic Types
 
 | Type | Description |
 |---|---|
-| `first_fit` | Assigns the first feasible value found. Fast. |
-| `first_fit_decreasing` | First fit, processing entities by difficulty. |
-| `weakest_fit` | Assigns the value that leaves the most room for future assignments. |
-| `weakest_fit_decreasing` | Weakest fit, processing entities by difficulty. |
-| `strongest_fit` | Assigns the value that uses resources most aggressively. |
-| `strongest_fit_decreasing` | Strongest fit, processing entities by difficulty. |
-| `cheapest_insertion` | Greedy insertion for standard variables. |
-| `allocate_entity_from_queue` | Queue-driven entity allocation. |
-| `allocate_to_value_from_queue` | Queue-driven value allocation. |
-| `list_round_robin` | Distributes elements evenly across entities (list variables). |
-| `list_cheapest_insertion` | Inserts each element at the score-minimizing position (list variables). |
-| `list_regret_insertion` | Inserts elements in order of highest placement regret (list variables). |
-| `list_clarke_wright` | Greedy route merging by savings value (list variables). |
-| `list_k_opt` | Per-route k-opt polishing (list variables). |
+| `first_fit` | Generic first-fit over mixed or list-bearing models; pure scalar matches reuse the descriptor-standard scalar path. |
+| `first_fit_decreasing` | Scalar-only first fit, processing entities by difficulty. |
+| `weakest_fit` | Scalar-only weakest-fit heuristic. |
+| `weakest_fit_decreasing` | Scalar-only weakest fit, processing entities by difficulty. |
+| `strongest_fit` | Scalar-only strongest-fit heuristic. |
+| `strongest_fit_decreasing` | Scalar-only strongest fit, processing entities by difficulty. |
+| `cheapest_insertion` | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-standard scalar path. |
+| `allocate_entity_from_queue` | Scalar-only queue-driven entity allocation. |
+| `allocate_to_value_from_queue` | Scalar-only queue-driven value allocation. |
+| `list_round_robin` | Specialized list-only even distribution. |
+| `list_cheapest_insertion` | Specialized list-only score-minimizing insertion. |
+| `list_regret_insertion` | Specialized list-only highest-regret insertion. |
+| `list_clarke_wright` | Specialized list-only greedy route merging by savings value. |
+| `list_k_opt` | Specialized list-only per-route k-opt polishing. |
 
 ```toml
 [[phases]]
 type = "construction_heuristic"
 construction_heuristic_type = "first_fit"
 ```
+
+The stock runtime now uses one `ModelContext` for scalar-only, list-only, and
+mixed planning models. Generic `first_fit` and `cheapest_insertion` follow that
+shared runtime path when list work is present, while specialized scalar and
+list heuristics remain explicit opt-ins.
+
+For `Option<T>` variables declared with `allows_unassigned = true`, stock
+`first_fit` keeps `None` when it is the best legal baseline instead of forcing
+an assignment during construction.
 
 ## Local Search
 
@@ -85,6 +95,10 @@ variable_name = "employee_id"
 accepted_count_limit = 32
 pick_early_type = "never"
 ```
+
+`accepted_count_limit` caps how many accepted moves are retained for final
+selection. It does **not** stop neighborhood evaluation early; use
+`pick_early_type` or a first-improving forager when you want early exit.
 
 ### Acceptor-Specific Configuration
 

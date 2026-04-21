@@ -9,7 +9,7 @@ description: >
 ---
 
 {{% pageinfo color="primary" %}} This section tracks the current
-`solverforge-ui` **v0.5.0** API: retained jobs, typed lifecycle events, exact
+`solverforge-ui` **v0.5.1** API: retained jobs, typed lifecycle events, exact
 paused snapshots, and pause/resume/cancel controls. {{% /pageinfo %}}
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -37,7 +37,7 @@ the runtime integration path.
 solverforge-ui = "0.5"
 
 # Pin the current GitHub release exactly when needed:
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.5.0" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.5.1" }
 ```
 
 ## Minimal Workflow
