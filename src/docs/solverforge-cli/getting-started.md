@@ -1,60 +1,90 @@
 ---
 title: Getting Started
 description: >
-  Install solverforge-cli, scaffold a neutral app shell, and run the default
-  local development server.
+  Install solverforge-cli, scaffold a neutral app shell, and take the first
+  generated project from empty shell to real model edits.
 weight: 1
 ---
 
 # Getting Started with solverforge-cli
 
-This guide covers the current onboarding path:
+This guide walks the default CLI-first onboarding path:
 
-1. install `solverforge-cli`
-2. scaffold a project shell
-3. run the local server
-4. grow the domain with generator commands
+1. install the CLI
+2. verify the scaffold targets baked into your binary
+3. scaffold a fresh project shell
+4. boot the generated backend and frontend
+5. grow the domain with the first generator commands
+6. inspect and validate the generated application
 
 ## Prerequisites
 
-- Rust stable toolchain (1.92+)
-- Cargo (included with Rust)
+- Rust stable `1.80+`
+- Cargo
+- A working C toolchain for Rust dependencies on your platform
 
-## Install the CLI
+The CLI crate itself declares `rust-version = "1.80"`. Generated applications
+then compile against the scaffolded SolverForge crate targets reported by
+`solverforge --version`.
+
+## Install or Update the CLI
 
 ```bash
 cargo install solverforge-cli
 ```
 
-If you already installed it previously, update to the latest published crate:
+Update an existing install:
 
 ```bash
 cargo install solverforge-cli --force
 ```
 
-Verify the installation:
+Install from a checkout when you are iterating on the CLI itself:
+
+```bash
+cd solverforge-cli
+cargo install --path .
+```
+
+## Verify the Installed Targets
+
+The CLI version is only one part of what matters. The binary also carries the
+current scaffold targets for the runtime, UI, and maps crates.
 
 ```bash
 solverforge --version
 ```
 
-This shows the CLI version and the runtime/UI target versions baked into newly
-scaffolded projects (currently targeting SolverForge 0.8.12, solverforge-ui
-0.5.1, and solverforge-maps 2.1.3).
+With `solverforge-cli 1.1.3`, the output includes:
+
+- CLI version `1.1.3`
+- scaffold runtime target `solverforge 0.9.0`
+- scaffold UI target `solverforge-ui 0.5.1`
+- scaffold maps target `solverforge-maps 2.1.3`
+- explicit source labels for each dependency line used in new projects
 
 ## Create a New Project
 
-The current scaffold command creates a neutral app shell:
+The `new` command always creates a neutral shell:
 
 ```bash
 solverforge new my-scheduler
 cd my-scheduler
 ```
 
-Options:
+Useful options:
 
-- `--skip-git` — Skip running `git init` and initial commit
-- `--skip-readme` — Skip generating README.md
+- `--skip-git` - do not run `git init` or create the initial commit
+- `--skip-readme` - do not generate `README.md`
+
+Fresh output includes a short "next steps" block and reminds you that the
+generated shell already contains:
+
+- one neutral app shell for scalar, list, or mixed modeling
+- retained lifecycle routes and UI wiring
+- typed SSE events
+- `solverforge.app.toml` as the scaffold contract
+- `solver.toml` as the solver search configuration layer
 
 ## Run the Local Server
 
@@ -62,14 +92,52 @@ Options:
 solverforge server
 ```
 
-Options:
+By default, `solverforge server` runs the generated project in release mode via
+`cargo run --release`. That makes first boot slower, but it keeps the default
+behavior close to the production runtime path.
 
-- `--port <PORT>` — Port to bind (default: 7860)
-- `--debug` — Run in debug mode (faster compilation, slower runtime)
+Useful options:
+
+- `--port <PORT>` - bind a different port instead of the default `7860`
+- `--debug` - run the generated app in debug mode for faster local iteration
 
 Open `http://localhost:7860` in your browser.
 
+The generated project serves:
+
+- the `solverforge-ui` asset bundle
+- a neutral frontend in `static/app.js`
+- retained job routes under `/jobs/*`
+- demo data endpoints under `/demo-data/*`
+
+## Inspect the Scaffold Before You Change It
+
+Right after scaffolding, these commands are useful:
+
+```bash
+solverforge info
+solverforge check
+solverforge routes
+```
+
+`solverforge info` summarizes the current planning solution, facts, entities,
+constraints, and solver-owned fields. `solverforge check` validates the project
+structure. `solverforge routes` lists the HTTP routes defined in `src/api/`.
+
+In a brand-new shell, the generated route surface already includes health,
+info, demo data, retained job lifecycle, snapshot analysis, pause, resume,
+cancel, and SSE events.
+
 ## Grow the Domain
+
+The normal build-out flow is:
+
+1. add facts
+2. add entities
+3. add scalar or list variables
+4. add constraints
+5. regenerate demo data
+6. replace placeholder constraint logic with real domain rules
 
 ### Add Problem Facts
 
@@ -78,11 +146,9 @@ solverforge generate fact resource --field category:String --field load:i32
 solverforge generate fact employee --field name:String --field skill_level:i32
 ```
 
-Options:
-
-- `--field "name:Type"` — Add additional fields (repeatable)
-- `--force` — Overwrite if fact already exists
-- `--pretend` — Preview changes without writing files
+This creates `src/domain/<fact>.rs`, exports the new type from
+`src/domain/mod.rs`, patches the planning solution collections, and syncs
+`solverforge.app.toml`.
 
 ### Add Planning Entities
 
@@ -91,58 +157,63 @@ solverforge generate entity task --field label:String --field priority:i32
 solverforge generate entity shift --planning-variable employee_idx --field start:String --field duration:i32
 ```
 
-Options:
-
-- `--planning-variable <FIELD>` — Add a planning variable field
-- `--field "name:Type"` — Add additional fields (repeatable)
-- `--force` — Overwrite if entity already exists
-- `--pretend` — Preview changes without writing files
+`--planning-variable` lets you create the entity and its first scalar planning
+variable in one step. If you omit it, the entity starts with no solvable field
+yet and `solverforge check` will warn until you add one.
 
 ### Add Planning Variables to Existing Entities
 
 ```bash
-solverforge generate variable resource_idx --entity Task --kind standard --range resources --allows-unassigned
+solverforge generate variable resource_idx --entity Task --kind scalar --range resources --allows-unassigned
 solverforge generate variable stops --entity Route --kind list --elements visits
 ```
 
-Options:
+Use `scalar` for standard one-value assignment variables and `list` for
+sequence variables. The CLI still accepts legacy `standard`, but the canonical
+term in current docs and metadata is `scalar`.
 
-- `--entity <TYPE>` — Entity struct name (required)
-- `--kind <standard|list>` — Variable kind (required)
-- `--range <COLLECTION>` — Standard-variable value range collection
-- `--elements <COLLECTION>` — List-variable element collection
-- `--allows-unassigned` — Allow leaving the standard variable unassigned
+Scalar example:
+
+```bash
+solverforge generate variable resource_idx \
+  --entity Task \
+  --kind scalar \
+  --range resources \
+  --allows-unassigned
+```
+
+List example:
+
+```bash
+solverforge generate variable stops \
+  --entity Route \
+  --kind list \
+  --elements visits
+```
 
 ### Add Constraints
 
 ```bash
-# Unary constraint (single entity violations)
+# Unary constraint: penalize one entity at a time
 solverforge generate constraint max_hours --unary --hard
 
-# Pair constraint (conflicting pairs)
+# Pair constraint: compare pairs of entities
 solverforge generate constraint no_overlap --pair
 
-# Join constraint (entity-fact mismatch)
+# Join constraint: entity-fact mismatch
 solverforge generate constraint required_skill --join --hard
 
-# Balance constraint
+# Balance assignments
 solverforge generate constraint fair_distribution --balance
 
-# Reward constraint
+# Reward preferred states
 solverforge generate constraint preferred_shift --reward
 ```
 
-Options:
-
-- `--hard` — Hard constraint (default, conflicts with --soft)
-- `--soft` — Soft constraint (conflicts with --hard)
-- `--unary` — Penalize matching entities
-- `--pair` — Penalize conflicting pairs
-- `--join` — Penalize entity-fact mismatch
-- `--balance` — Balance assignments across entities
-- `--reward` — Reward matching entities
-- `--force` — Overwrite if constraint already exists
-- `--pretend` — Preview changes without writing files
+Constraint generation writes a skeleton into `src/constraints/` and updates
+`src/constraints/mod.rs`. Generated skeletons include placeholder TODOs, and
+pair templates intentionally panic inside the placeholder filter until you
+replace them with real domain logic.
 
 ### Generate Demo Data
 
@@ -152,16 +223,14 @@ solverforge generate data --size large
 solverforge generate data --mode stub
 ```
 
-Options:
-
-- `--mode <sample|stub>` — Data generation mode (default: sample)
-- `--size <small|standard|large>` — Default dataset size
-
 The `solverforge generate data` command rewrites the compiler-owned sample
 builders in `src/generated/data_seed.rs`. The stable wrapper in
 `src/data/mod.rs` delegates to that generated seed file by default, so the
 command can keep regenerating sample data without clobbering user-owned
 entrypoints. Dataset size defaults are persisted in `solverforge.app.toml`.
+
+`sample` mode generates generic deterministic values. `stub` mode keeps the
+shape but minimizes content so you can take over manually.
 
 ### Compound Scaffolding
 
@@ -174,17 +243,12 @@ solverforge generate scaffold shift employee_idx:usize --entity --constraint no_
 The first field becomes the planning variable. Remaining fields are extra entity
 fields.
 
-Options:
-
-- `--entity` — Also generate a planning entity
-- `--constraint <NAME>` — Also generate a constraint with this name
-- `--pair` — Also generate a paired twin entity named `<name>_pair`
-- `--force` — Overwrite if resources already exist
-- `--pretend` — Preview changes without writing files
+This command is useful when you already know the entity, its first solvable
+field, and the paired-entity or paired-constraint shape you want up front.
 
 ## Project Management Commands
 
-### View Project Info
+### View Project Summary
 
 ```bash
 solverforge info
@@ -198,7 +262,9 @@ Shows a summary of entities, facts, constraints, and score type.
 solverforge check
 ```
 
-Validates project structure and configuration.
+This validates the structure of `src/domain/`, `src/constraints/`, and
+`solver.toml`. It warns when an entity exists but still has no scalar or list
+planning variables.
 
 ### Run Tests
 
@@ -216,14 +282,15 @@ Runs `cargo test` with optional passthrough arguments.
 solverforge routes
 ```
 
-Lists HTTP routes defined in `src/api/`.
+This parses `src/api/routes.rs` and lists the generated routes. It is a quick
+way to verify whether your app still exposes the retained lifecycle and demo
+data surface you expect.
 
 ### Manage Solver Configuration
 
 ```bash
 solverforge config show
-solverforge config set termination.time_spent_seconds 60
-solverforge config set termination.best_score_limit 0hard/0soft
+solverforge config set termination.seconds_spent_limit 60
 ```
 
 ### Generate Shell Completions
@@ -250,17 +317,19 @@ solverforge destroy solution --yes
 
 These options work with any command:
 
-- `-q, --quiet` — Suppress all output except errors
-- `-v, --verbose` — Show extra diagnostic output
-- `--no-color` — Disable colored output (also respects `NO_COLOR` environment
+- `-q, --quiet` - suppress all output except errors
+- `-v, --verbose` - show extra diagnostic output
+- `--no-color` - disable colored output (also respects `NO_COLOR` environment
   variable)
 
 ## Next Steps
 
-- Continue with [Getting Started](/docs/getting-started/) for a broader
-  onboarding map.
-- Follow the
-  [Employee Scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
-  for a deeper domain-model walkthrough.
-- Explore [SolverForge](/docs/solverforge/) API-focused documentation for
-  modeling and constraints.
+- Read [Project Anatomy](../project-anatomy/) before you start heavy manual
+  edits.
+- Read [Modeling & Generation](../modeling-and-generation/) for the full
+  generator workflow.
+- Read [Configuration](../configuration/) before changing the solver or UI
+  metadata layers.
+- Keep [Command Reference](../command-reference/) open while working.
+- Continue with [SolverForge](/docs/solverforge/) when you need runtime-level
+  domain modeling and solver API detail.
