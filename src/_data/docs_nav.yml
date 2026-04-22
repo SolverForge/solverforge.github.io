@@ -20,6 +20,14 @@ docs:
     children:
       - title: Getting Started
         href: /docs/solverforge-cli/getting-started/
+      - title: Project Anatomy
+        href: /docs/solverforge-cli/project-anatomy/
+      - title: Modeling & Generation
+        href: /docs/solverforge-cli/modeling-and-generation/
+      - title: Configuration
+        href: /docs/solverforge-cli/configuration/
+      - title: Command Reference
+        href: /docs/solverforge-cli/command-reference/
   - title: SolverForge
     href: /docs/solverforge/
     children:
