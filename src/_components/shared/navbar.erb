@@ -1,0 +1,41 @@
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="site-brand" href="<%= relative_url '/' %>">
+      <img src="<%= relative_url '/images/brand/solverforge-header-dark-clean.svg' %>" alt="SolverForge" />
+    </a>
+
+    <div class="site-header__search">
+      <a class="site-search-trigger" href="<%= relative_url '/search/' %>" data-search-open>
+        <span class="site-search-trigger__copy">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <span class="site-search-trigger__text">Search docs, reference, releases, and guides</span>
+        </span>
+        <kbd><%= search_shortcut %></kbd>
+      </a>
+    </div>
+
+    <div class="site-header__actions">
+      <nav class="site-nav" id="site-nav" data-nav-menu>
+        <ul class="site-nav__list">
+          <% @navigation.each do |item| %>
+            <% url = item.fetch("url") %>
+            <li>
+              <a
+                class="site-nav__link <%= "is-active" if active?(item) %>"
+                href="<%= url %>"
+                <%= 'target="_blank" rel="noopener"' if external?(url) %>
+              >
+                <%= item.fetch("title") %>
+              </a>
+            </li>
+          <% end %>
+        </ul>
+      </nav>
+
+      <button class="site-header__toggle" data-nav-toggle aria-expanded="false" aria-controls="site-nav">
+        <span class="sr-only">Toggle navigation</span>
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+  </div>
+</header>

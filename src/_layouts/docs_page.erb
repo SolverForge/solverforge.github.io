@@ -1,0 +1,32 @@
+---
+layout: default
+---
+
+<%
+  nav_items =
+    if resource.relative_url.start_with?("/reference/")
+      site.data.reference_nav.reference
+    else
+      site.data.docs_nav.docs
+    end
+
+  nav_title = resource.relative_url.start_with?("/reference/") ? "Reference" : "Documentation"
+%>
+<section class="docs-shell">
+  <aside class="docs-shell__sidebar">
+    <%= render Docs::Sidebar.new(current_url: resource.relative_url, items: nav_items, title: nav_title) %>
+  </aside>
+
+  <article class="docs-shell__content">
+    <header class="docs-shell__header">
+      <p class="page-shell__eyebrow"><%= nav_title %></p>
+      <% if data.description %>
+        <p class="page-shell__lede"><%= data.description %></p>
+      <% end %>
+    </header>
+
+    <div class="prose">
+      <%= yield %>
+    </div>
+  </article>
+</section>

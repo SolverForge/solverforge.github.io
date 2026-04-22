@@ -1,0 +1,8 @@
+<aside class="ui-callout ui-callout--<%= @variant %>">
+  <% if title? %>
+    <p class="ui-callout__title"><%= @title %></p>
+  <% end %>
+  <div class="ui-callout__body">
+    <%= markdownify content %>
+  </div>
+</aside>

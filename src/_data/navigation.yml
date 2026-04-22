@@ -1,0 +1,48 @@
+main:
+  - title: Docs
+    url: /docs/
+  - title: Blog
+    url: /blog/
+  - title: Reference
+    url: /reference/
+  - title: About
+    url: /about/
+  - title: Community
+    url: /community/
+  - title: GitHub
+    url: https://github.com/SolverForge/solverforge
+
+footer:
+  product:
+    title: Product
+    links:
+      - title: Documentation
+        url: /docs/
+      - title: Reference
+        url: /reference/
+      - title: Blog
+        url: /blog/
+      - title: About
+        url: /about/
+      - title: Community
+        url: /community/
+  ecosystem:
+    title: Ecosystem
+    links:
+      - title: solverforge-cli
+        url: /docs/solverforge-cli/
+      - title: solverforge-ui
+        url: /docs/solverforge-ui/
+      - title: solverforge-maps
+        url: /docs/solverforge-maps/
+      - title: docs.rs
+        url: https://docs.rs/solverforge
+  community:
+    title: Community
+    links:
+      - title: GitHub Org
+        url: https://github.com/SolverForge
+      - title: Discord
+        url: https://discord.gg/pHwXZ2u3
+      - title: Crates.io
+        url: https://crates.io/crates/solverforge

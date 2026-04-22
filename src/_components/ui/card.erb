@@ -1,0 +1,22 @@
+<article class="ui-card">
+  <% if linked? %>
+    <a class="ui-card__inner" href="<%= @href %>">
+  <% else %>
+    <div class="ui-card__inner">
+  <% end %>
+      <% if @eyebrow %>
+        <p class="ui-card__eyebrow"><%= @eyebrow %></p>
+      <% end %>
+      <h3 class="ui-card__title">
+        <% if @icon %>
+          <i class="<%= @icon %>"></i>
+        <% end %>
+        <span><%= @title %></span>
+      </h3>
+      <div class="ui-card__content"><%= markdownify content %></div>
+  <% if linked? %>
+    </a>
+  <% else %>
+    </div>
+  <% end %>
+</article>

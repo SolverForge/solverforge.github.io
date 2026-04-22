@@ -1,0 +1,21 @@
+---
+title: Reference
+description: Dense engineering reference for SolverForge users, with internal maintainer notes clearly separated from the public library material.
+layout: docs_page
+page_class: page-reference
+---
+
+<h1>Reference</h1>
+
+<%= render Ui::Callout.new(title: "How Reference differs from Docs") do %>
+The main docs teach concepts, walkthroughs, and product surfaces. Reference is the compact decision-making layer: crate maps, modeling checklists, extension playbooks, and other pages you open when you already know what you are trying to build.
+<% end %>
+
+<div class="card-grid">
+  <% site.data.reference_nav.reference.each do |item| %>
+    <% icon = item.fetch("href").include?("/maintainers/") ? "fa-solid fa-screwdriver-wrench" : "fa-solid fa-book-open" %>
+    <%= render Ui::Card.new(title: item.fetch("title"), href: relative_url(item.fetch("href")), icon: icon) do %>
+<%= item.fetch("summary") %>
+    <% end %>
+  <% end %>
+</div>

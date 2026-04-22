@@ -1,0 +1,17 @@
+---
+layout: default
+---
+
+<article class="page-shell">
+  <header class="page-shell__header">
+    <p class="page-shell__eyebrow"><%= data.eyebrow || "SolverForge" %></p>
+    <h1><%= data.title %></h1>
+    <% if data.description %>
+      <p class="page-shell__lede"><%= data.description %></p>
+    <% end %>
+  </header>
+
+  <div class="prose">
+    <%= yield %>
+  </div>
+</article>

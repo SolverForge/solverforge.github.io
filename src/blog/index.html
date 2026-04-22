@@ -1,0 +1,35 @@
+---
+title: Blog
+description: Release notes, technical articles, and product direction updates from SolverForge.
+layout: page
+eyebrow: Journal
+---
+
+<%
+  posts = collections.posts.resources.sort_by(&:date).reverse
+  groups = {
+    "Releases" => posts.select { |post| Array(post.data.categories).include?("releases") },
+    "Technical" => posts.select { |post| Array(post.data.categories).include?("technical") },
+    "Essays" => posts.reject { |post| Array(post.data.categories).any? }
+  }
+%>
+
+<% groups.each do |label, entries| %>
+  <% next if entries.empty? %>
+  <section class="blog-section">
+    <h2><%= label %></h2>
+    <div class="blog-grid">
+      <% entries.each do |post| %>
+        <article class="blog-post-card">
+          <p class="blog-post-card__meta">
+            <time datetime="<%= post.date.strftime('%F') %>"><%= post.date.strftime("%B %-d, %Y") %></time>
+          </p>
+          <h3><a href="<%= post.relative_url %>"><%= post.data.title %></a></h3>
+          <% if post.data.description %>
+            <p><%= post.data.description %></p>
+          <% end %>
+        </article>
+      <% end %>
+    </div>
+  </section>
+<% end %>

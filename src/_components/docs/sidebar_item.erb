@@ -1,0 +1,10 @@
+<li class="docs-sidebar__item <%= "is-active" if active? %>">
+  <a class="docs-sidebar__link" href="<%= @item.fetch("href") %>"><%= @item.fetch("title") %></a>
+  <% if children.any? %>
+    <ul class="docs-sidebar__sublist">
+      <% children.each do |child| %>
+        <%= render Docs::SidebarItem.new(current_url: @current_url, item: child) %>
+      <% end %>
+    </ul>
+  <% end %>
+</li>

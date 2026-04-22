@@ -1,0 +1,82 @@
+docs:
+  - title: Overview
+    href: /docs/overview/
+  - title: Concepts
+    href: /docs/concepts/
+    children:
+      - title: What is Planning?
+        href: /docs/concepts/what-is-planning/
+      - title: Problem Types
+        href: /docs/concepts/problem-types/
+      - title: Terminology
+        href: /docs/concepts/terminology/
+  - title: Getting Started
+    href: /docs/getting-started/
+    children:
+      - title: Employee Scheduling
+        href: /docs/getting-started/employee-scheduling-rust/
+  - title: solverforge-cli
+    href: /docs/solverforge-cli/
+    children:
+      - title: Getting Started
+        href: /docs/solverforge-cli/getting-started/
+  - title: SolverForge
+    href: /docs/solverforge/
+    children:
+      - title: Domain Modeling
+        href: /docs/solverforge/modeling/
+        children:
+          - title: Planning Solutions
+            href: /docs/solverforge/modeling/planning-solutions/
+          - title: Planning Entities
+            href: /docs/solverforge/modeling/planning-entities/
+          - title: Problem Facts
+            href: /docs/solverforge/modeling/problem-facts/
+          - title: List Variables
+            href: /docs/solverforge/modeling/list-variables/
+      - title: Constraints
+        href: /docs/solverforge/constraints/
+        children:
+          - title: Constraint Streams
+            href: /docs/solverforge/constraints/constraint-streams/
+          - title: Joiners
+            href: /docs/solverforge/constraints/joiners/
+          - title: Collectors
+            href: /docs/solverforge/constraints/collectors/
+          - title: Score Types
+            href: /docs/solverforge/constraints/score-types/
+          - title: Score Analysis
+            href: /docs/solverforge/constraints/score-analysis/
+      - title: Solver
+        href: /docs/solverforge/solver/
+        children:
+          - title: Configuration
+            href: /docs/solverforge/solver/configuration/
+          - title: Phases
+            href: /docs/solverforge/solver/phases/
+          - title: Moves
+            href: /docs/solverforge/solver/moves/
+          - title: Termination
+            href: /docs/solverforge/solver/termination/
+          - title: SolverManager
+            href: /docs/solverforge/solver/solver-manager/
+  - title: solverforge-maps
+    href: /docs/solverforge-maps/
+    children:
+      - title: Getting Started
+        href: /docs/solverforge-maps/getting-started/
+      - title: Routing & Matrices
+        href: /docs/solverforge-maps/routing/
+      - title: Caching & Operations
+        href: /docs/solverforge-maps/caching/
+  - title: solverforge-ui
+    href: /docs/solverforge-ui/
+    children:
+      - title: Getting Started
+        href: /docs/solverforge-ui/getting-started/
+      - title: Components
+        href: /docs/solverforge-ui/components/
+      - title: Scheduling Views
+        href: /docs/solverforge-ui/scheduling-views/
+      - title: Integration & Assets
+        href: /docs/solverforge-ui/integration-assets/

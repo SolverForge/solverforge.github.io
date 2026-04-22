@@ -1,0 +1,23 @@
+---
+layout: default
+---
+
+<article class="post-shell">
+  <header class="post-shell__header">
+    <p class="page-shell__eyebrow"><%= Array(data.categories).first || "Notes" %></p>
+    <h1><%= data.title %></h1>
+    <div class="post-shell__meta">
+      <time datetime="<%= data.date.strftime('%F') %>"><%= data.date.strftime("%B %-d, %Y") %></time>
+      <% Array(data.tags).each do |tag| %>
+        <span class="tag-pill"><%= tag %></span>
+      <% end %>
+    </div>
+    <% if data.description %>
+      <p class="page-shell__lede"><%= data.description %></p>
+    <% end %>
+  </header>
+
+  <div class="prose">
+    <%= yield %>
+  </div>
+</article>

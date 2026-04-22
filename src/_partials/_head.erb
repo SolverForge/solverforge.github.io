@@ -1,0 +1,22 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<% resource_title = strip_html(strip_newlines(title)) %>
+<title><% if resource_title != "Index" && !resource_title.to_s.empty? %><%= resource_title %> | <%= metadata.title %><% else %><%= metadata.title %> | <%= metadata.tagline %><% end %></title>
+
+<meta name="description" content="<%= resource&.data&.description || metadata.description %>" />
+<meta property="og:title" content="<%= resource_title != 'Index' && !resource_title.to_s.empty? ? "#{resource_title} | #{metadata.title}" : "#{metadata.title} | #{metadata.tagline}" %>" />
+<meta property="og:description" content="<%= resource&.data&.description || metadata.description %>" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="<%= [metadata.url, resource&.relative_url].compact.join %>" />
+<link rel="canonical" href="<%= [metadata.url, resource&.relative_url].compact.join %>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="icon" type="image/svg+xml" href="<%= relative_url '/favicons/favicon.svg' %>" />
+<link rel="shortcut icon" href="<%= relative_url '/favicons/favicon.ico' %>" />
+<link rel="apple-touch-icon" href="<%= relative_url '/favicons/apple-touch-icon-180x180.png' %>" sizes="180x180" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Outfit:wght@500;600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<link rel="stylesheet" href="<%= asset_path :css %>" />
+<script src="<%= asset_path :js %>" defer></script>
+<%= live_reload_dev_js %>

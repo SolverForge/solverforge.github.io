@@ -1,0 +1,8 @@
+<nav class="docs-sidebar">
+  <p class="docs-sidebar__title"><%= @title %></p>
+  <ul class="docs-sidebar__list">
+    <% @items.each do |item| %>
+      <%= render Docs::SidebarItem.new(current_url: @current_url, item: item) %>
+    <% end %>
+  </ul>
+</nav>

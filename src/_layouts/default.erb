@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="<%= site.locale %>">
+  <head>
+    <%= render "head", metadata: site.metadata, resource: resource, title: data.title %>
+  </head>
+  <body class="site-shell <%= data.layout %> <%= data.page_class %>">
+    <%= render Shared::Navbar.new(metadata: site.metadata, navigation: site.data.navigation, resource: resource) %>
+    <%= render Shared::SearchSurface.new(mode: :overlay, index_url: relative_url('/search-index.json'), page_url: relative_url('/search/')) %>
+
+    <main class="site-main">
+      <%= yield %>
+    </main>
+
+    <%= render Shared::Footer.new(metadata: site.metadata, navigation: site.data.navigation) %>
+  </body>
+</html>

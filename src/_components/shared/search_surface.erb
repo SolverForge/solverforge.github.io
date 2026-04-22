@@ -1,0 +1,113 @@
+<section
+  class="search-surface search-surface--<%= @mode %>"
+  data-search-root
+  data-search-mode="<%= @mode %>"
+  data-search-index-url="<%= @index_url %>"
+  data-search-page-url="<%= @page_url %>"
+  <%= "hidden" if overlay? %>
+>
+  <% if overlay? %>
+    <button class="search-surface__scrim" type="button" data-search-close aria-label="Close search"></button>
+  <% end %>
+
+  <div
+    class="search-surface__panel"
+    <%= 'role="dialog" aria-modal="true" aria-labelledby="search-overlay-title"' if overlay? %>
+  >
+    <header class="search-surface__header">
+      <div>
+        <p class="search-surface__eyebrow">Search</p>
+        <% if overlay? %>
+          <h2 class="search-surface__title" id="search-overlay-title">Find anything across the whole site.</h2>
+          <p class="search-surface__summary">Docs, reference pages, blog posts, and top-level pages all live in one static index.</p>
+        <% else %>
+          <h1 class="search-surface__title">Search the whole SolverForge site.</h1>
+          <p class="search-surface__summary">Type naturally, use partial names, or search by version, component, or concept.</p>
+        <% end %>
+      </div>
+
+      <% if overlay? %>
+        <button class="search-surface__dismiss" type="button" data-search-close aria-label="Close search">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      <% end %>
+    </header>
+
+    <form class="search-surface__form" action="<%= @page_url %>" method="get" role="search">
+      <div class="search-surface__input-wrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          class="search-surface__input"
+          type="search"
+          name="q"
+          value=""
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="Search SolverForge, solverforge-ui, 0.8.12, scheduling views..."
+          data-search-input
+        />
+      </div>
+
+      <button class="search-surface__clear" type="button" data-search-clear>Clear</button>
+      <% if overlay? %>
+        <a class="search-surface__full-page" href="<%= @page_url %>">Open full page</a>
+      <% end %>
+    </form>
+
+    <div class="search-surface__toolbar">
+      <div class="search-surface__scopes" aria-label="Search scope">
+        <% Shared::SearchSurface::SCOPES.each do |scope, label| %>
+          <button
+            class="search-surface__scope"
+            type="button"
+            data-search-scope="<%= scope %>"
+            aria-pressed="<%= scope == "all" %>"
+          >
+            <%= label %>
+          </button>
+        <% end %>
+      </div>
+
+      <p class="search-surface__hint">
+        <span><kbd>/</kbd> focus</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> move</span>
+        <span><kbd>Enter</kbd> open</span>
+        <% if overlay? %>
+          <span><kbd>Esc</kbd> close</span>
+        <% end %>
+      </p>
+    </div>
+
+    <div class="search-surface__status" data-search-status>
+      Search is build-time indexed in Ruby and served as static JSON.
+    </div>
+
+    <div class="search-surface__empty" data-search-empty>
+      <div class="search-surface__empty-copy">
+        <h3>Start broad, then narrow down.</h3>
+        <p>
+          Search across tutorials, API concepts, release notes, integration guides, and operational reference pages without leaving the static site.
+        </p>
+      </div>
+
+      <div class="search-surface__quick-links">
+        <% Shared::SearchSurface::QUICK_LINKS.each do |url, title, body| %>
+          <a class="search-quick-link" href="<%= relative_url url %>">
+            <span class="search-quick-link__title"><%= title %></span>
+            <span class="search-quick-link__body"><%= body %></span>
+          </a>
+        <% end %>
+      </div>
+
+      <noscript>
+        <p class="search-surface__noscript">
+          JavaScript is required for live fuzzy search. Without it, use your browser page search or the quick links above.
+        </p>
+      </noscript>
+    </div>
+
+    <div class="search-surface__results-frame" data-search-results-frame hidden>
+      <div class="search-surface__results" data-search-results></div>
+    </div>
+  </div>
+</section>
