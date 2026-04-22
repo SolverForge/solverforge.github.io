@@ -6,7 +6,7 @@ description: "Internal maintainer note for retained-job lifecycle, snapshot iden
 # Lifecycle Pause / Resume Contract
 
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
-This page is for SolverForge maintainers and coding agents. It records the retained-job lifecycle contract shared across the runtime, CLI, and UI; it is not the primary starting point for library users.
+This page is for SolverForge maintainers. It records the retained-job lifecycle contract shared across the runtime, CLI, and UI; it is not the primary starting point for library users.
 <% end %>
 
 Date: 2026-04-06
@@ -462,8 +462,8 @@ Exact version bumps are not automatic and are not authorized by this PRD alone.
 - changelogs are not to be authored manually in implementation PRs for this
   initiative
 - changelog generation remains under `commit-and-tag-version`
-- no version bump may be performed by the agent without explicit user
-  confirmation at the time the repo is ready
+- no version bump may be performed without explicit user confirmation at the
+  time the repo is ready
 - release execution remains user-managed
 
 ### Release order
