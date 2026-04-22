@@ -7,7 +7,7 @@ description: Native Rust constraint solving for planning, scheduling, routing, a
 
 <section class="home-shell">
   <section class="home-hero">
-    <p class="page-shell__eyebrow">Rust-native optimization infrastructure</p>
+    <p class="page-shell__eyebrow">AI Optimization Framework and Solver</p>
     <h1>Build planning software without switching to a solver language.</h1>
     <p class="home-hero__summary">
       SolverForge keeps domain models, constraints, runtime control, and static documentation in one inspectable codebase. You write the business rules in Rust, the solver stays zero-erasure all the way down, and the docs remain readable both on disk and on the web.
@@ -31,7 +31,7 @@ description: Native Rust constraint solving for planning, scheduling, routing, a
 
   <section class="home-section home-section--split">
     <div>
-      <p class="page-shell__eyebrow">Constraint code</p>
+      <p class="page-shell__eyebrow">Write constraints like you write code</p>
       <h2>Readable rules, explicit tradeoffs, real application shapes.</h2>
       <p>
         Model shifts, routes, tasks, workers, vehicles, and inventories as ordinary application code. SolverForge keeps the runtime concrete and inspectable while Bridgetown turns the same repository into a polished documentation site.
@@ -73,7 +73,7 @@ Open the engineering handbooks, crate maps, extension playbooks, and clearly lab
   </section>
 
   <section class="home-section">
-    <p class="page-shell__eyebrow">Ecosystem</p>
+    <p class="page-shell__eyebrow">An entire Free, Open Source Ecosystem</p>
     <h2>Solver core, UI primitives, routing helpers, and reference docs in one surface.</h2>
     <div class="card-grid">
       <%= render Ui::Card.new(title: "solverforge-cli", href: relative_url('/docs/solverforge-cli/'), icon: "fa-solid fa-terminal") do %>
