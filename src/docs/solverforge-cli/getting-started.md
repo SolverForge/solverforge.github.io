@@ -19,13 +19,16 @@ This guide walks the default CLI-first onboarding path:
 
 ## Prerequisites
 
-- Rust stable `1.80+`
+- Rust stable `1.80+` to build the CLI itself
+- The Rust toolchain required by the scaffolded runtime target reported by
+  `solverforge --version`
 - Cargo
 - A working C toolchain for Rust dependencies on your platform
 
 The CLI crate itself declares `rust-version = "1.80"`. Generated applications
-then compile against the scaffolded SolverForge crate targets reported by
-`solverforge --version`.
+compile against the scaffolded SolverForge crate targets reported by
+`solverforge --version`; use the runtime crate metadata as the source of truth
+for the generated app's Rust version requirement.
 
 ## Install or Update the CLI
 
@@ -55,12 +58,12 @@ current scaffold targets for the runtime, UI, and maps crates.
 solverforge --version
 ```
 
-With `solverforge-cli 1.1.3`, the output includes:
+The output includes:
 
-- CLI version `1.1.3`
-- scaffold runtime target `solverforge 0.9.0`
-- scaffold UI target `solverforge-ui 0.5.1`
-- scaffold maps target `solverforge-maps 2.1.3`
+- CLI version
+- scaffold runtime target
+- scaffold UI target
+- scaffold maps target
 - explicit source labels for each dependency line used in new projects
 
 ## Create a New Project
@@ -168,9 +171,9 @@ solverforge generate variable resource_idx --entity Task --kind scalar --range r
 solverforge generate variable stops --entity Route --kind list --elements visits
 ```
 
-Use `scalar` for standard one-value assignment variables and `list` for
-sequence variables. The CLI still accepts legacy `standard`, but the canonical
-term in current docs and metadata is `scalar`.
+Use `scalar` for single-value assignment variables and `list` for sequence
+variables. The only valid `--kind` values are `scalar` and `list`; `standard` is
+only the default demo data size label.
 
 Scalar example:
 
@@ -224,10 +227,10 @@ solverforge generate data --mode stub
 ```
 
 The `solverforge generate data` command rewrites the compiler-owned sample
-builders in `src/generated/data_seed.rs`. The stable wrapper in
-`src/data/mod.rs` delegates to that generated seed file by default, so the
-command can keep regenerating sample data without clobbering user-owned
-entrypoints. Dataset size defaults are persisted in `solverforge.app.toml`.
+builders in `src/data/data_seed.rs`. The stable wrapper in `src/data/mod.rs`
+delegates to that generated seed file by default, so the command can keep
+regenerating sample data without clobbering user-owned entrypoints. Dataset size
+defaults are persisted in `solverforge.app.toml`.
 
 `sample` mode generates generic deterministic values. `stub` mode keeps the
 shape but minimizes content so you can take over manually.
@@ -282,9 +285,9 @@ Runs `cargo test` with optional passthrough arguments.
 solverforge routes
 ```
 
-This parses `src/api/routes.rs` and lists the generated routes. It is a quick
-way to verify whether your app still exposes the retained lifecycle and demo
-data surface you expect.
+This parses `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs` and lists the
+generated routes. It is a quick way to verify whether your app still exposes the
+retained lifecycle and demo data surface you expect.
 
 ### Manage Solver Configuration
 
@@ -303,14 +306,15 @@ solverforge completions fish > ~/.config/fish/completions/solverforge.fish
 
 ## Remove Resources
 
-All destroy commands support `--yes` (or `-y`) to skip confirmation.
+All destroy commands support `--yes` (or `-y`) to skip confirmation. Place it on
+the `destroy` command before the resource subcommand.
 
 ```bash
-solverforge destroy entity task --yes
-solverforge destroy constraint no_overlap --yes
-solverforge destroy variable --entity Task resource_idx --yes
-solverforge destroy fact employee --yes
-solverforge destroy solution --yes
+solverforge destroy --yes entity task
+solverforge destroy --yes constraint no_overlap
+solverforge destroy --yes variable --entity Task resource_idx
+solverforge destroy --yes fact employee
+solverforge destroy --yes solution
 ```
 
 ## Global Options

@@ -76,7 +76,7 @@ the solver cannot optimize it.
 
 ## Scalar Variables
 
-The canonical term is now `scalar`, not `standard`.
+The canonical one-value assignment kind is `scalar`.
 
 ```bash
 solverforge generate variable resource_idx \
@@ -104,8 +104,8 @@ Useful flags:
 - `--range <FACT_COLLECTION>` - value range collection name
 - `--allows-unassigned` - allow `None`
 
-The CLI still accepts legacy `--kind standard`, but generated metadata is
-normalized to `scalar`.
+`standard` is not a variable kind in the current CLI. It remains only as the
+default demo data size label.
 
 ## List Variables
 
@@ -222,7 +222,7 @@ Supported modes:
 
 What happens on each run:
 
-- `src/generated/data_seed.rs` is rewritten
+- `src/data/data_seed.rs` is rewritten
 - `solverforge.app.toml` stores the selected default size
 - `static/generated/ui-model.json` is refreshed from the app spec
 
@@ -263,10 +263,10 @@ solverforge destroy constraint no_overlap
 solverforge destroy solution
 ```
 
-Use `--yes` or `-y` to skip the confirmation prompt:
+Use `--yes` or `-y` on the `destroy` command to skip the confirmation prompt:
 
 ```bash
-solverforge destroy constraint no_overlap --yes
+solverforge destroy --yes constraint no_overlap
 ```
 
 Destroy operations update the same managed surfaces used by generation:

@@ -1,44 +1,78 @@
 ---
 title: Command Reference
 description: >
-  Complete command, flag, and example reference for solverforge-cli 1.1.3.
+  Complete command, argument, option, and example reference for solverforge-cli.
 weight: 5
 ---
 
 # Command Reference
 
-The top-level CLI surface is:
+The public CLI surface is:
 
 ```text
 solverforge [OPTIONS] <COMMAND>
 ```
 
+`solverforge-cli` enables Clap subcommand inference, so unambiguous command
+prefixes may work. The documented interface uses full command names.
+
 ## Global Options
 
-These options work with every command:
+These options are global and can be used with any command:
 
 | Option | Meaning |
 | ------ | ------- |
 | `-q, --quiet` | Suppress all output except errors |
 | `-v, --verbose` | Show extra diagnostic output |
-| `--no-color` | Disable colored output and respect `NO_COLOR` |
-| `-h, --help` | Print help |
-| `-V, --version` | Print the long version report with scaffold targets |
+| `--no-color` | Disable colored output; `NO_COLOR` is also respected |
+
+Top-level help and version options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `-h, --help` | Print top-level help |
+| `-V, --version` | Print the CLI version plus scaffold target versions |
+
+Every subcommand also supports `--help`.
 
 ## Top-Level Commands
 
 | Command | Purpose |
 | ------- | ------- |
-| `new` | Scaffold a new SolverForge project |
+| `new` | Scaffold a new neutral SolverForge project |
 | `generate` | Add a generated resource to the current project |
 | `destroy` | Remove a generated resource from the current project |
 | `server` | Start the generated development server |
 | `info` | Summarize entities, facts, constraints, and score type |
 | `check` | Validate project structure and configuration |
-| `test` | Run `cargo test` with passthrough args |
-| `routes` | List routes defined in `src/api/routes.rs` |
+| `test` | Run `cargo test` with passthrough arguments |
+| `routes` | List HTTP routes defined in `src/api/` |
 | `config` | Show or set values in `solver.toml` |
 | `completions` | Generate shell completions |
+| `help` | Print top-level or subcommand help |
+
+## Version And Help
+
+```bash
+solverforge --version
+solverforge --help
+solverforge help generate
+solverforge generate variable --help
+```
+
+`solverforge --version` reports the CLI package version separately from the
+crate targets used by newly scaffolded projects:
+
+```text
+solverforge solverforge-cli <cli-version>
+CLI version: <cli-version>
+Scaffold runtime target: <solverforge target>
+Scaffold UI target: <solverforge-ui target>
+Scaffold maps target: <solverforge-maps target>
+Runtime source: <runtime source>
+UI source: <ui source>
+Maps source: <maps source>
+```
 
 ## `solverforge new`
 
@@ -46,14 +80,30 @@ These options work with every command:
 solverforge new [OPTIONS] <NAME>
 ```
 
+Creates one neutral project shell. There are no public starter-family flags such
+as `--scalar`, `--list`, or `--mixed`; scalar, list, and mixed models are created
+after scaffolding with `solverforge generate ...`.
+
 Arguments:
 
-- `<NAME>` - project directory name
+| Argument | Meaning |
+| -------- | ------- |
+| `<NAME>` | Project directory to create |
 
 Options:
 
-- `--skip-git` - skip `git init` and the initial commit
-- `--skip-readme` - do not generate `README.md`
+| Option | Meaning |
+| ------ | ------- |
+| `--skip-git` | Skip `git init` and the initial commit |
+| `--skip-readme` | Do not generate `README.md` |
+
+Project names must start with an ASCII letter and contain only letters, digits,
+hyphens, or underscores. Hyphens are converted to underscores for the generated
+Rust crate name, and Rust keywords are rejected.
+
+Unless `--skip-git` is set, the command initializes a Git repository and attempts
+an initial commit. Unless `--skip-readme` is set, it writes a generated README.
+When not running quiet, it prompts to run `cargo check` after scaffolding.
 
 Example:
 
@@ -61,86 +111,28 @@ Example:
 solverforge new my-optimizer
 ```
 
-## `solverforge server`
-
-```text
-solverforge server [OPTIONS]
-```
-
-Options:
-
-- `-p, --port <PORT>` - bind a different port, default `7860`
-- `--debug` - run `cargo run` instead of `cargo run --release`
-
-Examples:
-
-```bash
-solverforge server
-solverforge server --port 8080
-solverforge server --debug
-```
-
-## `solverforge info`
-
-```text
-solverforge info
-```
-
-Prints:
-
-- project name
-- planning solution type
-- score type
-- facts
-- entities
-- scalar and list solvable fields
-- constraints
-- presence of `solver.toml`
-
-## `solverforge check`
-
-```text
-solverforge check
-```
-
-Checks:
-
-- `src/domain/` exists
-- a planning solution can be parsed
-- entity modules declared in `src/domain/mod.rs` exist
-- constraint modules declared in `src/constraints/mod.rs` exist
-- `solver.toml` exists
-- entities without planning variables are flagged as warnings
-
-## `solverforge routes`
-
-```text
-solverforge routes
-```
-
-Parses `src/api/routes.rs` and lists the generated HTTP route table.
-
-## `solverforge test`
-
-```text
-solverforge test [EXTRA_ARGS]...
-```
-
-Examples:
-
-```bash
-solverforge test
-solverforge test -- --nocapture
-solverforge test integration
-```
-
-This is a convenience wrapper around `cargo test`.
-
 ## `solverforge generate`
 
 ```text
-solverforge generate <SUBCOMMAND>
+solverforge generate [OPTIONS] <COMMAND>
 ```
+
+Adds resources to an existing generated project. Generator commands assume the
+current project still has the managed `@solverforge:begin ...` /
+`@solverforge:end ...` regions used by the current scaffold.
+
+Subcommands:
+
+| Subcommand | Purpose |
+| ---------- | ------- |
+| `constraint` | Add a constraint skeleton to `src/constraints/` |
+| `entity` | Add a planning entity struct in `src/domain/` |
+| `fact` | Add a problem fact struct in `src/domain/` |
+| `solution` | Add or replace the neutral planning solution struct |
+| `variable` | Add a scalar or list planning variable to an existing entity |
+| `score` | Change the score type in the existing planning solution |
+| `data` | Regenerate compiler-owned demo data from the project model |
+| `scaffold` | Run a compound entity, constraint, and paired-entity generator |
 
 ### `generate fact`
 
@@ -148,11 +140,23 @@ solverforge generate <SUBCOMMAND>
 solverforge generate fact [OPTIONS] <NAME>
 ```
 
+Arguments:
+
+| Argument | Meaning |
+| -------- | ------- |
+| `<NAME>` | Fact name in snake_case, such as `employee` |
+
 Options:
 
-- `--field <NAME:TYPE>` - repeatable extra field
-- `-f, --force` - overwrite if the fact exists
-- `--pretend` - preview only
+| Option | Meaning |
+| ------ | ------- |
+| `--field <NAME:TYPE>` | Add a repeatable extra Rust field |
+| `-f, --force` | Overwrite the fact file if it already exists |
+| `--pretend` | Preview changes without writing files |
+
+Creates `src/domain/<name>.rs`, updates `src/domain/mod.rs`, wires the collection
+into the planning solution, and syncs `solverforge.app.toml` plus the generated
+UI model.
 
 Example:
 
@@ -166,12 +170,24 @@ solverforge generate fact employee --field "skill:String"
 solverforge generate entity [OPTIONS] <NAME>
 ```
 
+Arguments:
+
+| Argument | Meaning |
+| -------- | ------- |
+| `<NAME>` | Entity name in snake_case, such as `shift` |
+
 Options:
 
-- `--planning-variable <FIELD>` - add the first scalar variable immediately
-- `--field <NAME:TYPE>` - repeatable extra field
-- `-f, --force` - overwrite if the entity exists
-- `--pretend` - preview only
+| Option | Meaning |
+| ------ | ------- |
+| `--planning-variable <FIELD>` | Add an optional scalar planning-variable placeholder |
+| `--field <NAME:TYPE>` | Add a repeatable extra Rust field |
+| `-f, --force` | Overwrite the entity file if it already exists |
+| `--pretend` | Preview changes without writing files |
+
+`--planning-variable` emits `#[planning_variable(allows_unassigned = true)]`
+with an `Option<usize>` field. Use `generate variable` when you need to add a
+variable with an explicit scalar range or list element collection.
 
 Example:
 
@@ -185,13 +201,24 @@ solverforge generate entity shift --planning-variable employee_idx
 solverforge generate variable [OPTIONS] --entity <ENTITY_TYPE> --kind <KIND> <FIELD>
 ```
 
+Arguments:
+
+| Argument | Meaning |
+| -------- | ------- |
+| `<FIELD>` | Variable field name in snake_case |
+
 Options:
 
-- `--entity <ENTITY_TYPE>` - target entity struct
-- `--kind <KIND>` - `scalar` or `list`; legacy `standard` is still accepted
-- `--range <FACT_COLLECTION>` - scalar value range collection
-- `--elements <FACT_COLLECTION>` - list element collection
-- `--allows-unassigned` - scalar variables only
+| Option | Meaning |
+| ------ | ------- |
+| `--entity <ENTITY_TYPE>` | Target entity struct name, such as `Shift` |
+| `--kind <KIND>` | Variable kind; valid values are `scalar` and `list` |
+| `--range <FACT_COLLECTION>` | Required for `--kind scalar`; source fact collection |
+| `--elements <FACT_COLLECTION>` | Required for `--kind list`; list element collection |
+| `--allows-unassigned` | Scalar only; generate an optional assignment |
+
+`standard` is not a variable kind. It is only the default demo data size label
+used by `solverforge.app.toml`.
 
 Examples:
 
@@ -206,17 +233,39 @@ solverforge generate variable stops --entity Route --kind list --elements visits
 solverforge generate constraint [OPTIONS] <NAME>
 ```
 
-Options:
+Arguments:
 
-- `--hard` - hard constraint, default
-- `--soft` - soft constraint
-- `--unary`
-- `--pair`
-- `--join`
-- `--balance`
-- `--reward`
-- `-f, --force`
-- `--pretend`
+| Argument | Meaning |
+| -------- | ------- |
+| `<NAME>` | Constraint module name in snake_case |
+
+Hardness options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `--hard` | Hard constraint; this is the default for hard-capable patterns |
+| `--soft` | Soft constraint |
+
+Pattern options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `--unary` | Penalize matching entities with `for_each + filter + penalize` |
+| `--pair` | Penalize conflicting pairs with pairwise comparison |
+| `--join` | Penalize entity-fact mismatch with `for_each + join` |
+| `--balance` | Generate a load-balance style soft constraint |
+| `--reward` | Reward matching entities with `for_each + filter + reward` |
+
+Write options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `-f, --force` | Overwrite the constraint file if it already exists |
+| `--pretend` | Preview changes without writing files |
+
+Choose at most one pattern flag. If no pattern flag is supplied, the command
+scans the current domain and opens an interactive wizard. `--balance` and
+`--reward` imply soft scoring in the current generator.
 
 Examples:
 
@@ -232,9 +281,20 @@ solverforge generate constraint required_skill --join --hard
 solverforge generate solution [OPTIONS] <NAME>
 ```
 
+Arguments:
+
+| Argument | Meaning |
+| -------- | ------- |
+| `<NAME>` | Solution name in snake_case, such as `schedule` |
+
 Options:
 
-- `--score <SCORE_TYPE>` - default `HardSoftScore`
+| Option | Meaning |
+| ------ | ------- |
+| `--score <SCORE_TYPE>` | Score type; default `HardSoftScore` |
+
+A fresh neutral scaffold can be replaced once by this command. If the project is
+already shaped, destroy the existing solution first.
 
 Example:
 
@@ -245,13 +305,22 @@ solverforge generate solution schedule --score HardSoftScore
 ### `generate score`
 
 ```text
-solverforge generate score <SCORE_TYPE>
+solverforge generate score [OPTIONS] <SCORE_TYPE>
 ```
+
+Arguments:
+
+| Argument | Meaning |
+| -------- | ------- |
+| `<SCORE_TYPE>` | Score type, such as `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore`, or `SimpleScore` |
+
+Updates the score type in the existing planning solution and syncs generated
+metadata.
 
 Example:
 
 ```bash
-solverforge generate score HardMediumSoftScore
+solverforge generate score HardSoftDecimalScore
 ```
 
 ### `generate data`
@@ -262,8 +331,14 @@ solverforge generate data [OPTIONS]
 
 Options:
 
-- `--mode <MODE>` - `sample` or `stub`, default `sample`
-- `--size <SIZE>` - `small`, `standard`, or `large`
+| Option | Meaning |
+| ------ | ------- |
+| `--mode <MODE>` | Data generation mode; valid values are `sample` and `stub`; default `sample` |
+| `--size <SIZE>` | Default demo size; valid values are `small`, `standard`, and `large` |
+
+The command rewrites `src/data/data_seed.rs`, ensures the stable
+`src/data/mod.rs` wrapper exists, and updates `[demo].default_size` in
+`solverforge.app.toml` when `--size` is provided.
 
 Examples:
 
@@ -279,85 +354,179 @@ solverforge generate data --mode stub
 solverforge generate scaffold [OPTIONS] <NAME> [FIELDS]...
 ```
 
-Behavior:
+Arguments:
 
-- `<NAME>` is the base entity name
-- the first field becomes the planning variable seed
+| Argument | Meaning |
+| -------- | ------- |
+| `<NAME>` | Base entity name in snake_case |
+| `[FIELDS]...` | Optional `name:Type` field specs; the first field becomes the planning-variable seed |
 
 Options:
 
-- `--entity`
-- `--constraint <CONSTRAINT_NAME>`
-- `--pair`
-- `-f, --force`
-- `--pretend`
+| Option | Meaning |
+| ------ | ------- |
+| `--entity` | Generate a planning entity for `<NAME>` |
+| `--constraint <CONSTRAINT_NAME>` | Generate a constraint with this name |
+| `--pair` | Generate a paired twin entity named `<name>_pair`; if a constraint is also generated, use the pair pattern |
+| `-f, --force` | Overwrite resources if they already exist |
+| `--pretend` | Preview changes without writing files |
 
-Example:
+Examples:
 
 ```bash
 solverforge generate scaffold shift employee_idx:usize --entity --constraint no_overlap --pair
+solverforge generate scaffold task resource_idx:usize --entity
 ```
 
 ## `solverforge destroy`
 
 ```text
-solverforge destroy [OPTIONS] <SUBCOMMAND>
+solverforge destroy [OPTIONS] <COMMAND>
 ```
 
-Top-level options:
+Removes generated resources and resyncs the app spec and UI model. The
+confirmation flag belongs to the `destroy` command itself, so place it before
+the resource subcommand.
 
-- `-y, --yes` - skip confirmation
+Options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `-y, --yes` | Skip the confirmation prompt |
 
 Subcommands:
 
-| Subcommand | Purpose |
-| ---------- | ------- |
-| `destroy solution` | Remove the planning solution struct |
-| `destroy entity <NAME>` | Remove an entity |
-| `destroy variable --entity <TYPE> <FIELD>` | Remove a planning variable from an entity |
-| `destroy fact <NAME>` | Remove a fact |
-| `destroy constraint <NAME>` | Remove a constraint |
+| Subcommand | Usage | Purpose |
+| ---------- | ----- | ------- |
+| `solution` | `solverforge destroy [OPTIONS] solution` | Remove the planning solution struct |
+| `entity` | `solverforge destroy [OPTIONS] entity <NAME>` | Remove a planning entity and unwire its solution collection |
+| `variable` | `solverforge destroy [OPTIONS] variable --entity <ENTITY_TYPE> <FIELD>` | Remove a planning variable field from an entity |
+| `fact` | `solverforge destroy [OPTIONS] fact <NAME>` | Remove a problem fact and unwire its solution collection |
+| `constraint` | `solverforge destroy [OPTIONS] constraint <NAME>` | Remove a constraint module and registry entry |
 
 Examples:
 
 ```bash
 solverforge destroy entity shift
-solverforge destroy constraint no_overlap --yes
+solverforge destroy --yes constraint no_overlap
+solverforge destroy -y variable --entity Task resource_idx
+```
+
+## `solverforge server`
+
+```text
+solverforge server [OPTIONS]
+```
+
+Options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `-p, --port <PORT>` | Set the `PORT` environment variable for the generated server; default `7860` |
+| `--debug` | Run `cargo run` instead of `cargo run --release` |
+
+By default the command runs the generated app with `cargo run --release`.
+
+Examples:
+
+```bash
+solverforge server
+solverforge server --port 8080
+solverforge server --debug
+```
+
+## `solverforge info`
+
+```text
+solverforge info [OPTIONS]
+```
+
+Prints the project name, planning solution type, score type, entities, facts,
+scalar and list solvable fields, constraints, and whether `solver.toml` exists.
+It requires a generated-style `src/domain/` directory.
+
+## `solverforge check`
+
+```text
+solverforge check [OPTIONS]
+```
+
+Validates:
+
+| Check | Result |
+| ----- | ------ |
+| `src/domain/` exists | Errors if missing |
+| planning solution parses | Errors if no solution is found |
+| entity modules in `src/domain/mod.rs` exist | Errors for missing files |
+| constraint modules in `src/constraints/mod.rs` exist | Errors for missing files |
+| `solver.toml` exists | Warns if missing |
+| entities have solvable fields | Warns for entities with no scalar or list variable |
+
+## `solverforge routes`
+
+```text
+solverforge routes [OPTIONS]
+```
+
+Searches for `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs`, then parses
+Axum `.route("...", method(handler))` calls and prints a `METHOD / PATH /
+HANDLER` table.
+
+## `solverforge test`
+
+```text
+solverforge test [OPTIONS] [EXTRA_ARGS]...
+```
+
+Arguments:
+
+| Argument | Meaning |
+| -------- | ------- |
+| `[EXTRA_ARGS]...` | Arguments passed directly to `cargo test` |
+
+Examples:
+
+```bash
+solverforge test
+solverforge test -- --nocapture
+solverforge test integration
 ```
 
 ## `solverforge config`
 
 ```text
-solverforge config <SUBCOMMAND>
+solverforge config [OPTIONS] <COMMAND>
 ```
 
 Subcommands:
 
-| Subcommand | Purpose |
-| ---------- | ------- |
-| `config show` | Print `solver.toml` |
-| `config set <KEY> <VALUE>` | Set a dotted key path in `solver.toml` |
+| Subcommand | Usage | Purpose |
+| ---------- | ----- | ------- |
+| `show` | `solverforge config show` | Print the contents of `solver.toml` |
+| `set` | `solverforge config set <KEY> <VALUE>` | Set a dotted TOML key path in `solver.toml` |
+
+`config set` parses values as integer, float, boolean (`true` or `false`), then
+string. Intermediate TOML tables are created when needed.
 
 Examples:
 
 ```bash
 solverforge config show
 solverforge config set termination.seconds_spent_limit 60
+solverforge config set phases.acceptor.type late_acceptance
 ```
 
 ## `solverforge completions`
 
 ```text
-solverforge completions <SHELL>
+solverforge completions [OPTIONS] <SHELL>
 ```
 
-Supported shells:
+Arguments:
 
-- `bash`
-- `elvish`
-- `fish`
-- `powershell`
-- `zsh`
+| Argument | Meaning |
+| -------- | ------- |
+| `<SHELL>` | One of `bash`, `elvish`, `fish`, `powershell`, or `zsh` |
 
 Examples:
 
@@ -365,15 +534,4 @@ Examples:
 solverforge completions bash >> ~/.bashrc
 solverforge completions zsh >> ~/.zshrc
 solverforge completions fish > ~/.config/fish/completions/solverforge.fish
-```
-
-## Help Pattern
-
-Every command supports `--help`. Examples:
-
-```bash
-solverforge --help
-solverforge generate --help
-solverforge generate variable --help
-solverforge destroy --help
 ```

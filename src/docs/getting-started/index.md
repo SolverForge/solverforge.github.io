@@ -48,11 +48,11 @@ Open `http://localhost:7860` to see the generated app shell.
 ```bash
 solverforge generate fact resource --field category:String --field load:i32
 solverforge generate entity task --field label:String --field priority:i32
-solverforge generate variable resource_idx --entity Task --kind standard --range resources --allows-unassigned
+solverforge generate variable resource_idx --entity Task --kind scalar --range resources --allows-unassigned
 solverforge generate data --size large
 ```
 
-The current CLI no longer asks you to pick a modeling shape up front. Standard-variable, list-variable, and mixed modeling are introduced through generation and `solverforge.app.toml` after scaffolding.
+The current CLI no longer asks you to pick a modeling shape up front. Scalar-variable, list-variable, and mixed modeling are introduced through generation and `solverforge.app.toml` after scaffolding.
 
 ## Where to Read More
 

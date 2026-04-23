@@ -11,10 +11,9 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual is aligned with `solverforge-cli` <strong>v1.1.3</strong>. Fresh
-projects currently target `solverforge 0.9.0`, `solverforge-ui 0.5.1`, and
-`solverforge-maps 2.1.3`. Run `solverforge --version` to confirm the exact
-targets baked into the binary you have installed.
+This manual documents the current `solverforge-cli` interface. Fresh projects
+use the scaffold targets baked into the binary you have installed; run
+`solverforge --version` to confirm the exact runtime, UI, and maps targets.
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It

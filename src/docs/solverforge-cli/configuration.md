@@ -71,12 +71,12 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "1.1.3"
+cli_version = "<cli-version>"
 
 [runtime]
-target = "solverforge 0.9.0"
-runtime_source = "crates.io: solverforge 0.9.0"
-ui_source = "crates.io: solverforge-ui 0.5.1"
+target = "<solverforge target>"
+runtime_source = "<runtime source>"
+ui_source = "<ui source>"
 
 [demo]
 default_size = "standard"
@@ -156,7 +156,7 @@ It is part of the shipped generated shell and stays aligned with the app spec.
 
 `solverforge generate data --size large` does two things:
 
-1. rewrites `src/generated/data_seed.rs`
+1. rewrites `src/data/data_seed.rs`
 2. updates `[demo].default_size` in `solverforge.app.toml`
 
 That means the selected default dataset is part of the scaffold contract, not
