@@ -9,9 +9,8 @@ weight: 1
 # Getting Started with solverforge-ui
 
 <%= render Ui::Callout.new do %>
-This guide follows the current `solverforge-ui`
-**v0.5.1** surface: retained jobs, typed lifecycle events, and exact paused or
-terminal snapshot sync.
+This guide follows the current `solverforge-ui` surface: retained jobs, typed
+lifecycle events, and exact paused or terminal snapshot sync.
 <% end %>
 
 This guide covers the verified integration path:
@@ -28,8 +27,7 @@ This guide covers the verified integration path:
 axum = "0.8"
 solverforge-ui = "0.5"
 
-# Pin the current GitHub release exactly when needed:
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.5.1" }
+# Pin a specific GitHub release tag when you need exact reproducibility.
 ```
 
 ## Mount `/sf/*` Routes in Axum

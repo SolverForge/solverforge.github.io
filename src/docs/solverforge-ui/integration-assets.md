@@ -9,8 +9,7 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui` **v0.5.1**
-contract is job-oriented and lifecycle-typed. New integrations should expose
+The current `solverforge-ui` contract is job-oriented and lifecycle-typed. New integrations should expose
 retained jobs, explicit `eventType` payloads, and exact paused or terminal
 snapshots.
 <% end %>
