@@ -72,7 +72,7 @@ When `constraints = "..."` is present, `#[planning_solution]` also generates:
 
 - A `{Name}ConstraintStreams<Sc>` trait implemented on `ConstraintFactory`, so
   you can write `factory.shifts()` instead of repeating `for_each(...)`
-- `Solvable` for channel-based solving through `SolverManager`
+- `Solvable` for retained-job solving through `SolverManager::solve()`
 - `Analyzable` for score breakdowns via `analyze()`
 
 For advanced list-shadow workflows, the struct can also carry

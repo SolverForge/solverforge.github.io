@@ -164,15 +164,16 @@ constraints.
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation set is aligned with **SolverForge 0.8.12** and the
-current crate line targets **Rust 1.92+**.
+in Rust. This documentation tracks the current public SolverForge runtime
+surface; check the crate metadata for the exact version and Rust toolchain
+requirements used by your checkout or dependency resolver.
 <% end %>
 
 ## Current Status
 
 | Component     | Status              | Description                                                      |
 | ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current `0.8.12` runtime surface |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current runtime surface |
 
 **Want to try it today?**
 
@@ -193,7 +194,7 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   `IndictmentMap`
 - **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
 - **Solver Phases**:
-  - Construction Heuristics for standard and list-variable models
+  - Construction Heuristics for scalar and list-variable models
   - Local Search with Hill Climbing, Simulated Annealing, Tabu Search, Late
     Acceptance, and Great Deluge in the stock config surface
   - Exhaustive Search (`branch_and_bound`, `brute_force`)
@@ -216,7 +217,12 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   `#[planning_solution(config = "...")]` overlays that decorate the loaded
   runtime config
 
-## Runtime Notes for 0.8.12
+## Runtime Notes
+
+- **Shape-aware startup telemetry**: startup logging now labels scalar solve
+  scale as average `candidates` instead of generic `values`. List-heavy solves
+  report element counts, and console output labels those solve shapes as
+  `candidates` or `elements`.
 
 - **Optional `FirstFit` keeps `None` as a real baseline**: optional scalar
   construction now leaves a value unassigned unless a concrete assignment is
@@ -227,7 +233,7 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   selection instead of acting as an implicit early-exit threshold.
 - **Canonical construction engine**: generic runtime construction now centers on
   the shared engine under `phase/construction/engine.rs`; pure scalar matches
-  reuse the descriptor-standard path, while round-robin list construction uses
+  reuse the descriptor-scalar path, while round-robin list construction uses
   one shared implementation for runtime and builder assembly.
 - **Tighter neighborhood iteration**: `limited_neighborhood` carries move caps
   at the neighborhood level, and `ChangeMoveSelector` keeps change-value
@@ -356,7 +362,7 @@ optimized native code.
 </details>
 
 <details>
-<summary><strong>What's implemented (0.8.12)</strong></summary>
+<summary><strong>What's implemented</strong></summary>
 
 **Repository**:
 [solverforge/solverforge](https://github.com/solverforge/solverforge)

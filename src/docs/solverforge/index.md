@@ -4,7 +4,7 @@ linkTitle: 'SolverForge'
 icon: fa-brands fa-rust
 weight: 10
 description: >
-  Native Rust constraint solver — aligned with the 0.8.12 runtime surface.
+  Native Rust constraint solver.
 ---
 
 SolverForge is a native Rust constraint solver for planning and scheduling
@@ -27,13 +27,18 @@ cd my-scheduler
 solverforge server
 ```
 
-The current `0.8.12` crate line targets Rust `1.92+`.
+Check the crate metadata for the exact Rust toolchain requirement of the
+SolverForge version you are using.
 
 The generated runtime now builds one `ModelContext` for each planning model.
 Generic `FirstFit` and `CheapestInsertion` use the canonical construction
 engine whenever matching list work is present, while pure scalar matches reuse
-the descriptor-standard path. Optional standard variables keep `None` when it
-is the best legal baseline instead of forcing an eager assignment.
+the descriptor-scalar path. Optional scalar variables keep `None` when it is
+the best legal baseline instead of forcing an eager assignment.
+
+Startup telemetry is shape-aware in the current release: scalar solves report
+average `candidates`, list solves report element counts, and console output
+labels those solve shapes as `candidates` or `elements`.
 
 ## Minimal Example
 

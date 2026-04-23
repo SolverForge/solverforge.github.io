@@ -16,13 +16,13 @@ Builds an initial solution by assigning values to all planning variables. Runs f
 
 | Type | Description |
 |---|---|
-| `first_fit` | Default generic first-fit construction. Mixed or list-bearing models use the shared runtime construction engine; pure scalar matches reuse the descriptor-standard path. |
+| `first_fit` | Default generic first-fit construction. Mixed or list-bearing models use the shared runtime construction engine; pure scalar matches reuse the descriptor-scalar path. |
 | `first_fit_decreasing` | Specialized scalar-only first fit, processing entities by difficulty. |
 | `weakest_fit` | Assigns the value that leaves the most room for future assignments. |
 | `weakest_fit_decreasing` | Weakest fit, processing entities by difficulty. |
 | `strongest_fit` | Assigns the value that uses resources most aggressively. |
 | `strongest_fit_decreasing` | Strongest fit, processing entities by difficulty. |
-| `cheapest_insertion` | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-standard path. |
+| `cheapest_insertion` | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-scalar path. |
 | `allocate_entity_from_queue` | Queue-driven entity allocation. |
 | `allocate_to_value_from_queue` | Queue-driven value allocation. |
 | `list_round_robin` | Distributes elements evenly across entities (list variables). |
@@ -39,7 +39,7 @@ construction_heuristic_type = "first_fit"
 
 The stock runtime now builds one `ModelContext` per planning model. Generic
 construction heuristics work over that shared runtime context instead of
-splitting standard-variable and list-variable solve paths.
+splitting scalar-variable and list-variable solve paths.
 
 ## Local Search
 

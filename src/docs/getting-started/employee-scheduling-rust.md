@@ -4,14 +4,12 @@ linkTitle: "Employee Scheduling"
 icon: fa-brands fa-rust
 date: 2026-04-17
 weight: 5
-description: "A comprehensive quickstart guide to understanding and building intelligent employee scheduling with SolverForge 0.8.12 in Rust"
+description: "A comprehensive quickstart guide to understanding and building intelligent employee scheduling with SolverForge in Rust"
 categories: [Quickstarts]
 tags: [quickstart, rust]
 ---
 
 <%= render Ui::Callout.new do %>
-This guide is written against **SolverForge 0.8.12**.
-
 The standard onboarding path is **`solverforge-cli`**. This page intentionally
 keeps the older employee scheduling tutorial shape and examples, but ports the
 implementation to the current Rust runtime surface: generated stream accessors,
@@ -102,12 +100,11 @@ This tutorial deliberately keeps the old employee scheduling walkthrough shape,
 so after scaffolding, replace the neutral shell with the domain, constraints,
 demo data, and optional API modules shown below.
 
-If your example uses `chrono` dates and times, add it to `Cargo.toml`:
+If your example uses `chrono` dates and times, add the dependencies with Cargo:
 
-```toml
-[dependencies]
-chrono = "0.4"
-solverforge = { version = "0.8.12", features = ["serde", "console", "verbose-logging"] }
+```bash
+cargo add chrono
+cargo add solverforge --features serde,console,verbose-logging
 ```
 
 Create a `solver.toml` so the runtime has an explicit search strategy:
