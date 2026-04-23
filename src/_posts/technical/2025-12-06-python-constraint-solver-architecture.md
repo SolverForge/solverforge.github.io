@@ -18,7 +18,9 @@ scratch.
 
 This article is preserved for historical context and the architectural insights
 it provides about Python domain modeling patterns, which remain relevant for
-constraint solver integrations.
+constraint solver integrations. The API snippets below use archived quickstart
+routes such as `/schedules`; current `solverforge-cli` generated apps expose the
+retained `/jobs` lifecycle instead.
 <% end %>
 
 When building constraint solvers in Python, one architectural decision shapes

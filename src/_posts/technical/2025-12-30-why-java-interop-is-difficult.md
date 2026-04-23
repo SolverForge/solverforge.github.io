@@ -12,7 +12,10 @@ description: >
 
 Since this article was written, **SolverForge has been completely rewritten as a native constraint solver in Rust**, with its own solving engine built from scratch. The Java interop, WASM complexity, and score corruption challenges described here no longer apply to current SolverForge.
 
-This article is preserved for historical context, documenting the architectural challenges that led to the decision to build a fully native Rust implementation.
+This article is preserved for historical context, documenting the architectural
+challenges that led to the decision to build a fully native Rust
+implementation. For current architecture, read
+[The Current SolverForge Architecture](/blog/technical/2026/04/23/current-solverforge-architecture-cli-first-rust-native/).
 <% end %>
 
 SolverForge Core is written in Rust. The constraint solving engine runs in Java (Timefold). Getting these two to talk to each other has been one of the more humbling engineering challenges we've faced.
@@ -65,7 +68,8 @@ This experience shaped our thinking: FFI bridges that cross the language boundar
 
 ## The HTTP/WASM Approach
 
-Our current architecture tries to solve this by moving all solving to Java:
+The architecture at that time tried to solve this by moving all solving to
+Java:
 
 1. **Serialize the problem** to JSON in Rust
 2. **Send via HTTP** to an embedded Java service

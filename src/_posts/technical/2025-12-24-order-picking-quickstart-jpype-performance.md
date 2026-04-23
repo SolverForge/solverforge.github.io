@@ -12,10 +12,14 @@ description: >
 
 Since this article was written, **SolverForge has been completely rewritten as a native constraint solver in Rust**, with its own solving engine built from scratch. The JPype bridge overhead and Java interop challenges described here no longer apply to current SolverForge.
 
-This article is preserved for historical context and the architectural insights it provides about FFI performance in constraint solving.
+Statements below about Rust/WASM were forward-looking at publication time. The
+current product architecture is native Rust plus `solverforge-cli` generated
+applications with REST, SSE, retained jobs, and `solverforge-ui` integration.
+Start with the [current architecture article](/blog/technical/2026/04/23/current-solverforge-architecture-cli-first-rust-native/)
+or the [CLI manual](/docs/solverforge-cli/).
 <% end %>
 
-Our current constraint solving quickstarts in Python are based on our stable, legacy fork of [Timefold](https://www.timefold.ai) for Python, which uses JPype to bridge to Timefold's Java solver engine. The latest example is [Order Picking](https://github.com/SolverForge/solverforge-quickstarts/tree/main/legacy/order-picking-fast)—a warehouse optimization problem with real-time isometric visualization showing trolleys routing through shelves to pick orders.
+At the time this was written, our constraint solving quickstarts in Python were based on our stable, legacy fork of [Timefold](https://www.timefold.ai) for Python, which used JPype to bridge to Timefold's Java solver engine. One example was [Order Picking](https://github.com/SolverForge/solverforge-quickstarts/tree/main/legacy/order-picking-fast)—a warehouse optimization problem with real-time isometric visualization showing trolleys routing through shelves to pick orders.
 
 The implementation works and demonstrates the architectural patterns we've developed. It also exposes the inherent overhead of FFI (Foreign Function Interface) bridges in constraint-heavy workloads.
 
@@ -100,7 +104,7 @@ Mitigation strategies that help:
 
 This quickstart doesn't just expose a performance problem—it validates our architectural direction.
 
-We're building a constraint solver framework in Rust with WASM + HTTP architecture:
+At publication time, this pointed toward a Rust/WASM + HTTP direction:
 
 - Solver compiles to WebAssembly
 - Runs natively in browser or server
@@ -108,7 +112,9 @@ We're building a constraint solver framework in Rust with WASM + HTTP architectu
 - Zero serialization overhead for in-memory solving
 - No JPype conversions, no GIL contention, direct memory access
 
-With Rust/WASM, the order picking implementation would eliminate all JPype overhead and run constraint evaluation at native speed while keeping the same domain model structure. The architecture stays the same. The performance gap disappears.
+The current SolverForge implementation took the native Rust route instead. New
+applications start from `solverforge-cli`, run a generated Rust service, and use
+the retained `/jobs` lifecycle rather than a WASM-first quickstart architecture.
 
 ## Source Code
 
@@ -126,9 +132,10 @@ run-app
 
 **Architecture:** All quickstarts follow the pattern documented in [dataclasses vs Pydantic](/blog/technical/python-constraint-solver-architecture/).
 
-**Rust framework development:**
+**Current Rust framework development:**
 
-The Rust/WASM framework is in early development. Follow progress at [github.com/SolverForge](https://github.com/SolverForge).
+Start with the [solverforge-cli manual](/docs/solverforge-cli/) and follow
+progress at [github.com/SolverForge](https://github.com/SolverForge).
 
 ---
 

@@ -8,6 +8,15 @@ description: >
   to production operations.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post describes the 0.8.x release line. Current projects should use the
+[solverforge-cli manual](/docs/solverforge-cli/) and the
+[current architecture article](/blog/technical/2026/04/23/current-solverforge-architecture-cli-first-rust-native/).
+The current CLI creates one neutral project shell with `solverforge new <name>`;
+it does not expose `--standard`, `--scalar`, `--list`, or problem-family starter
+flags, and current planning-variable kinds are `scalar` and `list`.
+<% end %>
+
 **SolverForge 0.8.2** is a cumulative update spanning the 0.7.x and 0.8.x lines.
 If you last checked in at 0.6.0, the main change is that `solverforge-cli` and
 `solverforge` now form one coherent developer experience.
@@ -229,7 +238,8 @@ search.
 
 ## Upgrade notes
 
-- **Rust version**: The current crate line targets Rust 1.92+.
+- **Rust version**: Check the crate metadata for the Rust toolchain required by
+  the SolverForge version you are using.
 - **Breaking in 0.8.0**: `Solvable::solve` now takes `SolverRuntime<Self>`
   instead of manual terminate/sender plumbing. `SolverManager::solve` returns
   `Result<(job_id, receiver), SolverManagerError>`. Manual retained-runtime
