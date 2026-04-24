@@ -32,7 +32,7 @@ derived helpers that describe the planning problem you actually need to solve.
 |---|---|---|
 | problem facts | immutable reference data | employees, skills, depots, rooms, vehicles |
 | planning entities | records whose assignment or ordering can change | shifts, visits, tasks, jobs |
-| standard planning variables | one entity chooses one value from a range | a shift picks an employee |
+| scalar planning variables | one entity chooses one value from a range | a shift picks an employee |
 | list planning variables | order matters and insertion/removal is the core move | route stops, job sequences, task chains |
 
 Use mixed models when the problem really has both assignment and sequencing.
@@ -55,7 +55,7 @@ construction heuristics already understand mixed scalar-plus-list problems.
 | You need to add... | Typical change |
 |---|---|
 | another planning dimension | add a new fact collection and reference it from entity variables |
-| optional assignment | use `allows_unassigned = true` on the standard variable |
+| optional assignment | use `allows_unassigned = true` on the scalar variable |
 | ordering behavior | introduce a planning list and list-aware constraints |
 | richer scoring context | add immutable facts or derived helper methods instead of shoving logic into constraints |
 | validation or import normalization | add app-side builders or conversion layers before solving |
@@ -92,4 +92,4 @@ no longer tiny.
 
 - [Modeling Cheat Sheet](/reference/modeling-cheat-sheet/)
 - [Docs: Domain Modeling](/docs/solverforge/modeling/)
-- [Employee Scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/) for a concrete end-to-end example

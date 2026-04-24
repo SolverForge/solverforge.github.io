@@ -22,5 +22,6 @@ involved are:
 
 - [Documentation](/docs/)
 - [Project overview](/docs/overview/)
-- [Employee scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
+- [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [Blog](/blog/)

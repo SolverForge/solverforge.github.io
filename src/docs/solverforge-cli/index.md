@@ -17,9 +17,9 @@ use the scaffold targets baked into the binary you have installed; run
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It
-creates one neutral app shell, then lets you grow that shell into a scalar,
-list, or mixed planning application with generator commands and ordinary Rust
-edits.
+creates one neutral app shell, then lets you grow that shell with scalar and
+list planning variables, or both in one app, using generator commands and
+ordinary Rust edits.
 
 The CLI owns project bootstrap and code generation. The generated application
 then uses:
@@ -31,7 +31,7 @@ then uses:
 ## What You Get
 
 - A neutral scaffold that starts runnable instead of forcing a tutorial-shaped
-  starter family
+  problem-class choice
 - A generated Axum backend with retained jobs, typed SSE events, snapshots,
   analysis, pause, resume, cancel, and delete flows
 - Generator commands for facts, entities, variables, constraints, solution

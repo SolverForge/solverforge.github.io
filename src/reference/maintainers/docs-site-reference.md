@@ -43,22 +43,55 @@ the site should not mirror them wholesale.
 
 From repository root:
 
-1. `bundle install`
-2. `npm install`
-3. `bundle exec rake frontend:build`
-4. `bundle exec bridgetown build`
-5. `bundle exec bridgetown start -P 4017`
+1. `make help`
+2. `make install`
+3. `make ci-local`
+4. `make pre-release`
+5. `make start`
 
-Equivalent Make targets:
+Direct commands behind the main targets:
 
-- `make install`
-- `make build`
-- `make start`
+- `bundle install`
+- `npm ci`
+- `bundle exec rake frontend:build`
+- `bundle exec bridgetown build`
+- `ruby scripts/verify-hospital-tutorial.rb`
+- `bundle exec bridgetown start -P 4017`
+
+The hospital tutorial verifier is portable for site-only clones. It always
+checks the published copy and snippets, then adds CLI scaffold or live hospital
+app checks when `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` point to
+local product checkouts. The stable workflow is the Make target; the Ruby
+script path is an implementation detail.
+
+## Quality gates
+
+| Target | Role |
+|---|---|
+| `make doctor` | verifies Ruby, Bundler, Node, npm, and expected Ruby/Node major versions |
+| `make lint` | runs dependency-light Ruby and JavaScript syntax checks |
+| `make build` | builds esbuild assets and Bridgetown output |
+| `make test` | builds in the test environment and runs the tutorial verifier |
+| `make ci-local` | matches the GitHub Actions gate: doctor, lint, build, tutorial verifier |
+| `make pre-release` | local release-readiness gate, currently delegating to `ci-local` |
+
+## Lint follow-up
+
+`make lint` intentionally avoids adding formatter or linter dependencies for
+the Makefile overhaul. A later hardening pass should choose and configure:
+
+- Ruby: StandardRB or RuboCop
+- JavaScript/CSS: ESLint plus Prettier
+- Markdown/content: markdownlint and an internal link checker
+
+After that, add `fmt` and `fmt-check`, and extend `lint` to use the configured
+tools instead of syntax checks only.
 
 ## Publishing
 
 GitHub Pages should build from this repo directly. The deployment workflow lives
-at `.github/workflows/site.yml` and publishes `output/`.
+at `.github/workflows/site.yml`; it installs with `make install`, runs
+`make ci-local`, and publishes `output/`.
 
 ## Static search
 

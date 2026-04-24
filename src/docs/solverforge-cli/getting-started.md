@@ -17,6 +17,9 @@ This guide walks the default CLI-first onboarding path:
 5. grow the domain with the first generator commands
 6. inspect and validate the generated application
 
+If you want a concrete app after that generic shell, continue with the
+[SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/).
+
 ## Prerequisites
 
 - Rust stable `1.80+` to build the CLI itself
@@ -83,7 +86,7 @@ Useful options:
 Fresh output includes a short "next steps" block and reminds you that the
 generated shell already contains:
 
-- one neutral app shell for scalar, list, or mixed modeling
+- one neutral app shell for scalar and list modeling
 - retained lifecycle routes and UI wiring
 - typed SSE events
 - `solverforge.app.toml` as the scaffold contract
@@ -234,20 +237,6 @@ defaults are persisted in `solverforge.app.toml`.
 
 `sample` mode generates generic deterministic values. `stub` mode keeps the
 shape but minimizes content so you can take over manually.
-
-### Compound Scaffolding
-
-Create entity, constraint, and paired twin entity in one command:
-
-```bash
-solverforge generate scaffold shift employee_idx:usize --entity --constraint no_overlap --pair
-```
-
-The first field becomes the planning variable. Remaining fields are extra entity
-fields.
-
-This command is useful when you already know the entity, its first solvable
-field, and the paired-entity or paired-constraint shape you want up front.
 
 ## Project Management Commands
 

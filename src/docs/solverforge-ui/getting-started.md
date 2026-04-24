@@ -25,7 +25,7 @@ This guide covers the verified integration path:
 ```toml
 [dependencies]
 axum = "0.8"
-solverforge-ui = "0.5"
+solverforge-ui = { version = "0.6.1" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
 ```
@@ -47,7 +47,7 @@ fn app() -> Router {
 ```
 
 `solverforge_ui::routes()` serves the embedded `/sf/*` assets. Your application
-still owns its HTML pages and any schedule/solver API routes.
+still owns its HTML pages and any job/solver API routes.
 
 ## Include Required Assets in HTML
 
@@ -137,14 +137,18 @@ snapshot-bearing `best_solution` events, and `onPaused(...)` or
 `onComplete(...)` when you need the exact retained snapshot after the runtime
 reaches an authoritative lifecycle state.
 
+The header renders the cancel action as **Stop**. Keep using the `onCancel`
+configuration key and call `solver.cancel()`; `delete()` is reserved for
+terminal retained-job cleanup.
+
 ## Application Routes
 
 `solverforge-ui` does not generate your scheduling API. The crate ships the UI
 surface and a set of backend helpers. If you use
 `SF.createBackend({ type: 'axum' })`, follow the canonical retained-job contract
 documented in [Integration & Assets](../integration-assets/). Older
-`/schedules/...` route shapes should be treated as application-side
-compatibility shims while your backend converges on `/jobs/...`.
+Schedule-named route shapes are historical. Current generated apps expose the
+retained `/jobs/...` contract.
 
 ## Next Steps
 

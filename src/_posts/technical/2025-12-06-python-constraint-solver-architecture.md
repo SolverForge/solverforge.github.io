@@ -179,15 +179,16 @@ millions of times.
 
 ## Practical Examples
 
-The quickstart guides demonstrate this pattern in action:
+The current public worked example plus archived quickstarts demonstrate this
+pattern in action:
 
-### Employee Scheduling
+### SolverForge Hospital Use Case
 
-[Employee Scheduling Guide](/docs/getting-started/employee-scheduling-rust/)
+[SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 shows:
 
-- Hard/soft constraint separation with `HardSoftDecimalScore`
-- Load balancing constraints using dataclass aggregation
+- Modular Rust domain modeling over the retained `/jobs` backend
+- The early hard-rule checkpoint before later hospital-specific refinements
 - Date-based filtering with simple set membership
 
 **Key pattern:** Domain uses `set[date]` for `unavailable_dates`—fast membership
@@ -196,7 +197,7 @@ testing during constraint evaluation.
 ### Meeting Scheduling
 
 Meeting Scheduling content is part of the archived legacy quickstarts and is not
-part of the active 0.6.0 getting-started path.
+part of the active `solverforge-cli` onboarding path.
 
 - Multi-variable planning entities (time + room)
 - Three-tier scoring (`HardMediumSoftScore`)
@@ -208,7 +209,7 @@ dataclasses keep joiner operations simple.
 ### Vehicle Routing
 
 Vehicle Routing walkthroughs currently live in archived legacy quickstarts and
-are not part of the active 0.6.0 getting-started path.
+are not part of the active `solverforge-cli` onboarding path.
 
 - Shadow variable chains (`PreviousElementShadowVariable`,
   `NextElementShadowVariable`)

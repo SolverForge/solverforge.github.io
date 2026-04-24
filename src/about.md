@@ -15,8 +15,9 @@ operational planning systems.
   <%= render Ui::Card.new(title: "Rust Solver Core", href: relative_url('/docs/overview/'), icon: "fa-brands fa-rust") do %>
 A production-ready constraint solver with Constraint Streams, zero-allocation move types, score analysis, and a stable Rust API.
   <% end %>
-  <%= render Ui::Card.new(title: "Employee Scheduling Tutorial", href: relative_url('/docs/getting-started/employee-scheduling-rust/'), icon: "fa-solid fa-calendar-days") do %>
-Work through shifts, skills, preferences, and solver-driven updates end to end.
+  <%= render Ui::Card.new(title: "SolverForge Hospital Use Case", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
+See one concrete hospital planning application end to end, starting from the
+generic CLI shell and carrying it through to solver-driven updates.
   <% end %>
   <%= render Ui::Card.new(title: "solverforge-ui", href: relative_url('/docs/solverforge-ui/'), icon: "fa-solid fa-display") do %>
 Frontend components and integration helpers for scheduling-heavy products built on SolverForge.
@@ -50,6 +51,7 @@ GitHub. Teams can audit the solver, study the reference implementations, and
 extend it for their own domains.
 
 - [Project overview](/docs/overview/)
+- [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
 - [GitHub organization](https://github.com/SolverForge)
 - [docs.rs API reference](https://docs.rs/solverforge)
 - [Documentation](/docs/)
@@ -60,6 +62,6 @@ SolverForge is suited to scheduling, routing, capacity planning, assignment, and
 similar problems where feasibility and business value depend on many
 interacting rules.
 
-- [Employee scheduling tutorial](/docs/getting-started/employee-scheduling-rust/)
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [Routing docs](/docs/solverforge-maps/)
 - [Blog](/blog/)

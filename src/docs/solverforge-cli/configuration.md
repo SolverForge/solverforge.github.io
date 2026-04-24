@@ -71,12 +71,12 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "<cli-version>"
+cli_version = "2.0.0"
 
 [runtime]
-target = "<solverforge target>"
-runtime_source = "<runtime source>"
-ui_source = "<ui source>"
+target = "solverforge 0.9.0"
+runtime_source = "crates.io: solverforge 0.9.0"
+ui_source = "crates.io: solverforge-ui 0.6.1"
 
 [demo]
 default_size = "standard"
@@ -149,8 +149,9 @@ Do not hand-edit this file. It is generated output.
 
 ### `static/sf-config.json`
 
-This is a lighter config payload for frontend labels and collection metadata.
-It is part of the shipped generated shell and stays aligned with the app spec.
+This is a lighter config payload for frontend shell labels such as title and
+subtitle. It is part of the shipped generated shell and stays aligned with the
+app spec.
 
 ## Demo Defaults
 

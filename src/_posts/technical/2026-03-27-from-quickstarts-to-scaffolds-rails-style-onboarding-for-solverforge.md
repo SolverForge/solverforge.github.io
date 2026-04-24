@@ -28,7 +28,7 @@ solverforge server
 ```
 
 `solverforge-cli` creates one neutral application shell. It does not ask users
-to choose a problem-class starter, and it does not expose public starter-family
+to choose a problem-class starter, and it does not expose public problem-class
 flags such as `--scalar`, `--list`, or `--mixed`.
 
 After scaffolding, the model grows through generators:

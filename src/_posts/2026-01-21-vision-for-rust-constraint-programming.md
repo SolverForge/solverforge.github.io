@@ -56,7 +56,7 @@ as current documentation:
 - The CLI is not merely a possible future onboarding path; it is the default
   entry point.
 - New users should not start by cloning a quickstart and deleting demo residue.
-- Current CLI scaffolding does not ask for a problem-class starter family.
+- Current CLI scaffolding does not ask for a problem-class preset.
 - Current modeling terms are `scalar` and `list`, not "standard-variable" and
   list-variable.
 
@@ -80,5 +80,6 @@ snapshots, events, pause/resume/cancel controls, and score analysis.
 
 - [The Current SolverForge Architecture](/blog/technical/2026/04/23/current-solverforge-architecture-cli-first-rust-native/)
 - [solverforge-cli Manual](/docs/solverforge-cli/)
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [solverforge-cli Command Reference](/docs/solverforge-cli/command-reference/)
 - [SolverForge Overview](/docs/overview/)

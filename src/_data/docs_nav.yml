@@ -13,8 +13,10 @@ docs:
   - title: Getting Started
     href: /docs/getting-started/
     children:
-      - title: Employee Scheduling
-        href: /docs/getting-started/employee-scheduling-rust/
+      - title: Start with solverforge-cli
+        href: /docs/solverforge-cli/getting-started/
+      - title: SolverForge Hospital Use Case
+        href: /docs/getting-started/solverforge-hospital-use-case/
   - title: solverforge-cli
     href: /docs/solverforge-cli/
     children:

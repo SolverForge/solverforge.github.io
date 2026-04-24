@@ -32,20 +32,48 @@ workflow, update the matching published pages here in the same effort.
 
 Preferred entry points:
 
-1. `make install`
-2. `make build`
-3. `make start`
+1. `make help`
+2. `make install`
+3. `make ci-local`
+4. `make pre-release`
+5. `make start`
 
 Direct Bridgetown commands:
 
 1. `bundle install`
-2. `npm install`
+2. `npm ci`
 3. `bundle exec rake frontend:build`
 4. `bundle exec bridgetown build`
-5. `bundle exec bridgetown start -P 4017`
+5. `ruby scripts/verify-cli-release.rb`
+6. `ruby scripts/verify-hospital-tutorial.rb`
+7. `bundle exec bridgetown start -P 4017`
+
+`make verify-hospital-tutorial` always runs site-local copy and snippet checks.
+When `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` point to local
+product checkouts, it also runs the CLI scaffold and live hospital app checks.
+The Make target is the stable public workflow; the Ruby script is an
+implementation detail behind that target.
+
+`make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
+linting, a full Bridgetown build, and the portable hospital tutorial verifier.
+`make pre-release` first installs the published `solverforge-cli` release into
+`/tmp`, verifies the scaffold targets, and then delegates to the local CI gate.
+
+## Lint follow-up
+
+The current `make lint` target is dependency-light and only performs Ruby and
+JavaScript syntax checks with the existing toolchain. A stricter follow-up
+should add configured tooling before broadening the gate:
+
+- Ruby: StandardRB or RuboCop, chosen once the repo style is settled
+- JavaScript/CSS: ESLint plus Prettier
+- Markdown/content: markdownlint and an internal link checker
+
+After those tools are configured, extend `fmt`, `fmt-check`, and `lint` to use
+them instead of relying only on syntax checks.
 
 ## Publishing
 
 This repo is meant to be served directly as the GitHub Pages source for
-`solverforge.github.io`. GitHub Actions builds the site from repository root
-and deploys `output/` to Pages.
+`solverforge.github.io`. GitHub Actions installs dependencies with
+`make install`, runs `make ci-local`, and deploys `output/` to Pages.

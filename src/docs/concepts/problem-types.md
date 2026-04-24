@@ -14,17 +14,17 @@ are some common categories:
 
 Assign activities to time slots and resources.
 
-### Employee Scheduling (Rostering)
+### Hospital Scheduling
 
-Assign employees to shifts based on:
+Assign hospital staff to shifts based on:
 
 - Skills and qualifications
 - Availability and preferences
 - Labor regulations (max hours, rest periods)
 - Fairness (balanced workload)
 
-**Examples:** Hospital nurse scheduling, retail staff scheduling, call center
-scheduling
+**Examples:** Hospital nurse scheduling, ward coverage planning, specialty rota
+planning
 
 ### School Timetabling
 

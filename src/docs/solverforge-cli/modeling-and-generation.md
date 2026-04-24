@@ -2,7 +2,7 @@
 title: Modeling & Generation
 description: >
   Facts, entities, scalar variables, list variables, constraints, data
-  generation, compound scaffolds, and destroy flows in solverforge-cli.
+  generation, and destroy flows in solverforge-cli.
 weight: 3
 ---
 
@@ -134,16 +134,16 @@ Useful flags:
 - `--kind list` - list variable
 - `--elements <FACT_COLLECTION>` - element collection name
 
-## Mixed Apps
+## Models With Both Variable Families
 
-There is no separate "mixed starter". A mixed application is simply a project
-whose `solverforge.app.toml` ends up with both scalar and list entries under
-`[[variables]]`.
+There is no separate third variable kind. A mixed application is simply a
+project whose `solverforge.app.toml` ends up with both scalar and list entries
+under `[[variables]]`.
 
 That is a core design decision of the CLI:
 
 - scaffold once
-- choose scalar, list, or mixed later
+- add scalar and list variables when the domain needs them
 - keep the generated shell neutral
 
 ## Solution and Score
@@ -228,28 +228,6 @@ What happens on each run:
 
 The generated wrapper in `src/data/mod.rs` keeps the rest of the application
 stable while the seed file is regenerated underneath it.
-
-## Compound Scaffolding
-
-When you already know the first entity, first field, and first constraint, use
-the compound generator:
-
-```bash
-solverforge generate scaffold shift employee_idx:usize --entity --constraint no_overlap --pair
-```
-
-Behavior:
-
-- `<NAME>` is the entity name
-- the first `name:Type` field becomes the planning variable seed
-
-Options:
-
-- `--entity`
-- `--constraint <CONSTRAINT_NAME>`
-- `--pair`
-- `--force`
-- `--pretend`
 
 ## Destroy Flows
 

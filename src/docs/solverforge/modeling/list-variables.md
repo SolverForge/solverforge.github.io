@@ -15,7 +15,7 @@ Use list variables when:
 - Each element belongs to exactly one list
 - The solver needs to optimize both assignment and ordering
 
-Use basic planning variables when:
+Use scalar planning variables when:
 - Only the assignment matters, not the order
 - Multiple entities can share the same value
 

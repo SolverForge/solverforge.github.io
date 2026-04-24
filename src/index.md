@@ -17,15 +17,15 @@ description: Native Rust constraint solving for planning, scheduling, routing, a
       <a class="button button--primary" href="<%= relative_url '/docs/solverforge-cli/getting-started/' %>">
         Start with solverforge-cli <i class="fa-solid fa-arrow-right"></i>
       </a>
-      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/employee-scheduling-rust/' %>">
-        See the employee scheduling tutorial <i class="fa-solid fa-book-open"></i>
+      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/solverforge-hospital-use-case/' %>">
+        Continue with the Hospital Use Case <i class="fa-solid fa-book-open"></i>
       </a>
     </div>
 
     <div class="home-proof">
       <span>Neutral app shell from the CLI</span>
       <span>Incremental domain generation after scaffolding</span>
-      <span>Step-by-step employee scheduling tutorial</span>
+      <span>Concrete hospital worked example</span>
     </div>
   </section>
 
@@ -38,7 +38,7 @@ description: Native Rust constraint solving for planning, scheduling, routing, a
       </p>
       <div class="card-grid">
         <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-rocket") do %>
-Follow the CLI-first path and the longer employee scheduling walkthrough.
+Start with the generic CLI path, then continue into one concrete hospital walkthrough.
         <% end %>
         <%= render Ui::Card.new(title: "Reference", href: relative_url('/reference/'), icon: "fa-solid fa-book") do %>
 Open the engineering handbooks, crate maps, extension playbooks, and clearly labeled maintainer notes.
@@ -54,19 +54,20 @@ Open the engineering handbooks, crate maps, extension playbooks, and clearly lab
         <strong>constraints.rs</strong>
       </div>
       <%= render Ui::CodeBlock.new(language: "rust") do %>
-        let required_skill = factory
+        let required_skill = ConstraintFactory::<Plan, HardSoftDecimalScore>::new()
             .shifts()
+            .filter(|shift: &Shift| shift.employee_idx.is_some())
             .join((
-                |s: &Schedule| &s.employees,
+                Plan::employees_slice,
                 equal_bi(
-                    |shift: &Shift| shift.employee,
-                    |emp: &Employee| Some(emp.id),
+                    |shift: &Shift| shift.employee_idx,
+                    |employee: &Employee| Some(employee.index),
                 ),
             ))
-            .filter(|shift: &Shift, emp: &Employee| {
-                !emp.skills.contains(&shift.required_skill)
+            .filter(|shift: &Shift, employee: &Employee| {
+                !employee.skills.contains(&shift.required_skill)
             })
-            .penalize_hard()
+            .penalize(HardSoftDecimalScore::of_hard_scaled(1_000_000))
             .named("Required skill");
       <% end %>
     </div>

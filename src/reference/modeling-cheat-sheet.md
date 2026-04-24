@@ -21,13 +21,13 @@ right SolverForge annotation or structure.
 | `#[planning_entity_collection]` | entity collections on the solution | the main search space |
 | `#[planning_score]` | current score field | typically `Option<ScoreType>` |
 
-## Standard variable or list variable?
+## Scalar Variable or List Variable?
 
 | Choose | When the decision is... | Example |
 |---|---|---|
-| standard variable | one entity picks one value | a shift picks an employee |
+| scalar variable | one entity picks one value | a shift picks an employee |
 | list variable | order or insertion position matters | a vehicle route or task sequence |
-| mixed model | both assignment and ordering matter | route planning with assigned operators |
+| model with both | both assignment and ordering matter | route planning with assigned operators |
 
 The current runtime builds one `ModelContext` per planning model, so mixed
 models are first-class. Generic `FirstFit` and `CheapestInsertion` already
@@ -69,5 +69,5 @@ PlanningEntity
 - Go to [Docs: Domain Modeling](/docs/solverforge/modeling/) for full examples.
 - Go to [Extend the Domain](/reference/extend-domain/) when the scaffold stops
   matching your real app.
-- Go to [Employee Scheduling](/docs/getting-started/employee-scheduling-rust/)
-  for a complete worked model.
+- Go to [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
+  for one concrete worked example built on top of `solverforge-cli`.

@@ -44,7 +44,7 @@ The CLI owns project bootstrap and project maintenance:
 
 The important part is what `solverforge new` does not ask.
 
-It does not ask whether this is an employee scheduling app, a vehicle routing
+It does not ask whether this is a hospital scheduling app, a vehicle routing
 app, a warehouse app, or a manufacturing app. It also does not expose starter
 flags such as `--scalar`, `--list`, or `--mixed`.
 
@@ -194,7 +194,7 @@ should not be read as the current architecture.
 If an article says the CLI is only a later direction, that is stale. The CLI is
 the default entry point.
 
-If an article says users choose a problem class or starter family up front, that
+If an article says users choose a problem class or preset up front, that
 is stale. `solverforge new` creates one neutral shell.
 
 If an article uses an older non-list model-shape name, that is stale. The
@@ -220,6 +220,7 @@ That is the architecture users should start from now.
 ## Next Steps
 
 - [Install the CLI](/docs/solverforge-cli/getting-started/)
+- [Continue with the Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [Read the complete CLI command reference](/docs/solverforge-cli/command-reference/)
 - [Review generated project anatomy](/docs/solverforge-cli/project-anatomy/)
 - [Study the SolverForge runtime overview](/docs/overview/)

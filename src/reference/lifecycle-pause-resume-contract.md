@@ -1,20 +1,24 @@
 ---
 title: "Lifecycle Pause / Resume Contract"
-description: "Internal maintainer note for retained-job lifecycle, snapshot identity, and exact pause/resume semantics."
+description: "Historical maintainer note for retained-job lifecycle, snapshot identity, and exact pause/resume semantics."
 ---
 
 # Lifecycle Pause / Resume Contract
 
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
-This page is for SolverForge maintainers. It records the retained-job lifecycle contract shared across the runtime, CLI, and UI; it is not the primary starting point for library users.
+This is a historical maintainer note from April 6, 2026. The current public
+contract is implemented in the runtime, `solverforge-cli 2.0.0` scaffolds, and
+`solverforge-ui 0.6.1`; use the current SolverManager, CLI, and UI docs for
+user-facing guidance.
 <% end %>
 
 Date: 2026-04-06
 
 ## Purpose
 
-`solverforge-rs`, `solverforge-ui`, and `solverforge-cli` must converge on one
-generic lifecycle contract for solving jobs.
+At the time this note was written, `solverforge-rs`, `solverforge-ui`, and
+`solverforge-cli` still needed to converge on one generic lifecycle contract for
+solving jobs.
 
 This contract must be:
 
@@ -29,7 +33,7 @@ This is a full contract program, not an incremental patch.
 
 ## Problem
 
-The current stack is internally inconsistent:
+The stack was internally inconsistent at the time:
 
 - the runtime only exposes coarse solve status
 - the UI infers completion from transport behavior instead of authoritative

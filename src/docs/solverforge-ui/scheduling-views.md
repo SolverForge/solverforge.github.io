@@ -26,6 +26,21 @@ Use this as the default scheduling surface when you need sticky time headers,
 sticky lane labels, synchronized scrolling, overview clustering, or packed
 detailed inspection.
 
+### Timeline Model Contract
+
+`SF.rail.createTimeline(...)` expects a normalized integer-minute model. All
+time coordinates are absolute minutes:
+
+- `model.axis.startMinute` and `model.axis.endMinute`
+- `model.axis.initialViewport.startMinute` and `endMinute`
+- `model.axis.days[].startMinute` and `endMinute`
+- `model.axis.ticks[].minute`
+- `model.lanes[].items[].startMinute` and `endMinute`
+- overlay `startMinute` and `endMinute` when an overlay is time-positioned
+
+Use application code to convert dates, shifts, and route windows into these
+integer-minute coordinates before calling `createTimeline(...)`.
+
 ### Timeline Example
 
 ```js

@@ -20,8 +20,8 @@ brute-force search is impossible (millions to billions of possibilities), but a
 good solution dramatically improves efficiency.
 
 <div class="card-grid">
-  <%= render Ui::Card.new(title: "Employee Scheduling", icon: "fa-solid fa-calendar-days") do %>
-Assign staff to shifts based on skills, availability, and labor regulations.
+  <%= render Ui::Card.new(title: "Hospital Scheduling", icon: "fa-solid fa-calendar-days") do %>
+Assign hospital staff to shifts based on skills, availability, and labor regulations.
   <% end %>
   <%= render Ui::Card.new(title: "Vehicle Routing", icon: "fa-solid fa-route") do %>
 Plan delivery routes that minimize travel time while meeting time windows.
@@ -66,32 +66,32 @@ different approaches.**
       use solverforge::prelude::*;
       use solverforge::stream::{joiner::*, ConstraintFactory};
 
-      fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
-          use ScheduleConstraintStreams;
+      fn define_constraints() -> impl ConstraintSet<Plan, HardSoftDecimalScore> {
+          use PlanConstraintStreams;
           use ShiftUnassignedFilter;
 
-          let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+          let factory = ConstraintFactory::<Plan, HardSoftDecimalScore>::new();
 
           let unassigned = factory.clone()
               .shifts()
               .unassigned()
-              .penalize_hard()
+              .penalize(HardSoftDecimalScore::of_hard_scaled(100_000))
               .named("Unassigned shift");
 
           let missing_skill = factory
               .shifts()
-              .filter(|shift: &Shift| shift.employee_id.is_some())
+              .filter(|shift: &Shift| shift.employee_idx.is_some())
               .join((
-                  |s: &Schedule| &s.employees,
+                  Plan::employees_slice,
                   equal_bi(
-                      |shift: &Shift| shift.employee_id,
-                      |emp: &Employee| Some(emp.id),
+                      |shift: &Shift| shift.employee_idx,
+                      |employee: &Employee| Some(employee.index),
                   ),
               ))
-              .filter(|shift: &Shift, emp: &Employee| {
-                  !emp.skills.contains(&shift.required_skill)
+              .filter(|shift: &Shift, employee: &Employee| {
+                  !employee.skills.contains(&shift.required_skill)
               })
-              .penalize_hard()
+              .penalize(HardSoftDecimalScore::of_hard_scaled(1_000_000))
               .named("Missing skill");
 
           (unassigned, missing_skill)
@@ -137,20 +137,20 @@ use solverforge::prelude::*;
 #[planning_entity]
 pub struct Shift {
     #[planning_id]
-    pub id: usize,
+    pub id: String,
     pub required_skill: String,
     #[planning_variable(value_range = "employees", allows_unassigned = true)]
-    pub employee_id: Option<usize>,
+    pub employee_idx: Option<usize>,
 }
 
 #[planning_solution(constraints = "crate::constraints::define_constraints")]
-pub struct Schedule {
+pub struct Plan {
     #[problem_fact_collection]
     pub employees: Vec<Employee>,
     #[planning_entity_collection]
     pub shifts: Vec<Shift>,
     #[planning_score]
-    pub score: Option<HardSoftScore>,
+    pub score: Option<HardSoftDecimalScore>,
 }
 ```
 
@@ -177,8 +177,9 @@ requirements used by your checkout or dependency resolver.
 
 **Want to try it today?**
 
-- Follow [Getting Started](/docs/getting-started/) for the CLI-first onboarding
-  path and the full employee scheduling tutorial
+- Start with [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
+  for the generic app shell, then continue with the
+  [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 
 ## What's Complete
 

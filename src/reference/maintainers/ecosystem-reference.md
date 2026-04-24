@@ -47,8 +47,15 @@ helpful, but do not duplicate their full contents here.
 
 ## Routine maintainer checks
 
-- in this repo: `make build`
+- in this repo: `make ci-local`
+- before release or publishing: `make pre-release`
+- while editing locally: `make help`, `make install`, `make build`, and `make start`
 - in a product repo: run that repo's own build, test, and release checks there
+
+`make verify-hospital-tutorial` runs site-local checks without product
+checkouts. Set `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` to add the
+deeper CLI scaffold and live hospital app checks. The Make target is the stable
+workflow entry point; the verifier implementation is Ruby.
 
 ## See also
 

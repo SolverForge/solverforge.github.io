@@ -55,8 +55,9 @@ var backend = SF.createBackend({
 });
 ```
 
-Use this when your app needs a custom HTTP shape, extra headers, or a
-compatibility layer during a route transition.
+Use this when your app needs extra headers or a non-default base path while
+still implementing the retained-job backend methods expected by
+`SF.createSolver(...)`.
 
 ## Lifecycle Contract Expectations
 
@@ -74,18 +75,13 @@ The shared lifecycle model is job-oriented:
 - delete job
 - get demo data
 
-Some older quickstarts still expose legacy `/schedules/...` routes. Treat that
-shape as compatibility glue, not the canonical lifecycle vocabulary for new
-integrations.
+Older articles may mention schedule-named routes. Current generated apps expose
+`/jobs/...`; new integrations should use the job vocabulary directly.
 
 The create operation may resolve to either:
 
 - a plain job id string, or
 - an object containing one of `id`, `jobId`, or `job_id`
-
-If your current app still uses a legacy route shape, add an application-side
-compatibility layer or use the generic `fetch` adapter until the routes
-converge.
 
 Current backend expectations are:
 
@@ -93,8 +89,10 @@ Current backend expectations are:
 - `pauseJob()` requests a pause, but `solver.pause()` resolves only after the
   authoritative `paused` event and snapshot sync complete
 - `resumeJob()` settles on the authoritative `resumed` event
-- `cancelJob()` settles after the terminal lifecycle event has been synchronized
-- `deleteJob()` is destructive cleanup for terminal retained jobs only
+- `cancelJob()` is the backend operation behind user-facing **Stop** and
+  settles after the terminal lifecycle event has been synchronized
+- `deleteJob()` is required for every backend passed to `SF.createSolver(...)`
+  and is destructive cleanup for terminal retained jobs only
 - streamed events should use canonical camelCase fields: `eventType`, `jobId`,
   `eventSequence`, `lifecycleState`, `snapshotRevision`, `currentScore`,
   `bestScore`, `telemetry`, and `solution` where required
@@ -132,6 +130,10 @@ it starts work, observes authoritative lifecycle events, renders snapshots, and
 coordinates pause, resume, cancel, analysis, and terminal cleanup through the
 backend adapter.
 
+`start()` never replaces an existing retained job. Even after completion,
+cancel, or failure, call `delete()` and wait for successful backend cleanup
+before starting the next solve.
+
 The current solver surface returns:
 
 - `start(data)`
@@ -167,6 +169,16 @@ Runtime rules:
 - the status bar uses `currentScore` as the live score during solving
 - missing or malformed typed lifecycle fields are ignored instead of being
   silently normalized
+- HTTP `EventSource.onerror` is transport state, not runtime lifecycle state;
+  transient reconnecting errors do not change the lifecycle
+- a closed SSE stream surfaces through `onError` while preserving the last
+  authoritative lifecycle, retained job id, score metadata, and snapshot
+  revision
+- `delete()` waits for required terminal snapshot synchronization before
+  calling `deleteJob()`; if synchronization or backend deletion fails, the
+  retained job id and terminal lifecycle state remain intact
+- **Stop** remains visible during `CANCELLING` so the UI can reattach a
+  detached stream listen-only, but it must not send a duplicate `cancelJob()`
 
 ## Asset Serving Under `/sf/*`
 

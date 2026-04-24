@@ -37,7 +37,7 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = "0.5"
+solverforge-ui = { version = "0.6.1" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
 ```
@@ -105,6 +105,9 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
   });
 </script>
 ```
+
+The header labels the cancel action as **Stop** in the UI. The JavaScript
+configuration key remains `onCancel`, and it should call `solver.cancel()`.
 
 ## When To Use It
 

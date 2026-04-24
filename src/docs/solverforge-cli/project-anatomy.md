@@ -57,7 +57,7 @@ my-scheduler/
 | `src/solver/` | Generated solver service wiring |
 | `static/app.js` | Neutral frontend built on `solverforge-ui` primitives |
 | `static/generated/ui-model.json` | Derived UI metadata generated from `solverforge.app.toml` |
-| `static/sf-config.json` | Frontend config payload with title, collections, and constraints |
+| `static/sf-config.json` | Lightweight frontend config payload with app title and subtitle |
 
 ## Ownership Boundaries
 
@@ -123,6 +123,7 @@ After scaffolding, `solverforge routes` already lists endpoints for:
 - exact snapshot retrieval
 - score analysis by snapshot revision
 - pause, resume, and cancel
+- terminal retained-job deletion with `DELETE /jobs/{id}`
 - SSE event streaming
 
 Those routes live in `src/api/` and are part of the generated app shell, not an

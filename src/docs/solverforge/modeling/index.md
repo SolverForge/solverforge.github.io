@@ -36,6 +36,26 @@ planning variables name their value source with `value_range = "solution_field"`
 and `#[planning_solution]` generates typed stream accessors such as
 `factory.shifts()`.
 
+Current generated domains also declare the model boundary with
+`solverforge::planning_model!` in `src/domain/mod.rs`:
+
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod employee;
+    mod shift;
+    mod schedule;
+
+    pub use employee::Employee;
+    pub use shift::Shift;
+    pub use schedule::Schedule;
+}
+```
+
+That manifest is the canonical place where the runtime validates the model and
+derives scalar/list metadata across separate Rust files.
+
 ## Sections
 
 - **[Planning Solutions](planning-solutions/)** — The top-level container struct
@@ -46,4 +66,4 @@ and `#[planning_solution]` generates typed stream accessors such as
 ## See Also
 
 - [docs.rs/solverforge](https://docs.rs/solverforge) — Full API reference
-- [Employee Scheduling (Rust)](/docs/getting-started/employee-scheduling-rust/) — Complete worked example
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/) — Concrete worked example built on the generic CLI scaffold

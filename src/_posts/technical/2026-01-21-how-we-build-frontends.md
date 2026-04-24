@@ -558,9 +558,9 @@ way of the concepts being taught.
 **Repository:**
 [SolverForge Quickstarts](https://github.com/SolverForge/solverforge-quickstarts)
 
-**Quickstarts:**
+**Examples:**
 
-- [Employee Scheduling](/docs/getting-started/employee-scheduling-rust/)
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/) (current concrete worked example)
 - Vehicle Routing (archived legacy quickstart)
 - Portfolio Optimization (archived legacy quickstart)
 

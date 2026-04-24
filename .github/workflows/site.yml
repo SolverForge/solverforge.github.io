@@ -33,17 +33,11 @@ jobs:
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Install Ruby gems
-        run: bundle install
+      - name: Install dependencies
+        run: make install
 
-      - name: Install Node dependencies
-        run: npm ci
-
-      - name: Build frontend assets
-        run: bundle exec rake frontend:build
-
-      - name: Build Bridgetown site
-        run: bundle exec bridgetown build
+      - name: Run local CI gate
+        run: make ci-local
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'

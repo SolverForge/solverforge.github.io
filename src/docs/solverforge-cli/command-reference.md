@@ -64,14 +64,14 @@ solverforge generate variable --help
 crate targets used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli <cli-version>
-CLI version: <cli-version>
-Scaffold runtime target: <solverforge target>
-Scaffold UI target: <solverforge-ui target>
-Scaffold maps target: <solverforge-maps target>
-Runtime source: <runtime source>
-UI source: <ui source>
-Maps source: <maps source>
+solverforge solverforge-cli 2.0.0
+CLI version: 2.0.0
+Scaffold runtime target: SolverForge crate target 0.9.0
+Scaffold UI target: solverforge-ui 0.6.1
+Scaffold maps target: solverforge-maps 2.1.3
+Runtime source: crates.io: solverforge 0.9.0
+UI source: crates.io: solverforge-ui 0.6.1
+Maps source: crates.io: solverforge-maps 2.1.3
 ```
 
 ## `solverforge new`
@@ -80,9 +80,9 @@ Maps source: <maps source>
 solverforge new [OPTIONS] <NAME>
 ```
 
-Creates one neutral project shell. There are no public starter-family flags such
-as `--scalar`, `--list`, or `--mixed`; scalar, list, and mixed models are created
-after scaffolding with `solverforge generate ...`.
+Creates one neutral project shell. There are no public problem-class flags such
+as `--scalar`, `--list`, or `--mixed`; scalar and list planning variables are
+created after scaffolding with `solverforge generate ...`.
 
 Arguments:
 
@@ -132,7 +132,6 @@ Subcommands:
 | `variable` | Add a scalar or list planning variable to an existing entity |
 | `score` | Change the score type in the existing planning solution |
 | `data` | Regenerate compiler-owned demo data from the project model |
-| `scaffold` | Run a compound entity, constraint, and paired-entity generator |
 
 ### `generate fact`
 
@@ -312,7 +311,7 @@ Arguments:
 
 | Argument | Meaning |
 | -------- | ------- |
-| `<SCORE_TYPE>` | Score type, such as `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore`, or `SimpleScore` |
+| `<SCORE_TYPE>` | Score type, such as `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore`, `SoftScore`, `SimpleScore`, or `BendableScore<2, 3>` |
 
 Updates the score type in the existing planning solution and syncs generated
 metadata.
@@ -346,36 +345,6 @@ Examples:
 solverforge generate data
 solverforge generate data --size large
 solverforge generate data --mode stub
-```
-
-### `generate scaffold`
-
-```text
-solverforge generate scaffold [OPTIONS] <NAME> [FIELDS]...
-```
-
-Arguments:
-
-| Argument | Meaning |
-| -------- | ------- |
-| `<NAME>` | Base entity name in snake_case |
-| `[FIELDS]...` | Optional `name:Type` field specs; the first field becomes the planning-variable seed |
-
-Options:
-
-| Option | Meaning |
-| ------ | ------- |
-| `--entity` | Generate a planning entity for `<NAME>` |
-| `--constraint <CONSTRAINT_NAME>` | Generate a constraint with this name |
-| `--pair` | Generate a paired twin entity named `<name>_pair`; if a constraint is also generated, use the pair pattern |
-| `-f, --force` | Overwrite resources if they already exist |
-| `--pretend` | Preview changes without writing files |
-
-Examples:
-
-```bash
-solverforge generate scaffold shift employee_idx:usize --entity --constraint no_overlap --pair
-solverforge generate scaffold task resource_idx:usize --entity
 ```
 
 ## `solverforge destroy`
