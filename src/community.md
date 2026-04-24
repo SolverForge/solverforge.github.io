@@ -7,7 +7,7 @@ eyebrow: Community
 SolverForge is built in public. The easiest ways to follow the project and get
 involved are:
 
-- [Discord](https://discord.gg/pHwXZ2u3)
+- [Discord](https://discord.gg/ngUDEAhq4P)
 - [GitHub organization](https://github.com/SolverForge)
 - [Crates.io package](https://crates.io/crates/solverforge)
 - [docs.rs API reference](https://docs.rs/solverforge)
