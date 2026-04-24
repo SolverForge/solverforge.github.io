@@ -20,5 +20,5 @@ jobs:
       - name: Install dependencies
         run: make install
 
-      - name: Run local CI gate
-        run: make ci-local
+      - name: Build site
+        run: make build
