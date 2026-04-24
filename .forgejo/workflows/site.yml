@@ -1,0 +1,24 @@
+name: Site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: site
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ruby
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: make install
+
+      - name: Run local CI gate
+        run: make ci-local

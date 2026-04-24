@@ -17,6 +17,7 @@ concurrency:
 
 jobs:
   build:
+    if: ${{ github.server_url == 'https://github.com' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -55,7 +56,7 @@ jobs:
           path: output
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: ${{ github.server_url == 'https://github.com' && github.event_name != 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
     environment:
