@@ -263,6 +263,8 @@ begin
   assert_file_contains(doc_page, "solverforge --version")
   assert_file_contains(doc_page, "solverforge new solverforge-hospital --quiet")
   assert_file_contains(doc_page, "cd solverforge-hospital")
+  assert_file_contains(doc_page, "git clone https://huggingface.co/spaces/SolverForge/solverforge-hospital")
+  assert_file_contains(doc_page, "The Space source is the finished app")
   assert_file_contains(doc_page, "solverforge generate score HardSoftDecimalScore")
   assert_file_contains(doc_page, "solverforge generate fact employee")
   assert_file_contains(doc_page, "solverforge generate entity shift")

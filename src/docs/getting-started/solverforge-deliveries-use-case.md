@@ -100,6 +100,19 @@ Right after scaffolding, the generated project already contains:
 The rest of this guide shows the manual coding path from that generic shell to
 the finished delivery-route app.
 
+### Download the Finished Example
+
+If you want the complete reference implementation instead of rebuilding it step
+by step, download the Hugging Face Space repository:
+
+```bash
+git clone https://huggingface.co/spaces/SolverForge/solverforge-deliveries
+cd solverforge-deliveries
+```
+
+The Space source is the finished app. The tutorial below explains how that app
+is assembled from the CLI scaffold plus manual delivery-routing code.
+
 ### Keep the Published Dependency Shape
 
 The CLI emits the current public crate line. Keep those published dependencies

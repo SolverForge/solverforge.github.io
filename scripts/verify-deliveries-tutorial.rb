@@ -286,6 +286,8 @@ begin
   assert_file_contains(doc_page, "solverforge --version")
   assert_file_contains(doc_page, "solverforge new solverforge-deliveries --quiet")
   assert_file_contains(doc_page, "cd solverforge-deliveries")
+  assert_file_contains(doc_page, "git clone https://huggingface.co/spaces/SolverForge/solverforge-deliveries")
+  assert_file_contains(doc_page, "The Space source is the finished app")
   assert_file_contains(doc_page, "solverforge generate fact delivery")
   assert_file_contains(doc_page, "solverforge generate entity vehicle")
   assert_file_contains(doc_page, "solverforge generate variable delivery_order")
