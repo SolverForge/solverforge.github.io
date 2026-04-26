@@ -31,16 +31,26 @@ tags: [quickstart, rust, hospital]
 
 ## Introduction
 
-This guide starts from the generic
+This guide has two working paths. The first starts from the generic
 [`solverforge-cli` Getting Started](/docs/solverforge-cli/getting-started/)
-flow, then carries that neutral shell into one concrete hospital scheduling
-application.
+flow and shows how the neutral shell becomes a concrete hospital scheduling
+application. The second points to the downloadable finished app when you want to
+run the real example, inspect complete code, or compare your work against the
+reference implementation.
+
+That split is intentional. `solverforge-cli` gives you the runnable shell,
+managed model seams, retained job lifecycle, sample data, and neutral frontend.
+The hospital use case still needs manual domain code: the deterministic
+benchmark generator, scheduling constraints, API DTOs, and complete browser UI
+live in the finished example.
 
 You will:
 
 - install `solverforge-cli` and verify the scaffold targets carried by your
   binary
 - scaffold a neutral app with `solverforge new`
+- know when to switch from the learning scaffold to the complete Hugging Face
+  example
 - replace the neutral `HardSoftScore` shell with the current
   `HardSoftDecimalScore` hospital contract
 - grow the domain into the current hospital model with `Employee`, `CareHub`,
@@ -78,8 +88,10 @@ solverforge new solverforge-hospital --quiet
 cd solverforge-hospital
 ```
 
-Those commands give you the neutral scaffold. The current hospital app then
-specializes the generated project into scalar employee scheduling.
+Those commands give you the neutral scaffold. It is runnable, but it is not the
+hospital app yet. The current hospital app specializes that generated project
+into scalar employee scheduling through manual domain, data, API, and frontend
+code.
 
 Right after scaffolding, the generated project already contains:
 
@@ -89,8 +101,9 @@ Right after scaffolding, the generated project already contains:
 - a neutral frontend in `static/app.js`
 - compiler-owned sample data in `src/data/data_seed.rs`
 
-The rest of this guide shows the manual coding path from that generic shell to
-the finished hospital scheduling app.
+Use this fresh scaffold as the learning workspace for the generator commands and
+the ownership boundaries below. Use the finished example when you want the full
+data generator, complete frontend, and tested application.
 
 ### Download the Finished Example
 
@@ -102,8 +115,10 @@ git clone https://huggingface.co/spaces/SolverForge/solverforge-hospital
 cd solverforge-hospital
 ```
 
-The Space source is the finished app. The tutorial below explains how that app
-is assembled from the CLI scaffold plus manual hospital scheduling code.
+The Space source is the finished app: it includes the deterministic hospital
+benchmark generator, retained-job API, modular schedule frontend, tests, and
+deployment files. The tutorial below explains how that app is assembled from the
+CLI scaffold plus manual hospital scheduling code.
 
 ### Keep the Published Dependency Shape
 
@@ -202,8 +217,9 @@ solverforge generate constraint balance_assignments --balance --soft
 solverforge generate data --mode stub
 ```
 
-Those commands are not the final app. They create the managed anchors. The app
-code then supplies the scheduling meaning:
+Those commands are not the final app. They create the managed anchors. They do
+not generate the hospital benchmark data or the finished frontend. The app code
+then supplies the scheduling meaning:
 
 - keep the scaffolded `Plan` as the solution root and switch its score type
 - add `CareHub` and the nearby-search helper functions
@@ -216,7 +232,8 @@ code then supplies the scheduling meaning:
   modules
 
 That is the teaching boundary: the CLI owns repeatable project seams, while the
-manual code owns hospital-scheduling semantics.
+manual code owns hospital-scheduling semantics. When you want to see every
+manual line in context, keep the Space checkout open next to this article.
 
 ### Project Shape
 
@@ -647,7 +664,8 @@ constraint addition.
 
 ## Testing and Validation
 
-Run the foundational checks from the finished app:
+After you have cloned the finished example, or after your manual build-out
+matches it, run the foundational checks from the app root:
 
 ```bash
 solverforge check
@@ -660,7 +678,7 @@ cargo test
 routes` confirms that the retained lifecycle endpoints are visible from the
 generated Axum route surface.
 
-If you are working in the finished example repository, the convenience target is:
+In the finished example repository, the convenience target is:
 
 ```bash
 make test
@@ -705,6 +723,10 @@ make test-slow
 
 ### Common Gotchas
 
+- The CLI scaffold is a starting shell, not a generator for the complete
+  hospital app.
+- The full deterministic data generator and complete frontend live in the
+  Hugging Face Space repository.
 - `employee_idx` is an index into `Plan.employees`; `Employee.id` is API/UI
   identity.
 - Nearby meters rank candidates before exact scoring; they do not replace

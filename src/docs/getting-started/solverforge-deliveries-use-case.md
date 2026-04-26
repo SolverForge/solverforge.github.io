@@ -31,12 +31,21 @@ tags: [quickstart, rust, routing, deliveries]
 
 ## Introduction
 
-This guide starts from the generic
+This guide has two working paths. The first starts from the generic
 [`solverforge-cli` Getting Started](/docs/solverforge-cli/getting-started/)
-flow, then carries that neutral shell into one concrete delivery-routing
-application. It is the list-variable counterpart to the
+flow and shows how the neutral shell becomes one concrete delivery-routing
+application. The second points to the downloadable finished app when you want to
+run the real example, inspect complete code, or compare your work against the
+reference implementation. It is the list-variable counterpart to the
 [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/),
 which teaches scalar assignment.
+
+That split is intentional. `solverforge-cli` gives you the runnable shell,
+managed model seams, retained job lifecycle, generic sample data, and neutral
+frontend. The deliveries use case still needs manual domain code: the city data
+generators, route-preparation pipeline, route endpoints, insertion
+recommendations, map rendering, timelines, and complete browser UI live in the
+finished example.
 
 Hospital asks SolverForge to choose one employee for each shift. Deliveries asks
 SolverForge to choose which vehicle owns each delivery and where that delivery
@@ -47,6 +56,8 @@ You will:
 - install `solverforge-cli` and verify the scaffold targets carried by your
   binary
 - scaffold a neutral app with `solverforge new`
+- know when to switch from the learning scaffold to the complete Hugging Face
+  example
 - generate the managed fact, entity, list variable, data, and constraint seams
 - manually code the delivery-routing domain on top of those seams
 - replace the generic scaffold sample data with the three delivery city datasets:
@@ -85,8 +96,10 @@ solverforge new solverforge-deliveries --quiet
 cd solverforge-deliveries
 ```
 
-Those commands give you the neutral scaffold. The current delivery app then
-specializes the generated project into list-variable vehicle routing.
+Those commands give you the neutral scaffold. It is runnable, but it is not the
+delivery app yet. The current delivery app specializes that generated project
+into list-variable vehicle routing through manual domain, routing, API, and
+frontend code.
 
 Right after scaffolding, the generated project already contains:
 
@@ -97,8 +110,10 @@ Right after scaffolding, the generated project already contains:
 - a neutral frontend in `static/app.js`
 - compiler-owned sample data in `src/data/data_seed.rs`
 
-The rest of this guide shows the manual coding path from that generic shell to
-the finished delivery-route app.
+Use this fresh scaffold as the learning workspace for the generator commands and
+the ownership boundaries below. Use the finished example when you want the full
+city data generators, map-backed routes, complete frontend, and tested
+application.
 
 ### Download the Finished Example
 
@@ -110,8 +125,11 @@ git clone https://huggingface.co/spaces/SolverForge/solverforge-deliveries
 cd solverforge-deliveries
 ```
 
-The Space source is the finished app. The tutorial below explains how that app
-is assembled from the CLI scaffold plus manual delivery-routing code.
+The Space source is the finished app: it includes the Philadelphia, Hartford,
+and Firenze data generators, route-preparation pipeline, map/timeline frontend,
+recommendation endpoint, tests, and deployment files. The tutorial below
+explains how that app is assembled from the CLI scaffold plus manual
+delivery-routing code.
 
 ### Keep the Published Dependency Shape
 
@@ -196,8 +214,9 @@ solverforge generate constraint total_travel_time --unary --soft
 solverforge generate data --mode stub
 ```
 
-Those commands are not the final app. They create the managed anchors. The app
-code then supplies the routing meaning:
+Those commands are not the final app. They create the managed anchors. They do
+not generate the city data, map-backed route pipeline, insertion endpoint, or
+finished frontend. The app code then supplies the routing meaning:
 
 - keep the scaffolded `Plan` as the solution root
 - replace the generated `Delivery` fact with stop data, coordinates, demand, and
@@ -214,7 +233,8 @@ code then supplies the routing meaning:
   data, analysis, and recommendation modules
 
 That is the teaching boundary: the CLI owns repeatable project seams, while the
-manual code owns delivery-routing semantics.
+manual code owns delivery-routing semantics. When you want to see every manual
+line in context, keep the Space checkout open next to this article.
 
 ### Run the Finished App
 
@@ -673,7 +693,8 @@ cost.
 
 ## Testing and Validation
 
-Run the foundational checks from the finished app:
+After you have cloned the finished example, or after your manual build-out
+matches it, run the foundational checks from the app root:
 
 ```bash
 solverforge check
@@ -686,7 +707,7 @@ cargo test
 routes` confirms that the retained lifecycle and delivery-specific endpoints are
 visible from the generated Axum route surface.
 
-If you are working in the finished example repository, the convenience target is:
+In the finished example repository, the convenience target is:
 
 ```bash
 make test
@@ -735,6 +756,10 @@ make test-live-road
 
 ### Common Gotchas
 
+- The CLI scaffold is a starting shell, not a generator for the complete
+  deliveries app.
+- The full city data generators, route previews, insertion recommendations, and
+  complete frontend live in the Hugging Face Space repository.
 - A route is an ordered list of delivery IDs, not delivery structs.
 - `Plan::normalize()` keeps route IDs dense after transport.
 - Road-network preparation builds scoring data; `/jobs/{id}/routes` builds
