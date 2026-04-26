@@ -1,6 +1,6 @@
 ---
-title: 'solverforge-ui'
-linkTitle: 'solverforge-ui'
+title: "solverforge-ui"
+linkTitle: "solverforge-ui"
 icon: fa-solid fa-display
 weight: 21
 description: >
@@ -11,8 +11,9 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks the current `solverforge-ui` API: retained jobs, typed
-lifecycle events, exact paused snapshots, and pause/resume/cancel controls.
+This section tracks `solverforge-ui 0.6.3`: retained jobs, typed lifecycle
+events, exact paused snapshots, pause/resume/cancel controls, dense scheduling
+views, and optional map helpers.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -26,6 +27,8 @@ the runtime integration path.
   tables, footers, API guides, and toasts
 - **Scheduling views** with the canonical dense timeline surface plus low-level
   rail primitives and split-pane Gantt
+- **Optional map helpers** for Leaflet-backed vehicle markers, visit markers,
+  route geometry, marker bounds, and route highlighting
 - **Retained job lifecycle helpers** via `SF.createBackend(...)` and
   `SF.createSolver(...)` with pause, resume, cancel, and snapshot sync
 - **Embedded asset serving** under `/sf/*` via
@@ -37,10 +40,12 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.6.1" }
+solverforge-ui = { version = "0.6.3" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
 ```
+
+`solverforge-ui 0.6.3` declares `rust-version = "1.95"`.
 
 ## Minimal Workflow
 
@@ -53,17 +58,17 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
 <script src="/sf/sf.js"></script>
 <script>
   var tabs = SF.createTabs({
-    tabs: [{ id: 'plan', content: '<div>Plan view</div>', active: true }],
+    tabs: [{ id: "plan", content: "<div>Plan view</div>", active: true }],
   });
   document.body.appendChild(tabs.el);
 
-  var backend = SF.createBackend({ type: 'axum' });
+  var backend = SF.createBackend({ type: "axum" });
   var solver;
 
   var header = SF.createHeader({
-    title: 'SolverForge UI',
-    subtitle: 'Retained job lifecycle',
-    tabs: [{ id: 'plan', label: 'Plan', active: true }],
+    title: "SolverForge UI",
+    subtitle: "Retained job lifecycle",
+    tabs: [{ id: "plan", label: "Plan", active: true }],
     onTabChange: function (id) {
       tabs.show(id);
     },
@@ -91,16 +96,16 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
     backend: backend,
     statusBar: statusBar,
     onProgress: function (meta) {
-      console.log('progress', meta.currentScore);
+      console.log("progress", meta.currentScore);
     },
     onSolution: function (snapshot) {
-      console.log('solution', snapshot.solution);
+      console.log("solution", snapshot.solution);
     },
     onPaused: function (snapshot) {
-      console.log('paused', snapshot.solution);
+      console.log("paused", snapshot.solution);
     },
     onComplete: function (snapshot) {
-      console.log('complete', snapshot.solution);
+      console.log("complete", snapshot.solution);
     },
   });
 </script>

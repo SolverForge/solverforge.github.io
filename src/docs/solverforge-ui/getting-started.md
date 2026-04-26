@@ -24,11 +24,13 @@ This guide covers the verified integration path:
 
 ```toml
 [dependencies]
-axum = "0.8"
-solverforge-ui = { version = "0.6.1" }
+axum = "0.8.9"
+solverforge-ui = { version = "0.6.3" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
 ```
+
+Use Rust `1.95+` for the current crate line.
 
 ## Mount `/sf/*` Routes in Axum
 
@@ -71,21 +73,21 @@ still owns its HTML pages and any job/solver API routes.
     <script>
       var tabs = SF.createTabs({
         tabs: [
-          { id: 'plan', content: '<div>Plan view</div>', active: true },
-          { id: 'gantt', content: '<div>Gantt view</div>' },
+          { id: "plan", content: "<div>Plan view</div>", active: true },
+          { id: "gantt", content: "<div>Gantt view</div>" },
         ],
       });
       document.body.appendChild(tabs.el);
 
-      var backend = SF.createBackend({ type: 'axum' });
+      var backend = SF.createBackend({ type: "axum" });
       var solver;
 
       var header = SF.createHeader({
-        title: 'SolverForge Scheduler',
-        subtitle: 'by SolverForge',
+        title: "SolverForge Scheduler",
+        subtitle: "by SolverForge",
         tabs: [
-          { id: 'plan', label: 'Plan', active: true },
-          { id: 'gantt', label: 'Gantt' },
+          { id: "plan", label: "Plan", active: true },
+          { id: "gantt", label: "Gantt" },
         ],
         onTabChange: function (id) {
           tabs.show(id);
@@ -114,16 +116,16 @@ still owns its HTML pages and any job/solver API routes.
         backend: backend,
         statusBar: statusBar,
         onProgress: function (meta) {
-          console.log('progress', meta.currentScore, meta.bestScore);
+          console.log("progress", meta.currentScore, meta.bestScore);
         },
         onSolution: function (snapshot) {
-          console.log('best solution', snapshot.solution);
+          console.log("best solution", snapshot.solution);
         },
         onPaused: function (snapshot, meta) {
-          console.log('paused', meta.snapshotRevision, snapshot.solution);
+          console.log("paused", meta.snapshotRevision, snapshot.solution);
         },
         onComplete: function (snapshot, meta) {
-          console.log('completed', meta.currentScore, snapshot.solution);
+          console.log("completed", meta.currentScore, snapshot.solution);
         },
       });
     </script>
@@ -156,4 +158,4 @@ retained `/jobs/...` contract.
 - Read [Scheduling Views](../scheduling-views/) for timeline rail and Gantt
   examples.
 - Read [Integration & Assets](../integration-assets/) for backend adapters,
-  asset serving, and versioned bundle behavior.
+  optional map modules, asset serving, and versioned bundle behavior.

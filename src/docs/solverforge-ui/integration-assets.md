@@ -9,9 +9,10 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui` contract is job-oriented and lifecycle-typed. New integrations should expose
-retained jobs, explicit `eventType` payloads, and exact paused or terminal
-snapshots.
+The current `solverforge-ui 0.6.3` contract is job-oriented and
+lifecycle-typed. New integrations should expose retained jobs, explicit
+`eventType` payloads, exact paused or terminal snapshots, and the shipped
+optional map module when they need Leaflet route views.
 <% end %>
 
 This page summarizes how `solverforge-ui` connects frontend code to backend APIs
@@ -25,7 +26,7 @@ Create adapters with `SF.createBackend(...)` and pass the result into
 ### Axum (default)
 
 ```js
-var backend = SF.createBackend({ type: 'axum', baseUrl: '' });
+var backend = SF.createBackend({ type: "axum", baseUrl: "" });
 ```
 
 Use this when your backend exposes the stock `solverforge-ui` lifecycle
@@ -36,10 +37,10 @@ build around schedule-specific naming.
 
 ```js
 var backend = SF.createBackend({
-  type: 'tauri',
+  type: "tauri",
   invoke: window.__TAURI__.core.invoke,
   listen: window.__TAURI__.event.listen,
-  eventName: 'solver-update',
+  eventName: "solver-update",
 });
 ```
 
@@ -49,9 +50,9 @@ Use this when solver traffic is bridged through Tauri IPC.
 
 ```js
 var backend = SF.createBackend({
-  type: 'fetch',
-  baseUrl: '/api/v1',
-  headers: { 'X-CSRF-Token': csrfToken },
+  type: "fetch",
+  baseUrl: "/api/v1",
+  headers: { "X-CSRF-Token": csrfToken },
 });
 ```
 
@@ -189,6 +190,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
+- `/sf/sf.0.6.3.css`
+- `/sf/sf.0.6.3.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 
@@ -222,6 +225,47 @@ alongside Leaflet:
 
 For route geometry, travel-time, and map-data pipeline details, see the existing
 [solverforge-maps](/docs/solverforge-maps/) docs.
+
+### Map Helper Surface
+
+The optional map module exposes `SF.map` after Leaflet and `sf-map.js` are
+loaded:
+
+```js
+var map = SF.map.create({
+  container: "map",
+  center: [45.07, 7.69],
+  zoom: 13,
+});
+
+map.addVehicleMarker({ lat: 45.07, lng: 7.69, color: "#10b981" });
+map.addVisitMarker({
+  lat: 45.08,
+  lng: 7.7,
+  color: "#3b82f6",
+  icon: "fa-utensils",
+});
+map.addStopNumber({ lat: 45.08, lng: 7.7, number: 1, color: "#3b82f6" });
+map.drawRoute({
+  points: [
+    [45.07, 7.69],
+    [45.08, 7.7],
+  ],
+  color: "#10b981",
+});
+map.drawEncodedRoute({ encoded: "encodedPolylineString", color: "#3b82f6" });
+map.fitBounds();
+map.highlight("#10b981");
+map.clearHighlight();
+map.clearRoutes();
+map.clearStops();
+map.clearMarkers();
+map.clearAll();
+```
+
+`fitBounds()` fits vehicle and visit markers. Since `0.6.2`, marker bounds are
+backed by a Leaflet feature group, so marker-only maps can call `fitBounds()`
+without needing route polylines first.
 
 ## Non-Rust Integration Path
 

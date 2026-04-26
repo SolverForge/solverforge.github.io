@@ -45,7 +45,7 @@ integer-minute coordinates before calling `createTimeline(...)`.
 
 ```js
 var timeline = SF.rail.createTimeline({
-  label: 'Staffing lane',
+  label: "Staffing lane",
   labelWidth: 280,
   model: {
     axis: {
@@ -57,72 +57,72 @@ var timeline = SF.rail.createTimeline({
     },
     lanes: [
       {
-        id: 'ward-east',
-        label: 'By location · Ward East',
-        mode: 'overview',
+        id: "ward-east",
+        label: "By location · Ward East",
+        mode: "overview",
         items: [
           {
-            id: 'east-rush',
-            clusterId: 'east-rush',
+            id: "east-rush",
+            clusterId: "east-rush",
             startMinute: 360,
             endMinute: 1080,
-            label: 'Monday intake surge',
-            tone: 'blue',
+            label: "Monday intake surge",
+            tone: "blue",
             summary: {
-              primaryLabel: 'Monday intake surge',
-              secondaryLabel: 'ER intake · trauma hold · overflow beds',
+              primaryLabel: "Monday intake surge",
+              secondaryLabel: "ER intake · trauma hold · overflow beds",
               count: 24,
               openCount: 3,
               toneSegments: [
-                { tone: 'blue', count: 15 },
-                { tone: 'amber', count: 6 },
-                { tone: 'rose', count: 3 },
+                { tone: "blue", count: 15 },
+                { tone: "amber", count: 6 },
+                { tone: "rose", count: 3 },
               ],
             },
             detailItems: [
               {
-                id: 'east-1',
+                id: "east-1",
                 startMinute: 360,
                 endMinute: 840,
-                label: 'ER intake',
-                tone: 'blue',
+                label: "ER intake",
+                tone: "blue",
               },
               {
-                id: 'east-2',
+                id: "east-2",
                 startMinute: 420,
                 endMinute: 960,
-                label: 'Trauma hold',
-                tone: 'amber',
+                label: "Trauma hold",
+                tone: "amber",
               },
               {
-                id: 'east-3',
+                id: "east-3",
                 startMinute: 480,
                 endMinute: 1080,
-                label: 'Overflow beds',
-                tone: 'rose',
+                label: "Overflow beds",
+                tone: "rose",
               },
             ],
           },
         ],
       },
       {
-        id: 'employee-ada',
-        label: 'By employee · Ada',
-        mode: 'detailed',
+        id: "employee-ada",
+        label: "By employee · Ada",
+        mode: "detailed",
         items: [
           {
-            id: 'ada-1',
+            id: "ada-1",
             startMinute: 2 * 1440 + 360,
             endMinute: 2 * 1440 + 840,
-            label: 'Primary shift',
-            tone: 'amber',
+            label: "Primary shift",
+            tone: "amber",
           },
           {
-            id: 'ada-2',
+            id: "ada-2",
             startMinute: 2 * 1440 + 660,
             endMinute: 2 * 1440 + 1020,
-            label: 'Handoff overlap',
-            tone: 'amber',
+            label: "Handoff overlap",
+            tone: "amber",
           },
         ],
       },
@@ -131,7 +131,7 @@ var timeline = SF.rail.createTimeline({
 });
 
 container.appendChild(timeline.el);
-timeline.expandCluster('ward-east', 'east-rush');
+timeline.expandCluster("ward-east", "east-rush");
 ```
 
 Overview summaries are additive per field. If a summary item overrides aggregate
@@ -159,47 +159,47 @@ dense timeline surface.
 `SF.gantt.create(config)` returns:
 
 - `el`, `mount`, `setTasks`, `refresh`, `changeViewMode`, `highlightTask`,
-  `destroy`
+  `getChart`, `destroy`
 
 ### Gantt Example
 
 ```js
 var gantt = SF.gantt.create({
-  gridTitle: 'Tasks',
-  chartTitle: 'Schedule',
-  viewMode: 'Quarter Day',
+  gridTitle: "Tasks",
+  chartTitle: "Schedule",
+  viewMode: "Quarter Day",
   splitSizes: [40, 60],
   columns: [
-    { key: 'name', label: 'Task', sortable: true },
-    { key: 'start', label: 'Start', sortable: true },
-    { key: 'end', label: 'End', sortable: true },
+    { key: "name", label: "Task", sortable: true },
+    { key: "start", label: "Start", sortable: true },
+    { key: "end", label: "End", sortable: true },
   ],
   onTaskClick: function (task) {
-    console.log('clicked', task.id);
+    console.log("clicked", task.id);
   },
   onDateChange: function (task, start, end) {
-    console.log('moved', task.id, start, end);
+    console.log("moved", task.id, start, end);
   },
 });
 
-gantt.mount('my-container');
+gantt.mount("my-container");
 
 gantt.setTasks([
   {
-    id: 'task-1',
-    name: 'Design review',
-    start: '2026-03-15 09:00',
-    end: '2026-03-15 10:30',
+    id: "task-1",
+    name: "Design review",
+    start: "2026-03-15 09:00",
+    end: "2026-03-15 10:30",
     priority: 1,
     projectIndex: 0,
     pinned: true,
-    custom_class: 'project-color-0 priority-1',
-    dependencies: '',
+    custom_class: "project-color-0 priority-1",
+    dependencies: "",
   },
 ]);
 
-gantt.changeViewMode('Day');
-gantt.highlightTask('task-1');
+gantt.changeViewMode("Day");
+gantt.highlightTask("task-1");
 ```
 
 View modes include `Quarter Day`, `Half Day`, `Day`, `Week`, and `Month`.

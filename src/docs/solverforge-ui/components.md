@@ -16,37 +16,37 @@ retained-job solver lifecycle.
 
 The current public API documents these factories:
 
-| Factory                       | Returns                                                                         | Description                                                              |
-| ----------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `SF.createHeader(config)`     | `HTMLElement`                                                                   | Sticky header with logo, title, nav tabs, and optional solve/pause/resume/cancel/analyze actions |
-| `SF.createStatusBar(config)`  | `{el, bindHeader, updateScore, setSolving, updateMoves, colorDotsFromAnalysis}` | Score display with constraint indicators                                 |
-| `SF.createButton(config)`     | `HTMLButtonElement`                                                             | Button with variant, size, icon, and shape modifiers                     |
-| `SF.createModal(config)`      | `{el, body, open, close, setBody}`                                              | Dialog with backdrop and header                                          |
-| `SF.createTable(config)`      | `HTMLElement`                                                                   | Data table with headers and row click support                            |
-| `SF.createTabs(config)`       | `{el, show}`                                                                    | Tab panel container with instance-scoped tab switching                   |
-| `SF.createFooter(config)`     | `HTMLElement`                                                                   | Footer with links and version                                            |
-| `SF.createApiGuide(config)`   | `HTMLElement`                                                                   | REST API documentation panel                                             |
-| `SF.showToast(config)`        | `void`                                                                          | Auto-dismissing toast notification                                       |
-| `SF.showError(title, detail)` | `void`                                                                          | Error toast shorthand                                                    |
-| `SF.showTab(tabId, root?)`    | `void`                                                                          | Activate tab panels globally or within one root                          |
+| Factory                       | Returns                                                                                                                                    | Description                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `SF.createHeader(config)`     | `HTMLElement`                                                                                                                              | Sticky header with logo, title, nav tabs, and optional solve/pause/resume/cancel/analyze actions |
+| `SF.createStatusBar(config)`  | `{el, bindHeader, updateScore, setLifecycleState, setSolving, updateMoves, updateConstraintDots, colorDotsByScore, colorDotsFromAnalysis}` | Score display with constraint indicators                                                         |
+| `SF.createButton(config)`     | `HTMLButtonElement`                                                                                                                        | Button with variant, size, icon, and shape modifiers                                             |
+| `SF.createModal(config)`      | `{el, body, open, close, setBody}`                                                                                                         | Dialog with backdrop and header                                                                  |
+| `SF.createTable(config)`      | `HTMLElement`                                                                                                                              | Data table with headers and row click support                                                    |
+| `SF.createTabs(config)`       | `{el, show}`                                                                                                                               | Tab panel container with instance-scoped tab switching                                           |
+| `SF.createFooter(config)`     | `HTMLElement`                                                                                                                              | Footer with links and version                                                                    |
+| `SF.createApiGuide(config)`   | `HTMLElement`                                                                                                                              | REST API documentation panel                                                                     |
+| `SF.showToast(config)`        | `void`                                                                                                                                     | Auto-dismissing toast notification                                                               |
+| `SF.showError(title, detail)` | `void`                                                                                                                                     | Error toast shorthand                                                                            |
+| `SF.showTab(tabId, root?)`    | `void`                                                                                                                                     | Activate tab panels globally or within one root                                                  |
 
 ## Composition Example
 
 ```js
 var tabs = SF.createTabs({
   tabs: [
-    { id: 'plan', content: '<div>Plan view</div>', active: true },
-    { id: 'gantt', content: '<div>Gantt view</div>' },
+    { id: "plan", content: "<div>Plan view</div>", active: true },
+    { id: "gantt", content: "<div>Gantt view</div>" },
   ],
 });
 document.body.appendChild(tabs.el);
 
 var header = SF.createHeader({
-  title: 'My Scheduler',
-  subtitle: 'by SolverForge',
+  title: "My Scheduler",
+  subtitle: "by SolverForge",
   tabs: [
-    { id: 'plan', label: 'Plan', active: true },
-    { id: 'gantt', label: 'Gantt' },
+    { id: "plan", label: "Plan", active: true },
+    { id: "gantt", label: "Gantt" },
   ],
   onTabChange: function (id) {
     tabs.show(id);
@@ -76,11 +76,11 @@ shipped helper for that.
 ## Button Variants
 
 ```js
-SF.createButton({ text: 'Solve', variant: 'success' });
-SF.createButton({ text: 'Stop', variant: 'danger' });
-SF.createButton({ text: 'Save', variant: 'primary' });
-SF.createButton({ text: 'Cancel', variant: 'default' });
-SF.createButton({ icon: 'fa-gear', variant: 'ghost', circle: true });
+SF.createButton({ text: "Solve", variant: "success" });
+SF.createButton({ text: "Stop", variant: "danger" });
+SF.createButton({ text: "Save", variant: "primary" });
+SF.createButton({ text: "Cancel", variant: "default" });
+SF.createButton({ icon: "fa-gear", variant: "ghost", circle: true });
 ```
 
 ## Useful Helpers
