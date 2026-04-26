@@ -17,6 +17,8 @@ docs:
         href: /docs/solverforge-cli/getting-started/
       - title: SolverForge Hospital Use Case
         href: /docs/getting-started/solverforge-hospital-use-case/
+      - title: SolverForge Deliveries Use Case
+        href: /docs/getting-started/solverforge-deliveries-use-case/
   - title: solverforge-cli
     href: /docs/solverforge-cli/
     children:

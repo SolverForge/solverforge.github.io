@@ -10,6 +10,7 @@ class Shared::SearchSurface < Bridgetown::Component
   QUICK_LINKS = [
     ["/docs/overview/", "Project overview", "Read the architecture, scope, and runtime framing."],
     ["/docs/getting-started/solverforge-hospital-use-case/", "SolverForge Hospital Use Case", "Continue from the CLI guide into one concrete hospital use case."],
+    ["/docs/getting-started/solverforge-deliveries-use-case/", "SolverForge Deliveries Use Case", "Study list-variable vehicle routing with maps, retained jobs, and route recommendations."],
     ["/reference/", "Reference docs", "Open the engineer-facing handbooks, crate maps, and clearly labeled maintainer notes."],
     ["/blog/", "Release notes and technical posts", "Browse changes, direction, and implementation notes."],
   ].freeze

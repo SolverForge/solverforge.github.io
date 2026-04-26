@@ -13,8 +13,8 @@ weight: 2
 
 <%= render Ui::Callout.new(title: "Current onboarding path") do %>
 Start with **`solverforge-cli`** for the generic project shell. Then continue
-with the **SolverForge Hospital Use Case** if you want one concrete worked
-example that goes further.
+with the **SolverForge Hospital Use Case** or **SolverForge Deliveries Use
+Case** if you want one concrete worked example that goes further.
 <% end %>
 
 ## Start Here
@@ -26,6 +26,10 @@ Install `solverforge-cli`, scaffold a new project, run the server, and extend th
   <%= render Ui::Card.new(title: "SolverForge Hospital Use Case", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
 Follow a longer worked example that carries the generic CLI shell into a
 concrete hospital planning application.
+  <% end %>
+  <%= render Ui::Card.new(title: "SolverForge Deliveries Use Case", href: relative_url('/docs/getting-started/solverforge-deliveries-use-case/'), icon: "fa-solid fa-route") do %>
+Study a route-optimization example with list variables, road-network data,
+retained jobs, and delivery insertion recommendations.
   <% end %>
 </div>
 
@@ -63,5 +67,6 @@ generation and `solverforge.app.toml` after scaffolding.
 
 - [CLI onboarding guide](../solverforge-cli/getting-started/)
 - [SolverForge Hospital Use Case](solverforge-hospital-use-case/)
+- [SolverForge Deliveries Use Case](solverforge-deliveries-use-case/)
 - [SolverForge API documentation](https://docs.rs/solverforge)
 - [Core GitHub repository](https://github.com/solverforge/solverforge)
