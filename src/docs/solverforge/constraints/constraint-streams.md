@@ -1,6 +1,6 @@
 ---
-title: 'Constraint Streams'
-linkTitle: 'Constraint Streams'
+title: "Constraint Streams"
+linkTitle: "Constraint Streams"
 weight: 10
 description: >
   Declarative constraint definition using the stream API.
@@ -136,6 +136,13 @@ factory.clone()
         equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
     ))
 ```
+
+For a beginner mental model, `if_exists` asks "does this item have at least one
+matching record over there?" and `if_not_exists` asks the inverse. In `v0.9.1`,
+the public API stays exactly that simple while the runtime chooses faster
+internal bookkeeping for exact `usize` keys. Direct and flattened existence
+constraints with plain `usize` keys use indexed storage; `Option<usize>`,
+newtype keys, strings, and other key shapes keep hashed storage.
 
 ## Terminal Operations
 

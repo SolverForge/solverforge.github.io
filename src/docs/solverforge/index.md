@@ -1,6 +1,6 @@
 ---
-title: 'SolverForge'
-linkTitle: 'SolverForge'
+title: "SolverForge"
+linkTitle: "SolverForge"
 icon: fa-brands fa-rust
 weight: 10
 description: >
@@ -16,6 +16,10 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 ```bash
 cargo add solverforge
 ```
+
+These pages are aligned with the published `solverforge 0.9.1` crate. Generated
+CLI projects can intentionally target an older runtime until the next CLI target
+refresh, so check `solverforge --version` when starting from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
@@ -39,6 +43,13 @@ the best legal baseline instead of forcing an eager assignment.
 Startup telemetry is shape-aware in the current release: scalar solves report
 average `candidates`, list solves report element counts, and console output
 labels those solve shapes as `candidates` or `elements`.
+
+`v0.9.1` also tightens runtime behavior in three focused places. Exact `usize`
+keys in direct and flattened existence constraints now use indexed internal
+storage without changing the stream API. Local-search `phase_start` telemetry
+includes the current score once the starting score has been calculated. List
+ruin selectors sample only non-empty list owners, so empty routes or sequences
+do not consume generated ruin candidates.
 
 ## Minimal Example
 

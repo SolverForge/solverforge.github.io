@@ -97,6 +97,7 @@ different approaches.**
           (unassigned, missing_skill)
       }
     <% end %>
+
   </div>
   <div class="code-tabs__panel" data-tab-panel="gurobi" hidden>
     <%= render Ui::CodeBlock.new(language: "python") do %>
@@ -164,22 +165,24 @@ constraints.
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation tracks the current public SolverForge runtime
-surface; check the crate metadata for the exact version and Rust toolchain
-requirements used by your checkout or dependency resolver.
+in Rust. This documentation tracks the published `solverforge` `0.9.1` runtime
+line and calls out CLI scaffold targets separately when an installed CLI
+intentionally lags the current runtime crate.
 <% end %>
 
 ## Current Status
 
-| Component     | Status              | Description                                                      |
-| ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver with the current runtime surface |
+| Component     | Status              | Description                                                              |
+| ------------- | ------------------- | ------------------------------------------------------------------------ |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver aligned with the published `0.9.1` runtime |
 
 **Want to try it today?**
 
 - Start with [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
   for the generic app shell, then continue with the
   [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
+  or the
+  [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
 
 ## What's Complete
 
@@ -220,6 +223,16 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
 
 ## Runtime Notes
 
+- **Indexed existence scoring for exact `usize` keys**: direct and flattened
+  `if_exists(...)` / `if_not_exists(...)` constraints keep the same public
+  stream API, but exact `usize` join keys now use dense indexed bookkeeping
+  internally. Other key types keep hashed storage.
+- **Local-search phase starts carry score context**: console telemetry now
+  renders the current score when the local-search phase starts, so the line
+  after construction shows the score local search is improving from.
+- **List-ruin search skips empty owners**: list ruin candidate generation
+  samples only entities with non-empty lists, avoiding wasted ruin attempts on
+  empty routes or sequences.
 - **Shape-aware startup telemetry**: startup logging now labels scalar solve
   scale as average `candidates` instead of generic `values`. List-heavy solves
   report element counts, and console output labels those solve shapes as

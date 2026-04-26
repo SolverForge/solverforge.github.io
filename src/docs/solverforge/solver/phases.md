@@ -14,22 +14,22 @@ Builds an initial solution by assigning values to all planning variables. Runs f
 
 ### Construction Heuristic Types
 
-| Type | Description |
-|---|---|
-| `first_fit` | Default generic first-fit construction. Mixed or list-bearing models use the shared runtime construction engine; pure scalar matches reuse the descriptor-scalar path. |
-| `first_fit_decreasing` | Specialized scalar-only first fit, processing entities by difficulty. |
-| `weakest_fit` | Assigns the value that leaves the most room for future assignments. |
-| `weakest_fit_decreasing` | Weakest fit, processing entities by difficulty. |
-| `strongest_fit` | Assigns the value that uses resources most aggressively. |
-| `strongest_fit_decreasing` | Strongest fit, processing entities by difficulty. |
-| `cheapest_insertion` | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-scalar path. |
-| `allocate_entity_from_queue` | Queue-driven entity allocation. |
-| `allocate_to_value_from_queue` | Queue-driven value allocation. |
-| `list_round_robin` | Distributes elements evenly across entities (list variables). |
-| `list_cheapest_insertion` | Inserts each element at the score-minimizing position (list variables). |
-| `list_regret_insertion` | Inserts elements in order of highest placement regret (list variables). |
-| `list_clarke_wright` | Greedy route merging by savings value (list variables). |
-| `list_k_opt` | Per-route k-opt polishing (list variables). |
+| Type                           | Description                                                                                                                                                            |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `first_fit`                    | Default generic first-fit construction. Mixed or list-bearing models use the shared runtime construction engine; pure scalar matches reuse the descriptor-scalar path. |
+| `first_fit_decreasing`         | Specialized scalar-only first fit, processing entities by difficulty.                                                                                                  |
+| `weakest_fit`                  | Assigns the value that leaves the most room for future assignments.                                                                                                    |
+| `weakest_fit_decreasing`       | Weakest fit, processing entities by difficulty.                                                                                                                        |
+| `strongest_fit`                | Assigns the value that uses resources most aggressively.                                                                                                               |
+| `strongest_fit_decreasing`     | Strongest fit, processing entities by difficulty.                                                                                                                      |
+| `cheapest_insertion`           | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-scalar path.                                               |
+| `allocate_entity_from_queue`   | Queue-driven entity allocation.                                                                                                                                        |
+| `allocate_to_value_from_queue` | Queue-driven value allocation.                                                                                                                                         |
+| `list_round_robin`             | Distributes elements evenly across entities (list variables).                                                                                                          |
+| `list_cheapest_insertion`      | Inserts each element at the score-minimizing position (list variables).                                                                                                |
+| `list_regret_insertion`        | Inserts elements in order of highest placement regret (list variables).                                                                                                |
+| `list_clarke_wright`           | Greedy route merging by savings value (list variables).                                                                                                                |
+| `list_k_opt`                   | Per-route k-opt polishing (list variables).                                                                                                                            |
 
 ```toml
 [[phases]]
@@ -45,18 +45,23 @@ splitting scalar-variable and list-variable solve paths.
 
 Iteratively improves the solution by applying moves and accepting improvements (and sometimes worse moves to escape local optima).
 
+Current local-search telemetry emits `phase_start` after the starting score is
+known. With console output enabled, the phase-start line includes that score,
+making it clear what construction handed to local search before the first move
+is evaluated.
+
 ### Acceptors
 
 Local search uses an **acceptor** to decide whether to keep a move. In the
 stock config surface, the acceptor is configured as a nested object:
 
-| Acceptor | Description |
-|---|---|
-| `hill_climbing` | Only accepts improving moves. Fast but gets stuck in local optima. |
-| `simulated_annealing` | Accepts worse moves with decreasing probability. Good exploration. |
-| `tabu_search` | Remembers recent moves and forbids reversing them. Strong for many problems. |
-| `late_acceptance` | Accepts moves better than N steps ago. Simple and effective. |
-| `great_deluge` | Accepts moves above a rising water level. Steady improvement. |
+| Acceptor              | Description                                                                  |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `hill_climbing`       | Only accepts improving moves. Fast but gets stuck in local optima.           |
+| `simulated_annealing` | Accepts worse moves with decreasing probability. Good exploration.           |
+| `tabu_search`         | Remembers recent moves and forbids reversing them. Strong for many problems. |
+| `late_acceptance`     | Accepts moves better than N steps ago. Simple and effective.                 |
+| `great_deluge`        | Accepts moves above a rising water level. Steady improvement.                |
 
 ```toml
 [[phases]]
@@ -98,6 +103,7 @@ policies.
 ### Acceptor-Specific Configuration
 
 **Simulated Annealing:**
+
 ```toml
 [phases.acceptor]
 type = "simulated_annealing"
@@ -105,6 +111,7 @@ starting_temperature = "0hard/500soft"
 ```
 
 **Tabu Search:**
+
 ```toml
 [phases.acceptor]
 type = "tabu_search"
@@ -113,6 +120,7 @@ entity_tabu_size = 7
 ```
 
 **Late Acceptance:**
+
 ```toml
 [phases.acceptor]
 type = "late_acceptance"
@@ -162,10 +170,10 @@ type = "exhaustive_search"
 exhaustive_search_type = "branch_and_bound"
 ```
 
-| Type | Description |
-|---|---|
+| Type               | Description                                                                    |
+| ------------------ | ------------------------------------------------------------------------------ |
 | `branch_and_bound` | Prunes branches that can't improve — memory efficient, finds solutions quickly |
-| `brute_force` | Explores every possibility |
+| `brute_force`      | Explores every possibility                                                     |
 
 ### Score Bounder
 

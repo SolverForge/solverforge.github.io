@@ -11,11 +11,13 @@ description: >
 ## When to Use List Variables
 
 Use list variables when:
+
 - The order of assignments matters (routes, sequences)
 - Each element belongs to exactly one list
 - The solver needs to optimize both assignment and ordering
 
 Use scalar planning variables when:
+
 - Only the assignment matters, not the order
 - Multiple entities can share the same value
 
@@ -103,15 +105,15 @@ runtime surface.
 
 The solver uses specialized moves for list variables:
 
-| Move | Description |
-|------|-------------|
-| `ListChangeMove` | Move an element from one list to another (or within the same list) |
-| `ListSwapMove` | Swap two elements between or within lists |
-| `ListReverseMove` | Reverse a subsequence within a list |
-| `SubListChangeMove` | Move a contiguous subsequence to another position |
-| `SubListSwapMove` | Swap two contiguous subsequences |
-| `KOptMove` | K-opt style moves for routing problems |
-| `RuinMove` | Remove elements and reinsert them (ruin-and-recreate) |
+| Move                | Description                                                        |
+| ------------------- | ------------------------------------------------------------------ |
+| `ListChangeMove`    | Move an element from one list to another (or within the same list) |
+| `ListSwapMove`      | Swap two elements between or within lists                          |
+| `ListReverseMove`   | Reverse a subsequence within a list                                |
+| `SubListChangeMove` | Move a contiguous subsequence to another position                  |
+| `SubListSwapMove`   | Swap two contiguous subsequences                                   |
+| `KOptMove`          | K-opt style moves for routing problems                             |
+| `RuinMove`          | Remove elements and reinsert them (ruin-and-recreate)              |
 
 ## Example: Vehicle Routing Constraint
 
@@ -146,7 +148,13 @@ solving, that is expressed through `move_selector` variants such as:
 - `k_opt_move_selector`
 - `list_ruin_move_selector`
 
+For ruin-and-recreate search, the current runtime samples only non-empty list
+owners for the ruin step. That keeps a vehicle with no visits, or a machine
+with no queued jobs, from using a local-search attempt that cannot remove
+anything.
+
 ## See Also
 
 - [Moves](/docs/solverforge/solver/moves/) — Move types including list-specific moves
 - [Planning Entities](../planning-entities/) — Shadow variable attributes
+- [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/) — List-variable vehicle routing with road-network scoring
