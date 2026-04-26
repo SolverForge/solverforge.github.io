@@ -49,7 +49,8 @@ You will:
 - scaffold a neutral app with `solverforge new`
 - generate the managed fact, entity, list variable, data, and constraint seams
 - manually code the delivery-routing domain on top of those seams
-- load the three city datasets: `PHILADELPHIA`, `HARTFORD`, and `FIRENZE`
+- replace the generic scaffold sample data with the three delivery city datasets:
+  `PHILADELPHIA`, `HARTFORD`, and `FIRENZE`
 - understand why delivery routing uses a list planning variable
 - follow the current `Delivery`, `Vehicle`, and `Plan` model
 - connect map preparation, route shadows, constraints, and previews
@@ -115,7 +116,11 @@ solverforge-ui = "0.6.3"
 solverforge-maps = "2.1.3"
 ```
 
-The matching metadata lives in `solverforge.app.toml`:
+Fresh scaffolds also start with generic demo sample data:
+`SMALL`, `STANDARD`, and `LARGE`. Those sizes are useful for proving the shell,
+but they are not the delivery-routing datasets. The finished tutorial app
+replaces the generated seed flow with app-owned city visits and records that
+delivery-specific catalog in `solverforge.app.toml`:
 
 ```toml
 [app]
@@ -190,7 +195,8 @@ code then supplies the routing meaning:
   the list-variable shadow update hook
 - add `CoordValue`, preview types, and `src/domain/route_metrics/`
 - replace the generated constraint skeletons with the four route rules
-- replace stub data with the Philadelphia, Hartford, and Firenze demo seeds
+- replace the generated `SMALL`/`STANDARD`/`LARGE` sample-data seed with the
+  Philadelphia, Hartford, and Firenze demo seeds
 - split the neutral frontend into the finished map, timeline, route-list, raw
   data, analysis, and recommendation modules
 
