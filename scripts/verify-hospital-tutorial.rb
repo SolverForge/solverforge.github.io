@@ -12,11 +12,13 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.0.0"
-EXPECTED_RUNTIME_VERSION = "0.9.0"
-EXPECTED_UI_VERSION = "0.6.1"
+EXPECTED_CLI_VERSION = "2.0.1"
+EXPECTED_CLI_RUNTIME_VERSION = "0.9.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.9.1"
+EXPECTED_CLI_UI_VERSION = "0.6.3"
+EXPECTED_TUTORIAL_UI_VERSION = "0.6.3"
 EXPECTED_MAPS_VERSION = "2.1.3"
-EXPECTED_HOSPITAL_APP_CLI_VERSION = "0.9.0"
+EXPECTED_HOSPITAL_APP_CLI_VERSION = "2.0.1"
 
 def log(message)
   puts "[verify-hospital-tutorial] #{message}"
@@ -162,6 +164,21 @@ def wait_for_json_endpoint(url, output_file, max_attempts: 60)
   fail!("timed out waiting for #{url}; last status #{last_status}")
 end
 
+def extract_first_sse_data(raw)
+  event, separator, = raw.gsub("\r\n", "\n").partition("\n\n")
+  return nil if separator.empty?
+
+  data_lines = event.lines.filter_map do |line|
+    next unless line.start_with?("data:")
+
+    line.sub(/^data:\s?/, "").chomp
+  end
+
+  return nil if data_lines.empty?
+
+  data_lines.join("\n")
+end
+
 def first_sse_data_payload(url, timeout_seconds: 10)
   uri = URI(url)
   raw = +""
@@ -169,22 +186,21 @@ def first_sse_data_payload(url, timeout_seconds: 10)
   Timeout.timeout(timeout_seconds) do
     Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https", read_timeout: timeout_seconds) do |http|
       request = Net::HTTP::Get.new(uri)
-      catch(:done) do
-        http.request(request) do |response|
-          fail!("GET #{url} returned #{response.code}") unless response.is_a?(Net::HTTPSuccess)
+      http.request(request) do |response|
+        fail!("GET #{url} returned #{response.code}") unless response.is_a?(Net::HTTPSuccess)
 
-          response.read_body do |chunk|
-            raw << chunk
-            throw :done if raw.match?(/^data: /)
-          end
+        response.read_body do |chunk|
+          raw << chunk
+          payload = extract_first_sse_data(raw)
+          return payload if payload
         end
       end
     end
   end
 
-  raw
+  extract_first_sse_data(raw)
 rescue Timeout::Error
-  raw.match?(/^data: /) ? raw : nil
+  extract_first_sse_data(raw)
 end
 
 def json_field(json, field)
@@ -243,16 +259,24 @@ begin
   assert_file_contains(hub_page, "one concrete worked")
   assert_file_contains(search_surface, "Continue from the CLI guide into one concrete hospital use case.")
 
-  assert_file_contains(doc_page, "cargo install solverforge-cli")
+  assert_file_contains(doc_page, "cargo install solverforge-cli --force")
   assert_file_contains(doc_page, "solverforge --version")
   assert_file_contains(doc_page, "solverforge new solverforge-hospital --quiet")
-  assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_UI_VERSION}\"")
+  assert_file_contains(doc_page, "cd solverforge-hospital")
+  assert_file_contains(doc_page, "solverforge generate score HardSoftDecimalScore")
+  assert_file_contains(doc_page, "solverforge generate fact employee")
+  assert_file_contains(doc_page, "solverforge generate entity shift")
+  assert_file_contains(doc_page, "solverforge generate variable employee_idx")
+  assert_file_contains(doc_page, "solverforge generate constraint balance_assignments --balance --soft")
+  assert_file_contains(doc_page, "solverforge generate data --mode stub")
+  assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_HOSPITAL_APP_CLI_VERSION}\"")
   assert_file_contains(doc_page, "target = \"SolverForge crates.io target\"")
   assert_file_contains(doc_page, "runtime_crate = \"solverforge\"")
-  assert_file_contains(doc_page, "runtime_version = \"#{EXPECTED_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_crate = \"solverforge-ui\"")
-  assert_file_contains(doc_page, "ui_version = \"#{EXPECTED_UI_VERSION}\"")
+  assert_file_contains(doc_page, "ui_version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "HardSoftDecimalScore")
   assert_file_contains(doc_page, "current hospital model with `Employee`, `CareHub`,")
   assert_file_contains(doc_page, "employee_idx")
@@ -266,6 +290,9 @@ begin
   assert_file_not_contains(doc_page, "SolverForge local path target")
   assert_file_not_contains(doc_page, "path = \"../solverforge-rs")
   assert_file_not_contains(doc_page, "path = \"../solverforge-ui")
+  assert_file_not_contains(doc_page, "cd ~/")
+  assert_file_not_contains(doc_page, "/srv/lab/dev/")
+  assert_file_not_contains(doc_page, "solverforge generate solution plan")
 
   assert_rendered_h1_count
 
@@ -279,11 +306,11 @@ begin
 
     version_output = run_command(cli_bin, "--version")
     assert_text_contains(version_output, "CLI version: #{EXPECTED_CLI_VERSION}", "solverforge --version output")
-    assert_text_contains(version_output, "Scaffold runtime target: SolverForge crate target #{EXPECTED_RUNTIME_VERSION}", "solverforge --version output")
-    assert_text_contains(version_output, "Scaffold UI target: solverforge-ui #{EXPECTED_UI_VERSION}", "solverforge --version output")
+    assert_text_contains(version_output, "Scaffold runtime target: SolverForge crate target #{EXPECTED_CLI_RUNTIME_VERSION}", "solverforge --version output")
+    assert_text_contains(version_output, "Scaffold UI target: solverforge-ui #{EXPECTED_CLI_UI_VERSION}", "solverforge --version output")
     assert_text_contains(version_output, "Scaffold maps target: solverforge-maps #{EXPECTED_MAPS_VERSION}", "solverforge --version output")
-    assert_text_contains(version_output, "Runtime source: crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}", "solverforge --version output")
-    assert_text_contains(version_output, "UI source: crates.io: solverforge-ui #{EXPECTED_UI_VERSION}", "solverforge --version output")
+    assert_text_contains(version_output, "Runtime source: crates.io: solverforge #{EXPECTED_CLI_RUNTIME_VERSION}", "solverforge --version output")
+    assert_text_contains(version_output, "UI source: crates.io: solverforge-ui #{EXPECTED_CLI_UI_VERSION}", "solverforge --version output")
     assert_text_contains(version_output, "Maps source: crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}", "solverforge --version output")
 
     new_help = run_command(cli_bin, "new", "--help")
@@ -300,13 +327,79 @@ begin
     fail!("CLI did not create #{generated_app}") unless Dir.exist?(generated_app)
 
     assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_UI_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\", features = [\"serde\", \"console\", \"verbose-logging\"] }")
-    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_UI_VERSION}\" }")
+    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_CLI_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_CLI_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_CLI_UI_VERSION}\"")
+    assert_file_contains(File.join(generated_app, "Cargo.toml"), "rust-version = \"1.95\"")
+    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_CLI_RUNTIME_VERSION}\", features = [\"serde\", \"console\", \"verbose-logging\"] }")
+    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_CLI_UI_VERSION}\" }")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\" }")
     fail!("fresh scaffold is missing static/app.js") unless File.file?(File.join(generated_app, "static/app.js"))
+
+    log "Replaying the documented hospital generator sequence"
+    run_system(cli_bin, "generate", "score", "HardSoftDecimalScore", chdir: generated_app)
+    run_system(
+      cli_bin,
+      "generate",
+      "fact",
+      "employee",
+      "--field",
+      "id:String",
+      "--field",
+      "name:String",
+      "--field",
+      "home_hub:CareHub",
+      "--field",
+      "skills:BTreeSet<String>",
+      "--field",
+      "unavailable_dates:BTreeSet<NaiveDate>",
+      "--field",
+      "undesired_dates:BTreeSet<NaiveDate>",
+      "--field",
+      "desired_dates:BTreeSet<NaiveDate>",
+      chdir: generated_app
+    )
+    run_system(
+      cli_bin,
+      "generate",
+      "entity",
+      "shift",
+      "--field",
+      "start:NaiveDateTime",
+      "--field",
+      "end:NaiveDateTime",
+      "--field",
+      "location:String",
+      "--field",
+      "care_hub:CareHub",
+      "--field",
+      "required_skill:String",
+      chdir: generated_app
+    )
+    run_system(
+      cli_bin,
+      "generate",
+      "variable",
+      "employee_idx",
+      "--entity",
+      "Shift",
+      "--kind",
+      "scalar",
+      "--range",
+      "employees",
+      "--allows-unassigned",
+      chdir: generated_app
+    )
+    run_system(cli_bin, "generate", "constraint", "assigned_shift", "--unary", "--hard", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "required_skill", "--join", "--hard", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "overlapping_shift", "--pair", "--hard", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "minimum_rest", "--pair", "--hard", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "one_shift_per_day", "--pair", "--hard", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "unavailable_employee", "--join", "--hard", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "undesired_day", "--join", "--soft", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "desired_day", "--join", "--soft", chdir: generated_app)
+    run_system(cli_bin, "generate", "constraint", "balance_assignments", "--balance", "--soft", chdir: generated_app)
+    run_system(cli_bin, "generate", "data", "--mode", "stub", chdir: generated_app)
 
     run_system(cli_bin, "check", chdir: generated_app)
     routes = run_command(cli_bin, "routes", chdir: generated_app)
@@ -321,13 +414,14 @@ begin
     require_command("cargo")
 
     log "Checking concrete hospital source files"
-    assert_file_contains(File.join(hospital_repo, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_UI_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_HOSPITAL_APP_CLI_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "target = \"SolverForge crates.io target\"")
     assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "runtime_crate = \"solverforge\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "runtime_version = \"#{EXPECTED_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "ui_crate = \"solverforge-ui\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "ui_version = \"#{EXPECTED_UI_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "ui_version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "src/domain/plan.rs"), "pub employee_idx: Option<usize>")
     assert_file_contains(File.join(hospital_repo, "src/domain/plan.rs"), "pub score: Option<HardSoftDecimalScore>")
     assert_file_contains(File.join(hospital_repo, "src/domain/employee.rs"), "pub struct Employee")
@@ -377,10 +471,7 @@ begin
       fail!("job summary missing lifecycleState") unless json["lifecycleState"].is_a?(String)
     end
 
-    sse_raw = first_sse_data_payload("#{base_url}/jobs/#{job_id}/events")
-    fail!("SSE endpoint did not produce a bootstrap payload") unless sse_raw
-
-    sse_data = sse_raw.lines.find { |line| line.start_with?("data: ") }&.sub(/^data: /, "")
+    sse_data = first_sse_data_payload("#{base_url}/jobs/#{job_id}/events")
     fail!("SSE endpoint did not produce a bootstrap payload") if sse_data.nil? || sse_data.empty?
 
     sse_path = File.join(tmp_dir, "sse.json")

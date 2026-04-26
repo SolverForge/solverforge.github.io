@@ -17,16 +17,16 @@ across the SolverForge ecosystem.
 
 ## Information architecture
 
-| Path | Role |
-|---|---|
-| `src/docs/**` | tutorials, concepts, and product-facing runtime docs |
-| `src/reference/**` | compact engineering reference plus internal maintainer pages |
-| `src/_posts/**` | blog and release posts |
-| `src/_components/**` | reusable Ruby components |
-| `src/_layouts/**` | layouts and shell templates |
-| `src/_data/**` | navigation and structured content |
-| `frontend/**` | bundled CSS/JS sources |
-| `plugins/**` | Bridgetown build-time extensions, including static search generation |
+| Path                 | Role                                                                 |
+| -------------------- | -------------------------------------------------------------------- |
+| `src/docs/**`        | tutorials, concepts, and product-facing runtime docs                 |
+| `src/reference/**`   | compact engineering reference plus internal maintainer pages         |
+| `src/_posts/**`      | blog and release posts                                               |
+| `src/_components/**` | reusable Ruby components                                             |
+| `src/_layouts/**`    | layouts and shell templates                                          |
+| `src/_data/**`       | navigation and structured content                                    |
+| `frontend/**`        | bundled CSS/JS sources                                               |
+| `plugins/**`         | Bridgetown build-time extensions, including static search generation |
 
 ## Published vs repo-only surfaces
 
@@ -56,24 +56,27 @@ Direct commands behind the main targets:
 - `bundle exec rake frontend:build`
 - `bundle exec bridgetown build`
 - `ruby scripts/verify-hospital-tutorial.rb`
+- `ruby scripts/verify-deliveries-tutorial.rb`
 - `bundle exec bridgetown start -P 4017`
 
-The hospital tutorial verifier is portable for site-only clones. It always
-checks the published copy and snippets, then adds CLI scaffold or live hospital
-app checks when `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` point to
-local product checkouts. The stable workflow is the Make target; the Ruby
-script path is an implementation detail.
+The worked-example tutorial verifiers are portable for site-only clones. They
+always check the published copy and snippets, then add deeper checks when local
+product checkouts are configured. `SOLVERFORGE_CLI_REPO` and
+`SOLVERFORGE_HOSPITAL_REPO` enable the CLI scaffold and live hospital app checks.
+`SOLVERFORGE_DELIVERIES_REPO` enables deliveries source checks and a
+straight-line retained-job smoke against the local deliveries app. The stable
+workflow is the Make target; the Ruby script paths are implementation details.
 
 ## Quality gates
 
-| Target | Role |
-|---|---|
-| `make doctor` | verifies Ruby, Bundler, Node, npm, and expected Ruby/Node major versions |
-| `make lint` | runs dependency-light Ruby and JavaScript syntax checks |
-| `make build` | builds esbuild assets and Bridgetown output |
-| `make test` | builds in the test environment and runs the tutorial verifier |
-| `make ci-local` | matches the GitHub Actions gate: doctor, lint, build, tutorial verifier |
-| `make pre-release` | local release-readiness gate, currently delegating to `ci-local` |
+| Target             | Role                                                                     |
+| ------------------ | ------------------------------------------------------------------------ |
+| `make doctor`      | verifies Ruby, Bundler, Node, npm, and expected Ruby/Node major versions |
+| `make lint`        | runs dependency-light Ruby and JavaScript syntax checks                  |
+| `make build`       | builds esbuild assets and Bridgetown output                              |
+| `make test`        | builds in the test environment and runs the tutorial verifiers           |
+| `make ci-local`    | matches the GitHub Actions gate: doctor, lint, build, tutorial verifiers |
+| `make pre-release` | local release-readiness gate, currently delegating to `ci-local`         |
 
 ## Lint follow-up
 

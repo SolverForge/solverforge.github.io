@@ -46,7 +46,8 @@ Direct Bridgetown commands:
 4. `bundle exec bridgetown build`
 5. `ruby scripts/verify-cli-release.rb`
 6. `ruby scripts/verify-hospital-tutorial.rb`
-7. `bundle exec bridgetown start -P 4017`
+7. `ruby scripts/verify-deliveries-tutorial.rb`
+8. `bundle exec bridgetown start -P 4017`
 
 `make verify-hospital-tutorial` always runs site-local copy and snippet checks.
 When `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` point to local
@@ -54,8 +55,13 @@ product checkouts, it also runs the CLI scaffold and live hospital app checks.
 The Make target is the stable public workflow; the Ruby script is an
 implementation detail behind that target.
 
+`make verify-deliveries-tutorial` follows the same pattern for
+`solverforge-deliveries`. It always checks the published guide and dependency
+snippets, then adds source-level and live app checks when
+`SOLVERFORGE_DELIVERIES_REPO` points to the app checkout.
+
 `make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
-linting, a full Bridgetown build, and the portable hospital tutorial verifier.
+linting, a full Bridgetown build, and the portable tutorial verifiers.
 `make pre-release` first installs the published `solverforge-cli` release into
 `/tmp`, verifies the scaffold targets, and then delegates to the local CI gate.
 

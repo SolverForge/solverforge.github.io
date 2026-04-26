@@ -13,12 +13,12 @@ repo-local documentation and implementation surfaces in `solverforge`, `solverfo
 
 ## Documentation surfaces
 
-| Surface | Audience | Role |
-|---|---|---|
-| `src/docs/**` and `src/reference/**` in this repo | users, engineers, maintainers | published website surface |
-| `README.md` in this repo | site maintainers | local workflow, build entry points, and repo boundaries |
-| `SolverForge/solverforge` repo files | product maintainers | core Rust workspace source of truth, including `README.md` and `crates/*/WIREFRAME.md` |
-| `SolverForge/solverforge-cli`, `SolverForge/solverforge-ui`, `SolverForge/solverforge-maps` repo files | product maintainers | canonical repo-local onboarding, architecture, and implementation detail for those products |
+| Surface                                                                                                | Audience                      | Role                                                                                        |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| `src/docs/**` and `src/reference/**` in this repo                                                      | users, engineers, maintainers | published website surface                                                                   |
+| `README.md` in this repo                                                                               | site maintainers              | local workflow, build entry points, and repo boundaries                                     |
+| `SolverForge/solverforge` repo files                                                                   | product maintainers           | core Rust workspace source of truth, including `README.md` and `crates/*/WIREFRAME.md`      |
+| `SolverForge/solverforge-cli`, `SolverForge/solverforge-ui`, `SolverForge/solverforge-maps` repo files | product maintainers           | canonical repo-local onboarding, architecture, and implementation detail for those products |
 
 The site is the published documentation surface. Repo-local maintainer files in
 the product repositories remain canonical for source-level detail and should be
@@ -26,12 +26,12 @@ referenced, not copied wholesale.
 
 ## Canonical update rules
 
-| If you change... | Update... |
-|---|---|
-| published docs, navigation, reference, or blog content | the matching `src/**` pages in this repo |
-| site workflow, build, or search plumbing | `README.md`, `.github/workflows/site.yml`, and the maintainer pages under `src/reference/maintainers/**` in this repo |
-| public API surface or onboarding in a product repo | the product repo's own `README.md`, wireframes, and implementation docs, plus the matching published pages here |
-| repo-local maintainer workflow or architecture notes in a product repo | the source repo first, then any site page here that summarizes or points to that guidance |
+| If you change...                                                       | Update...                                                                                                             |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| published docs, navigation, reference, or blog content                 | the matching `src/**` pages in this repo                                                                              |
+| site workflow, build, or search plumbing                               | `README.md`, `.github/workflows/site.yml`, and the maintainer pages under `src/reference/maintainers/**` in this repo |
+| public API surface or onboarding in a product repo                     | the product repo's own `README.md`, wireframes, and implementation docs, plus the matching published pages here       |
+| repo-local maintainer workflow or architecture notes in a product repo | the source repo first, then any site page here that summarizes or points to that guidance                             |
 
 ## Repo-local maintainer surfaces
 
@@ -52,10 +52,13 @@ helpful, but do not duplicate their full contents here.
 - while editing locally: `make help`, `make install`, `make build`, and `make start`
 - in a product repo: run that repo's own build, test, and release checks there
 
-`make verify-hospital-tutorial` runs site-local checks without product
-checkouts. Set `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` to add the
-deeper CLI scaffold and live hospital app checks. The Make target is the stable
-workflow entry point; the verifier implementation is Ruby.
+`make verify-hospital-tutorial` and `make verify-deliveries-tutorial` run
+site-local checks without product checkouts. Set `SOLVERFORGE_CLI_REPO` or
+`SOLVERFORGE_HOSPITAL_REPO` to add the deeper CLI scaffold and live hospital app
+checks. Set `SOLVERFORGE_DELIVERIES_REPO` to add deliveries source checks and the
+straight-line retained-job smoke against the local deliveries app. The Make
+targets are the stable workflow entry points; the verifier implementations are
+Ruby.
 
 ## See also
 
