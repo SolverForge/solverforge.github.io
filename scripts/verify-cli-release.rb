@@ -5,9 +5,9 @@ require "fileutils"
 require "open3"
 require "tmpdir"
 
-EXPECTED_CLI_VERSION = "2.0.0"
-EXPECTED_RUNTIME_VERSION = "0.9.0"
-EXPECTED_UI_VERSION = "0.6.1"
+EXPECTED_CLI_VERSION = "2.0.1"
+EXPECTED_RUNTIME_VERSION = "0.9.1"
+EXPECTED_UI_VERSION = "0.6.3"
 EXPECTED_MAPS_VERSION = "2.1.3"
 
 def fail!(message)
@@ -70,6 +70,7 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   run_command(cli, "new", "release-gate", "--skip-git", "--skip-readme", "--quiet", chdir: scaffold_root)
 
   app_root = File.join(scaffold_root, "release-gate")
+  assert_file_contains(File.join(app_root, "Cargo.toml"), "rust-version = \"1.95\"")
   assert_file_contains(File.join(app_root, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\", features = [\"serde\", \"console\", \"verbose-logging\"] }")
   assert_file_contains(File.join(app_root, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_UI_VERSION}\" }")
   assert_file_contains(File.join(app_root, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\" }")

@@ -1,10 +1,10 @@
 ---
-title: 'solverforge-cli 2.0.0: One Entry Point for Current SolverForge Apps'
+title: "solverforge-cli 2.0.0: One Entry Point for Current SolverForge Apps"
 date: 2026-04-24
 draft: false
 description: >
-  solverforge-cli 2.0.0 is the current CLI contract: one neutral scaffold entry
-  point, generator-driven model growth, and published targets for solverforge
+  solverforge-cli 2.0.0 introduced the one neutral scaffold entry point,
+  generator-driven model growth, and published targets for solverforge
   0.9.0, solverforge-ui 0.6.1, and solverforge-maps 2.1.3.
 ---
 
@@ -12,7 +12,10 @@ description: >
 [crates.io](https://crates.io/crates/solverforge-cli/2.0.0) with API docs on
 [docs.rs](https://docs.rs/solverforge-cli/2.0.0).
 
-This is the release that makes the public CLI contract match the current
+For current scaffold targets, use
+[solverforge-cli 2.0.1](/blog/releases/2026/04/26/solverforge-cli-2-0-1/).
+
+This was the release that made the public CLI contract match the current
 SolverForge application architecture. New projects start from one neutral app
 shell, then grow through explicit generator commands. The CLI no longer exposes
 problem-family scaffold commands or starter flags as part of the public surface.
@@ -147,8 +150,7 @@ This is a major CLI release because stale public scaffold surfaces are gone.
   `DELETE /jobs/{id}` cleanup.
 
 Existing projects created by older CLI versions are not rewritten in place by
-installing 2.0.0. Use the current docs when generating new resources, and create
-a fresh 2.0.0 project when you want the current neutral shell layout.
+installing 2.0.0. Use the current docs when generating new resources.
 
 ## Upgrade notes
 

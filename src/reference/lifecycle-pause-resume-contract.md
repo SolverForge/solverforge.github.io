@@ -7,8 +7,8 @@ description: "Historical maintainer note for retained-job lifecycle, snapshot id
 
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
 This is a historical maintainer note from April 6, 2026. The current public
-contract is implemented in the runtime, `solverforge-cli 2.0.0` scaffolds, and
-`solverforge-ui 0.6.1`; use the current SolverManager, CLI, and UI docs for
+contract is implemented in the runtime, `solverforge-cli 2.0.1` scaffolds, and
+`solverforge-ui 0.6.3`; use the current SolverManager, CLI, and UI docs for
 user-facing guidance.
 <% end %>
 

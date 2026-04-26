@@ -71,12 +71,12 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "2.0.0"
+cli_version = "2.0.1"
 
 [runtime]
-target = "solverforge 0.9.0"
-runtime_source = "crates.io: solverforge 0.9.0"
-ui_source = "crates.io: solverforge-ui 0.6.1"
+target = "solverforge 0.9.1"
+runtime_source = "crates.io: solverforge 0.9.1"
+ui_source = "crates.io: solverforge-ui 0.6.3"
 
 [demo]
 default_size = "standard"
@@ -86,6 +86,10 @@ available_sizes = ["small", "standard", "large"]
 name = "Plan"
 score = "HardSoftScore"
 ```
+
+This example reflects the published `solverforge-cli 2.0.1` scaffold target.
+Fresh generated apps start on the current `solverforge 0.9.1` and
+`solverforge-ui 0.6.3` patch line.
 
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:

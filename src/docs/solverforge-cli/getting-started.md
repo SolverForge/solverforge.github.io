@@ -18,7 +18,9 @@ This guide walks the default CLI-first onboarding path:
 6. inspect and validate the generated application
 
 If you want a concrete app after that generic shell, continue with the
-[SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/).
+[SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
+or the
+[SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/).
 
 ## Prerequisites
 
