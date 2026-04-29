@@ -67,7 +67,7 @@ You will:
 - connect map preparation, route shadows, constraints, and previews
 - use the retained `/jobs` lifecycle plus `/jobs/{id}/routes`
 - study `/recommendations/delivery-insertions` as an interactive optimization
-  surface
+  workflow
 
 **No routing or optimization background required**. The article explains the
 end-to-end pipeline. The code comments explain the local reason each function,
@@ -694,7 +694,7 @@ cost.
 ## Testing and Validation
 
 After you have cloned the finished example, or after your manual build-out
-matches it, run the foundational checks from the app root:
+matches it, run the baseline checks from the app root:
 
 ```bash
 solverforge check
@@ -705,7 +705,7 @@ cargo test
 
 `solverforge check` validates the app metadata and model wiring. `solverforge
 routes` confirms that the retained lifecycle and delivery-specific endpoints are
-visible from the generated Axum route surface.
+visible in the generated Axum router.
 
 In the finished example repository, the convenience target is:
 
@@ -723,7 +723,7 @@ make ci-local
 ```
 
 `make ci-local` runs format check, clippy, release build, the standard test
-surface, and the Docker/Space image build.
+suite, and the Docker/Space image build.
 
 Run the live road-network smoke when you need to prove the map-backed route
 path:

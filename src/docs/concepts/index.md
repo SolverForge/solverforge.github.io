@@ -9,6 +9,6 @@ description: >
 
 Before diving into SolverForge, it's helpful to understand the core concepts behind planning optimization. This section covers:
 
-- [What is Planning Optimization?](what-is-planning.md) - Introduction to constraint satisfaction and optimization
-- [Problem Types](problem-types.md) - Common categories of planning problems
-- [Terminology](terminology.md) - Glossary of terms used throughout the documentation
+- [What is Planning Optimization?](what-is-planning/) - Introduction to constraint satisfaction and optimization
+- [Problem Types](problem-types/) - Common categories of planning problems
+- [Terminology](terminology/) - Glossary of terms used throughout the documentation

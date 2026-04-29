@@ -1,16 +1,17 @@
 ---
-title: "Integration Surfaces"
+title: "Integration Boundaries"
 description: "A compact map of where runtime, scaffolding, UI, and map-backed planning responsibilities belong."
 ---
 
-# Integration Surfaces
+# Integration Boundaries
 
-SolverForge is not one binary blob. The value is in knowing which layer should
-own which concern.
+SolverForge works best when each responsibility is owned by the right crate,
+tool, or application module. This keeps solver truth in the runtime, product
+behavior in your app, and optional helpers limited to the problems they solve.
 
 ## Boundary map
 
-| Surface | Owns | Should not own |
+| Component | Owns | Should not own |
 |---|---|---|
 | `solverforge` runtime | domain modeling, constraints, solving, retained lifecycle | project scaffolding, web components, routing datasets |
 | `solverforge-cli` | app bootstrap and code generation | runtime truth, UI state, solver lifecycle semantics |
@@ -56,7 +57,7 @@ network structure are real business inputs, not as a default dependency.
 - Does it belong in app code, or is it generic enough for SolverForge itself?
 - Are you reaching for a companion repo because you need it, or because it
   happens to exist?
-- Would a tutorial page or a compact reference page help future users more?
+- Would a tutorial or reference note help future users avoid the same mistake?
 
 ## See also
 

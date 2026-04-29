@@ -257,7 +257,7 @@ begin
   assert_file_contains(home_page, "Continue with the Hospital Use Case")
   assert_file_contains(hub_page, "Start with **`solverforge-cli`** for the generic project shell.")
   assert_file_contains(hub_page, "one concrete worked")
-  assert_file_contains(search_surface, "Continue from the CLI guide into one concrete hospital use case.")
+  assert_file_contains(search_surface, "See a concrete hospital scheduling application from scaffold to solver-driven UI.")
 
   assert_file_contains(doc_page, "cargo install solverforge-cli --force")
   assert_file_contains(doc_page, "solverforge --version")

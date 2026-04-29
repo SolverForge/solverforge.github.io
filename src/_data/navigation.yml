@@ -26,8 +26,8 @@ footer:
         url: /about/
       - title: Community
         url: /community/
-  ecosystem:
-    title: Ecosystem
+  tools:
+    title: Tools
     links:
       - title: solverforge-cli
         url: /docs/solverforge-cli/

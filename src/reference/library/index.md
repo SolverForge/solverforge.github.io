@@ -6,7 +6,7 @@ description: "Fast lookup material for engineers integrating, extending, or eval
 # Library Reference
 
 <%= render Ui::Callout.new(title: "Use this section when you already know the question") do %>
-The main docs teach concepts and workflows. This section is the compact reference layer for crate boundaries, modeling choices, extension decisions, and ecosystem fit.
+Use these pages to choose crate boundaries, check modeling choices, and decide when an extension should stay in app code.
 <% end %>
 
 ## What lives here
@@ -14,7 +14,7 @@ The main docs teach concepts and workflows. This section is the compact referenc
 - crate and runtime boundaries
 - modeling rules of thumb
 - practical extension playbooks
-- integration boundaries across the SolverForge ecosystem
+- integration boundaries across the SolverForge crates and companion libraries
 
 ## Start here
 
@@ -31,7 +31,7 @@ Grow the generated shell into a real planning model without turning it into fram
   <%= render Ui::Card.new(title: "Extend the Solver", href: relative_url('/reference/extend-solver/'), icon: "fa-solid fa-sliders") do %>
 Tune configuration first, then decide whether custom runtime code is actually justified.
   <% end %>
-  <%= render Ui::Card.new(title: "Integration Surfaces", href: relative_url('/reference/integration-surfaces/'), icon: "fa-solid fa-puzzle-piece") do %>
+  <%= render Ui::Card.new(title: "Integration Boundaries", href: relative_url('/reference/integration-surfaces/'), icon: "fa-solid fa-puzzle-piece") do %>
 See where the runtime ends and where `solverforge-cli`, `solverforge-ui`, and `solverforge-maps` begin.
   <% end %>
 </div>

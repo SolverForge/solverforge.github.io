@@ -18,7 +18,7 @@ For current scaffold targets, use
 This was the release that made the public CLI contract match the current
 SolverForge application architecture. New projects start from one neutral app
 shell, then grow through explicit generator commands. The CLI no longer exposes
-problem-family scaffold commands or starter flags as part of the public surface.
+problem-family scaffold commands or starter flags as public commands.
 
 ```bash
 cargo install solverforge-cli --version 2.0.0 --force
@@ -97,7 +97,7 @@ solverforge generate solution schedule --score HardSoftScore
 solverforge generate data --size standard
 ```
 
-The documented generator surface is:
+The documented generator commands are:
 
 - `generate fact`
 - `generate entity`
@@ -140,7 +140,7 @@ frontend shell config for labels such as title and subtitle.
 
 ## Breaking changes
 
-This is a major CLI release because stale public scaffold surfaces are gone.
+This is a major CLI release because stale public scaffold commands are gone.
 
 - `solverforge generate scaffold` is no longer part of the CLI.
 - `solverforge new --scalar`, `--list`, `--mixed`, and starter-family flags are

@@ -51,7 +51,7 @@ We looked at Rust libraries that wrap JNI (j4rs, jni-rs, robusta_jni). They redu
 
 Before SolverForge, we maintained Python bindings to Timefold using JPype. JPype bridges Python and Java by creating proxy objects—Python method calls translate to Java method calls transparently.
 
-This transparency has a cost. Our [order picking quickstart](/blog/technical/order-picking-quickstart-jpype-performance/) made this viscerally clear: constraint evaluation calls cross the Python-Java boundary millions of times. Each crossing involves type conversion, reference management, and GIL coordination.
+This transparency has a cost. Our [order picking quickstart](/blog/technical/2025/12/24/order-picking-quickstart-jpype-performance/) made this viscerally clear: constraint evaluation calls cross the Python-Java boundary millions of times. Each crossing involves type conversion, reference management, and GIL coordination.
 
 ```python
 @constraint_provider
@@ -62,7 +62,7 @@ def define_constraints(factory: ConstraintFactory):
     ]
 ```
 
-The constraint provider looks like Python. It runs as Java. Every evaluation triggers JPype conversions. Even with [dataclass optimizations](/blog/technical/python-constraint-solver-architecture/), we couldn't eliminate the FFI cost.
+The constraint provider looks like Python. It runs as Java. Every evaluation triggers JPype conversions. Even with [dataclass optimizations](/blog/technical/2025/12/06/python-constraint-solver-architecture/), we couldn't eliminate the FFI cost.
 
 This experience shaped our thinking: FFI bridges that cross the language boundary in constraint hot paths will always have performance problems at scale. The only way to win is to keep the hot path on one side of the boundary.
 
@@ -148,7 +148,7 @@ Stay tuned. We think you'll like what we've been building.
 ---
 
 **Further reading:**
-- [JPype Performance in Order Picking](/blog/technical/order-picking-quickstart-jpype-performance/)
-- [Dataclasses vs Pydantic Architecture](/blog/technical/python-constraint-solver-architecture/)
+- [JPype Performance in Order Picking](/blog/technical/2025/12/24/order-picking-quickstart-jpype-performance/)
+- [Dataclasses vs Pydantic Architecture](/blog/technical/2025/12/06/python-constraint-solver-architecture/)
 - [SolverForge Documentation](/docs/)
 - [SolverForge on GitHub](https://github.com/SolverForge/solverforge)

@@ -91,4 +91,4 @@ That means:
 
 - [Docs: Solver](/docs/solverforge/solver/)
 - [Lifecycle Contract](/reference/lifecycle-pause-resume-contract/)
-- [Integration Surfaces](/reference/integration-surfaces/)
+- [Integration Boundaries](/reference/integration-surfaces/)

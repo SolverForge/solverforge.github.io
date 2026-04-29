@@ -1,19 +1,19 @@
 ---
-title: "Ecosystem Maintainer Reference"
-description: "Maintainer reference for the engineering surfaces across the SolverForge ecosystem."
+title: "Maintainer Coordination Reference"
+description: "Maintainer reference for ownership checks across SolverForge crates, docs, and companion libraries."
 ---
 
-# Ecosystem Maintainer Reference
+# Maintainer Coordination Reference
 
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
 This page is for maintainers coordinating documentation and implementation
-surfaces in `solverforge`, `solverforge-cli`, `solverforge-ui`, and
+contracts in `solverforge`, `solverforge-cli`, `solverforge-ui`, and
 `solverforge-maps`.
 <% end %>
 
-## Documentation surfaces
+## Documentation ownership
 
-| Surface                                                                                                | Audience                      | Role                                                                                        |
+| Source                                                                                                 | Audience                      | Role                                                                                        |
 | ------------------------------------------------------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------- |
 | Public SolverForge docs                                                                                | users, engineers, maintainers | tutorials, concepts, references, releases, and integration guidance                         |
 | `SolverForge/solverforge` repo files                                                                   | product maintainers           | core Rust workspace source of truth, including `README.md` and `crates/*/WIREFRAME.md`      |
@@ -27,10 +27,10 @@ should be referenced, not copied wholesale.
 | If you change...                                                       | Update...                                                                                                       |
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | public docs, navigation, reference, or release content                 | the matching public documentation pages                                                                         |
-| public API surface or onboarding in a product repo                     | the product repo's own `README.md`, wireframes, and implementation docs, plus the matching public documentation |
+| public API or onboarding in a product repo                             | the product repo's own `README.md`, wireframes, and implementation docs, plus the matching public documentation |
 | repo-local maintainer workflow or architecture notes in a product repo | the source repo first, then any public maintainer note that summarizes or points to that guidance                |
 
-## Repo-local maintainer surfaces
+## Repo-local maintainer material
 
 The product repositories keep files that should remain repo-local:
 

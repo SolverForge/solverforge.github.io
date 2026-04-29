@@ -4,7 +4,7 @@ linkTitle: "Hospital Use Case"
 icon: fa-brands fa-rust
 date: 2026-04-23
 weight: 5
-description: "A long-form worked example that starts with solverforge-cli and carries one concrete hospital scheduling app through to the current public surface"
+description: "A long-form worked example that starts with solverforge-cli and carries one concrete hospital scheduling app through retained jobs, constraints, and browser updates"
 categories: [Quickstarts]
 tags: [quickstart, rust, hospital]
 ---
@@ -22,7 +22,7 @@ tags: [quickstart, rust, hospital]
 7. [How Optimization Works](#how-optimization-works)
 8. [Writing Constraints](#writing-constraints)
 9. [Solver Policy](#solver-policy)
-10. [Runtime and Browser Surface](#runtime-and-browser-surface)
+10. [Runtime and Browser Behavior](#runtime-and-browser-behavior)
 11. [Making Your First Customization](#making-your-first-customization)
 12. [Testing and Validation](#testing-and-validation)
 13. [Quick Reference](#quick-reference)
@@ -58,7 +58,7 @@ You will:
 - follow how `employee_idx` moves through constraints, solver policy, retained
   jobs, snapshots, and the browser
 - keep the stock retained `/jobs` lifecycle while landing on the current
-  hospital UI and data surface
+  hospital UI and data contract
 
 **No optimization background required**. The article explains the end-to-end
 path. The code comments in the example repo explain the local intent at the
@@ -600,11 +600,11 @@ decide feasibility and quality.
 
 ---
 
-## Runtime and Browser Surface
+## Runtime and Browser Behavior
 
 The hospital app keeps the stock retained lifecycle and adapts it to its domain.
 
-The public job surface is:
+The public job API is:
 
 ```text
 POST   /jobs
@@ -665,7 +665,7 @@ constraint addition.
 ## Testing and Validation
 
 After you have cloned the finished example, or after your manual build-out
-matches it, run the foundational checks from the app root:
+matches it, run the baseline checks from the app root:
 
 ```bash
 solverforge check
@@ -675,8 +675,8 @@ cargo test
 ```
 
 `solverforge check` validates the app metadata and model wiring. `solverforge
-routes` confirms that the retained lifecycle endpoints are visible from the
-generated Axum route surface.
+routes` confirms that the retained lifecycle endpoints are visible in the
+generated Axum router.
 
 In the finished example repository, the convenience target is:
 

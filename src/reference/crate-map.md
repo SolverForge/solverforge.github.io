@@ -15,7 +15,7 @@ you have a concrete reason to go lower-level.
 
 ## Workspace crates
 
-| Surface | Owns | Reach for it when... |
+| Crate | Owns | Reach for it when... |
 |---|---|---|
 | `solverforge` | the public facade and re-exports | you are building an app and want the normal public API |
 | `solverforge-core` | score types, descriptors, domain traits | you are extending lower-level abstractions or implementing core-facing helpers |
@@ -56,7 +56,7 @@ you have a concrete reason to go lower-level.
 
 ## What not to do
 
-- Do not start on the lowest-level crates unless the public surface is clearly
+- Do not start on the lowest-level crates unless the public API is clearly
   insufficient.
 - Do not push app-specific business rules into SolverForge crates just because
   the extension point exists.
@@ -66,5 +66,5 @@ you have a concrete reason to go lower-level.
 ## See also
 
 - [SolverForge docs](/docs/solverforge/)
-- [Integration Surfaces](/reference/integration-surfaces/)
+- [Integration Boundaries](/reference/integration-surfaces/)
 - [Modeling Cheat Sheet](/reference/modeling-cheat-sheet/)

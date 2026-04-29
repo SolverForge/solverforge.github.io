@@ -67,7 +67,7 @@ Use `solverforge-maps` when your optimization model needs **real road travel tim
 ## Sections
 
 - **[Getting Started](getting-started/)** — From coordinates to a computed matrix
-- **[Core Types](core-types/)** — `Coord`, `BoundingBox`, `NetworkConfig`, and `RoadNetwork`
+- **Validated coordinates and routing boxes** — covered in [Getting Started](getting-started/) and [Routing & Matrices](routing/)
 - **[Routing & Matrices](routing/)** — Routes, snapping, matrices, geometries, and objectives
 - **[Caching & Operations](caching/)** — Cache management, progress updates, and diagnostics
 

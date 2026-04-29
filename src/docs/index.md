@@ -6,11 +6,12 @@ menu: { main: { weight: 20 } }
 
 <h1>Documentation</h1>
 
-Welcome to the SolverForge documentation. Choose a section to get started:
+Use these docs to learn what SolverForge solves, scaffold a working app, and
+inspect the Rust APIs behind the runtime, UI, and routing helpers.
 
 <div class="card-grid">
   <%= render Ui::Card.new(title: "Overview", href: relative_url('/docs/overview/'), icon: "fa-solid fa-compass") do %>
-Project overview, positioning, and roadmap notes.
+What SolverForge solves, when to use it, and how it differs from mathematical solvers.
   <% end %>
   <%= render Ui::Card.new(title: "Concepts", href: relative_url('/docs/concepts/'), icon: "fa-solid fa-lightbulb") do %>
 Core planning and optimization concepts for SolverForge users.
@@ -22,7 +23,7 @@ CLI-first onboarding, quickstarts, and longer tutorials.
 Project scaffolding and generator workflows.
   <% end %>
   <%= render Ui::Card.new(title: "SolverForge", href: relative_url('/docs/solverforge/'), icon: "fa-brands fa-rust") do %>
-Native runtime, modeling surface, phases, moves, and analysis APIs.
+Native runtime, domain modeling, phases, moves, and analysis APIs.
   <% end %>
   <%= render Ui::Card.new(title: "solverforge-ui", href: relative_url('/docs/solverforge-ui/'), icon: "fa-solid fa-display") do %>
 Frontend components, lifecycle adapters, scheduling views, and assets.

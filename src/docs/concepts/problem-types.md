@@ -162,5 +162,5 @@ When modeling your problem:
 3. **Identify constraints** - What rules must be followed?
 4. **Define the score** - How do you measure solution quality?
 
-The [Getting Started](../getting-started/) section provides complete examples
+The [Getting Started](/docs/getting-started/) section provides complete examples
 for common problem types.

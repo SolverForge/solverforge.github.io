@@ -2,7 +2,7 @@ title: SolverForge
 tagline: Write constraints like you write code
 email: maintainers@solverforge.org
 description: >-
-  Native Rust constraint solving for planning, scheduling, routing, and allocation software.
+  Inspectable Rust planning software for scheduling, routing, allocation, and dispatch.
 url: https://solverforge.github.io
 github: https://github.com/SolverForge/solverforge
 github_org: https://github.com/SolverForge

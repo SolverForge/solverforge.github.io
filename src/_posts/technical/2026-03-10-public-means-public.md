@@ -43,19 +43,19 @@ In Rust, no. The entire SolverForge architecture is zero-erasure — fully monom
 
 Exposing `ChangeMove`, `SwapMove`, `KOptMove` as public types doesn't add indirection. Making `ScoreDirector` generic over your solution and score types doesn't add vtable lookups. The `pub` keyword tells the compiler "other crates can name this type." It says nothing about runtime cost, because there is none.
 
-This is not true in every language. In some, making something accessible across module boundaries requires boxing, dynamic dispatch, or reflection. The API designer faces a real trade-off: clean public surface or fast internal execution. Rust eliminates this trade-off entirely. Monomorphization means the public API compiles to the same machine code as if everything were in a single module.
+This is not true in every language. In some, making something accessible across module boundaries requires boxing, dynamic dispatch, or reflection. The API designer faces a real trade-off: clean public API or fast internal execution. Rust eliminates this trade-off entirely. Monomorphization means the public API compiles to the same machine code as if everything were in a single module.
 
 So we expose everything that's useful. There's no performance reason not to.
 
 ## The Permanent Commitment
 
-Here is the commitment, stated plainly: SolverForge will never shrink its public API surface.
+Here is the commitment, stated plainly: SolverForge will not take public APIs away.
 
 What is `pub` today will not become `pub(crate)` tomorrow. We will not introduce a module system, an access control layer, or a policy document that reinterprets existing visibility markers. We will not deprecate public types because users found creative ways to use them that we didn't anticipate. If you build on something that's public, it stays public.
 
 This is enforced structurally, not by good intentions. Rust's visibility model doesn't have a mechanism for "public but actually don't use this." There is no annotation that says "this compiles today but might not next release." `pub` is `pub`. The compiler doesn't know about your product roadmap.
 
-New public APIs will be added as the solver grows. Existing public APIs will be extended, never restricted. The surface area only expands.
+New public APIs will be added as the solver grows. Existing public APIs will be extended, never restricted. The set of public types and functions only expands.
 
 Power users — the ones building custom heuristics, writing domain-specific moves, integrating solvers into production pipelines — need to know the ground won't shift. That what compiled today compiles tomorrow. That the types they depend on won't disappear behind an access control change justified by "architectural best practices."
 

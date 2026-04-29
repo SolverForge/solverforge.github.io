@@ -566,5 +566,5 @@ way of the concepts being taught.
 
 **Further reading:**
 
-- [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/python-constraint-solver-architecture/)
-- [Order Picking Quickstart: JPype Bridge Overhead](/blog/technical/order-picking-quickstart-jpype-performance/)
+- [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/2025/12/06/python-constraint-solver-architecture/)
+- [Order Picking Quickstart: JPype Bridge Overhead](/blog/technical/2025/12/24/order-picking-quickstart-jpype-performance/)

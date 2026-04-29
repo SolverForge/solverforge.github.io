@@ -87,7 +87,7 @@ def define_constraints(factory: ConstraintFactory):
     ]
 ```
 
-Every constraint evaluation triggers JPype conversions. Even with [dataclass optimization]((/blog/technical/python-constraint-solver-architecture/))(avoiding Pydantic overhead in hot paths), we can't eliminate the FFI cost.
+Every constraint evaluation triggers JPype conversions. Even with [dataclass optimization](/blog/technical/2025/12/06/python-constraint-solver-architecture/) avoiding Pydantic overhead in hot paths, we can't eliminate the FFI cost.
 
 The operations most affected by bridge overhead:
 
@@ -98,7 +98,7 @@ The operations most affected by bridge overhead:
 Mitigation strategies that help:
 - **Callback-based caching**: Store serialized solutions to avoid repeated boundary crossings
 - **Simplified domain models**: Fewer fields means fewer conversions
-- **Dataclass over Pydantic**: Skip validation overhead in solver hot paths (see [architecture comparison](/blog/technical/python-constraint-solver-architecture/))
+- **Dataclass over Pydantic**: Skip validation overhead in solver hot paths (see [architecture comparison](/blog/technical/2025/12/06/python-constraint-solver-architecture/))
 
 ## Why This Validates Rust
 
@@ -130,7 +130,7 @@ pip install -e .
 run-app
 ```
 
-**Architecture:** All quickstarts follow the pattern documented in [dataclasses vs Pydantic](/blog/technical/python-constraint-solver-architecture/).
+**Architecture:** All quickstarts follow the pattern documented in [dataclasses vs Pydantic](/blog/technical/2025/12/06/python-constraint-solver-architecture/).
 
 **Current Rust framework development:**
 
@@ -140,7 +140,7 @@ progress at [github.com/SolverForge](https://github.com/SolverForge).
 ---
 
 **Further reading:**
-- [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/python-constraint-solver-architecture/)
-- [Vehicle Routing Quickstart](/docs/getting-started/vehicle-routing/)
+- [Dataclasses vs Pydantic in Constraint Solvers](/blog/technical/2025/12/06/python-constraint-solver-architecture/)
+- [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
 - [Order Picking README](https://github.com/SolverForge/solverforge-quickstarts/tree/main/legacy/order-picking-fast)
 - [SolverForge Docs](/docs/)

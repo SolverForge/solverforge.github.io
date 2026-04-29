@@ -8,11 +8,11 @@ class Shared::SearchSurface < Bridgetown::Component
   ].freeze
 
   QUICK_LINKS = [
-    ["/docs/overview/", "Project overview", "Read the architecture, scope, and runtime framing."],
-    ["/docs/getting-started/solverforge-hospital-use-case/", "SolverForge Hospital Use Case", "Continue from the CLI guide into one concrete hospital use case."],
+    ["/docs/overview/", "Project overview", "Understand the planning problems SolverForge handles and when to use it."],
+    ["/docs/getting-started/solverforge-hospital-use-case/", "SolverForge Hospital Use Case", "See a concrete hospital scheduling application from scaffold to solver-driven UI."],
     ["/docs/getting-started/solverforge-deliveries-use-case/", "SolverForge Deliveries Use Case", "Study list-variable vehicle routing with maps, retained jobs, and route recommendations."],
-    ["/reference/", "Reference docs", "Open the engineer-facing handbooks, crate maps, and clearly labeled maintainer notes."],
-    ["/blog/", "Release notes and technical posts", "Browse changes, direction, and implementation notes."],
+    ["/reference/", "Reference docs", "Check crate boundaries, modeling choices, and extension guidance."],
+    ["/blog/", "Release notes and technical posts", "Review shipped changes and implementation decisions."],
   ].freeze
 
   def initialize(mode:, index_url:, page_url:)

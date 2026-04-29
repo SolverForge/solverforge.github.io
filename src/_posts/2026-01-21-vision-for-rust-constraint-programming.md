@@ -21,9 +21,9 @@ The durable part of the original article was the language choice: SolverForge is
 a Rust constraint solver because planning and scheduling problems spend most of
 their time in tight move-evaluation and scoring loops.
 
-The current architecture keeps that Rust-native foundation, but the public
-product shape has changed. SolverForge should now be understood through four
-current surfaces:
+The current implementation keeps that Rust-native design, but the product shape
+has changed. SolverForge should now be understood through four current
+capabilities:
 
 - `solverforge`, the Rust runtime and modeling API
 - `solverforge-cli`, the default entry point for new projects

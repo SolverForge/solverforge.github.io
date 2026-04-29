@@ -68,7 +68,7 @@ Shared terminology must use neutral words:
 - delete
 
 Legacy `schedule` terminology is removed from shared UI contracts and generated
-scaffold HTTP surfaces in this initiative.
+scaffold HTTP routes in this initiative.
 
 ### 2. Runtime truth
 
@@ -371,7 +371,7 @@ Required resource shape:
 - `DELETE /jobs/{id}`
 - `GET /jobs/{id}/events`
 
-The current generated `schedules` surface is retired in this initiative.
+The current generated `schedules` route group is retired in this initiative.
 
 ### 2. Thin generated UI
 
