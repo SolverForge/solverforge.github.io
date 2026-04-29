@@ -10,7 +10,7 @@ description: Native Rust constraint solving for planning, scheduling, routing, a
     <p class="page-shell__eyebrow">AI Optimization Framework and Solver</p>
     <h1>Build planning software without switching to a solver language.</h1>
     <p class="home-hero__summary">
-      SolverForge keeps domain models, constraints, runtime control, and static documentation in one inspectable codebase. You write the business rules in Rust, the solver stays zero-erasure all the way down, and the docs remain readable both on disk and on the web.
+      SolverForge keeps domain models, constraints, and runtime control in ordinary Rust code. You write business rules in the same language as the rest of your application, while the solver stays concrete and inspectable all the way down.
     </p>
 
     <div class="home-actions">
@@ -34,7 +34,7 @@ description: Native Rust constraint solving for planning, scheduling, routing, a
       <p class="page-shell__eyebrow">Write constraints like you write code</p>
       <h2>Readable rules, explicit tradeoffs, real application shapes.</h2>
       <p>
-        Model shifts, routes, tasks, workers, vehicles, and inventories as ordinary application code. SolverForge keeps the runtime concrete and inspectable while Bridgetown turns the same repository into a polished documentation site.
+        Model shifts, routes, tasks, workers, vehicles, and inventories as ordinary application code. SolverForge keeps constraint definitions, move generation, score analysis, and solver control close to the domain types they operate on.
       </p>
       <div class="card-grid">
         <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-rocket") do %>
