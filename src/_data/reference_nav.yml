@@ -15,11 +15,9 @@ reference:
         href: /reference/integration-surfaces/
   - title: Maintainer Notes (Internal)
     href: /reference/maintainers/
-    summary: Internal maintainer references and operational contracts kept in-repo for SolverForge maintainers.
+    summary: Operational contracts for SolverForge maintainers.
     children:
       - title: Ecosystem Maintainer Reference
         href: /reference/maintainers/ecosystem-reference/
       - title: Lifecycle Contract
         href: /reference/lifecycle-pause-resume-contract/
-      - title: Docs Site Maintainer Reference
-        href: /reference/maintainers/docs-site-reference/

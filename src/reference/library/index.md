@@ -39,4 +39,4 @@ See where the runtime ends and where `solverforge-cli`, `solverforge-ui`, and `s
 ## Not what you need?
 
 - For tutorials and walkthroughs, go to [Docs](/docs/).
-- For internal contracts and site-operation notes, go to [Maintainer Notes](/reference/maintainers/).
+- For internal SolverForge maintainer contracts, go to [Maintainer Notes](/reference/maintainers/).

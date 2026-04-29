@@ -334,10 +334,10 @@ function highlightCode(source, lineNumber, filename) {
 
 ### Bidirectional Navigation
 
-The documentation site has a corresponding "See in Demo" feature. When reading
-about a constraint in the docs, you can click through to the running application
-with that constraint highlighted. Education flows both ways: from UI to code,
-and from code to UI.
+The docs have a corresponding "See in Demo" feature. When reading about a
+constraint, you can click through to the running application with that
+constraint highlighted. Education flows both ways: from UI to code, and from
+code to UI.
 
 ## CSS Architecture
 

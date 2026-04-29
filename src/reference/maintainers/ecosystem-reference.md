@@ -1,37 +1,34 @@
 ---
 title: "Ecosystem Maintainer Reference"
-description: "Maintainer reference for the published site and the repo-local engineering surfaces across the SolverForge ecosystem."
+description: "Maintainer reference for the engineering surfaces across the SolverForge ecosystem."
 ---
 
 # Ecosystem Maintainer Reference
 
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
-This page is for maintainers coordinating the published site with the
-repo-local documentation and implementation surfaces in `solverforge`, `solverforge-cli`,
-`solverforge-ui`, and `solverforge-maps`.
+This page is for maintainers coordinating documentation and implementation
+surfaces in `solverforge`, `solverforge-cli`, `solverforge-ui`, and
+`solverforge-maps`.
 <% end %>
 
 ## Documentation surfaces
 
 | Surface                                                                                                | Audience                      | Role                                                                                        |
 | ------------------------------------------------------------------------------------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------- |
-| `src/docs/**` and `src/reference/**` in this repo                                                      | users, engineers, maintainers | published website surface                                                                   |
-| `README.md` in this repo                                                                               | site maintainers              | local workflow, build entry points, and repo boundaries                                     |
+| Public SolverForge docs                                                                                | users, engineers, maintainers | tutorials, concepts, references, releases, and integration guidance                         |
 | `SolverForge/solverforge` repo files                                                                   | product maintainers           | core Rust workspace source of truth, including `README.md` and `crates/*/WIREFRAME.md`      |
 | `SolverForge/solverforge-cli`, `SolverForge/solverforge-ui`, `SolverForge/solverforge-maps` repo files | product maintainers           | canonical repo-local onboarding, architecture, and implementation detail for those products |
 
-The site is the published documentation surface. Repo-local maintainer files in
-the product repositories remain canonical for source-level detail and should be
-referenced, not copied wholesale.
+Product repositories remain canonical for source-level maintainer detail and
+should be referenced, not copied wholesale.
 
 ## Canonical update rules
 
-| If you change...                                                       | Update...                                                                                                             |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| published docs, navigation, reference, or blog content                 | the matching `src/**` pages in this repo                                                                              |
-| site workflow, build, or search plumbing                               | `README.md`, `.github/workflows/site.yml`, and the maintainer pages under `src/reference/maintainers/**` in this repo |
-| public API surface or onboarding in a product repo                     | the product repo's own `README.md`, wireframes, and implementation docs, plus the matching published pages here       |
-| repo-local maintainer workflow or architecture notes in a product repo | the source repo first, then any site page here that summarizes or points to that guidance                             |
+| If you change...                                                       | Update...                                                                                                       |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| public docs, navigation, reference, or release content                 | the matching public documentation pages                                                                         |
+| public API surface or onboarding in a product repo                     | the product repo's own `README.md`, wireframes, and implementation docs, plus the matching public documentation |
+| repo-local maintainer workflow or architecture notes in a product repo | the source repo first, then any public maintainer note that summarizes or points to that guidance                |
 
 ## Repo-local maintainer surfaces
 
@@ -42,8 +39,8 @@ The product repositories keep files that should remain repo-local:
 - `SolverForge/solverforge-ui`: repo-local maintainer docs and implementation notes
 - `SolverForge/solverforge-maps`: repo-local maintainer docs and implementation notes
 
-Those files are not rendered through the site. Mention them on the site when
-helpful, but do not duplicate their full contents here.
+Those files are source-level maintainer material. Mention them when helpful, but
+do not duplicate their full contents here.
 
 ## Routine maintainer checks
 
@@ -53,7 +50,7 @@ helpful, but do not duplicate their full contents here.
 - in a product repo: run that repo's own build, test, and release checks there
 
 `make verify-hospital-tutorial` and `make verify-deliveries-tutorial` run
-site-local checks without product checkouts. Set `SOLVERFORGE_CLI_REPO` or
+documentation checks without product checkouts. Set `SOLVERFORGE_CLI_REPO` or
 `SOLVERFORGE_HOSPITAL_REPO` to add the deeper CLI scaffold and live hospital app
 checks. Set `SOLVERFORGE_DELIVERIES_REPO` to add deliveries source checks and the
 straight-line retained-job smoke against the local deliveries app. The Make
@@ -62,5 +59,4 @@ Ruby.
 
 ## See also
 
-- [Docs Site Maintainer Reference](/reference/maintainers/docs-site-reference/)
 - [Library Reference](/reference/library/)
