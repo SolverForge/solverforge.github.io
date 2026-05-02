@@ -35,16 +35,21 @@ for constraint in &analysis.constraints {
 
 Each `ConstraintAnalysis` contains:
 
-| Field | Description |
-|---|---|
-| `name` | Human-readable constraint name (from `.named()`) |
-| `weight` | Constraint weight used when scoring |
-| `score` | Total score impact of this constraint |
-| `match_count` | Number of times the constraint matched |
+| Field         | Description                                      |
+| ------------- | ------------------------------------------------ |
+| `name`        | Human-readable constraint name (from `.named()`) |
+| `weight`      | Constraint weight used when scoring              |
+| `score`       | Total score impact of this constraint            |
+| `match_count` | Number of times the constraint matched           |
 
 The stock `analyze(&solution)` helper returns this summarized view. If you need
 full per-match justifications and indictment maps, use the lower-level
 `solverforge-scoring` analysis APIs directly.
+
+Lower-level scoring metadata uses `ConstraintRef` as the constraint identity.
+That means package-qualified constraints can share a short display name without
+collapsing into one constraint during scoring, analysis, or conflict-repair
+lookup. Package-less constraints still resolve by short name.
 
 ## Use Cases
 

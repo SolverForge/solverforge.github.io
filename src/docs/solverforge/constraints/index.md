@@ -11,7 +11,7 @@ Constraints are the business rules that define what makes a good solution. Solve
 ## How Constraints Work
 
 1. **Select** entities or facts from your solution using `for_each`
-2. **Filter, join, or group** to narrow down the matches
+2. **Filter, project, join, or group** to narrow down the matches
 3. **Penalize or reward** to affect the score
 4. **Name** the constraint with `.named()`
 
@@ -24,7 +24,11 @@ factory.for_each(|s: &Schedule| s.shifts.as_slice())    // Select all shifts
     .named("Unassigned shift")                           // Finalize
 ```
 
-Constraints are returned as a tuple implementing `ConstraintSet<S, Sc>`, which the solver evaluates incrementally as it explores moves.
+Constraints are returned as a tuple implementing `ConstraintSet<S, Sc>`, which
+the solver evaluates incrementally as it explores moves. In the 0.10.0 codebase,
+generated accessors preserve source metadata for localized incremental updates,
+projected streams can emit bounded derived scoring rows, and lower-level
+constraint metadata is keyed by full `ConstraintRef` identity.
 
 ## Sections
 

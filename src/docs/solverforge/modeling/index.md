@@ -8,11 +8,11 @@ description: >
 
 SolverForge uses derive macros to turn your Rust structs into a planning domain. There are three key concepts:
 
-| Concept | Macro | Purpose |
-|---------|-------|---------|
+| Concept               | Macro                  | Purpose                                                        |
+| --------------------- | ---------------------- | -------------------------------------------------------------- |
 | **Planning Solution** | `#[planning_solution]` | The top-level container — holds entities, facts, and the score |
-| **Planning Entity** | `#[planning_entity]` | Something the solver changes (assigns variables to) |
-| **Problem Fact** | `#[problem_fact]` | Immutable input data the solver reads but doesn't modify |
+| **Planning Entity**   | `#[planning_entity]`   | Something the solver changes (assigns variables to)            |
+| **Problem Fact**      | `#[problem_fact]`      | Immutable input data the solver reads but doesn't modify       |
 
 ```
 Planning Solution
@@ -54,7 +54,15 @@ solverforge::planning_model! {
 ```
 
 That manifest is the canonical place where the runtime validates the model and
-derives scalar/list metadata across separate Rust files.
+derives scalar/list metadata across separate Rust files. Public Rust aliases are
+accepted at the manifest boundary, including `type Alias = Type;` and
+`pub use module::Type as Alias;`, but solver configuration still targets the
+canonical descriptor type name such as `Task.worker`.
+
+Scalar runtime metadata is descriptor-addressed. The generated compact
+`variable_index` remains an internal getter/setter dispatch index, while runtime
+hook attachment and ordering use the descriptor index plus variable name. That
+means Rust module declaration order is not a modeling contract.
 
 ## Sections
 

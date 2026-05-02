@@ -165,16 +165,17 @@ constraints.
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation tracks the published `solverforge` `0.9.1` runtime
-line and calls out CLI scaffold targets separately when an installed CLI
-intentionally lags the current runtime crate.
+in Rust. This documentation tracks the `solverforge` `0.10.0` core-library
+codebase and calls out CLI scaffold targets separately when an installed CLI
+intentionally lags the current runtime crate. Crates.io may still report
+`solverforge 0.9.1` until the 0.10.0 package is published.
 <% end %>
 
 ## Current Status
 
-| Component     | Status              | Description                                                              |
-| ------------- | ------------------- | ------------------------------------------------------------------------ |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver aligned with the published `0.9.1` runtime |
+| Component     | Status              | Description                                                      |
+| ------------- | ------------------- | ---------------------------------------------------------------- |
+| **Rust Core** | ✅ Production-ready | Native Rust constraint solver aligned with the `0.10.0` codebase |
 
 **Want to try it today?**
 
@@ -189,13 +190,13 @@ intentionally lags the current runtime crate.
 SolverForge Rust is **feature-complete** as a production constraint solver:
 
 - **Constraint Streams API**: Declarative constraint definition with `for_each`,
-  generated collection accessors, `filter`, unified `join(...)`,
-  `flatten_last`, `group_by`, `balance`, `if_exists(...)`,
+  source-aware generated collection accessors, `filter`, unified `join(...)`,
+  `flatten_last`, `project(...)`, `group_by`, `balance`, `if_exists(...)`,
   `if_not_exists(...)`, `penalize`, `reward`, and `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
   HardSoftDecimalScore, BendableScore
-- **Score Analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`,
-  `IndictmentMap`
+- **Score Analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
+  plus lower-level detailed match/explanation APIs in `solverforge-scoring`
 - **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
 - **Solver Phases**:
   - Construction Heuristics for scalar and list-variable models
@@ -217,12 +218,36 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   snapshots, snapshot-bound analysis, terminal-job deletion, and exact retained
   telemetry
 - **Configuration**: stock `solver.toml` loading plus
-  `SolverConfig::load()`, `from_toml_str()`, `from_yaml_str()`, and
-  `#[planning_solution(config = "...")]` overlays that decorate the loaded
+  `SolverConfig::load()`, `from_toml_str()`, `from_yaml_str()`, bounded scalar
+  candidate limits, grouped scalar selectors, level-aware simulated annealing,
+  and `#[planning_solution(config = "...")]` overlays that decorate the loaded
   runtime config
 
 ## Runtime Notes
 
+- **0.10.0 workspace baseline**: the core workspace version is `0.10.0` and the
+  Rust toolchain floor is `1.95`.
+- **Projected scoring rows**: `Projection` / `ProjectionSink` create bounded
+  derived rows without materializing new facts or entities. Projected self-join
+  ordering is coordinate-stable by source slot, entity index, and emission
+  index rather than sparse storage row id.
+- **Allocation-free score levels**: `Score::level_number()` is the required
+  per-level accessor; `to_level_numbers()` is the allocating vector view for
+  callers that need owned level data.
+- **Level-aware simulated annealing**: simulated annealing uses per-score-level
+  temperatures, hard-regression policy, calibration, and deterministic
+  hill-climbing behavior once cooled.
+- **Constraint metadata identity**: typed constraint metadata is keyed by full
+  `ConstraintRef`, so package-qualified constraints can share a short name
+  without collapsing into one scoring identity.
+- **Descriptor-addressed scalar runtime assembly**: generated scalar getter and
+  setter dispatch still uses compact internal indexes, while runtime hook
+  attachment and ordering use descriptor index plus variable name.
+- **Model-owned scalar hooks**: `candidate_values`,
+  `nearby_value_candidates`, `nearby_entity_candidates`,
+  `construction_entity_order_key`, and `construction_value_order_key` declare
+  bounded scalar neighborhoods and construction ordering on the planning
+  variable itself.
 - **Indexed existence scoring for exact `usize` keys**: direct and flattened
   `if_exists(...)` / `if_not_exists(...)` constraints keep the same public
   stream API, but exact `usize` join keys now use dense indexed bookkeeping
@@ -387,15 +412,16 @@ optimized native code.
   HardSoftDecimalScore, BendableScore
 - **Domain model**: Derive macros for `#[planning_solution]`,
   `#[planning_entity]`, `#[problem_fact]`
-- **Variable types**: Genuine, shadow, list variables
+- **Variable types**: scalar, shadow, and list variables
 - **Shadow variables**: `#[inverse_relation_shadow_variable]`,
   `#[previous_element_shadow_variable]`, `#[next_element_shadow_variable]`
-- **Constraint Streams API**: `for_each`, generated collection accessors,
-  unified `join`, `flatten_last`, `group_by`, `balance`, `if_exists(...)`,
-  `if_not_exists(...)`, `penalize`, `reward`, and `.named()`
+- **Constraint Streams API**: `for_each`, source-aware generated collection
+  accessors, unified `join`, `flatten_last`, `project(...)`, `group_by`,
+  `balance`, `if_exists(...)`, `if_not_exists(...)`, `penalize`, `reward`, and
+  `.named()`
 - **Grouped helpers**: `count`, `sum`, and `load_balance`
-- **Score analysis**: `ScoreAnalysis`, `ConstraintAnalysis`, `ScoreExplanation`,
-  `IndictmentMap`
+- **Score analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
+  plus lower-level detailed match/explanation APIs in `solverforge-scoring`
 
 **Solver phases and runtime:**
 

@@ -17,9 +17,12 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages are aligned with the published `solverforge 0.9.1` crate. Generated
-CLI projects can intentionally target an older runtime until the next CLI target
-refresh, so check `solverforge --version` when starting from a scaffold.
+These pages track the `solverforge` `0.10.0` core-library codebase. At the time
+of this docs update, crates.io still reports `solverforge 0.9.1`; use a git/path
+dependency for unreleased 0.10.0 work and check crate metadata before assuming a
+published package is available. Generated CLI projects can intentionally target
+an older runtime until the next CLI target refresh, so check `solverforge
+--version` when starting from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
@@ -31,25 +34,36 @@ cd my-scheduler
 solverforge server
 ```
 
-Check the crate metadata for the exact Rust toolchain requirement of the
-SolverForge version you are using.
+The 0.10.0 workspace declares Rust `1.95`.
 
 The generated runtime now builds one `ModelContext` for each planning model.
-Generic `FirstFit` and `CheapestInsertion` use the canonical construction
-engine whenever matching list work is present, while pure scalar matches reuse
-the descriptor-scalar path. Optional scalar variables keep `None` when it is
-the best legal baseline instead of forcing an eager assignment.
+Scalar metadata is resolved by descriptor index and variable name, not by Rust
+module declaration order. Generic `FirstFit` and `CheapestInsertion` use the
+canonical construction engine whenever matching list work is present, while pure
+scalar matches reuse the descriptor-scalar path. Optional scalar variables keep
+`None` when it is the best legal baseline instead of forcing an eager assignment.
 
 Startup telemetry is shape-aware in the current release: scalar solves report
 average `candidates`, list solves report element counts, and console output
 labels those solve shapes as `candidates` or `elements`.
 
-`v0.9.1` also tightens runtime behavior in three focused places. Exact `usize`
-keys in direct and flattened existence constraints now use indexed internal
-storage without changing the stream API. Local-search `phase_start` telemetry
-includes the current score once the starting score has been calculated. List
-ruin selectors sample only non-empty list owners, so empty routes or sequences
-do not consume generated ruin candidates.
+The 0.10.0 codebase also tightens several public contracts:
+
+- projected scoring rows use `Projection` / `ProjectionSink`, declare
+  `MAX_EMITS`, and keep self-join ordering coordinate-stable by source slot,
+  entity index, and emission index
+- scalar construction order is model-owned through
+  `construction_entity_order_key` and `construction_value_order_key`; those
+  hooks are evaluated against the live working solution at each construction
+  step and do not reorder local-search candidates
+- nearby scalar neighborhoods are bounded model capabilities through
+  `nearby_value_candidates` and `nearby_entity_candidates`; distance meters rank
+  or filter those candidates, but do not discover them
+- default local-search neighborhoods are explicit streaming defaults: scalar
+  change plus swap, list nearby-change plus nearby-swap plus reverse, and mixed
+  models concatenate list defaults before scalar defaults
+- retained telemetry preserves exact generated, evaluated, and accepted counts
+  plus generation and evaluation durations; `moves/s` is only a display metric
 
 ## Minimal Example
 

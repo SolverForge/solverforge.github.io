@@ -41,6 +41,19 @@ The stock runtime now builds one `ModelContext` per planning model. Generic
 construction heuristics work over that shared runtime context instead of
 splitting scalar-variable and list-variable solve paths.
 
+Scalar-only construction heuristics validate their model-owned hooks before
+phase build. `first_fit_decreasing` and `allocate_entity_from_queue` require
+`construction_entity_order_key`; `weakest_fit`, `strongest_fit`, and
+`allocate_to_value_from_queue` require `construction_value_order_key`;
+decreasing weakest/strongest fit require both. Those keys are evaluated against
+the live working solution at each construction step.
+
+Nullable scalar construction defaults to
+`construction_obligation = "preserve_unassigned"`, so an optional variable may
+keep `None` when that is the best legal baseline. Use
+`assign_when_candidate_exists` only when construction must assign any doable
+candidate instead.
+
 ## Local Search
 
 Iteratively improves the solution by applying moves and accepting improvements (and sometimes worse moves to escape local optima).
@@ -107,8 +120,20 @@ policies.
 ```toml
 [phases.acceptor]
 type = "simulated_annealing"
-starting_temperature = "0hard/500soft"
+level_temperatures = [5.0, 500.0]
+hard_regression_policy = "temperature_controlled"
+
+[phases.acceptor.calibration]
+sample_size = 64
+target_acceptance_probability = 0.75
+fallback_temperature = 2.0
 ```
+
+Simulated annealing is score-level aware. `level_temperatures` are ordered from
+highest-priority score level to lowest; if they are omitted, calibration can
+sample candidate deltas and derive temperatures per level. Once the configured
+temperature cools to the hill-climbing threshold, worsening moves are rejected
+deterministically.
 
 **Tabu Search:**
 

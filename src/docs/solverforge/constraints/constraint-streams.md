@@ -41,6 +41,9 @@ similar) via `.named()`. Return them as a tuple — SolverForge implements
 ### `for_each`
 
 Selects all items from a collection in the solution, using a closure extractor.
+Generated `{Name}ConstraintStreams` accessors call the same public operation
+with hidden `ChangeSource` metadata so localized incremental callbacks are
+owned by the right planning-entity collection.
 
 ```rust
 factory.shifts()
@@ -138,11 +141,45 @@ factory.clone()
 ```
 
 For a beginner mental model, `if_exists` asks "does this item have at least one
-matching record over there?" and `if_not_exists` asks the inverse. In `v0.9.1`,
-the public API stays exactly that simple while the runtime chooses faster
-internal bookkeeping for exact `usize` keys. Direct and flattened existence
-constraints with plain `usize` keys use indexed storage; `Option<usize>`,
-newtype keys, strings, and other key shapes keep hashed storage.
+matching record over there?" and `if_not_exists` asks the inverse. The public API
+stays exactly that simple while the runtime chooses faster internal bookkeeping
+for exact `usize` keys. Direct and flattened existence constraints with plain
+`usize` keys use indexed storage; `Option<usize>`, newtype keys, strings, and
+other key shapes keep hashed storage.
+
+### `project`
+
+Projected streams derive bounded scoring rows from a source entity without
+materializing new facts or entities. Implement `Projection<A>` on a named type,
+declare `MAX_EMITS`, and emit rows through `ProjectionSink`:
+
+```rust
+use solverforge::{Projection, ProjectionSink};
+
+struct ShiftWindows;
+
+impl Projection<Shift> for ShiftWindows {
+    type Out = WorkWindow;
+    const MAX_EMITS: usize = 2;
+
+    fn project<Sink>(&self, shift: &Shift, sink: &mut Sink)
+    where
+        Sink: ProjectionSink<Self::Out>,
+    {
+        sink.emit(WorkWindow::from_shift(shift));
+    }
+}
+
+factory.shifts()
+    .project(ShiftWindows)
+    .filter(|window: &WorkWindow| window.is_overtime())
+    .penalize_soft()
+    .named("Projected overtime");
+```
+
+Projected streams can be filtered, self-joined, merged, grouped, and weighted
+like ordinary scoring state. Self-join ordering is coordinate-stable by source
+slot, entity index, and emission index rather than by sparse storage row id.
 
 ## Terminal Operations
 

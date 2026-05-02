@@ -66,17 +66,21 @@ unimproved_seconds_spent_limit = 60
 [[phases]]
 type = "construction_heuristic"
 construction_heuristic_type = "first_fit"
+construction_obligation = "preserve_unassigned"
+value_candidate_limit = 32
 
 [[phases]]
 type = "local_search"
 
 [phases.acceptor]
 type = "simulated_annealing"
-starting_temperature = "0hard/500soft"
+level_temperatures = [5.0, 500.0]
+hard_regression_policy = "never_accept_hard_regression"
 
 [phases.move_selector]
 type = "change_move_selector"
 variable_name = "employee_id"
+value_candidate_limit = 32
 
 [phases.termination]
 step_count_limit = 100000
@@ -88,12 +92,12 @@ step_count_limit = 100000
 
 Controls reproducibility and assertion levels.
 
-| Mode | Description |
-|---|---|
-| `reproducible` | Deterministic — same input always produces the same output. Slower. |
-| `non_reproducible` | Non-deterministic — fastest mode for production use |
-| `fast_assert` | Enables light assertions for debugging |
-| `full_assert` | Enables all assertions — slowest, for development only |
+| Mode               | Description                                                         |
+| ------------------ | ------------------------------------------------------------------- |
+| `reproducible`     | Deterministic — same input always produces the same output. Slower. |
+| `non_reproducible` | Non-deterministic — fastest mode for production use                 |
+| `fast_assert`      | Enables light assertions for debugging                              |
+| `full_assert`      | Enables all assertions — slowest, for development only              |
 
 ```toml
 environment_mode = "non_reproducible"
@@ -151,6 +155,12 @@ variable_name = "visits"
 Nearby selection is configured by choosing a nearby selector variant, not by
 top-level `nearby_selection = true` flags.
 
+Nearby scalar selectors require model-declared candidate hooks on the matching
+`#[planning_variable]`: `nearby_value_candidates` for
+`nearby_change_move_selector` and `nearby_entity_candidates` for
+`nearby_swap_move_selector`. Distance meters only rank or filter those bounded
+candidates.
+
 When you need to cap one neighborhood deliberately, use the
 `limited_neighborhood` selector variant and wrap the concrete selector inside
 it:
@@ -168,6 +178,16 @@ variable_name = "employee_id"
 That cap applies to the wrapped neighborhood itself. It is not a replacement
 for `accepted_count_limit`, which only controls how many accepted moves the
 forager retains for final selection.
+
+Scalar `change_move_selector`, `nearby_change_move_selector`,
+`pillar_change_move_selector`, and `ruin_recreate_move_selector` accept
+`value_candidate_limit`. Scalar `cheapest_insertion` requires a bounded
+candidate source: either `candidate_values` on the model or this config limit.
+
+Grouped scalar construction and grouped scalar local search use `group_name`
+when the model provides a scalar group through the generated model support
+surface. Grouped local search also supports `require_hard_improvement` when a
+compound candidate must improve the hard score before it can be accepted.
 
 ### Termination
 

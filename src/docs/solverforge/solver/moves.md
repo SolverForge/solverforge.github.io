@@ -30,12 +30,13 @@ For [list variables](/docs/solverforge/modeling/list-variables/):
 
 ## Advanced Moves
 
-| Move               | Description                                                                                  |
-| ------------------ | -------------------------------------------------------------------------------------------- |
-| `KOptMove`         | K-opt style moves — removes K edges and reconnects. Powerful for routing.                    |
-| `RuinMove`         | Removes a set of elements and reinserts them (ruin-and-recreate). Escapes deep local optima. |
-| `PillarChangeMove` | Changes the same variable on a group of related entities simultaneously                      |
-| `PillarSwapMove`   | Swaps variable values between two groups of related entities                                 |
+| Move                 | Description                                                                                  |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| `KOptMove`           | K-opt style moves — removes K edges and reconnects. Powerful for routing.                    |
+| `RuinMove`           | Removes a set of elements and reinserts them (ruin-and-recreate). Escapes deep local optima. |
+| `PillarChangeMove`   | Changes the same variable on a group of related entities simultaneously                      |
+| `PillarSwapMove`     | Swaps variable values between two groups of related entities                                 |
+| `CompoundScalarMove` | Applies multiple scalar edits atomically with exact undo and affected-entity reporting       |
 
 ## MoveArena (Zero-Allocation)
 
@@ -80,14 +81,30 @@ variable_name = "visits"
 ```
 
 Other selector variants include `change_move_selector`, `swap_move_selector`,
+`nearby_change_move_selector`, `nearby_swap_move_selector`,
+`pillar_change_move_selector`, `pillar_swap_move_selector`,
+`ruin_recreate_move_selector`, `grouped_scalar_move_selector`,
 `list_change_move_selector`, `list_swap_move_selector`,
-`sub_list_change_move_selector`, `sub_list_swap_move_selector`,
-`k_opt_move_selector`, `list_ruin_move_selector`, `union_move_selector`, and
-`cartesian_product_move_selector`.
+`sublist_change_move_selector`, `sublist_swap_move_selector`,
+`list_reverse_move_selector`, `k_opt_move_selector`, `list_ruin_move_selector`,
+`limited_neighborhood`, `union_move_selector`,
+`cartesian_product_move_selector`, `conflict_repair_move_selector`, and
+`compound_conflict_repair_move_selector`.
 
 `list_ruin_move_selector` now chooses only list owners that currently contain
 elements. Empty routes and sequences can still receive elements through later
 insertions, but they no longer spend ruin candidate budget on removing nothing.
+
+Scalar value generation is separate from scalar legality. `value_candidate_limit`
+caps values for scalar construction, change, nearby-change, pillar-change, and
+ruin-recreate. Nearby scalar selectors also require the matching
+model-declared nearby candidate hook; a distance meter alone is not a discovery
+mechanism.
+
+Cartesian selectors preview the left child first, open the right child against
+that preview state, and materialize the selected winning composite only after
+the forager chooses it. Left children that require full score evaluation during
+preview are rejected up front.
 
 ### Pillar Selector
 

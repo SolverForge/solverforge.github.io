@@ -42,11 +42,22 @@ The stock generated solve path loads `solver.toml` automatically from the
 current working directory. `solverforge-config` also exposes parsing APIs when
 you want to inspect or construct configs directly.
 
+The 0.10.0 runtime uses one `ModelContext` per planning model. Generic
+construction heuristics share that context for mixed/list-bearing work, while
+pure scalar construction uses the descriptor-scalar boundary. Local search uses
+explicit streaming defaults when `move_selector` is omitted, and scalar
+candidate limits, grouped scalar selectors, and score-level simulated annealing
+are expressed in `solver.toml`.
+
 `SolverManager` now exposes a retained job lifecycle rather than a fire-and-forget
 channel. In addition to `Progress` and `BestSolution`, you can observe
 `PauseRequested`, `Paused`, `Resumed`, `Completed`, `Cancelled`, and `Failed`,
 inspect `SolverStatus`, and fetch or analyze retained snapshots by
 `snapshot_revision`.
+
+Retained telemetry carries exact generated, evaluated, and accepted move counts
+plus generation and evaluation durations. User-facing rates such as `moves/s`
+are display-only derived values.
 
 ## Sections
 

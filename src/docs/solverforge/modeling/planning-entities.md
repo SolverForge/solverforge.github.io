@@ -55,9 +55,24 @@ Common parameters:
   references a field on the planning solution that supplies possible values
 - `allows_unassigned = true`: permits `None` for `Option<T>` variables
 - `countable_range = "0..10"`: declares an integer range directly on the field
+- `candidate_values = "fn_name"`: supplies an ordered bounded scalar value
+  neighborhood for construction, change, pillar-change, and ruin-recreate
+- `nearby_value_candidates = "fn_name"` and
+  `nearby_entity_candidates = "fn_name"`: supply bounded candidates for nearby
+  scalar local-search selectors
+- `nearby_value_distance_meter = "fn_name"` and
+  `nearby_entity_distance_meter = "fn_name"`: rank or filter already bounded
+  nearby candidates; they do not discover candidates by themselves
+- `construction_entity_order_key = "fn_name"` and
+  `construction_value_order_key = "fn_name"`: provide live construction-order
+  keys for scalar-only construction heuristics
 
 The macro also generates an `.unassigned()` stream helper when the entity has
 exactly one `Option<_>` planning variable.
+
+Construction order keys are construction-only. Local-search scalar selectors
+keep canonical bounded candidate order even when the same variable declares
+construction keys.
 
 ### `#[planning_list_variable]`
 
