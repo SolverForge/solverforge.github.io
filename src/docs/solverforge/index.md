@@ -62,8 +62,10 @@ The 0.10.0 codebase also tightens several public contracts:
 - default local-search neighborhoods are explicit streaming defaults: scalar
   change plus swap, list nearby-change plus nearby-swap plus reverse, and mixed
   models concatenate list defaults before scalar defaults
-- retained telemetry preserves exact generated, evaluated, and accepted counts
-  plus generation and evaluation durations; `moves/s` is only a display metric
+- retained telemetry preserves exact generated, evaluated, accepted,
+  not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
+  and construction-slot counters plus generation and evaluation durations;
+  `moves/s` is only a display metric
 
 ## Minimal Example
 

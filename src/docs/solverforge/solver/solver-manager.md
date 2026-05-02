@@ -35,9 +35,13 @@ lifecycle state, telemetry, current/best score, and the latest
 `snapshot_revision` when one exists.
 
 In the current runtime surface, retained telemetry keeps exact generated,
-evaluated, and accepted move counts together with generation and evaluation
-durations. Any displayed `moves/s` value is derived at the edge rather than
-stored as the canonical runtime metric.
+evaluated, accepted, not-doable, acceptor-rejected, forager-ignored,
+hard-improving, hard-neutral, hard-worse, conflict-repair, and construction-slot
+counts together with generation and evaluation durations. `SelectorTelemetry`
+also carries `selector_index` and `selector_label` so local-search and VND
+diagnostics can tie those counters back to the active neighborhood. Any
+displayed `moves/s` value is derived at the edge rather than stored as the
+canonical runtime metric.
 
 Consume them in a loop:
 

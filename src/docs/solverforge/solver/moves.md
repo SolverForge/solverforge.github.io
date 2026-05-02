@@ -106,6 +106,16 @@ that preview state, and materialize the selected winning composite only after
 the forager chooses it. Left children that require full score evaluation during
 preview are rejected up front.
 
+Grouped scalar and conflict-repair selectors both produce compound scalar moves
+through framework-owned legality, duplicate, not-doable, scoring, hard-delta,
+tabu, and affected-entity handling. When `require_hard_improvement` is enabled,
+they share the same hard-score improvement gate used by cartesian composition
+and VND.
+
+Conflict-repair selector `constraints` must match scoring metadata exactly:
+package-qualified constraints use `ConstraintRef::full_name()` strings and
+package-less constraints use the short name.
+
 ### Pillar Selector
 
 Groups related entities for pillar-based moves. This is an advanced lower-level

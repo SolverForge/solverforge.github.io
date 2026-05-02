@@ -189,6 +189,12 @@ when the model provides a scalar group through the generated model support
 surface. Grouped local search also supports `require_hard_improvement` when a
 compound candidate must improve the hard score before it can be accepted.
 
+Conflict-repair selectors configure `constraints` by exact scoring metadata
+identity. Use `ConstraintRef::full_name()` for package-qualified constraints and
+the short name for package-less constraints. With `include_soft_matches = false`,
+soft constraints are rejected before providers run; setting it to `true`
+explicitly allows soft repair providers.
+
 ### Termination
 
 Controls when the solver stops. See [Termination](../termination/) for all options.

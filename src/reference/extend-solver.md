@@ -81,6 +81,10 @@ Retained jobs now expose exact counts and durations through structured events.
 That means:
 
 - generated, evaluated, and accepted move counts belong to runtime telemetry
+- not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
+  and construction-slot counters belong there too
+- selector telemetry carries stable selector indexes and labels for
+  local-search and VND diagnosis
 - generation and evaluation durations stay exact in the event stream
 - `moves/s` is a display-only derived metric at the UI edge
 - pause, resume, snapshot fetch, and analysis should use the retained

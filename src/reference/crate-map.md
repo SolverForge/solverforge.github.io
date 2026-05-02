@@ -17,6 +17,12 @@ This map is aligned with the `solverforge` `0.10.0` core-library codebase. The
 published crates.io facade may lag that codebase until the 0.10.0 package is
 released.
 
+The facade re-exports the normal modeling, scoring, projection, and retained
+runtime surface, including `Projection`, `ProjectionSink`, collector helpers
+such as `count`, `sum`, and `load_balance`, plus advanced grouped-scalar and
+conflict-repair extension types. That keeps app code on `solverforge` unless it
+needs to implement lower-level solver internals directly.
+
 ## Workspace crates
 
 | Crate                 | Owns                                                                     | Reach for it when...                                                           |

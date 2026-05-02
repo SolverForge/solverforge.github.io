@@ -55,9 +55,10 @@ channel. In addition to `Progress` and `BestSolution`, you can observe
 inspect `SolverStatus`, and fetch or analyze retained snapshots by
 `snapshot_revision`.
 
-Retained telemetry carries exact generated, evaluated, and accepted move counts
-plus generation and evaluation durations. User-facing rates such as `moves/s`
-are display-only derived values.
+Retained telemetry carries exact generated, evaluated, accepted, not-doable,
+acceptor-rejected, forager-ignored, hard-delta, conflict-repair, and
+construction-slot counters plus generation and evaluation durations.
+User-facing rates such as `moves/s` are display-only derived values.
 
 ## Sections
 

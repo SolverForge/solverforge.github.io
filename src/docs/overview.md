@@ -239,7 +239,9 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   hill-climbing behavior once cooled.
 - **Constraint metadata identity**: typed constraint metadata is keyed by full
   `ConstraintRef`, so package-qualified constraints can share a short name
-  without collapsing into one scoring identity.
+  without collapsing into one scoring identity. Configured conflict-repair keys
+  use `ConstraintRef::full_name()` for package-qualified constraints and the
+  short name for package-less constraints.
 - **Descriptor-addressed scalar runtime assembly**: generated scalar getter and
   setter dispatch still uses compact internal indexes, while runtime hook
   attachment and ordering use descriptor index plus variable name.
@@ -279,9 +281,11 @@ SolverForge Rust is **feature-complete** as a production constraint solver:
   iteration lazy so cursor caps and early-stop paths avoid unnecessary
   candidate generation.
 - **Exact retained telemetry remains authoritative**: generated, evaluated, and
-  accepted counts plus generation/evaluation `Duration`s are retained exactly
-  through the solver pipeline. Any displayed `moves/s` metric is still derived
-  at the edge.
+  accepted counts, not-doable filtering, acceptor rejection, forager retention,
+  hard-delta buckets, conflict-repair provider/filter/exposure counters,
+  construction slot outcomes, and generation/evaluation `Duration`s are
+  retained exactly through the solver pipeline. Any displayed `moves/s` metric
+  is still derived at the edge.
 
 ## Roadmap
 

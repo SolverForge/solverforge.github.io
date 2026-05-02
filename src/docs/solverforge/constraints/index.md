@@ -28,7 +28,9 @@ Constraints are returned as a tuple implementing `ConstraintSet<S, Sc>`, which
 the solver evaluates incrementally as it explores moves. In the 0.10.0 codebase,
 generated accessors preserve source metadata for localized incremental updates,
 projected streams can emit bounded derived scoring rows, and lower-level
-constraint metadata is keyed by full `ConstraintRef` identity.
+constraint metadata is keyed by full `ConstraintRef` identity. Package-qualified
+constraints use `ConstraintRef::full_name()` as the configured key; package-less
+constraints use the short name.
 
 ## Sections
 
