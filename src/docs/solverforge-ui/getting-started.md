@@ -25,7 +25,7 @@ This guide covers the verified integration path:
 ```toml
 [dependencies]
 axum = "0.8.9"
-solverforge-ui = { version = "0.6.3" }
+solverforge-ui = { version = "0.6.4" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
 ```

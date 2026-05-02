@@ -11,9 +11,9 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks `solverforge-ui 0.6.3`: retained jobs, typed lifecycle
-events, exact paused snapshots, pause/resume/cancel controls, dense scheduling
-views, and optional map helpers.
+This section tracks `solverforge-ui 0.6.4`: retained jobs, typed lifecycle
+events, exact paused snapshots, pause/resume/cancel controls, exact dense
+scheduling geometry, and optional map helpers.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -25,8 +25,8 @@ the runtime integration path.
 
 - **Drop-in components** for headers, status bars, buttons, modals, tabs,
   tables, footers, API guides, and toasts
-- **Scheduling views** with the canonical dense timeline surface plus low-level
-  rail primitives and split-pane Gantt
+- **Scheduling views** with the canonical dense timeline surface, exact detailed
+  interval geometry, low-level rail primitives, and split-pane Gantt
 - **Optional map helpers** for Leaflet-backed vehicle markers, visit markers,
   route geometry, marker bounds, and route highlighting
 - **Retained job lifecycle helpers** via `SF.createBackend(...)` and
@@ -40,12 +40,12 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.6.3" }
+solverforge-ui = { version = "0.6.4" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
 ```
 
-`solverforge-ui 0.6.3` declares `rust-version = "1.95"`.
+`solverforge-ui 0.6.4` declares `rust-version = "1.95"`.
 
 ## Minimal Workflow
 
@@ -133,7 +133,7 @@ It is a strong fit for:
 - **[Components](components/)** — Core factories, return values, and unsafe HTML
   opt-ins
 - **[Scheduling Views](scheduling-views/)** — Canonical timeline, low-level rail
-  primitives, and Gantt APIs with shipped examples
+  primitives, and Gantt APIs with exact-geometry examples
 - **[Integration & Assets](integration-assets/)** — Backend adapters, asset
   serving, cache behavior, and example route contracts
 

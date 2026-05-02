@@ -122,8 +122,9 @@ CLI scaffold plus manual hospital scheduling code.
 
 ### Keep the Published Dependency Shape
 
-The CLI emits the current public crate line. Keep those published dependencies
-and add the hospital app's normal scheduling and web/runtime dependencies:
+Start from the CLI's current published scaffold line, then use the current
+published `solverforge-ui 0.6.4` crate for the UI patch line. Add the hospital
+app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
@@ -132,7 +133,7 @@ solverforge = { version = "0.9.1", features = [
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.6.3"
+solverforge-ui = "0.6.4"
 rand = "0.10.1"
 
 axum = "0.8.9"
@@ -146,9 +147,10 @@ chrono = { version = "0.4.44", features = ["serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-cli 2.0.1` scaffolds the current `solverforge 0.9.1` and
-`solverforge-ui 0.6.3` patch line. This tutorial keeps that published target
-and adds the hospital-specific dependencies and domain model.
+`solverforge-cli 2.0.1` scaffolds the published `solverforge 0.9.1` and
+`solverforge-ui 0.6.3` target. The finished hospital app uses the current
+published `solverforge-ui 0.6.4` crate for the UI patch line, then adds the
+hospital-specific dependencies and domain model.
 
 ### Align App Metadata
 
@@ -165,7 +167,7 @@ target = "SolverForge crates.io target"
 runtime_crate = "solverforge"
 runtime_version = "0.9.1"
 ui_crate = "solverforge-ui"
-ui_version = "0.6.3"
+ui_version = "0.6.4"
 
 [demo]
 default_size = "large"

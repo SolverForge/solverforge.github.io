@@ -9,7 +9,7 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui 0.6.3` contract is job-oriented and
+The current `solverforge-ui 0.6.4` contract is job-oriented and
 lifecycle-typed. New integrations should expose retained jobs, explicit
 `eventType` payloads, exact paused or terminal snapshots, and the shipped
 optional map module when they need Leaflet route views.
@@ -190,8 +190,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
-- `/sf/sf.0.6.3.css`
-- `/sf/sf.0.6.3.js`
+- `/sf/sf.0.6.4.css`
+- `/sf/sf.0.6.4.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 

@@ -89,7 +89,11 @@ score = "HardSoftScore"
 
 This example reflects the published `solverforge-cli 2.0.1` scaffold target.
 Fresh generated apps start on the current `solverforge 0.9.1` and
-`solverforge-ui 0.6.3` patch line.
+the CLI's `solverforge-ui 0.6.3` scaffold target.
+
+The current published `solverforge-ui` crate is `0.6.4`. Use it directly in
+app-owned dependency manifests when an app needs the exact rail timeline geometry
+fix before a newer CLI scaffold release.
 
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:

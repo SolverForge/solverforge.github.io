@@ -12,7 +12,8 @@ weight: 3
 complementary chart-first surface:
 
 - **Timeline** for compact, lane-by-lane operator workflows with overview
-  clustering, inline expand/collapse, and packed detailed lanes
+  clustering, inline expand/collapse, exact interval geometry, and packed
+  detailed lanes
 - **Gantt** for dense, timeline-first planning and diagnostics
 
 ## Timeline API
@@ -24,7 +25,9 @@ The shipped dense timeline surface is built around:
 
 Use this as the default scheduling surface when you need sticky time headers,
 sticky lane labels, synchronized scrolling, overview clustering, or packed
-detailed inspection.
+detailed inspection. In `solverforge-ui 0.6.4`, detailed timeline blocks keep
+their exact interval width instead of receiving timeline-specific minimum-width
+inflation.
 
 ### Timeline Model Contract
 
@@ -45,8 +48,9 @@ integer-minute coordinates before calling `createTimeline(...)`.
 
 ```js
 var timeline = SF.rail.createTimeline({
-  label: "Staffing lane",
+  title: "Scheduling timeline",
   labelWidth: 280,
+  zoomPresets: ["1w", "2w", "4w", "reset"],
   model: {
     axis: {
       startMinute: 0,
@@ -139,6 +143,22 @@ Overview summaries are additive per field. If a summary item overrides aggregate
 `summary.openCount` and `summary.toneSegments` explicitly if you want those
 aggregate signals rendered.
 
+### Detailed Geometry and Viewport Rules
+
+`solverforge-ui 0.6.4` tightened the timeline contract for solved schedules:
+
+- `zoomPresets` defaults to `["1w", "2w", "4w", "reset"]`; pass `[]` to omit
+  zoom controls for fixed-horizon app surfaces
+- detailed blocks render exact interval geometry with no timeline-specific
+  minimum width inflation
+- adjacent detailed intervals, such as `[60, 120]` and `[120, 180]`, stay
+  disjoint on one track
+- true detailed interval overlaps are packed onto separate track rows
+- the body viewport owns vertical scrolling for dense solved schedules, while
+  horizontal scroll and drag-pan stay synchronized with the sticky header
+- timelines created or updated before DOM attachment resynchronize layout after
+  mount so label compaction and content width use real viewport dimensions
+
 ## Low-level Rail Primitives
 
 The original rail helpers remain shipped for custom primitive compositions:
@@ -208,7 +228,8 @@ Sortable headers are opt-in per column.
 ## Choosing Timeline, Rail, or Gantt
 
 Use **timeline** when operators need overview clustering, inline detail
-inspection, synchronized time navigation, and dense lane scanning.
+inspection, exact interval geometry, synchronized time navigation, and dense
+lane scanning.
 
 Use the **low-level rail primitives** when you are composing custom resource
 cards, gauges, and changeover-aware lanes by hand.
