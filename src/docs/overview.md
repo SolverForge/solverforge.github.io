@@ -167,8 +167,8 @@ constraints.
 SolverForge is a **production-ready constraint solver** written
 in Rust. This documentation tracks the `solverforge` `0.10.0` core-library
 codebase and calls out CLI scaffold targets separately when an installed CLI
-intentionally lags the current runtime crate. Crates.io may still report
-`solverforge 0.9.1` until the 0.10.0 package is published.
+intentionally lags the current runtime crate. `solverforge 0.10.0` is the
+current published runtime crate.
 <% end %>
 
 ## Current Status

@@ -17,12 +17,10 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge` `0.10.0` core-library codebase. At the time
-of this docs update, crates.io still reports `solverforge 0.9.1`; use a git/path
-dependency for unreleased 0.10.0 work and check crate metadata before assuming a
-published package is available. Generated CLI projects can intentionally target
-an older runtime until the next CLI target refresh, so check `solverforge
---version` when starting from a scaffold.
+These pages track the published `solverforge` `0.10.0` core-library crate.
+Generated CLI projects can intentionally target an older runtime until the next
+CLI target refresh, so check `solverforge --version` when starting from a
+scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:

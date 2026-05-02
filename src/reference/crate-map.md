@@ -13,9 +13,8 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the `solverforge` `0.10.0` core-library codebase. The
-published crates.io facade may lag that codebase until the 0.10.0 package is
-released.
+This map is aligned with the published `solverforge` `0.10.0` core-library
+crate.
 
 The facade re-exports the normal modeling, scoring, projection, and retained
 runtime surface, including `Projection`, `ProjectionSink`, collector helpers
