@@ -34,6 +34,10 @@ Top-level help and version options:
 | `-V, --version` | Print the CLI version plus scaffold target versions |
 
 Every subcommand also supports `--help`.
+The command groups also expose Clap's generated `help` leaf, so
+`solverforge generate help variable`, `solverforge destroy help entity`, and
+`solverforge config help set` are equivalent to the matching nested `--help`
+form.
 
 ## Top-Level Commands
 
@@ -56,6 +60,7 @@ Every subcommand also supports `--help`.
 ```bash
 solverforge --version
 solverforge --help
+solverforge help
 solverforge help generate
 solverforge generate variable --help
 ```
@@ -77,6 +82,27 @@ Maps source: crates.io: solverforge-maps 2.1.3
 That output is versioned with the installed CLI. The current
 `solverforge-cli 2.0.1` scaffold starts on the published `solverforge 0.9.1`,
 `solverforge-ui 0.6.3`, and `solverforge-maps 2.1.3` crate line.
+
+The current published `solverforge-ui` crate is `0.6.4`. Use it directly in
+app-owned dependency manifests when you want the exact rail timeline geometry
+fix before the next CLI scaffold target moves.
+
+### `solverforge help`
+
+```text
+solverforge help [COMMAND]...
+```
+
+Prints the same help text exposed by `--help`. With no argument, it prints
+top-level help. With one or more command names, it prints help for that nested
+command:
+
+```bash
+solverforge help
+solverforge help generate
+solverforge help generate variable
+solverforge help config set
+```
 
 ## `solverforge new`
 
@@ -385,6 +411,80 @@ solverforge destroy --yes constraint no_overlap
 solverforge destroy -y variable --entity Task resource_idx
 ```
 
+### `destroy solution`
+
+```text
+solverforge destroy [OPTIONS] solution
+```
+
+Removes the planning solution struct and synchronized metadata after
+confirmation, unless `--yes` is supplied to the parent `destroy` command.
+
+### `destroy entity`
+
+```text
+solverforge destroy [OPTIONS] entity <NAME>
+```
+
+Arguments:
+
+| Argument | Meaning               |
+| -------- | --------------------- |
+| `<NAME>` | Entity name to remove |
+
+Removes the entity module, unwires its solution collection, and syncs generated
+metadata after confirmation.
+
+### `destroy variable`
+
+```text
+solverforge destroy [OPTIONS] variable --entity <ENTITY_TYPE> <FIELD>
+```
+
+Arguments:
+
+| Argument  | Meaning                  |
+| --------- | ------------------------ |
+| `<FIELD>` | Variable field to remove |
+
+Options:
+
+| Option                   | Meaning                            |
+| ------------------------ | ---------------------------------- |
+| `--entity <ENTITY_TYPE>` | Entity struct name, such as `Task` |
+
+Removes the scalar or list planning-variable field from the target entity and
+syncs generated metadata after confirmation.
+
+### `destroy fact`
+
+```text
+solverforge destroy [OPTIONS] fact <NAME>
+```
+
+Arguments:
+
+| Argument | Meaning             |
+| -------- | ------------------- |
+| `<NAME>` | Fact name to remove |
+
+Removes the fact module, unwires its solution collection, and syncs generated
+metadata after confirmation.
+
+### `destroy constraint`
+
+```text
+solverforge destroy [OPTIONS] constraint <NAME>
+```
+
+Arguments:
+
+| Argument | Meaning                   |
+| -------- | ------------------------- |
+| `<NAME>` | Constraint name to remove |
+
+Removes the constraint module and registry entry after confirmation.
+
 ## `solverforge server`
 
 ```text
@@ -488,6 +588,32 @@ solverforge config show
 solverforge config set termination.seconds_spent_limit 60
 solverforge config set phases.acceptor.type late_acceptance
 ```
+
+### `config show`
+
+```text
+solverforge config show [OPTIONS]
+```
+
+Prints the current `solver.toml` contents. The command has no local arguments
+or local options beyond the global flags.
+
+### `config set`
+
+```text
+solverforge config set [OPTIONS] <KEY> <VALUE>
+```
+
+Arguments:
+
+| Argument  | Meaning                                            |
+| --------- | -------------------------------------------------- |
+| `<KEY>`   | Dotted key path in `solver.toml`                   |
+| `<VALUE>` | New value                                          |
+
+For example, `termination.seconds_spent_limit` addresses the solver termination
+limit. Values are parsed as integer, float, boolean, then string. Intermediate
+TOML tables are created when needed.
 
 ## `solverforge completions`
 
