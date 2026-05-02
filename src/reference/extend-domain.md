@@ -18,22 +18,22 @@ derived helpers that describe the planning problem you actually need to solve.
 
 ## Keep the boundary crisp
 
-| Put it in the domain model | Put it somewhere else |
-|---|---|
-| entities the solver changes | HTTP handlers, database code, and CLI orchestration |
-| immutable input facts | page components and frontend formatting |
-| planning variables and score fields | ad-hoc migration logic |
-| derived helpers that explain the model | solver search policy that belongs in `solver.toml` |
+| Put it in the domain model                       | Put it somewhere else                                            |
+| ------------------------------------------------ | ---------------------------------------------------------------- |
+| entities the solver changes                      | HTTP handlers, database code, and CLI orchestration              |
+| immutable input facts                            | page components and frontend formatting                          |
+| planning variables and score fields              | ad-hoc migration logic                                           |
+| derived helpers that explain the model           | solver search policy that belongs in `solver.toml`               |
 | fixtures and validation helpers for this problem | generic runtime internals that should stay in SolverForge crates |
 
 ## Choose the right modeling primitive
 
-| Use | When it fits | Typical example |
-|---|---|---|
-| problem facts | immutable reference data | employees, skills, depots, rooms, vehicles |
-| planning entities | records whose assignment or ordering can change | shifts, visits, tasks, jobs |
-| scalar planning variables | one entity chooses one value from a range | a shift picks an employee |
-| list planning variables | order matters and insertion/removal is the core move | route stops, job sequences, task chains |
+| Use                       | When it fits                                         | Typical example                            |
+| ------------------------- | ---------------------------------------------------- | ------------------------------------------ |
+| problem facts             | immutable reference data                             | employees, skills, depots, rooms, vehicles |
+| planning entities         | records whose assignment or ordering can change      | shifts, visits, tasks, jobs                |
+| scalar planning variables | one entity chooses one value from a range            | a shift picks an employee                  |
+| list planning variables   | order matters and insertion/removal is the core move | route stops, job sequences, task chains    |
 
 Use mixed models when the problem really has both assignment and sequencing.
 The current runtime builds one `ModelContext` per planning model, and the stock
@@ -52,13 +52,15 @@ construction heuristics already understand mixed scalar-plus-list problems.
 
 ## Common extensions
 
-| You need to add... | Typical change |
-|---|---|
-| another planning dimension | add a new fact collection and reference it from entity variables |
-| optional assignment | use `allows_unassigned = true` on the scalar variable |
-| ordering behavior | introduce a planning list and list-aware constraints |
-| richer scoring context | add immutable facts or derived helper methods instead of shoving logic into constraints |
-| validation or import normalization | add app-side builders or conversion layers before solving |
+| You need to add...                 | Typical change                                                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| another planning dimension         | add a new fact collection and reference it from entity variables                                     |
+| optional assignment                | use `allows_unassigned = true` on the scalar variable                                                |
+| ordering behavior                  | introduce a planning list and list-aware constraints                                                 |
+| bounded scalar neighborhoods       | declare `candidate_values`, `nearby_value_candidates`, or `nearby_entity_candidates` on the variable |
+| scalar construction ordering       | declare `construction_entity_order_key` or `construction_value_order_key` on the variable            |
+| richer scoring context             | add immutable facts or derived helper methods instead of shoving logic into constraints              |
+| validation or import normalization | add app-side builders or conversion layers before solving                                            |
 
 ## Suggested module layout
 
@@ -87,6 +89,10 @@ no longer tiny.
 - Treat the scaffold as disposable starter code once the app has a real shape.
 - Reach for list variables when order is the point, not when a single scalar
   assignment would do.
+- Treat nearby scalar hooks, scalar candidate hooks, and construction-order keys
+  as model capabilities. Solver config consumes them; it does not infer them.
+- Keep solver config targets on canonical descriptor names even if the Rust
+  manifest uses public aliases.
 
 ## See also
 

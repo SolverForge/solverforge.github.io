@@ -13,25 +13,29 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
+This map is aligned with the `solverforge` `0.10.0` core-library codebase. The
+published crates.io facade may lag that codebase until the 0.10.0 package is
+released.
+
 ## Workspace crates
 
-| Crate | Owns | Reach for it when... |
-|---|---|---|
-| `solverforge` | the public facade and re-exports | you are building an app and want the normal public API |
-| `solverforge-core` | score types, descriptors, domain traits | you are extending lower-level abstractions or implementing core-facing helpers |
-| `solverforge-macros` | `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]` | you need derive behavior or macro-generated domain glue |
-| `solverforge-scoring` | constraint streams and incremental scoring | you are working directly on scoring internals or advanced scoring extensions |
-| `solverforge-config` | TOML and YAML config parsing/builders | you need direct config construction or parsing outside the stock solve path |
-| `solverforge-solver` | phases, move selectors, acceptors, retained lifecycle | you are building custom runtime behavior beyond facade-level use |
-| `solverforge-console` | tracing-driven console output | you want the standard terminal UX or progress formatting |
-| `solverforge-cvrp` | CVRP-specific helpers and distance utilities | your problem is route-centric and the domain benefits from these helpers |
+| Crate                 | Owns                                                                     | Reach for it when...                                                           |
+| --------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| `solverforge`         | the public facade and re-exports                                         | you are building an app and want the normal public API                         |
+| `solverforge-core`    | score types, descriptors, domain traits                                  | you are extending lower-level abstractions or implementing core-facing helpers |
+| `solverforge-macros`  | `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]`          | you need derive behavior or macro-generated domain glue                        |
+| `solverforge-scoring` | constraint streams and incremental scoring                               | you are working directly on scoring internals or advanced scoring extensions   |
+| `solverforge-config`  | TOML/YAML config parsing, selector config, acceptor config, and builders | you need direct config construction or parsing outside the stock solve path    |
+| `solverforge-solver`  | phases, move selectors, acceptors, retained lifecycle, and telemetry     | you are building custom runtime behavior beyond facade-level use               |
+| `solverforge-console` | tracing-driven console output                                            | you want the standard terminal UX or progress formatting                       |
+| `solverforge-cvrp`    | CVRP-specific helpers and distance utilities                             | your problem is route-centric and the domain benefits from these helpers       |
 
 ## Companion repositories
 
-| Repo | Owns | Use it when... |
-|---|---|---|
-| `solverforge-cli` | scaffolding and code generation | you are starting a new app or extending a generated shell |
-| `solverforge-ui` | retained-job frontend controls and scheduling-facing components | you need a web UI around a retained solve lifecycle |
+| Repo               | Owns                                                              | Use it when...                                              |
+| ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
+| `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
+| `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
 ## Practical dependency rules
@@ -39,6 +43,9 @@ you have a concrete reason to go lower-level.
 - Start with `solverforge-cli` to scaffold the app shell.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
+- Keep scalar/list model declarations in the `planning_model!` manifest and
+  variable attributes; solver config consumes declared hooks rather than
+  inferring nearby or construction-order behavior.
 - Add `solverforge-ui` only if the product needs retained-job UI flows.
 - Add `solverforge-maps` only if routing or map-backed costs are part of the
   planning model.
@@ -47,12 +54,12 @@ you have a concrete reason to go lower-level.
 
 ## Typical stacks
 
-| Scenario | Typical stack |
-|---|---|
-| service or CLI planner | `solverforge-cli` scaffold + `solverforge` |
-| web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui` |
-| routing or fleet optimization | `solverforge-cli` + `solverforge` + `solverforge-maps` |
-| research or advanced runtime work | `solverforge` plus selected lower-level crates |
+| Scenario                           | Typical stack                                          |
+| ---------------------------------- | ------------------------------------------------------ |
+| service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
+| web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
+| routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
+| research or advanced runtime work  | `solverforge` plus selected lower-level crates         |
 
 ## What not to do
 

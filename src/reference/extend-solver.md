@@ -23,22 +23,23 @@ well-tested retained runtime path.
 
 ## What belongs where
 
-| Concern | Best home |
-|---|---|
-| business rules and penalties | constraint code |
-| search strategy and runtime limits | `solver.toml` |
-| per-job adjustments | a `#[planning_solution(config = \"...\")]` callback layering on top of the loaded config |
-| UI-specific progress display | the edge layer, not the runtime |
-| experimental custom phases or selectors | app-side code using the lower-level crates |
+| Concern                                 | Best home                                                                              |
+| --------------------------------------- | -------------------------------------------------------------------------------------- |
+| business rules and penalties            | constraint code                                                                        |
+| search strategy and runtime limits      | `solver.toml`                                                                          |
+| per-job adjustments                     | a `#[planning_solution(config = "...")]` callback layering on top of the loaded config |
+| UI-specific progress display            | the edge layer, not the runtime                                                        |
+| experimental custom phases or selectors | app-side code using the lower-level crates                                             |
 
 ## Canonical selector defaults
 
 If `move_selector` is omitted, the stock runtime stays intentionally narrow:
 
 - scalar-only models default to `ChangeMoveSelector`
+  plus `SwapMoveSelector`
 - list-only models default to `NearbyListChangeMoveSelector(20)`,
   `NearbyListSwapMoveSelector(20)`, and `ListReverseMoveSelector`
-- mixed models use the list defaults first, then scalar change
+- mixed models use the list defaults first, then scalar defaults
 
 `limited_neighborhood` is the tool for putting a hard cap on one neighborhood
 that is otherwise too broad. It is not a substitute for understanding the
@@ -46,14 +47,20 @@ search policy you are expressing.
 
 ## Tune in this order
 
-| Tuning step | Use it for |
-|---|---|
-| construction phase choice | initial feasibility and seed quality |
-| local search acceptor | exploration vs greediness |
-| move selector choice | neighborhood breadth and cost |
-| `accepted_count_limit` | how many accepted candidates are retained for final selection |
-| termination limits | wall time, unimproved steps, or best-score goals |
-| VND / exhaustive / partitioned search | explicit advanced search strategies, not a default reflex |
+| Tuning step                           | Use it for                                                    |
+| ------------------------------------- | ------------------------------------------------------------- |
+| construction phase choice             | initial feasibility and seed quality                          |
+| local search acceptor                 | exploration vs greediness                                     |
+| move selector choice                  | neighborhood breadth and cost                                 |
+| `accepted_count_limit`                | how many accepted candidates are retained for final selection |
+| `value_candidate_limit`               | bounded scalar value generation for selectors that support it |
+| termination limits                    | wall time, unimproved steps, or best-score goals              |
+| VND / exhaustive / partitioned search | explicit advanced search strategies, not a default reflex     |
+
+Nearby scalar selectors require model-declared candidate hooks. Use
+`nearby_value_candidates` for nearby change, `nearby_entity_candidates` for
+nearby swap, and distance meters only to rank or filter those bounded
+candidates.
 
 ## When custom code is justified
 
