@@ -312,6 +312,13 @@ const fetchSearchIndex = async root => {
 const runSearch = async (root, state) => {
   const status = root.querySelector("[data-search-status]")
 
+  if (normalizeText(state.query).length < SEARCH_MIN_QUERY_LENGTH) {
+    renderResults(root, [], state.query, state.scope, state)
+    syncSearchPageUrl(state, state.mode)
+    updateScopeButtons(root, state.scope)
+    return
+  }
+
   try {
     const documents = await fetchSearchIndex(root)
     const ranked = rankDocuments(documents, state.query, state.scope, state.mode)

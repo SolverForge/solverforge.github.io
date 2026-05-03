@@ -133,4 +133,4 @@ After the first matrix is working, most applications move on to one or more of t
 - compute full matrices for solver input
 - tune `NetworkConfig` for production environments
 
-Read [Routing & Matrices](../routing/) and [Caching & Operations](../caching/) for those topics.
+Read [Routing & Matrices](/docs/solverforge-maps/routing/) and [Caching & Operations](/docs/solverforge-maps/caching/) for those topics.

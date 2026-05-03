@@ -65,8 +65,8 @@ generation and `solverforge.app.toml` after scaffolding.
 
 ## Where to Read More
 
-- [CLI onboarding guide](../solverforge-cli/getting-started/)
-- [SolverForge Hospital Use Case](solverforge-hospital-use-case/)
-- [SolverForge Deliveries Use Case](solverforge-deliveries-use-case/)
+- [CLI onboarding guide](/docs/solverforge-cli/getting-started/)
+- [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
+- [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
 - [SolverForge API documentation](https://docs.rs/solverforge)
 - [Core GitHub repository](https://github.com/solverforge/solverforge)

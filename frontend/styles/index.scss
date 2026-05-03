@@ -32,7 +32,7 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  scroll-padding-top: 7rem;
 }
 
 body {
@@ -231,6 +231,11 @@ img {
 .docs-shell__header,
 .post-shell__header {
   margin-bottom: 2rem;
+}
+
+.docs-shell__title {
+  margin-top: 0.65rem;
+  max-width: 18ch;
 }
 
 .page-shell__eyebrow,
@@ -506,6 +511,12 @@ h3 {
   position: sticky;
   top: 6rem;
   height: fit-content;
+  min-width: 0;
+}
+
+.docs-shell__content {
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .docs-sidebar {
@@ -549,6 +560,8 @@ h3 {
 
 .prose {
   font-size: 1.06rem;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .prose p,
@@ -563,11 +576,18 @@ h3 {
 
 .prose pre,
 .terminal-card pre {
+  max-width: 100%;
   background: var(--sf-code-bg);
   color: var(--sf-code-text);
   border-radius: var(--sf-radius-sm);
   border: 1px solid var(--sf-code-border);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  overflow-x: auto;
+}
+
+.prose .highlighter-rouge,
+.prose .highlight {
+  max-width: 100%;
   overflow-x: auto;
 }
 
@@ -590,6 +610,11 @@ h3 {
   font-size: 0.9em;
 }
 
+.prose pre code {
+  display: block;
+  min-width: max-content;
+}
+
 .prose :not(pre) > code {
   padding: 0.15rem 0.45rem;
   border-radius: var(--sf-radius-sm);
@@ -597,9 +622,11 @@ h3 {
 }
 
 .prose table {
+  display: block;
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
-  overflow: hidden;
+  overflow-x: auto;
   border-radius: var(--sf-radius-sm);
   border: 1px solid var(--sf-border);
 }
@@ -1082,6 +1109,11 @@ h3 {
 
   .docs-shell__sidebar {
     position: static;
+    order: 2;
+  }
+
+  .docs-shell__content {
+    order: 1;
   }
 }
 

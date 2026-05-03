@@ -3,6 +3,7 @@ layout: default
 ---
 
 <%
+  page_content = yield
   nav_items =
     if resource.relative_url.start_with?("/reference/")
       site.data.reference_nav.reference
@@ -20,13 +21,16 @@ layout: default
   <article class="docs-shell__content">
     <header class="docs-shell__header">
       <p class="page-shell__eyebrow"><%= nav_title %></p>
+      <% unless page_content.match?(/<h1\b/i) %>
+        <h1 class="docs-shell__title"><%= data.title %></h1>
+      <% end %>
       <% if data.description %>
         <p class="page-shell__lede"><%= data.description %></p>
       <% end %>
     </header>
 
     <div class="prose">
-      <%= yield %>
+      <%= page_content %>
     </div>
   </article>
 </section>

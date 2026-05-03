@@ -66,10 +66,10 @@ Use `solverforge-maps` when your optimization model needs **real road travel tim
 
 ## Sections
 
-- **[Getting Started](getting-started/)** — From coordinates to a computed matrix
-- **Validated coordinates and routing boxes** — covered in [Getting Started](getting-started/) and [Routing & Matrices](routing/)
-- **[Routing & Matrices](routing/)** — Routes, snapping, matrices, geometries, and objectives
-- **[Caching & Operations](caching/)** — Cache management, progress updates, and diagnostics
+- **[Getting Started](/docs/solverforge-maps/getting-started/)** — From coordinates to a computed matrix
+- **Validated coordinates and routing boxes** — covered in [Getting Started](/docs/solverforge-maps/getting-started/) and [Routing & Matrices](/docs/solverforge-maps/routing/)
+- **[Routing & Matrices](/docs/solverforge-maps/routing/)** — Routes, snapping, matrices, geometries, and objectives
+- **[Caching & Operations](/docs/solverforge-maps/caching/)** — Cache management, progress updates, and diagnostics
 
 ## External References
 
