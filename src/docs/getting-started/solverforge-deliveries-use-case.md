@@ -134,17 +134,17 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then use the current
-published `solverforge-ui 0.6.4` crate for the UI patch line. Add the delivery
+published `solverforge-ui 0.6.5` crate for the UI patch line. Add the delivery
 app's normal web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.9.1", features = [
+solverforge = { version = "0.10.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.6.4"
+solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.3"
 ```
 
@@ -158,12 +158,12 @@ delivery-specific catalog in `solverforge.app.toml`:
 [app]
 name = "solverforge-deliveries"
 starter = "neutral-shell"
-cli_version = "2.0.1"
+cli_version = "2.0.2"
 
 [runtime]
-target = "solverforge 0.9.1"
-runtime_source = "crates.io: solverforge 0.9.1"
-ui_source = "crates.io: solverforge-ui 0.6.4"
+target = "solverforge 0.10.0"
+runtime_source = "crates.io: solverforge 0.10.0"
+ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.3"
 
 [demo]

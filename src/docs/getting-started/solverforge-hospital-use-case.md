@@ -123,17 +123,17 @@ CLI scaffold plus manual hospital scheduling code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then use the current
-published `solverforge-ui 0.6.4` crate for the UI patch line. Add the hospital
+published `solverforge-ui 0.6.5` crate for the UI patch line. Add the hospital
 app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.9.1", features = [
+solverforge = { version = "0.10.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.6.4"
+solverforge-ui = "0.6.5"
 rand = "0.10.1"
 
 axum = "0.8.9"
@@ -147,10 +147,10 @@ chrono = { version = "0.4.44", features = ["serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-cli 2.0.1` scaffolds the published `solverforge 0.9.1` and
-`solverforge-ui 0.6.3` target. The finished hospital app uses the current
-published `solverforge-ui 0.6.4` crate for the UI patch line, then adds the
-hospital-specific dependencies and domain model.
+`solverforge-cli 2.0.2` scaffolds the published `solverforge 0.10.0` and
+`solverforge-ui 0.6.4` target. The finished hospital app uses the current
+published `solverforge-ui 0.6.5` patch line, then adds the hospital-specific
+dependencies and domain model.
 
 ### Align App Metadata
 
@@ -160,14 +160,14 @@ The current hospital app metadata is intentionally explicit:
 [app]
 name = "SolverForge Hospital"
 starter = "neutral-shell"
-cli_version = "2.0.1"
+cli_version = "2.0.2"
 
 [runtime]
 target = "SolverForge crates.io target"
 runtime_crate = "solverforge"
-runtime_version = "0.9.1"
+runtime_version = "0.10.0"
 ui_crate = "solverforge-ui"
-ui_version = "0.6.4"
+ui_version = "0.6.5"
 
 [demo]
 default_size = "large"
