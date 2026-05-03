@@ -83,7 +83,7 @@ factory.shifts()
     ))
 ```
 
-See [Joiners](../joiners/) for all available joiner types.
+See [Joiners](/docs/solverforge/constraints/joiners/) for all available joiner types.
 
 ### `flatten_last`
 
@@ -106,7 +106,7 @@ factory.for_each(|s: &Schedule| s.employees.as_slice())
 
 ### `group_by`
 
-Groups elements and applies a [collector](../collectors/) to aggregate.
+Groups elements and applies a [collector](/docs/solverforge/constraints/collectors/) to aggregate.
 
 ```rust
 factory.shifts()
@@ -260,6 +260,6 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
 ## See Also
 
-- [Joiners](../joiners/) — Controlling how streams are joined
-- [Collectors](../collectors/) — Aggregation functions for `group_by`
-- [Score Types](../score-types/) — Available score types
+- [Joiners](/docs/solverforge/constraints/joiners/) — Controlling how streams are joined
+- [Collectors](/docs/solverforge/constraints/collectors/) — Aggregation functions for `group_by`
+- [Score Types](/docs/solverforge/constraints/score-types/) — Available score types

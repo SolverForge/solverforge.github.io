@@ -10,6 +10,19 @@ The stock generated runtime loads `solver.toml` automatically when you call
 `SolverManager::solve(...)`. The `solverforge-config` crate also exposes parsing
 helpers for TOML and YAML when you want to inspect or build configs directly.
 
+Configuration has three levels:
+
+| Level | Scope | Typical owner |
+| ----- | ----- | ------------- |
+| Global config | environment mode, random seed, thread count, top-level termination | app/operator |
+| Phase config | construction, local search, exhaustive search, VND, phase-specific termination | app/operator |
+| Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups | Rust domain model |
+
+The important rule is that config selects declared capabilities. It does not
+invent model hooks. If a selector asks for nearby scalar candidates, grouped
+scalar candidates, or conflict repair providers, the model must expose those
+capabilities through the generated model support layer.
+
 ## Loading Configuration
 
 ### From a TOML file
@@ -138,7 +151,49 @@ type = "tabu_search"
 entity_tabu_size = 7
 ```
 
-See [Phases](../phases/) for all phase types and their options.
+See [Phases](/docs/solverforge/solver/phases/) for all phase types and their options.
+
+### Phase Anatomy
+
+Most production configs have this shape:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+construction_obligation = "preserve_unassigned"
+value_candidate_limit = 32
+
+[[phases]]
+type = "local_search"
+
+[phases.acceptor]
+type = "late_acceptance"
+late_acceptance_size = 400
+
+[phases.forager]
+type = "accepted_count"
+limit = 4
+
+[phases.move_selector]
+type = "union_move_selector"
+selection_order = "round_robin"
+
+[[phases.move_selector.selectors]]
+type = "change_move_selector"
+value_candidate_limit = 32
+
+[[phases.move_selector.selectors]]
+type = "swap_move_selector"
+
+[phases.termination]
+step_count_limit = 100000
+```
+
+Construction creates the first workable solution. Local search improves it.
+The acceptor decides whether a scored candidate can be accepted. The forager
+decides which accepted candidate is committed. The move selector decides which
+candidate moves are generated.
 
 ### Move Selectors
 
@@ -189,15 +244,63 @@ when the model provides a scalar group through the generated model support
 surface. Grouped local search also supports `require_hard_improvement` when a
 compound candidate must improve the hard score before it can be accepted.
 
+Grouped construction example:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+group_name = "task_operator_assignment"
+value_candidate_limit = 32
+group_candidate_limit = 128
+```
+
+Grouped local-search example:
+
+```toml
+[phases.move_selector]
+type = "grouped_scalar_move_selector"
+group_name = "task_operator_assignment"
+value_candidate_limit = 32
+max_moves_per_step = 256
+require_hard_improvement = true
+```
+
 Conflict-repair selectors configure `constraints` by exact scoring metadata
 identity. Use `ConstraintRef::full_name()` for package-qualified constraints and
 the short name for package-less constraints. With `include_soft_matches = false`,
 soft constraints are rejected before providers run; setting it to `true`
 explicitly allows soft repair providers.
 
+Compound repair example:
+
+```toml
+[phases.move_selector]
+type = "compound_conflict_repair_move_selector"
+constraints = ["schedule/no_overlapping_operator_assignment"]
+max_matches_per_step = 16
+max_repairs_per_match = 32
+max_moves_per_step = 256
+require_hard_improvement = true
+```
+
+### Construction Obligation
+
+Nullable scalar variables default to `preserve_unassigned`: construction may
+leave `None` in place when that is legal and scores best. Use
+`assign_when_candidate_exists` when construction should assign a doable value
+whenever one exists:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+construction_obligation = "assign_when_candidate_exists"
+```
+
 ### Termination
 
-Controls when the solver stops. See [Termination](../termination/) for all options.
+Controls when the solver stops. See [Termination](/docs/solverforge/solver/termination/) for all options.
 
 ```toml
 [termination]
@@ -240,6 +343,7 @@ decorate that base config rather than replace it from scratch.
 
 ## See Also
 
-- [Phases](../phases/) — Phase types and configuration
-- [Termination](../termination/) — Termination conditions
-- [SolverManager](../solver-manager/) — Running the solver
+- [Phases](/docs/solverforge/solver/phases/) — Phase types and configuration
+- [Moves](/docs/solverforge/solver/moves/) — Selector families and move behavior
+- [Termination](/docs/solverforge/solver/termination/) — Termination conditions
+- [SolverManager](/docs/solverforge/solver/solver-manager/) — Running the solver

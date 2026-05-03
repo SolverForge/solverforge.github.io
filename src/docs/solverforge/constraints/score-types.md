@@ -109,5 +109,5 @@ let sum = a + b;           // (-1, -8)
 
 ## See Also
 
-- [Constraint Streams](../constraint-streams/) — Using scores in `penalize` / `reward`
-- [Score Analysis](../score-analysis/) — Understanding score breakdowns
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — Using scores in `penalize` / `reward`
+- [Score Analysis](/docs/solverforge/constraints/score-analysis/) — Understanding score breakdowns

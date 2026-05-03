@@ -10,6 +10,11 @@ Moves are the atomic operations the solver uses to explore the search space.
 Selectors decide which moves are generated for a phase. Together they form the
 solver's reusable search building blocks.
 
+Most application code should choose selectors in `solver.toml`; it should not
+construct lower-level move structs directly. Move structs matter when you are
+extending SolverForge internals or writing a custom runtime path. Selectors are
+the public configuration surface for ordinary apps.
+
 ## Start by Problem Shape
 
 | Problem shape                                       | Start with                                                                                         |
@@ -30,6 +35,112 @@ the normal public path.
 All selector `entity_class` and `variable_name` fields are optional target
 filters. When omitted, the selector uses every compatible variable. When set,
 they match the canonical model descriptor names, not local Rust aliases.
+
+## Selector Recipes
+
+### Scalar assignment baseline
+
+Use change plus swap when each entity has one scalar assignment and no domain
+specific nearby hooks yet:
+
+```toml
+[phases.move_selector]
+type = "union_move_selector"
+selection_order = "round_robin"
+
+[[phases.move_selector.selectors]]
+type = "change_move_selector"
+variable_name = "employee_idx"
+value_candidate_limit = 32
+
+[[phases.move_selector.selectors]]
+type = "swap_move_selector"
+variable_name = "employee_idx"
+```
+
+### Route or sequence baseline
+
+Use nearby list relocation, nearby list swap, and reverse for ordered variables:
+
+```toml
+[phases.move_selector]
+type = "union_move_selector"
+selection_order = "round_robin"
+
+[[phases.move_selector.selectors]]
+type = "nearby_list_change_move_selector"
+variable_name = "visits"
+max_nearby = 16
+
+[[phases.move_selector.selectors]]
+type = "nearby_list_swap_move_selector"
+variable_name = "visits"
+max_nearby = 16
+
+[[phases.move_selector.selectors]]
+type = "list_reverse_move_selector"
+variable_name = "visits"
+```
+
+### Coupled nullable scalar decisions
+
+Use grouped scalar construction and grouped scalar local search when the legal
+decision changes several nullable scalar variables at once:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+group_name = "task_operator_assignment"
+group_candidate_limit = 128
+
+[[phases]]
+type = "local_search"
+
+[phases.move_selector]
+type = "grouped_scalar_move_selector"
+group_name = "task_operator_assignment"
+max_moves_per_step = 256
+require_hard_improvement = true
+```
+
+### Conflict-directed hard repair
+
+Use compound conflict repair when score matches can explain the coupled repair
+edits:
+
+```toml
+[phases.move_selector]
+type = "compound_conflict_repair_move_selector"
+constraints = ["schedule/no_overlapping_operator_assignment"]
+max_matches_per_step = 16
+max_repairs_per_match = 32
+max_moves_per_step = 256
+require_hard_improvement = true
+```
+
+Constraint keys match scoring metadata exactly. Package-qualified constraints
+use `ConstraintRef::full_name()` values such as `package/name`; package-less
+constraints use the short name.
+
+### Controlled broad neighborhoods
+
+Use `limited_neighborhood` when one selector is useful but too broad:
+
+```toml
+[phases.move_selector]
+type = "limited_neighborhood"
+selected_count_limit = 100
+
+[phases.move_selector.selector]
+type = "nearby_change_move_selector"
+variable_name = "employee_idx"
+max_nearby = 20
+```
+
+Use `accepted_count_limit` or `[phases.forager]` when the question is how many
+accepted candidates survive scoring. Use `limited_neighborhood` when the
+question is how many candidates a selector emits before scoring.
 
 ## Move Types
 
@@ -693,6 +804,6 @@ meters only rank or filter those candidates.
 
 ## See Also
 
-- [Configuration](../configuration/) — `solver.toml` examples and phase config
-- [Phases](../phases/) — How moves are used in solver phases
+- [Configuration](/docs/solverforge/solver/configuration/) — `solver.toml` examples and phase config
+- [Phases](/docs/solverforge/solver/phases/) — How moves are used in solver phases
 - [List Variables](/docs/solverforge/modeling/list-variables/) — Domain modeling for list moves

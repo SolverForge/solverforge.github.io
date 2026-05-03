@@ -235,6 +235,6 @@ For better results, try tabu search or simulated annealing as the acceptor.
 
 ## See Also
 
-- [Moves](../moves/) — Move types used by local search
-- [Termination](../termination/) — Stopping conditions for phases
-- [Configuration](../configuration/) — Runtime configuration format
+- [Moves](/docs/solverforge/solver/moves/) — Move types used by local search
+- [Termination](/docs/solverforge/solver/termination/) — Stopping conditions for phases
+- [Configuration](/docs/solverforge/solver/configuration/) — Runtime configuration format

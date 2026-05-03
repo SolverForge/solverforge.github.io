@@ -86,5 +86,5 @@ Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`
 
 ## See Also
 
-- [Constraint Streams](../constraint-streams/) — The core stream API
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — The core stream API
 - [docs.rs/solverforge](https://docs.rs/solverforge) — Full joiner API reference

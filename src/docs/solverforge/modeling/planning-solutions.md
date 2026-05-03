@@ -92,5 +92,5 @@ Common value-range setup lives on the entity side, for example
 
 ## See Also
 
-- [Planning Entities](../planning-entities/) — What the solver changes
+- [Planning Entities](/docs/solverforge/modeling/planning-entities/) — What the solver changes
 - [Score Types](/docs/solverforge/constraints/score-types/) — Available score types

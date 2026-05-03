@@ -156,5 +156,5 @@ anything.
 ## See Also
 
 - [Moves](/docs/solverforge/solver/moves/) — Move types including list-specific moves
-- [Planning Entities](../planning-entities/) — Shadow variable attributes
+- [Planning Entities](/docs/solverforge/modeling/planning-entities/) — Shadow variable attributes
 - [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/) — List-variable vehicle routing with road-network scoring

@@ -224,5 +224,5 @@ includes a `constraints = "..."` path.
 
 ## See Also
 
-- [Configuration](../configuration/) — Solver configuration
-- [Termination](../termination/) — Termination conditions
+- [Configuration](/docs/solverforge/solver/configuration/) — Solver configuration
+- [Termination](/docs/solverforge/solver/termination/) — Termination conditions

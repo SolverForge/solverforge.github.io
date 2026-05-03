@@ -85,5 +85,5 @@ The macro provides the standard derives and trait impls automatically.
 
 ## See Also
 
-- [Planning Entities](../planning-entities/) — Mutable structs with planning variables
-- [Planning Solutions](../planning-solutions/) — The container struct
+- [Planning Entities](/docs/solverforge/modeling/planning-entities/) — Mutable structs with planning variables
+- [Planning Solutions](/docs/solverforge/modeling/planning-solutions/) — The container struct

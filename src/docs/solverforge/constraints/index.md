@@ -34,8 +34,8 @@ constraints use the short name.
 
 ## Sections
 
-- **[Constraint Streams](constraint-streams/)** — The core stream API
-- **[Joiners](joiners/)** — Combining multiple entity streams
-- **[Collectors](collectors/)** — Aggregation functions for `group_by`
-- **[Score Types](score-types/)** — Available score types and when to use each
-- **[Score Analysis](score-analysis/)** — Understanding and explaining scores
+- **[Constraint Streams](/docs/solverforge/constraints/constraint-streams/)** — The core stream API
+- **[Joiners](/docs/solverforge/constraints/joiners/)** — Combining multiple entity streams
+- **[Collectors](/docs/solverforge/constraints/collectors/)** — Aggregation functions for `group_by`
+- **[Score Types](/docs/solverforge/constraints/score-types/)** — Available score types and when to use each
+- **[Score Analysis](/docs/solverforge/constraints/score-analysis/)** — Understanding and explaining scores

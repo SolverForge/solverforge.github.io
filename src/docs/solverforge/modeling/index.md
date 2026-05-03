@@ -66,10 +66,10 @@ means Rust module declaration order is not a modeling contract.
 
 ## Sections
 
-- **[Planning Solutions](planning-solutions/)** — The top-level container struct
-- **[Planning Entities](planning-entities/)** — Structs the solver modifies
-- **[Problem Facts](problem-facts/)** — Immutable input data
-- **[List Variables](list-variables/)** — Ordered sequence variables for routing/sequencing
+- **[Planning Solutions](/docs/solverforge/modeling/planning-solutions/)** — The top-level container struct
+- **[Planning Entities](/docs/solverforge/modeling/planning-entities/)** — Structs the solver modifies
+- **[Problem Facts](/docs/solverforge/modeling/problem-facts/)** — Immutable input data
+- **[List Variables](/docs/solverforge/modeling/list-variables/)** — Ordered sequence variables for routing/sequencing
 
 ## See Also
 

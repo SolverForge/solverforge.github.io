@@ -146,6 +146,6 @@ not need to duplicate `Clone` or `Debug` manually in the common case.
 
 ## See Also
 
-- [Planning Solutions](../planning-solutions/) — The container that holds entities
-- [Problem Facts](../problem-facts/) — Immutable input data
-- [List Variables](../list-variables/) — Sequencing and routing variables
+- [Planning Solutions](/docs/solverforge/modeling/planning-solutions/) — The container that holds entities
+- [Problem Facts](/docs/solverforge/modeling/problem-facts/) — Immutable input data
+- [List Variables](/docs/solverforge/modeling/list-variables/) — Sequencing and routing variables

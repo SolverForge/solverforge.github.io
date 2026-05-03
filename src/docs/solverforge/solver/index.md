@@ -62,8 +62,8 @@ User-facing rates such as `moves/s` are display-only derived values.
 
 ## Sections
 
-- **[Configuration](configuration/)** — `SolverConfig`, `solver.toml`, and YAML parsing
-- **[Phases](phases/)** — Construction heuristic, local search, exhaustive search, and VND
-- **[Moves](moves/)** — Move types and selectors
-- **[Termination](termination/)** — When to stop solving
-- **[SolverManager](solver-manager/)** — Running and managing solver instances
+- **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, `solver.toml`, and YAML parsing
+- **[Phases](/docs/solverforge/solver/phases/)** — Construction heuristic, local search, exhaustive search, and VND
+- **[Moves](/docs/solverforge/solver/moves/)** — Move types and selectors
+- **[Termination](/docs/solverforge/solver/termination/)** — When to stop solving
+- **[SolverManager](/docs/solverforge/solver/solver-manager/)** — Running and managing solver instances

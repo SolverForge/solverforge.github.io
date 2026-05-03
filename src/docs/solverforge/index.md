@@ -157,9 +157,9 @@ Full API documentation is available on
 
 ## Sections
 
-- **[Domain Modeling](modeling/)** — Derive macros for solutions, entities, and
+- **[Domain Modeling](/docs/solverforge/modeling/)** — Derive macros for solutions, entities, and
   problem facts
-- **[Constraints](constraints/)** — Constraint streams, joiners, collectors, and
+- **[Constraints](/docs/solverforge/constraints/)** — Constraint streams, joiners, collectors, and
   score types
-- **[Solver](solver/)** — Configuration, phases, moves, termination, and
+- **[Solver](/docs/solverforge/solver/)** — Configuration, phases, moves, termination, and
   SolverManager

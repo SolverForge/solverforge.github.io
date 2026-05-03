@@ -61,5 +61,5 @@ package-less constraints use the short name.
 
 ## See Also
 
-- [Score Types](../score-types/) — Available score types
-- [Constraint Streams](../constraint-streams/) — Defining constraints
+- [Score Types](/docs/solverforge/constraints/score-types/) — Available score types
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — Defining constraints

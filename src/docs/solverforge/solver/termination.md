@@ -93,5 +93,5 @@ the terminal event is `SolverEvent::Completed` and the terminal reason is
 
 ## See Also
 
-- [Configuration](../configuration/) — TOML configuration format
-- [SolverManager](../solver-manager/) — Programmatic solver control
+- [Configuration](/docs/solverforge/solver/configuration/) — TOML configuration format
+- [SolverManager](/docs/solverforge/solver/solver-manager/) — Programmatic solver control

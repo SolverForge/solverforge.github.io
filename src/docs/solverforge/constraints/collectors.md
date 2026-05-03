@@ -70,5 +70,5 @@ The key function returns `Option<K>` — `None` values (unassigned entities) are
 
 ## See Also
 
-- [Constraint Streams](../constraint-streams/) — The `group_by` operation
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — The `group_by` operation
 - [docs.rs/solverforge](https://docs.rs/solverforge) — Full collector API reference
