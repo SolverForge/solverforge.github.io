@@ -9,10 +9,11 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui 0.6.4` contract is job-oriented and
+The current `solverforge-ui 0.6.5` contract is job-oriented and
 lifecycle-typed. New integrations should expose retained jobs, explicit
-`eventType` payloads, exact paused or terminal snapshots, and the shipped
-optional map module when they need Leaflet route views.
+`eventType` payloads, exact paused or terminal snapshots, normalized create-job
+identifiers, and the shipped optional map module when they need Leaflet route
+views.
 <% end %>
 
 This page summarizes how `solverforge-ui` connects frontend code to backend APIs
@@ -81,8 +82,14 @@ Older articles may mention schedule-named routes. Current generated apps expose
 
 The create operation may resolve to either:
 
-- a plain job id string, or
-- an object containing one of `id`, `jobId`, or `job_id`
+- a non-empty plain job id string
+- a finite numeric job id, including `0`
+- an object containing a scalar `id`, `jobId`, or `job_id`
+
+`SF.createSolver(...)` normalizes accepted create-job identifiers to strings
+before stream attachment. Empty strings, non-finite numbers, missing object
+fields, arrays, and nested object identifiers reject startup instead of being
+silently stringified.
 
 Current backend expectations are:
 
@@ -190,8 +197,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
-- `/sf/sf.0.6.4.css`
-- `/sf/sf.0.6.4.js`
+- `/sf/sf.0.6.5.css`
+- `/sf/sf.0.6.5.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 

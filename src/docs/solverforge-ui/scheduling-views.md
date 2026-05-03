@@ -25,7 +25,7 @@ The shipped dense timeline surface is built around:
 
 Use this as the default scheduling surface when you need sticky time headers,
 sticky lane labels, synchronized scrolling, overview clustering, or packed
-detailed inspection. In `solverforge-ui 0.6.4`, detailed timeline blocks keep
+detailed inspection. Since `solverforge-ui 0.6.4`, detailed timeline blocks keep
 their exact interval width instead of receiving timeline-specific minimum-width
 inflation.
 

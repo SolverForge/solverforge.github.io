@@ -11,9 +11,10 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks `solverforge-ui 0.6.4`: retained jobs, typed lifecycle
-events, exact paused snapshots, pause/resume/cancel controls, exact dense
-scheduling geometry, and optional map helpers.
+This section tracks `solverforge-ui 0.6.5`: retained jobs,
+typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
+exact dense scheduling geometry, normalized create-job identifiers, and
+optional map helpers.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -40,12 +41,16 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.6.4" }
+solverforge-ui = { version = "0.6.5" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.6.5" }
 ```
 
-`solverforge-ui 0.6.4` declares `rust-version = "1.95"`.
+Use the Git tag form when you need exact source-tag reproducibility instead of
+the crates.io package.
+
+`solverforge-ui 0.6.5` declares `rust-version = "1.95"`.
 
 ## Minimal Workflow
 
@@ -128,13 +133,13 @@ It is a strong fit for:
 
 ## Sections
 
-- **[Getting Started](getting-started/)** — Mount `/sf/*`, include the bundled
+- **[Getting Started](/docs/solverforge-ui/getting-started/)** — Mount `/sf/*`, include the bundled
   assets, and wire the verified primitives into an app
-- **[Components](components/)** — Core factories, return values, and unsafe HTML
+- **[Components](/docs/solverforge-ui/components/)** — Core factories, return values, and unsafe HTML
   opt-ins
-- **[Scheduling Views](scheduling-views/)** — Canonical timeline, low-level rail
+- **[Scheduling Views](/docs/solverforge-ui/scheduling-views/)** — Canonical timeline, low-level rail
   primitives, and Gantt APIs with exact-geometry examples
-- **[Integration & Assets](integration-assets/)** — Backend adapters, asset
+- **[Integration & Assets](/docs/solverforge-ui/integration-assets/)** — Backend adapters, asset
   serving, cache behavior, and example route contracts
 
 ## External References

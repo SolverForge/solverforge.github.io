@@ -51,7 +51,7 @@ For cache-pinned deployments, use the 0.6.4 bundle names:
 <script src="/sf/sf.0.6.4.js"></script>
 ```
 
-`solverforge-ui 0.6.4` is the current published UI crate. `solverforge-cli
-2.0.1` still scaffolds `solverforge-ui 0.6.3`, so upgrade the UI dependency in
-app-owned manifests when you need the rail timeline geometry fix before the next
-CLI scaffold release.
+`solverforge-ui 0.6.4` is the UI crate used by the current `solverforge-cli
+2.0.2` scaffold target. A newer published `solverforge-ui 0.6.5` patch carries
+create-job identifier normalization for apps that need that patch before the
+next CLI scaffold refresh.

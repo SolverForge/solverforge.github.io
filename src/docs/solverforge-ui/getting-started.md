@@ -25,10 +25,14 @@ This guide covers the verified integration path:
 ```toml
 [dependencies]
 axum = "0.8.9"
-solverforge-ui = { version = "0.6.4" }
+solverforge-ui = { version = "0.6.5" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.6.5" }
 ```
+
+Use the Git tag form when you need exact source-tag reproducibility instead of
+the crates.io package.
 
 Use Rust `1.95+` for the current crate line.
 
@@ -148,14 +152,14 @@ terminal retained-job cleanup.
 `solverforge-ui` does not generate your scheduling API. The crate ships the UI
 surface and a set of backend helpers. If you use
 `SF.createBackend({ type: 'axum' })`, follow the canonical retained-job contract
-documented in [Integration & Assets](../integration-assets/). Older
+documented in [Integration & Assets](/docs/solverforge-ui/integration-assets/). Older
 Schedule-named route shapes are historical. Current generated apps expose the
 retained `/jobs/...` contract.
 
 ## Next Steps
 
-- Read [Components](../components/) to build richer page layouts.
-- Read [Scheduling Views](../scheduling-views/) for timeline rail and Gantt
+- Read [Components](/docs/solverforge-ui/components/) to build richer page layouts.
+- Read [Scheduling Views](/docs/solverforge-ui/scheduling-views/) for timeline rail and Gantt
   examples.
-- Read [Integration & Assets](../integration-assets/) for backend adapters,
+- Read [Integration & Assets](/docs/solverforge-ui/integration-assets/) for backend adapters,
   optional map modules, asset serving, and versioned bundle behavior.
