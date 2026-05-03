@@ -147,6 +147,22 @@ The normal build-out flow is:
 5. regenerate demo data
 6. replace placeholder constraint logic with real domain rules
 
+Keep this order unless the domain gives you a reason to deviate. Facts define
+the immutable value ranges and reference data. Entities define the mutable
+records the solver can change. Planning variables make those entities solvable.
+Constraints make the solve meaningful.
+
+After each step, run:
+
+```bash
+solverforge info
+solverforge check
+```
+
+Use `info` to verify that the CLI sees the model you meant to create. Use
+`check` to catch missing files, incomplete domain wiring, and entities that
+still have no scalar or list planning variable.
+
 ### Add Problem Facts
 
 ```bash
@@ -223,6 +239,10 @@ Constraint generation writes a skeleton into `src/constraints/` and updates
 pair templates intentionally panic inside the placeholder filter until you
 replace them with real domain logic.
 
+Treat the generated file as a compile-time wiring aid. It gives you the module,
+constraint name, score shape, and stream pattern; you still own the real
+predicate, join keys, weights, and hard/soft decision.
+
 ### Generate Demo Data
 
 ```bash
@@ -241,6 +261,16 @@ defaults are persisted in `solverforge.app.toml`.
 shape but minimizes content so you can take over manually.
 
 ## Project Management Commands
+
+The CLI has inspection commands for different layers of the generated app:
+
+| Command | Use it when |
+| ------- | ----------- |
+| `solverforge info` | You want to see the model the CLI currently detects |
+| `solverforge check` | You want structural validation before running Rust tests |
+| `solverforge routes` | You want to confirm the backend route surface |
+| `solverforge test` | You want the app's Rust tests, with passthrough args |
+| `solverforge config show` | You want the current `solver.toml` without opening the file |
 
 ### View Project Summary
 
@@ -319,12 +349,12 @@ These options work with any command:
 
 ## Next Steps
 
-- Read [Project Anatomy](../project-anatomy/) before you start heavy manual
+- Read [Project Anatomy](/docs/solverforge-cli/project-anatomy/) before you start heavy manual
   edits.
-- Read [Modeling & Generation](../modeling-and-generation/) for the full
+- Read [Modeling & Generation](/docs/solverforge-cli/modeling-and-generation/) for the full
   generator workflow.
-- Read [Configuration](../configuration/) before changing the solver or UI
+- Read [Configuration](/docs/solverforge-cli/configuration/) before changing the solver or UI
   metadata layers.
-- Keep [Command Reference](../command-reference/) open while working.
+- Keep [Command Reference](/docs/solverforge-cli/command-reference/) open while working.
 - Continue with [SolverForge](/docs/solverforge/) when you need runtime-level
   domain modeling and solver API detail.

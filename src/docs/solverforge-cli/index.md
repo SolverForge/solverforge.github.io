@@ -28,6 +28,22 @@ then uses:
 - `solverforge-ui` for the shipped frontend and retained-job lifecycle
 - `solverforge-maps` for map and routing integration in generated projects
 
+## Mental Model
+
+Think of the CLI as a project shaper, not as a separate modeling language.
+
+| Layer | Owner | What changes there |
+| ----- | ----- | ------------------ |
+| Scaffold shell | `solverforge new` | Axum app, retained-job API, frontend shell, config files |
+| Domain model | CLI generators plus Rust edits | facts, entities, scalar variables, list variables, solution type |
+| Constraint logic | generated skeletons, then user Rust | real hard and soft scoring rules |
+| Runtime search | `solver.toml` | phases, acceptors, selectors, termination, candidate limits |
+| App metadata | CLI synchronization | `solverforge.app.toml` and `static/generated/ui-model.json` |
+
+The generated shell is intentionally neutral. You do not choose `scalar`,
+`list`, or `mixed` at project creation time. You add scalar and list planning
+variables as the domain earns them, and the app metadata follows the Rust model.
+
 ## What You Get
 
 - A neutral scaffold that starts runnable instead of forcing a tutorial-shaped
@@ -41,6 +57,26 @@ then uses:
   vendoring a template-specific asset pipeline
 - A local development flow built around `solverforge server`, `solverforge
   info`, `solverforge check`, `solverforge routes`, and `solverforge test`
+
+## Daily Loop
+
+Use this loop while shaping a generated app:
+
+```bash
+solverforge info
+solverforge generate fact employee --field skill:String
+solverforge generate entity shift --field starts_at:String --field ends_at:String
+solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --allows-unassigned
+solverforge generate constraint no_overlap --pair --hard
+solverforge generate data --size standard
+solverforge check
+solverforge test
+solverforge server --debug
+```
+
+After each generator step, inspect the Rust files it touched. Generated
+constraint skeletons are deliberately unfinished; replace placeholder logic
+before treating a solve result as meaningful.
 
 ## Installation
 
@@ -99,17 +135,33 @@ Use `solverforge-cli` when you want the fastest path from zero to a running
 SolverForge app and you want to shape the model incrementally instead of
 starting from a fixed tutorial repository.
 
+Use the long-form use cases after you understand the generic shell. They show
+complete app work, data generation, frontend decisions, and deployment shape;
+they are not replacements for the CLI-first project model.
+
+## Boundaries
+
+The CLI keeps generated structure coherent, but it does not decide the planning
+model for you.
+
+- It scaffolds facts, entities, variables, constraints, demo data, and metadata.
+- It keeps managed blocks and `solverforge.app.toml` synchronized.
+- It does not infer business rules from field names.
+- It does not make generated constraint TODOs correct.
+- It does not replace runtime-level `solver.toml` tuning when a model needs a
+  different construction, selector, acceptor, or termination policy.
+
 ## Sections
 
-- **[Getting Started](getting-started/)** - install the CLI, scaffold a project,
+- **[Getting Started](/docs/solverforge-cli/getting-started/)** - install the CLI, scaffold a project,
   run the server, and make the first model changes
-- **[Project Anatomy](project-anatomy/)** - generated file layout, ownership
+- **[Project Anatomy](/docs/solverforge-cli/project-anatomy/)** - generated file layout, ownership
   boundaries, and managed markers
-- **[Modeling & Generation](modeling-and-generation/)** - facts, entities,
+- **[Modeling & Generation](/docs/solverforge-cli/modeling-and-generation/)** - facts, entities,
   scalar variables, list variables, constraints, data, and destroy flows
-- **[Configuration](configuration/)** - `solver.toml`,
+- **[Configuration](/docs/solverforge-cli/configuration/)** - `solver.toml`,
   `solverforge.app.toml`, UI metadata, and scaffold target versioning
-- **[Command Reference](command-reference/)** - complete command, flag, and
+- **[Command Reference](/docs/solverforge-cli/command-reference/)** - complete command, flag, and
   example reference
 
 ## External References

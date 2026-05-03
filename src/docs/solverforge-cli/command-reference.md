@@ -69,23 +69,23 @@ solverforge generate variable --help
 crate targets used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 2.0.1
-CLI version: 2.0.1
-Scaffold runtime target: SolverForge crate target 0.9.1
-Scaffold UI target: solverforge-ui 0.6.3
+solverforge solverforge-cli 2.0.2
+CLI version: 2.0.2
+Scaffold runtime target: SolverForge crate target 0.10.0
+Scaffold UI target: solverforge-ui 0.6.4
 Scaffold maps target: solverforge-maps 2.1.3
-Runtime source: crates.io: solverforge 0.9.1
-UI source: crates.io: solverforge-ui 0.6.3
+Runtime source: crates.io: solverforge 0.10.0
+UI source: crates.io: solverforge-ui 0.6.4
 Maps source: crates.io: solverforge-maps 2.1.3
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 2.0.1` scaffold starts on the published `solverforge 0.9.1`,
-`solverforge-ui 0.6.3`, and `solverforge-maps 2.1.3` crate line.
+`solverforge-cli 2.0.2` scaffold starts on the published `solverforge 0.10.0`,
+`solverforge-ui 0.6.4`, and `solverforge-maps 2.1.3` crate line.
 
-The current published `solverforge-ui` crate is `0.6.4`. Use it directly in
-app-owned dependency manifests when you want the exact rail timeline geometry
-fix before the next CLI scaffold target moves.
+The current published `solverforge-ui` crate is `0.6.5`. Use it directly in
+app-owned dependency manifests when you need create-job identifier
+normalization before the CLI scaffold target moves again.
 
 ### `solverforge help`
 

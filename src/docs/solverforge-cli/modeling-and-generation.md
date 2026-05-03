@@ -20,6 +20,36 @@ The current workflow is:
 5. regenerate demo data
 6. iterate on solver behavior and frontend presentation
 
+## Generator Ownership
+
+The CLI writes code, but not every generated line has the same ownership model.
+
+| Surface | CLI behavior | Your responsibility |
+| ------- | ------------ | ------------------- |
+| `src/domain/*.rs` | creates structs and managed planning-variable blocks | keep real domain fields and semantics coherent |
+| `src/domain/mod.rs` | maintains module exports and `planning_model!` wiring | avoid deleting managed exports by hand |
+| `src/domain/plan.rs` | patches collections, score field, and solution metadata | keep solution-level custom fields intentional |
+| `src/constraints/*.rs` | creates skeleton stream patterns | replace placeholder predicates and weights |
+| `solverforge.app.toml` | syncs structural metadata | treat as derived scaffold contract |
+| `static/generated/ui-model.json` | rewrites frontend model metadata | do not hand-edit |
+| `solver.toml` | starts with defaults and can be edited through `config` helpers | own search policy explicitly |
+
+When a generator uses managed markers, keep the `@solverforge:begin` and
+`@solverforge:end` comments intact. They are the boundary that lets future CLI
+operations patch generated regions without taking over the whole file.
+
+## Choosing The Next Generator
+
+| You need... | Command |
+| ----------- | ------- |
+| immutable input data | `solverforge generate fact ...` |
+| a mutable planning record | `solverforge generate entity ...` |
+| one selected value per entity | `solverforge generate variable ... --kind scalar ...` |
+| an ordered sequence owned by an entity | `solverforge generate variable ... --kind list ...` |
+| a hard or soft scoring rule skeleton | `solverforge generate constraint ...` |
+| deterministic sample data | `solverforge generate data --size ...` |
+| a different score type | `solverforge generate score ...` |
+
 ## Facts
 
 Create a problem fact:

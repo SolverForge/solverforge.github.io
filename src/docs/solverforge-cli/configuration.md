@@ -39,6 +39,21 @@ seconds_spent_limit = 30
 
 This is the user-owned search layer. Edit it directly or use the CLI helpers.
 
+`solver.toml` should answer operational search questions:
+
+| Question | Config surface |
+| -------- | -------------- |
+| How long may the solve run? | `[termination]` or `[phases.termination]` |
+| How is the initial solution constructed? | `[[phases]] type = "construction_heuristic"` |
+| Which neighborhoods are searched? | `[phases.move_selector]` |
+| How are candidates accepted? | `[phases.acceptor]` |
+| How many accepted candidates are retained? | `[phases.forager]` |
+| Is the run deterministic? | `environment_mode`, `random_seed`, `move_thread_count` |
+
+When selector or phase behavior is the question, read the runtime
+[configuration docs](/docs/solverforge/solver/configuration/) and
+[moves docs](/docs/solverforge/solver/moves/) rather than guessing key names.
+
 ### Show the Current Config
 
 ```bash
@@ -71,12 +86,12 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "2.0.1"
+cli_version = "2.0.2"
 
 [runtime]
-target = "solverforge 0.9.1"
-runtime_source = "crates.io: solverforge 0.9.1"
-ui_source = "crates.io: solverforge-ui 0.6.3"
+target = "solverforge 0.10.0"
+runtime_source = "crates.io: solverforge 0.10.0"
+ui_source = "crates.io: solverforge-ui 0.6.4"
 
 [demo]
 default_size = "standard"
@@ -87,13 +102,13 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the published `solverforge-cli 2.0.1` scaffold target.
-Fresh generated apps start on the current `solverforge 0.9.1` and
-the CLI's `solverforge-ui 0.6.3` scaffold target.
+This example reflects the published `solverforge-cli 2.0.2` scaffold target.
+Fresh generated apps start on the current `solverforge 0.10.0` and
+the CLI's `solverforge-ui 0.6.4` scaffold target.
 
-The current published `solverforge-ui` crate is `0.6.4`. Use it directly in
-app-owned dependency manifests when an app needs the exact rail timeline geometry
-fix before a newer CLI scaffold release.
+The current published `solverforge-ui` crate is `0.6.5`. Use it directly in
+app-owned dependency manifests when an app needs create-job identifier
+normalization before a newer CLI scaffold release.
 
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:
