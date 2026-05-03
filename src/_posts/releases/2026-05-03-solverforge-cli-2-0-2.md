@@ -61,3 +61,9 @@ maps_source = "crates.io: solverforge-maps 2.1.3"
 The current published `solverforge-ui` crate is `0.6.5` for create-job
 identifier normalization. Use that patch line directly in app-owned manifests
 when you need the 0.6.5 fix before the CLI scaffold target moves again.
+
+The `solverforge-maps` source repository is tagged `v2.1.4` for matrix
+route-distance access. `solverforge-cli 2.0.2` still scaffolds
+`solverforge-maps 2.1.3`; use the maps source tag directly in app-owned
+manifests when you need the 2.1.4 matrix-distance API before a newer CLI
+scaffold target is released.

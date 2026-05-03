@@ -50,6 +50,8 @@ Good first questions are:
 - Is the bounding box large enough for realistic detours?
 - Is the graph strongly connected in the area you care about?
 - Are some locations landing in disconnected subgraphs?
+- Do the travel-time row and distance row both mark the same pairs as
+  `UNREACHABLE`?
 - Is the current process reusing cached regions for repeated work?
 
 ## Recommended Production Practices

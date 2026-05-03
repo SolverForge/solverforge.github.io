@@ -7,14 +7,20 @@ description: >
   Road-network loading, routing, travel-time matrices, and route geometry utilities for vehicle routing applications.
 ---
 
-`solverforge-maps` is SolverForge's Rust library for map-backed routing workflows. It is designed for vehicle routing and similar optimization problems where you need to turn geographic coordinates into travel times, route geometries, and network diagnostics.
+<%= render Ui::Callout.new do %>
+This section tracks the `solverforge-maps 2.1.4` source release. The current
+`solverforge-cli 2.0.2` scaffold target still uses the published
+`solverforge-maps 2.1.3` crate until a newer CLI target moves.
+<% end %>
+
+`solverforge-maps` is SolverForge's Rust library for map-backed routing workflows. It is designed for vehicle routing and similar optimization problems where you need to turn geographic coordinates into travel times, same-path route distances, route geometries, and network diagnostics.
 
 ## What It Provides
 
 - **OSM-backed road networks** loaded from the Overpass API with local caching
 - **Validated geographic primitives** such as `Coord` and `BoundingBox`
 - **Routing on road graphs** for time- or distance-based objectives
-- **Travel-time matrices** for feeding VRP and dispatch solvers
+- **Travel-time matrices** with same-path route distances for feeding VRP and dispatch solvers
 - **Route geometries** for frontend visualization and polyline transport
 - **Connectivity diagnostics** for debugging unreachable pairs and bad map regions
 
@@ -24,6 +30,10 @@ description: >
 [dependencies]
 solverforge-maps = "2"
 tokio = { version = "1", features = ["full"] }
+
+# Pin the 2.1.4 source tag when you need matrix route-distance access
+# before the matching crates.io package is available:
+# solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
 ```
 
 ## Minimal Workflow
@@ -47,6 +57,7 @@ async fn main() -> RoutingResult<()> {
     let route = network.route(locations[0], locations[1])?;
 
     println!("{} locations", matrix.size());
+    println!("Distance 0 -> 1: {:?} meters", matrix.distance_meters(0, 1));
     println!("Route duration: {} seconds", route.duration_seconds);
     Ok(())
 }

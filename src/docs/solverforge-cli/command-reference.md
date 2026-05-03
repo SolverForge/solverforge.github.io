@@ -87,6 +87,11 @@ The current published `solverforge-ui` crate is `0.6.5`. Use it directly in
 app-owned dependency manifests when you need create-job identifier
 normalization before the CLI scaffold target moves again.
 
+The `solverforge-maps` source repository is tagged `v2.1.4` for matrix
+route-distance access. `solverforge-cli 2.0.2` still scaffolds
+`solverforge-maps 2.1.3`, so use the maps source tag directly in app-owned
+manifests when you need the 2.1.4 API before the CLI target moves.
+
 ### `solverforge help`
 
 ```text

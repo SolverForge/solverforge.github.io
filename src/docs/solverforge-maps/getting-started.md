@@ -12,7 +12,8 @@ This guide covers the standard `solverforge-maps` workflow:
 2. derive a bounding box that covers the relevant area
 3. load a road network from cache or Overpass
 4. compute a travel-time matrix
-5. optionally compute a route for visualization or debugging
+5. read same-path route distances from the matrix
+6. optionally compute a route for visualization or debugging
 
 ## Prerequisites
 
@@ -26,6 +27,10 @@ This guide covers the standard `solverforge-maps` workflow:
 [dependencies]
 solverforge-maps = "2"
 tokio = { version = "1", features = ["full"] }
+
+# Pin the 2.1.4 source tag when you need matrix route-distance access
+# before the matching crates.io package is available:
+# solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
 ```
 
 ## Step 1: Start with Validated Coordinates
@@ -74,9 +79,16 @@ let network = RoadNetwork::load_or_fetch(&bbox, &config, None).await?;
 let matrix = network.compute_matrix(&locations, None).await;
 
 println!("Matrix size: {}", matrix.size());
+println!("Travel time 0 -> 1: {:?} seconds", matrix.get(0, 1));
+println!("Distance 0 -> 1: {:?} meters", matrix.distance_meters(0, 1));
 ```
 
-This matrix is the bridge between geospatial data and optimization. A VRP solver can use it as the cost model for sequencing stops, estimating arrival times, and comparing alternative route plans.
+This matrix is the bridge between geospatial data and optimization. A VRP solver can use it as the cost model for sequencing stops, estimating arrival times, comparing alternative route plans, and reporting the route distance associated with the fastest-time path.
+
+Since the `2.1.4` source release, `TravelTimeMatrix` stores route distances next
+to travel times. `matrix.distance_meters(from, to)` returns meters for the same
+fastest-time path used by `matrix.get(from, to)`. Unreachable pairs return
+`Some(UNREACHABLE)`, and out-of-bounds indices return `None`.
 
 ## Step 5: Route Individual Pairs
 
@@ -118,6 +130,8 @@ async fn main() -> RoutingResult<()> {
     let route = network.route(locations[0], locations[1])?;
 
     println!("Matrix size: {}", matrix.size());
+    println!("Travel time 0 -> 1: {:?} seconds", matrix.get(0, 1));
+    println!("Distance 0 -> 1: {:?} meters", matrix.distance_meters(0, 1));
     println!("Route duration: {} seconds", route.duration_seconds);
 
     Ok(())

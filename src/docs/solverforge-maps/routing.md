@@ -57,6 +57,31 @@ println!("Locations: {}", matrix.size());
 
 The matrix is the most common output for optimization systems because it lets the solver compare every stop against every other stop using realistic road travel instead of straight-line distance.
 
+### Travel Times and Same-Path Distances
+
+The `2.1.4` source release stores two aligned row-major matrices:
+
+- `matrix.get(from, to)` returns travel time in seconds
+- `matrix.distance_meters(from, to)` returns meters along the same fastest-time
+  path
+- `matrix.row(from)` returns the full travel-time row
+- `matrix.row_distances(from)` returns the full same-path distance row
+- `matrix.as_slice()` exposes the flat travel-time data
+- `matrix.distances_as_slice()` exposes the flat distance data
+
+```rust
+let time_seconds = matrix.get(0, 1);
+let distance_meters = matrix.distance_meters(0, 1);
+let all_times_from_depot = matrix.row(0);
+let all_distances_from_depot = matrix.row_distances(0);
+```
+
+Distances follow the path chosen by the time objective in `compute_matrix`.
+That means distance data is suitable for reporting, diagnostics, and secondary
+cost displays without recomputing every pair as a separate route. If a pair is
+unreachable, both matrices use `UNREACHABLE`. If the indices are outside the
+matrix bounds, the accessors return `None`.
+
 ## Geometry for Frontend Visualization
 
 `RouteResult` includes geometry that can be rendered directly on a web map. For compact transmission, `solverforge-maps` also exposes Google polyline helpers.
@@ -84,6 +109,8 @@ These metrics are useful when evaluating a new operating area or diagnosing a ma
 ## Practical Advice
 
 - Use matrices when your solver will evaluate many alternative stop orders.
+- Use matrix distance accessors when you need mileage for the same fastest-time
+  paths the solver is scoring.
 - Use single-route calls when you need a detailed geometry or debugging trace.
 - Expand your bounding box if you see unexpected routing failures at the edges of a region.
 - Inspect graph connectivity before assuming the optimization layer is at fault.

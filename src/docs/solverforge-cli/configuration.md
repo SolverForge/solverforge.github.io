@@ -110,6 +110,11 @@ The current published `solverforge-ui` crate is `0.6.5`. Use it directly in
 app-owned dependency manifests when an app needs create-job identifier
 normalization before a newer CLI scaffold release.
 
+The `solverforge-maps` source repository is tagged `v2.1.4` for matrix
+route-distance access. Fresh CLI scaffolds still record
+`solverforge-maps 2.1.3` until the CLI scaffold target moves, so record any
+app-owned source-tag upgrade explicitly in the app's own dependency manifest.
+
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:
 

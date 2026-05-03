@@ -146,6 +146,10 @@ solverforge = { version = "0.10.0", features = [
 ] }
 solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.3"
+
+# Use this source tag instead when the delivery app needs solverforge-maps
+# 2.1.4 matrix route-distance access before the crates.io package is available:
+# solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
 ```
 
 Fresh scaffolds also start with generic demo sample data:
@@ -178,6 +182,11 @@ available_sizes = [
 name = "Plan"
 score = "HardSoftScore"
 ```
+
+`solverforge-maps v2.1.4` adds route-distance accessors to
+`TravelTimeMatrix`. The finished delivery app can use that source tag when it
+needs same-path route distances from the matrix, while published CLI scaffold
+metadata remains on `solverforge-maps 2.1.3` until the CLI target moves.
 
 That metadata matters because this example teaches the current public
 integration: SolverForge core, SolverForge UI, and SolverForge Maps working
