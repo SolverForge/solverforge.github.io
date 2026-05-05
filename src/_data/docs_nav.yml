@@ -1,6 +1,11 @@
 docs:
   - title: Overview
     href: /docs/overview/
+    children:
+      - title: Status & Roadmap
+        href: /docs/status-and-roadmap/
+      - title: Architecture
+        href: /docs/architecture/
   - title: Concepts
     href: /docs/concepts/
     children:
@@ -17,8 +22,43 @@ docs:
         href: /docs/solverforge-cli/getting-started/
       - title: SolverForge Hospital Use Case
         href: /docs/getting-started/solverforge-hospital-use-case/
+        children:
+          - title: Setup
+            href: /docs/getting-started/solverforge-hospital-use-case/#getting-started
+          - title: Data Model
+            href: /docs/getting-started/solverforge-hospital-use-case/#understanding-the-data-model
+          - title: Constraints
+            href: /docs/getting-started/solverforge-hospital-use-case/#writing-constraints
+          - title: Solver Policy
+            href: /docs/getting-started/solverforge-hospital-use-case/#solver-policy
+          - title: Runtime
+            href: /docs/getting-started/solverforge-hospital-use-case/#runtime-and-browser-behavior
       - title: SolverForge Deliveries Use Case
         href: /docs/getting-started/solverforge-deliveries-use-case/
+        children:
+          - title: Setup
+            href: /docs/getting-started/solverforge-deliveries-use-case/#getting-started
+          - title: Data Model
+            href: /docs/getting-started/solverforge-deliveries-use-case/#understanding-the-data-model
+          - title: Routing Pipeline
+            href: /docs/getting-started/solverforge-deliveries-use-case/#prepared-routing-pipeline
+          - title: Constraints
+            href: /docs/getting-started/solverforge-deliveries-use-case/#writing-constraints
+          - title: Solver Policy
+            href: /docs/getting-started/solverforge-deliveries-use-case/#solver-policy
+      - title: SolverForge FSR Use Case
+        href: /docs/getting-started/solverforge-fsr-use-case/
+        children:
+          - title: Setup
+            href: /docs/getting-started/solverforge-fsr-use-case/#getting-started
+          - title: Data Model
+            href: /docs/getting-started/solverforge-fsr-use-case/#understanding-the-data-model
+          - title: Bergamo Routing Data
+            href: /docs/getting-started/solverforge-fsr-use-case/#bergamo-routing-data
+          - title: Constraints
+            href: /docs/getting-started/solverforge-fsr-use-case/#writing-constraints
+          - title: Solver Policy
+            href: /docs/getting-started/solverforge-fsr-use-case/#solver-policy
   - title: solverforge-cli
     href: /docs/solverforge-cli/
     children:
@@ -32,6 +72,13 @@ docs:
         href: /docs/solverforge-cli/configuration/
       - title: Command Reference
         href: /docs/solverforge-cli/command-reference/
+        children:
+          - title: Scaffold Commands
+            href: /docs/solverforge-cli/scaffold-commands/
+          - title: Generator Commands
+            href: /docs/solverforge-cli/generator-commands/
+          - title: Operations Commands
+            href: /docs/solverforge-cli/operations-commands/
   - title: SolverForge
     href: /docs/solverforge/
     children:
@@ -51,6 +98,12 @@ docs:
         children:
           - title: Constraint Streams
             href: /docs/solverforge/constraints/constraint-streams/
+          - title: Constraint Factory Methods
+            href: /docs/solverforge/constraints/constraint-factory-methods/
+          - title: Projected Scoring Rows
+            href: /docs/solverforge/constraints/projected-scoring-rows/
+          - title: Existence & Flattening
+            href: /docs/solverforge/constraints/existence-and-flattening/
           - title: Joiners
             href: /docs/solverforge/constraints/joiners/
           - title: Collectors
@@ -64,10 +117,21 @@ docs:
         children:
           - title: Configuration
             href: /docs/solverforge/solver/configuration/
+          - title: Construction
+            href: /docs/solverforge/solver/construction/
+          - title: Local Search
+            href: /docs/solverforge/solver/local-search/
           - title: Phases
             href: /docs/solverforge/solver/phases/
           - title: Moves
             href: /docs/solverforge/solver/moves/
+            children:
+              - title: Scalar Selectors
+                href: /docs/solverforge/solver/scalar-move-selectors/
+              - title: List Selectors
+                href: /docs/solverforge/solver/list-move-selectors/
+              - title: Composite Selectors
+                href: /docs/solverforge/solver/composite-move-selectors/
           - title: Termination
             href: /docs/solverforge/solver/termination/
           - title: SolverManager
