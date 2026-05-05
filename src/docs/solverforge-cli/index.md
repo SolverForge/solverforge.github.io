@@ -161,8 +161,8 @@ model for you.
   scalar variables, list variables, constraints, data, and destroy flows
 - **[Configuration](/docs/solverforge-cli/configuration/)** - `solver.toml`,
   `solverforge.app.toml`, UI metadata, and scaffold target versioning
-- **[Command Reference](/docs/solverforge-cli/command-reference/)** - complete command, flag, and
-  example reference
+- **[Command Reference](/docs/solverforge-cli/command-reference/)** - command groups, version output,
+  global options, and focused command-reference subsections
 
 ## External References
 

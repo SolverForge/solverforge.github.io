@@ -120,7 +120,7 @@ This patches the entity file inside the managed blocks and produces a field like
 this:
 
 ```rust
-#[planning_variable(value_range = "resources", allows_unassigned = true)]
+#[planning_variable(value_range_provider = "resources", allows_unassigned = true)]
 pub resource_idx: Option<usize>,
 ```
 

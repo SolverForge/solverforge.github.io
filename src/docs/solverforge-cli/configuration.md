@@ -86,12 +86,12 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "2.0.2"
+cli_version = "2.0.3"
 
 [runtime]
 target = "solverforge 0.10.0"
 runtime_source = "crates.io: solverforge 0.10.0"
-ui_source = "crates.io: solverforge-ui 0.6.4"
+ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
 default_size = "standard"
@@ -102,18 +102,14 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the published `solverforge-cli 2.0.2` scaffold target.
-Fresh generated apps start on the current `solverforge 0.10.0` and
-the CLI's `solverforge-ui 0.6.4` scaffold target.
+This example reflects the published `solverforge-cli 2.0.3` scaffold target.
+Fresh generated apps start on the published `solverforge 0.10.0` runtime and
+the CLI's `solverforge-ui 0.6.5` scaffold target until the CLI runtime target
+moves.
 
-The current published `solverforge-ui` crate is `0.6.5`. Use it directly in
-app-owned dependency manifests when an app needs create-job identifier
-normalization before a newer CLI scaffold release.
-
-The `solverforge-maps` source repository is tagged `v2.1.4` for matrix
-route-distance access. Fresh CLI scaffolds still record
-`solverforge-maps 2.1.3` until the CLI scaffold target moves, so record any
-app-owned source-tag upgrade explicitly in the app's own dependency manifest.
+The `solverforge` crate itself is published at `0.11.0`; record any app-owned
+runtime-target upgrade explicitly in that app's dependency manifest and
+`solverforge.app.toml`.
 
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:
