@@ -23,6 +23,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Checkout SolverForge runtime source
+        uses: actions/checkout@v4
+        with:
+          repository: SolverForge/solverforge
+          path: .ci/solverforge-rs
+
+      - name: Checkout SolverForge maps source
+        uses: actions/checkout@v4
+        with:
+          repository: SolverForge/solverforge-maps
+          path: .ci/solverforge-maps
+
+      - name: Checkout SolverForge UI source
+        uses: actions/checkout@v4
+        with:
+          repository: SolverForge/solverforge-ui
+          path: .ci/solverforge-ui
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4
@@ -37,6 +55,10 @@ jobs:
         run: make install
 
       - name: Run local CI gate
+        env:
+          SOLVERFORGE_RS_REPO: ${{ github.workspace }}/.ci/solverforge-rs
+          SOLVERFORGE_MAPS_REPO: ${{ github.workspace }}/.ci/solverforge-maps
+          SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
         run: make ci-local
 
       - name: Configure Pages
