@@ -144,11 +144,85 @@ function checkInternalLinks() {
   return misses;
 }
 
-async function checkLayout(origin, paths) {
+function checkDocsIndexTargets() {
+  const docsIndex = join(outputDir, "docs", "index.html");
+  const failures = [];
+  if (!existsSync(docsIndex)) return failures;
+
+  const docsHtml = readFileSync(docsIndex, "utf8");
+  const expectedFooterLinks = new Map([
+    ["solverforge-cli", "/docs/solverforge-cli/"],
+    ["solverforge-ui", "/docs/solverforge-ui/"],
+    ["solverforge-maps", "/docs/solverforge-maps/"],
+  ]);
+  for (const match of docsHtml.matchAll(/<a\s+href=["']([^"']+)["'][^>]*>\s*(solverforge-cli|solverforge-ui|solverforge-maps)\s*<\/a>/g)) {
+    const href = match[1];
+    const title = match[2];
+    const expected = expectedFooterLinks.get(title);
+    if (expected && href !== expected) {
+      failures.push({ surface: "footer", title, expected, link: href });
+    }
+  }
+
+  const hospitalPage = join(outputDir, "docs", "getting-started", "solverforge-hospital-use-case", "index.html");
+  if (existsSync(hospitalPage)) {
+    const hospitalHtml = readFileSync(hospitalPage, "utf8");
+    const expectedSidebarLinks = [
+      ["Getting Started", "/docs/getting-started/"],
+      ["Start with solverforge-cli", "/docs/solverforge-cli/getting-started/"],
+      ["SolverForge Hospital Use Case", "/docs/getting-started/solverforge-hospital-use-case/"],
+      ["Setup", "/docs/getting-started/solverforge-hospital-use-case/#getting-started"],
+      ["Data Model", "/docs/getting-started/solverforge-hospital-use-case/#understanding-the-data-model"],
+      ["Constraints", "/docs/getting-started/solverforge-hospital-use-case/#writing-constraints"],
+      ["Solver Policy", "/docs/getting-started/solverforge-hospital-use-case/#solver-policy"],
+      ["Runtime", "/docs/getting-started/solverforge-hospital-use-case/#runtime-and-browser-behavior"],
+    ];
+
+    for (const [title, href] of expectedSidebarLinks) {
+      const linkPattern = new RegExp(
+        `<a\\s+class="docs-sidebar__link"\\s+href="${escapeRegExp(href)}"[\\s\\S]*?>\\s*${escapeRegExp(title)}\\s*<\\/a>`,
+      );
+      if (!linkPattern.test(hospitalHtml)) {
+        failures.push({ surface: "hospital-sidebar", title, expected: href });
+      }
+    }
+  }
+
+  const cliGettingStartedPage = join(outputDir, "docs", "solverforge-cli", "getting-started", "index.html");
+  if (existsSync(cliGettingStartedPage)) {
+    const cliHtml = readFileSync(cliGettingStartedPage, "utf8");
+    const activeSidebarLinks = [...cliHtml.matchAll(/<li class="docs-sidebar__item is-active">[\s\S]*?<a\s+class="docs-sidebar__link"\s+href="([^"]+)"[\s\S]*?>([^<]+)<\/a>/g)]
+      .map((match) => ({ href: match[1], title: match[2].trim() }));
+    const crossLinkActive = activeSidebarLinks.some(
+      (link) => link.href === "/docs/solverforge-cli/getting-started/" && link.title === "Start with solverforge-cli",
+    );
+    if (crossLinkActive) {
+      failures.push({
+        surface: "cli-sidebar-active",
+        title: "Start with solverforge-cli",
+        link: "/docs/solverforge-cli/getting-started/",
+      });
+    }
+  }
+
+  return failures;
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function chromiumOptions() {
   const executablePath = existsSync("/usr/bin/chromium") ? "/usr/bin/chromium" : undefined;
-  const browser = await chromium.launch({
+  return {
     executablePath,
     args: executablePath ? ["--no-sandbox"] : [],
+  };
+}
+
+async function checkLayout(origin, paths) {
+  const browser = await chromium.launch({
+    ...chromiumOptions(),
   });
   const viewports = [
     { label: "desktop", width: 1440, height: 1100, isMobile: false },
@@ -211,6 +285,51 @@ async function checkLayout(origin, paths) {
   return failures;
 }
 
+async function checkDocsSidebarActive(origin) {
+  const browser = await chromium.launch({
+    ...chromiumOptions(),
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1100 },
+  });
+  const page = await context.newPage();
+  const failures = [];
+  const checks = [
+    {
+      path: "/docs/getting-started/solverforge-deliveries-use-case/#solver-policy",
+      expected: [
+        ["Getting Started", "/docs/getting-started/"],
+        ["SolverForge Deliveries Use Case", "/docs/getting-started/solverforge-deliveries-use-case/"],
+        ["Solver Policy", "/docs/getting-started/solverforge-deliveries-use-case/#solver-policy"],
+      ],
+    },
+    {
+      path: "/docs/getting-started/solverforge-deliveries-use-case/#runtime-and-browser-behavior",
+      expected: [
+        ["Getting Started", "/docs/getting-started/"],
+        ["SolverForge Deliveries Use Case", "/docs/getting-started/solverforge-deliveries-use-case/"],
+        ["Runtime", "/docs/getting-started/solverforge-deliveries-use-case/#runtime-and-browser-behavior"],
+      ],
+    },
+  ];
+
+  for (const check of checks) {
+    await page.goto(`${origin}${check.path}`, { waitUntil: "load" });
+    const active = await page.evaluate(() => [...document.querySelectorAll("nav.docs-sidebar li.docs-sidebar__item.is-active > a.docs-sidebar__link")]
+      .map((link) => [link.textContent.trim(), link.getAttribute("href")]));
+
+    for (const expected of check.expected) {
+      if (!active.some(([title, href]) => title === expected[0] && href === expected[1])) {
+        failures.push({ path: check.path, expected, active });
+      }
+    }
+  }
+
+  await context.close();
+  await browser.close();
+  return failures;
+}
+
 if (!existsSync(outputDir)) {
   throw new Error("Missing output/. Run `make build` first.");
 }
@@ -218,11 +337,14 @@ if (!existsSync(outputDir)) {
 const paths = pagePaths();
 const staleCopy = checkStaleCopy();
 const missingLinks = checkInternalLinks();
+const docsIndexTargets = checkDocsIndexTargets();
 const { server, origin } = await startServer();
 let layoutFailures = [];
+let docsSidebarActive = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
+  docsSidebarActive = await checkDocsSidebarActive(origin);
 } finally {
   server.close();
 }
@@ -232,11 +354,13 @@ const summary = {
   renderedChecks: paths.length * 2,
   staleCopy,
   missingLinks,
+  docsIndexTargets,
+  docsSidebarActive,
   layoutFailures,
 };
 
 console.log(JSON.stringify(summary, null, 2));
 
-if (staleCopy.length || missingLinks.length || layoutFailures.length) {
+if (staleCopy.length || missingLinks.length || docsIndexTargets.length || docsSidebarActive.length || layoutFailures.length) {
   process.exit(1);
 }

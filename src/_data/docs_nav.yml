@@ -20,6 +20,7 @@ docs:
     children:
       - title: Start with solverforge-cli
         href: /docs/solverforge-cli/getting-started/
+        active: false
       - title: SolverForge Hospital Use Case
         href: /docs/getting-started/solverforge-hospital-use-case/
         children:
@@ -46,6 +47,8 @@ docs:
             href: /docs/getting-started/solverforge-deliveries-use-case/#writing-constraints
           - title: Solver Policy
             href: /docs/getting-started/solverforge-deliveries-use-case/#solver-policy
+          - title: Runtime
+            href: /docs/getting-started/solverforge-deliveries-use-case/#runtime-and-browser-behavior
       - title: SolverForge FSR Use Case
         href: /docs/getting-started/solverforge-fsr-use-case/
         children:
@@ -59,6 +62,8 @@ docs:
             href: /docs/getting-started/solverforge-fsr-use-case/#writing-constraints
           - title: Solver Policy
             href: /docs/getting-started/solverforge-fsr-use-case/#solver-policy
+          - title: Runtime
+            href: /docs/getting-started/solverforge-fsr-use-case/#runtime-and-browser-behavior
   - title: solverforge-cli
     href: /docs/solverforge-cli/
     children:

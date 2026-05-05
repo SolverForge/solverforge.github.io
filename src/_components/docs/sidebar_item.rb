@@ -15,8 +15,10 @@ class Docs::SidebarItem < Bridgetown::Component
   private
 
   def active_item?(item)
+    return false if item["active"] == false
+
     href = item["href"]
-    return true if @current_url == href || @current_url.start_with?(href)
+    return true if @current_url == href
 
     (item["children"] || []).any? { |child| active_item?(child) }
   end

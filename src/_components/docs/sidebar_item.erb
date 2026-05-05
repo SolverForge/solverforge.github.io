@@ -1,5 +1,9 @@
 <li class="docs-sidebar__item <%= "is-active" if active? %>">
-  <a class="docs-sidebar__link" href="<%= @item.fetch("href") %>"><%= @item.fetch("title") %></a>
+  <a
+    class="docs-sidebar__link"
+    href="<%= @item.fetch("href") %>"
+    <%= "data-docs-sidebar-skip-active" if @item["active"] == false %>
+  ><%= @item.fetch("title") %></a>
   <% if children.any? %>
     <ul class="docs-sidebar__sublist">
       <% children.each do |child| %>
