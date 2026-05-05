@@ -51,7 +51,6 @@ For cache-pinned deployments, use the 0.6.4 bundle names:
 <script src="/sf/sf.0.6.4.js"></script>
 ```
 
-`solverforge-ui 0.6.4` is the UI crate used by the current `solverforge-cli
-2.0.2` scaffold target. A newer published `solverforge-ui 0.6.5` patch carries
-create-job identifier normalization for apps that need that patch before the
-next CLI scaffold refresh.
+`solverforge-ui 0.6.4` was the UI crate used by the `solverforge-cli 2.0.2`
+scaffold target. Current `solverforge-cli 2.0.3` scaffolds
+`solverforge-ui 0.6.5`.

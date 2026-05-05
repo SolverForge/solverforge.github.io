@@ -11,6 +11,7 @@ class Shared::SearchSurface < Bridgetown::Component
     ["/docs/overview/", "Project overview", "Understand the planning problems SolverForge handles and when to use it."],
     ["/docs/getting-started/solverforge-hospital-use-case/", "SolverForge Hospital Use Case", "See a concrete hospital scheduling application from scaffold to solver-driven UI."],
     ["/docs/getting-started/solverforge-deliveries-use-case/", "SolverForge Deliveries Use Case", "Study list-variable vehicle routing with maps, retained jobs, and route recommendations."],
+    ["/docs/getting-started/solverforge-fsr-use-case/", "SolverForge FSR Use Case", "Trace field-service routing with technicians, skills, shifts, road-network travel, and route geometry."],
     ["/reference/", "Reference docs", "Check crate boundaries, modeling choices, and extension guidance."],
     ["/blog/", "Release notes and technical posts", "Review shipped changes and implementation decisions."],
   ].freeze

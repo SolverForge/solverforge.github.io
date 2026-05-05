@@ -8,9 +8,8 @@ description: >
 ---
 
 <%= render Ui::Callout.new do %>
-This section tracks the `solverforge-maps 2.1.4` source release. The current
-`solverforge-cli 2.0.2` scaffold target still uses the published
-`solverforge-maps 2.1.3` crate until a newer CLI target moves.
+This section tracks the published `solverforge-maps 2.1.4` crate. The current
+`solverforge-cli 2.0.3` scaffold target also uses `solverforge-maps 2.1.4`.
 <% end %>
 
 `solverforge-maps` is SolverForge's Rust library for map-backed routing workflows. It is designed for vehicle routing and similar optimization problems where you need to turn geographic coordinates into travel times, same-path route distances, route geometries, and network diagnostics.
@@ -30,10 +29,6 @@ This section tracks the `solverforge-maps 2.1.4` source release. The current
 [dependencies]
 solverforge-maps = "2"
 tokio = { version = "1", features = ["full"] }
-
-# Pin the 2.1.4 source tag when you need matrix route-distance access
-# before the matching crates.io package is available:
-# solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
 ```
 
 ## Minimal Workflow

@@ -27,10 +27,6 @@ This guide covers the standard `solverforge-maps` workflow:
 [dependencies]
 solverforge-maps = "2"
 tokio = { version = "1", features = ["full"] }
-
-# Pin the 2.1.4 source tag when you need matrix route-distance access
-# before the matching crates.io package is available:
-# solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
 ```
 
 ## Step 1: Start with Validated Coordinates
@@ -85,7 +81,7 @@ println!("Distance 0 -> 1: {:?} meters", matrix.distance_meters(0, 1));
 
 This matrix is the bridge between geospatial data and optimization. A VRP solver can use it as the cost model for sequencing stops, estimating arrival times, comparing alternative route plans, and reporting the route distance associated with the fastest-time path.
 
-Since the `2.1.4` source release, `TravelTimeMatrix` stores route distances next
+Since the `2.1.4` release, `TravelTimeMatrix` stores route distances next
 to travel times. `matrix.distance_meters(from, to)` returns meters for the same
 fastest-time path used by `matrix.get(from, to)`. Unreachable pairs return
 `Some(UNREACHABLE)`, and out-of-bounds indices return `None`.

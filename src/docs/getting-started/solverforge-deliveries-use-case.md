@@ -139,17 +139,13 @@ app's normal web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.10.0", features = [
+solverforge = { version = "0.11.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
 solverforge-ui = "0.6.5"
-solverforge-maps = "2.1.3"
-
-# Use this source tag instead when the delivery app needs solverforge-maps
-# 2.1.4 matrix route-distance access before the crates.io package is available:
-# solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
+solverforge-maps = "2.1.4"
 ```
 
 Fresh scaffolds also start with generic demo sample data:
@@ -162,13 +158,13 @@ delivery-specific catalog in `solverforge.app.toml`:
 [app]
 name = "solverforge-deliveries"
 starter = "neutral-shell"
-cli_version = "2.0.2"
+cli_version = "2.0.3"
 
 [runtime]
-target = "solverforge 0.10.0"
-runtime_source = "crates.io: solverforge 0.10.0"
+target = "solverforge 0.11.0"
+runtime_source = "crates.io: solverforge 0.11.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
-maps_source = "crates.io: solverforge-maps 2.1.3"
+maps_source = "crates.io: solverforge-maps 2.1.4"
 
 [demo]
 default_size = "PHILADELPHIA"
@@ -184,9 +180,7 @@ score = "HardSoftScore"
 ```
 
 `solverforge-maps v2.1.4` adds route-distance accessors to
-`TravelTimeMatrix`. The finished delivery app can use that source tag when it
-needs same-path route distances from the matrix, while published CLI scaffold
-metadata remains on `solverforge-maps 2.1.3` until the CLI target moves.
+`TravelTimeMatrix`, and the package is available directly from crates.io.
 
 That metadata matters because this example teaches the current public
 integration: SolverForge core, SolverForge UI, and SolverForge Maps working

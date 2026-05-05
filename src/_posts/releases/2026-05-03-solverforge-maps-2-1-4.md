@@ -7,12 +7,10 @@ description: >
   matrix data for routing and delivery applications.
 ---
 
-**solverforge-maps 2.1.4** is tagged in the
+**solverforge-maps 2.1.4** is available on
+[crates.io](https://crates.io/crates/solverforge-maps/2.1.4), documented on
+[docs.rs](https://docs.rs/solverforge-maps/2.1.4), and tagged in the
 [source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.1.4).
-
-At the time this post was written, crates.io still listed `2.1.3` as the newest
-published `solverforge-maps` package. Use the source tag when you need the
-2.1.4 matrix-distance API before the matching crates.io package is available.
 
 ## What Changed
 
@@ -32,15 +30,7 @@ access returns `None`.
 
 ## Upgrade
 
-Use the source tag directly while crates.io indexing or publication is still
-behind the repository tag:
-
-```toml
-[dependencies]
-solverforge-maps = { git = "https://github.com/SolverForge/solverforge-maps", tag = "v2.1.4" }
-```
-
-After the matching crates.io package is available, the equivalent package pin is:
+Use the crates.io package pin:
 
 ```toml
 [dependencies]

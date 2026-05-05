@@ -24,12 +24,19 @@ Repeat runs for the same service area can become much faster after the first net
 let stats = RoadNetwork::cache_stats().await;
 println!("Networks cached: {}", stats.networks_cached);
 println!("Nodes: {}, edges: {}", stats.total_nodes, stats.total_edges);
-println!("In-memory hits: {}, misses: {}", stats.hits, stats.misses);
+println!("Load requests: {}", stats.load_requests);
+println!("Memory hits: {}", stats.memory_hits);
+println!("Disk hits: {}", stats.disk_hits);
+println!("Network fetches: {}", stats.network_fetches);
+println!("In-flight waits: {}", stats.in_flight_waits);
 ```
 
 `cache_stats()` is most useful for understanding the current in-memory cache footprint.
 
-The `hits` and `misses` counters are coarse process-level counters, not a precise breakdown of memory hits versus file-cache loads versus Overpass fetches.
+The counters are process-level cache activity counters. `memory_hits`,
+`disk_hits`, `network_fetches`, and `in_flight_waits` separate the major cache
+paths so repeated-region behavior is visible without inferring misses from one
+combined number.
 
 ## Progress Reporting
 

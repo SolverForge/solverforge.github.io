@@ -13,8 +13,9 @@ weight: 2
 
 <%= render Ui::Callout.new(title: "Current onboarding path") do %>
 Start with **`solverforge-cli`** for the generic project shell. Then continue
-with the **SolverForge Hospital Use Case** or **SolverForge Deliveries Use
-Case** if you want one concrete worked example that goes further.
+with the **SolverForge Hospital Use Case**, **SolverForge Deliveries Use
+Case**, or **SolverForge FSR Use Case** if you want one concrete worked example
+that goes further.
 <% end %>
 
 ## Start Here
@@ -30,6 +31,10 @@ concrete hospital planning application.
   <%= render Ui::Card.new(title: "SolverForge Deliveries Use Case", href: relative_url('/docs/getting-started/solverforge-deliveries-use-case/'), icon: "fa-solid fa-route") do %>
 Study a route-optimization example with list variables, road-network data,
 retained jobs, and delivery insertion recommendations.
+  <% end %>
+  <%= render Ui::Card.new(title: "SolverForge FSR Use Case", href: relative_url('/docs/getting-started/solverforge-fsr-use-case/'), icon: "fa-solid fa-screwdriver-wrench") do %>
+Follow a field-service routing example with technicians, skills, parts, shifts,
+road-network travel, retained jobs, and route geometry.
   <% end %>
 </div>
 
@@ -68,5 +73,6 @@ generation and `solverforge.app.toml` after scaffolding.
 - [CLI onboarding guide](/docs/solverforge-cli/getting-started/)
 - [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
+- [SolverForge FSR Use Case](/docs/getting-started/solverforge-fsr-use-case/)
 - [SolverForge API documentation](https://docs.rs/solverforge)
 - [Core GitHub repository](https://github.com/solverforge/solverforge)

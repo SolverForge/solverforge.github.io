@@ -59,7 +59,7 @@ The matrix is the most common output for optimization systems because it lets th
 
 ### Travel Times and Same-Path Distances
 
-The `2.1.4` source release stores two aligned row-major matrices:
+The `2.1.4` release stores two aligned row-major matrices:
 
 - `matrix.get(from, to)` returns travel time in seconds
 - `matrix.distance_meters(from, to)` returns meters along the same fastest-time
