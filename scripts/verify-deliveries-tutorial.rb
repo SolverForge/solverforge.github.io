@@ -12,11 +12,12 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.0.2"
-EXPECTED_RUNTIME_VERSION = "0.10.0"
-EXPECTED_CLI_UI_VERSION = "0.6.4"
+EXPECTED_CLI_VERSION = "2.0.3"
+EXPECTED_CLI_RUNTIME_VERSION = "0.10.0"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.11.0"
+EXPECTED_CLI_UI_VERSION = "0.6.5"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
-EXPECTED_MAPS_VERSION = "2.1.3"
+EXPECTED_MAPS_VERSION = "2.1.4"
 
 def log(message)
   puts "[verify-deliveries-tutorial] #{message}"
@@ -298,12 +299,12 @@ begin
   assert_file_contains(doc_page, "solverforge generate variable delivery_order")
   assert_file_contains(doc_page, "solverforge generate constraint total_travel_time --unary --soft")
   assert_file_contains(doc_page, "solverforge generate data --mode stub")
-  assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-maps = \"#{EXPECTED_MAPS_VERSION}\"")
   assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
-  assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_RUNTIME_VERSION}\"")
-  assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
   assert_file_contains(doc_page, "Vehicle.delivery_order")
@@ -342,7 +343,7 @@ begin
 
     version_output = run_command(cli_bin, "--version")
     assert_text_contains(version_output, "CLI version: #{EXPECTED_CLI_VERSION}", "solverforge --version output")
-    assert_text_contains(version_output, "Scaffold runtime target: SolverForge crate target #{EXPECTED_RUNTIME_VERSION}", "solverforge --version output")
+    assert_text_contains(version_output, "Scaffold runtime target: SolverForge crate target #{EXPECTED_CLI_RUNTIME_VERSION}", "solverforge --version output")
     assert_text_contains(version_output, "Scaffold UI target: solverforge-ui #{EXPECTED_CLI_UI_VERSION}", "solverforge --version output")
     assert_text_contains(version_output, "Scaffold maps target: solverforge-maps #{EXPECTED_MAPS_VERSION}", "solverforge --version output")
 
@@ -355,11 +356,11 @@ begin
     fail!("CLI did not create #{generated_app}") unless Dir.exist?(generated_app)
 
     assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_CLI_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_CLI_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_CLI_UI_VERSION}\"")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "rust-version = \"1.95\"")
-    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\", features = [\"serde\", \"console\", \"verbose-logging\"] }")
+    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_CLI_RUNTIME_VERSION}\", features = [\"serde\", \"console\", \"verbose-logging\"] }")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_CLI_UI_VERSION}\" }")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\" }")
     fail!("fresh scaffold is missing static/app.js") unless File.file?(File.join(generated_app, "static/app.js"))
@@ -436,7 +437,7 @@ begin
   if deliveries_repo
     log "Checking concrete deliveries source files"
     assert_file_contains(File.join(deliveries_repo, "Cargo.toml"), "rust-version = \"1.95\"")
-    assert_file_contains(File.join(deliveries_repo, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(deliveries_repo, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "Cargo.toml"), "solverforge-maps = \"#{EXPECTED_MAPS_VERSION}\"")
     assert_file_not_contains(File.join(deliveries_repo, "Cargo.toml"), "path = \"../solverforge-rs")
@@ -444,8 +445,8 @@ begin
     assert_file_not_contains(File.join(deliveries_repo, "Cargo.toml"), "path = \"../solverforge-maps")
 
     assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
-    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
     assert_file_not_contains(File.join(deliveries_repo, "solverforge.app.toml"), "path:")

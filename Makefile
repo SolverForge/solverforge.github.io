@@ -8,7 +8,12 @@ NODE_VERSION_REQUIRED ?= 22
 export RUBY_VERSION_REQUIRED
 export NODE_VERSION_REQUIRED
 
-.PHONY: help doctor install frontend frontend-watch build test lint ci-local pre-release verify-cli-release verify-hospital-tutorial verify-deliveries-tutorial start clean version
+# The Codex desktop shell can inherit a truncated exported Bash function for
+# Midnight Commander. Dash imports it before every recipe line and prints
+# syntax errors, which makes `make doctor` look broken even when checks pass.
+unexport BASH_FUNC_mc%%
+
+.PHONY: help doctor install frontend frontend-watch build test lint ci-local pre-release verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-deliveries-tutorial verify-fsr-tutorial start clean version
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -29,8 +34,10 @@ help:
 	@printf '  make test                       Build in test mode and verify worked examples\n'
 	@printf '  make lint                       Run Ruby and JavaScript syntax checks\n'
 	@printf '  make verify-cli-release         Install the published CLI and verify scaffold targets\n'
+	@printf '  make verify-rust-snippets       Compile-check Rust snippets in docs\n'
 	@printf '  make verify-hospital-tutorial   Run portable tutorial contract checks\n'
 	@printf '  make verify-deliveries-tutorial Run portable deliveries contract checks\n'
+	@printf '  make verify-fsr-tutorial        Run portable FSR tutorial contract checks\n'
 	@printf '  make ci-local                   Run the same gate used by CI\n'
 	@printf '  make pre-release                Run the release-readiness gate\n'
 	@printf '\nInspection\n'
@@ -74,6 +81,8 @@ test: frontend
 	@ruby scripts/verify-hospital-tutorial.rb
 	$(call status,Verifying deliveries tutorial contract)
 	@ruby scripts/verify-deliveries-tutorial.rb
+	$(call status,Verifying FSR tutorial contract)
+	@ruby scripts/verify-fsr-tutorial.rb
 
 lint:
 	$(call status,Checking Ruby syntax)
@@ -83,7 +92,7 @@ lint:
 	$(call status,Checking JavaScript syntax)
 	@find . \( -path './.git' -o -path './.bridgetown-cache' -o -path './node_modules' -o -path './output' -o -path './vendor' \) -prune -o \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -n 1 node --check
 
-ci-local: doctor lint build verify-hospital-tutorial verify-deliveries-tutorial
+ci-local: doctor lint verify-rust-snippets build verify-hospital-tutorial verify-deliveries-tutorial verify-fsr-tutorial
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -92,6 +101,10 @@ verify-cli-release:
 	$(call status,Verifying published solverforge-cli release)
 	@ruby scripts/verify-cli-release.rb
 
+verify-rust-snippets:
+	$(call status,Verifying Rust documentation snippets)
+	@ruby scripts/verify-rust-snippets.rb
+
 verify-hospital-tutorial:
 	$(call status,Verifying hospital tutorial contract)
 	@ruby scripts/verify-hospital-tutorial.rb
@@ -99,6 +112,10 @@ verify-hospital-tutorial:
 verify-deliveries-tutorial:
 	$(call status,Verifying deliveries tutorial contract)
 	@ruby scripts/verify-deliveries-tutorial.rb
+
+verify-fsr-tutorial:
+	$(call status,Verifying FSR tutorial contract)
+	@ruby scripts/verify-fsr-tutorial.rb
 
 start:
 	$(call status,Starting Bridgetown on $(BIND):$(PORT))
