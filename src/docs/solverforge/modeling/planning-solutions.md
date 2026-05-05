@@ -75,6 +75,11 @@ When `constraints = "..."` is present, `#[planning_solution]` also generates:
 - `Solvable` for retained-job solving through `SolverManager::solve()`
 - `Analyzable` for score breakdowns via `analyze()`
 
+Generated constraint stream accessors are the default way to start constraints
+over planning entity and problem fact collections. See
+[Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/)
+for the full method contract and the lower-level `for_each(...)` escape hatch.
+
 For advanced list-shadow workflows, the struct can also carry
 `#[shadow_variable_updates(...)]`. When present, the macro generates
 `PlanningSolution::update_entity_shadows(...)` and `update_all_shadows()`
@@ -88,7 +93,7 @@ those hooks automatically during solving and score analysis.
 - Must have at least one `#[planning_entity_collection]` field for stock solving
 
 Common value-range setup lives on the entity side, for example
-`#[planning_variable(value_range = "employees")]`.
+`#[planning_variable(value_range_provider = "employees")]`.
 
 ## See Also
 

@@ -17,10 +17,10 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge` `0.10.0` core-library crate.
-Generated CLI projects can intentionally target an older runtime until the next
-CLI target refresh, so check `solverforge --version` when starting from a
-scaffold.
+These pages track the published `solverforge 0.11.0` crate and current source
+workspace. Generated CLI projects can intentionally target an older scaffold
+runtime until the next CLI runtime-target refresh, so check
+`solverforge --version` when starting from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
@@ -32,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The 0.10.0 workspace declares Rust `1.95`.
+The `0.11.0` crate declares Rust `1.95`.
 
 The generated runtime now builds one `ModelContext` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -45,11 +45,15 @@ Startup telemetry is shape-aware in the current release: scalar solves report
 average `candidates`, list solves report element counts, and console output
 labels those solve shapes as `candidates` or `elements`.
 
-The 0.10.0 codebase also tightens several public contracts:
+The current release tightens several public contracts:
 
-- projected scoring rows use `Projection` / `ProjectionSink`, declare
-  `MAX_EMITS`, and keep self-join ordering coordinate-stable by source slot,
-  entity index, and emission index
+- projected scoring rows use `Projection` / `ProjectionSink` for bounded
+  single-source rows, and cross joins can retain one scoring row per joined
+  pair with `.project(|left, right| row)`
+- projected outputs, projected self-join keys, and grouped collector values no
+  longer require `Clone`
+- projected self-join ordering is coordinate-stable by source ownership and
+  emission index
 - scalar construction order is model-owned through
   `construction_entity_order_key` and `construction_value_order_key`; those
   hooks are evaluated against the live working solution at each construction
@@ -84,7 +88,7 @@ pub struct Task {
     #[planning_id]
     pub id: usize,
 
-    #[planning_variable(value_range = "workers", allows_unassigned = true)]
+    #[planning_variable(value_range_provider = "workers", allows_unassigned = true)]
     pub worker: Option<usize>,
 }
 
@@ -101,9 +105,6 @@ pub struct Plan {
 }
 
 fn define_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
-    use PlanConstraintStreams;
-    use TaskUnassignedFilter;
-
     (
         ConstraintFactory::<Plan, HardSoftScore>::new()
             .tasks()
@@ -152,14 +153,15 @@ fn main() {
 
 ## API Reference
 
-Full API documentation is available on
-[docs.rs/solverforge](https://docs.rs/solverforge).
+Full published API documentation is available on
+[docs.rs/solverforge](https://docs.rs/solverforge). Source-line API maps for
+the local workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections
 
 - **[Domain Modeling](/docs/solverforge/modeling/)** — Derive macros for solutions, entities, and
   problem facts
-- **[Constraints](/docs/solverforge/constraints/)** — Constraint streams, joiners, collectors, and
-  score types
-- **[Solver](/docs/solverforge/solver/)** — Configuration, phases, moves, termination, and
-  SolverManager
+- **[Constraints](/docs/solverforge/constraints/)** — Constraint streams,
+  projected scoring rows, existence, joiners, collectors, and score types
+- **[Solver](/docs/solverforge/solver/)** — Configuration, construction, local
+  search, moves, termination, and SolverManager

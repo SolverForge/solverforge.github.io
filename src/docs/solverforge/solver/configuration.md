@@ -343,7 +343,8 @@ decorate that base config rather than replace it from scratch.
 
 ## See Also
 
-- [Phases](/docs/solverforge/solver/phases/) — Phase types and configuration
+- [Construction](/docs/solverforge/solver/construction/) — Construction policy and grouped scalar construction
+- [Local Search](/docs/solverforge/solver/local-search/) — Acceptors, foragers, and move selectors
 - [Moves](/docs/solverforge/solver/moves/) — Selector families and move behavior
 - [Termination](/docs/solverforge/solver/termination/) — Termination conditions
 - [SolverManager](/docs/solverforge/solver/solver-manager/) — Running the solver

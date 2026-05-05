@@ -16,8 +16,9 @@ Types that derive `#[planning_solution]` with a `constraints` path automatically
 
 ```rust
 use solverforge::prelude::*;
+use solverforge::Analyzable;
 
-let analysis = analyze(&solution);
+let analysis = solution.analyze();
 
 println!("Total score: {:?}", analysis.score);
 
@@ -42,16 +43,18 @@ Each `ConstraintAnalysis` contains:
 | `score`       | Total score impact of this constraint            |
 | `match_count` | Number of times the constraint matched           |
 
-The stock `analyze(&solution)` helper returns this summarized view. If you need
+The stock `solution.analyze()` method returns this summarized view. If you need
 full per-match justifications and indictment maps, use the lower-level
 `solverforge-scoring` analysis APIs directly.
 
 Lower-level scoring metadata uses `ConstraintRef` as the constraint identity.
-That means package-qualified constraints can share a short display name without
-collapsing into one constraint during scoring, analysis, or conflict-repair
-lookup. Configured constraint keys match that metadata exactly:
-package-qualified constraints use `ConstraintRef::full_name()` strings, while
-package-less constraints use the short name.
+In the `0.11.0` release, analysis views borrow that identity from the owning
+constraint rather than cloning it into public reporting types. That means
+package-qualified constraints can share a short display name without collapsing
+into one constraint during scoring, analysis, or conflict-repair lookup.
+Configured constraint keys match that metadata exactly: package-qualified
+constraints use `ConstraintRef::full_name()` strings, while package-less
+constraints use the short name.
 
 ## Use Cases
 

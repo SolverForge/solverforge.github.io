@@ -235,6 +235,8 @@ For better results, try tabu search or simulated annealing as the acceptor.
 
 ## See Also
 
+- [Construction](/docs/solverforge/solver/construction/) — Initial solution policy
+- [Local Search](/docs/solverforge/solver/local-search/) — Acceptors, foragers, and selector placement
 - [Moves](/docs/solverforge/solver/moves/) — Move types used by local search
 - [Termination](/docs/solverforge/solver/termination/) — Stopping conditions for phases
 - [Configuration](/docs/solverforge/solver/configuration/) — Runtime configuration format

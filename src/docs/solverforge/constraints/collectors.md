@@ -16,7 +16,7 @@ counts, totals, or custom imbalance data.
 Pass a collector as the second argument to `group_by`:
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .group_by(
         |shift: &Shift| shift.employee_idx,   // grouping key
         count(),                              // collector
@@ -60,7 +60,7 @@ Measures load imbalance across a grouping key. Returns a `LoadBalance<K>` with u
 For simple load balancing without `group_by`, use the `balance` stream operation directly:
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .balance(|shift: &Shift| shift.employee_idx)
     .penalize_soft()
     .named("Fair distribution")
@@ -70,5 +70,6 @@ The key function returns `Option<K>` — `None` values (unassigned entities) are
 
 ## See Also
 
-- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — The `group_by` operation
-- [docs.rs/solverforge](https://docs.rs/solverforge) — Full collector API reference
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) - The `group_by` operation
+- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection accessors
+- [docs.rs/solverforge](https://docs.rs/solverforge) - Full collector API reference

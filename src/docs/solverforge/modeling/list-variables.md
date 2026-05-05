@@ -119,19 +119,19 @@ The solver uses specialized moves for list variables:
 
 ```rust
 fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
-    use VehicleRoutePlanConstraintStreams;
-
-    let factory = ConstraintFactory::<VehicleRoutePlan, HardSoftScore>::new();
+    type Streams = ConstraintFactory<VehicleRoutePlan, HardSoftScore>;
 
     (
-        factory.vehicles()
+        Streams::new()
+            .vehicles()
             .filter(|v| v.total_demand() > v.capacity)
             .penalize_hard_with(|v: &Vehicle| {
                 HardSoftScore::of_hard((v.total_demand() - v.capacity) as i64)
             })
             .named("Capacity"),
 
-        factory.vehicles()
+        Streams::new()
+            .vehicles()
             .penalize_with(|v: &Vehicle| HardSoftScore::of_soft(v.total_distance()))
             .named("Distance"),
     )

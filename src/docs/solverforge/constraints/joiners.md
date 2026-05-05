@@ -6,7 +6,9 @@ description: >
   Control which tuples are created when joining constraint streams.
 ---
 
-Joiners define the matching criteria when two streams are joined. Without joiners, a join produces every possible pair — joiners filter this down to only relevant combinations.
+Joiners define the matching criteria when two streams are joined. Without
+joiners, a join produces every possible pair; joiners filter this down to only
+relevant combinations.
 
 ## Available Joiners
 
@@ -63,19 +65,22 @@ filtering(|a: &Shift, b: &Shift| a.location.distance_to(&b.location) < 50.0)
 
 ## Using Joiners with `join`
 
-**Self-join** — pass a single `equal` joiner directly:
+**Self-join** - pass a single `equal` joiner directly:
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+factory.shifts()
     .join(equal(|shift: &Shift| shift.employee_idx))
 ```
 
-**Cross-join** — pass a tuple of (extractor, joiner):
+**Cross-join** - pass a tuple of (stream, joiner):
 
 ```rust
-factory.for_each(|s: &Schedule| s.shifts.as_slice())
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+Streams::new()
+    .shifts()
     .join((
-        |s: &Schedule| s.unavailability.as_slice(),
+        Streams::new().unavailability(),
         equal_bi(|shift: &Shift| shift.date, |u: &Unavailability| u.date),
     ))
 ```
@@ -86,5 +91,6 @@ Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`
 
 ## See Also
 
-- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — The core stream API
-- [docs.rs/solverforge](https://docs.rs/solverforge) — Full joiner API reference
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) - The core stream API
+- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection accessors
+- [docs.rs/solverforge](https://docs.rs/solverforge) - Full joiner API reference

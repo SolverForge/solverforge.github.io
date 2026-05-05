@@ -7,8 +7,8 @@ description: >
 ---
 
 Constraint streams are the primary way to define constraints in SolverForge.
-They provide a pipeline-style API where you select entities, transform the
-stream, and terminate with a scoring impact.
+They provide a pipeline-style API where you select entities or facts, transform
+the stream, and terminate with a scoring impact.
 
 ## Defining Constraints
 
@@ -18,7 +18,6 @@ objects. The `#[planning_solution]` macro wires this up automatically.
 ```rust
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
-use ScheduleConstraintStreams;
 
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
@@ -32,28 +31,54 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-Each constraint builder chain produces an `IncrementalUniConstraint` (or
-similar) via `.named()`. Return them as a tuple — SolverForge implements
-`ConstraintSet` for tuples of up to 16 constraints.
+Each constraint builder chain produces an `IncrementalUniConstraint`,
+`IncrementalBiConstraint`, or related constraint object through `.named()`.
+Return them as a tuple; SolverForge implements `ConstraintSet` for tuples of up
+to 16 constraints.
 
 ## Source Operations
 
-### `for_each`
+### Generated Accessors
 
-Selects all items from a collection in the solution, using a closure extractor.
-Generated `{Name}ConstraintStreams` accessors call the same public operation
-with hidden `ChangeSource` metadata so localized incremental callbacks are
-owned by the right planning-entity collection.
+Generated `{Name}ConstraintStreams` accessors select all items from a solution
+collection and carry hidden source metadata for localized incremental scoring.
 
 ```rust
-factory.shifts()
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+Streams::new().shifts()
+Streams::new().employees()
+```
+
+These should be the default entry points for planning entity and problem fact
+collections. See [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/)
+for the generated method contract.
+
+### `for_each`
+
+`for_each` selects items from a solution collection using a closure extractor.
+Use generated accessors when they exist; use `for_each` for lower-level or
+custom collection surfaces.
+
+```rust
+use solverforge::stream::vec;
+
+factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 ```
 
 ## Intermediate Operations
 
-### `filter`
+| Operation | Purpose |
+| --------- | ------- |
+| `filter` | Keep only matches that satisfy a predicate |
+| `join` | Combine rows from the same stream or a second stream |
+| `project` | Create retained scoring-only rows |
+| `flatten_last` | Expand a collection carried by the last joined item |
+| `group_by` | Group rows and apply a collector |
+| `balance` | Score load balance without manual grouped unfairness logic |
+| `if_exists` / `if_not_exists` | Keep rows based on matching rows in another collection |
 
-Keeps only elements that match a predicate.
+### `filter`
 
 ```rust
 factory.shifts()
@@ -62,124 +87,57 @@ factory.shifts()
 
 ### `join`
 
-Combines elements from the same or different collections. The join target
-determines the behavior:
+`join` dispatches on the target shape.
 
-**Self-join** — pairs from the same collection, using an `equal` joiner:
+Self-join with an `equal` joiner:
 
 ```rust
 factory.shifts()
     .join(equal(|shift: &Shift| shift.employee_idx))
 ```
 
-**Cross-join** — pairs from two different collections, using an `equal_bi`
-joiner:
+Cross-join with a generated accessor plus `equal_bi`:
 
 ```rust
-factory.shifts()
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+Streams::new()
+    .shifts()
     .join((
-        |s: &Schedule| s.unavailability.as_slice(),
-        equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
+        Streams::new().unavailability(),
+        equal_bi(
+            |shift: &Shift| shift.employee_idx,
+            |u: &Unavailability| u.employee_idx,
+        ),
     ))
 ```
 
-See [Joiners](/docs/solverforge/constraints/joiners/) for all available joiner types.
-
-### `flatten_last`
-
-Flattens a collection in the last element into individual elements. Takes three
-arguments: a slice extractor, a key function for the flattened items, and a
-lookup function for matching.
-
-```rust
-factory.for_each(|s: &Schedule| s.employees.as_slice())
-    .join((
-        |s: &Schedule| s.shifts.as_slice(),
-        equal_bi(|e: &Employee| e.id, |s: &Shift| s.employee_idx),
-    ))
-    .flatten_last(
-        |e: &Employee| e.available_days.as_slice(),  // slice extractor
-        |d| *d,                                       // key for flattened item
-        |s: &Shift| s.date(),                         // lookup from A
-    )
-```
+See [Joiners](/docs/solverforge/constraints/joiners/) for joiner types and
+composition.
 
 ### `group_by`
-
-Groups elements and applies a [collector](/docs/solverforge/constraints/collectors/) to aggregate.
 
 ```rust
 factory.shifts()
     .group_by(
-        |shift: &Shift| shift.employee_idx,   // grouping key
-        count(),                              // collector
+        |shift: &Shift| shift.employee_idx,
+        count(),
     )
 ```
 
+See [Collectors](/docs/solverforge/constraints/collectors/) for `count`, `sum`,
+and `load_balance`.
+
 ### `balance`
 
-Calculates load imbalance across a grouping key. The key function returns
-`Option<K>` — `None` values are skipped (useful for unassigned entities).
+`balance` calculates load imbalance across a grouping key. The key function
+returns `Option<K>`; `None` values are skipped, which is useful for unassigned
+entities.
 
 ```rust
 factory.shifts()
     .balance(|shift: &Shift| shift.employee_idx)
 ```
-
-### `if_exists` / `if_not_exists`
-
-Filters based on the existence (or absence) of matching entities in another
-collection.
-
-```rust
-factory.clone()
-    .shifts()
-    .if_exists((
-        factory.unavailability(),
-        equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx),
-    ))
-```
-
-For a beginner mental model, `if_exists` asks "does this item have at least one
-matching record over there?" and `if_not_exists` asks the inverse. The public API
-stays exactly that simple while the runtime chooses faster internal bookkeeping
-for exact `usize` keys. Direct and flattened existence constraints with plain
-`usize` keys use indexed storage; `Option<usize>`, newtype keys, strings, and
-other key shapes keep hashed storage.
-
-### `project`
-
-Projected streams derive bounded scoring rows from a source entity without
-materializing new facts or entities. Implement `Projection<A>` on a named type,
-declare `MAX_EMITS`, and emit rows through `ProjectionSink`:
-
-```rust
-use solverforge::{Projection, ProjectionSink};
-
-struct ShiftWindows;
-
-impl Projection<Shift> for ShiftWindows {
-    type Out = WorkWindow;
-    const MAX_EMITS: usize = 2;
-
-    fn project<Sink>(&self, shift: &Shift, sink: &mut Sink)
-    where
-        Sink: ProjectionSink<Self::Out>,
-    {
-        sink.emit(WorkWindow::from_shift(shift));
-    }
-}
-
-factory.shifts()
-    .project(ShiftWindows)
-    .filter(|window: &WorkWindow| window.is_overtime())
-    .penalize_soft()
-    .named("Projected overtime");
-```
-
-Projected streams can be filtered, self-joined, merged, grouped, and weighted
-like ordinary scoring state. Self-join ordering is coordinate-stable by source
-slot, entity index, and emission index rather than by sparse storage row id.
 
 ## Terminal Operations
 
@@ -188,41 +146,51 @@ slot, entity index, and emission index rather than by sparse storage row id.
 Apply a fixed score impact per match, then finalize with `.named()`.
 
 ```rust
-.penalize(HardSoftScore::ONE_HARD)
-    .named("Constraint name")
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
-.reward(HardSoftScore::ONE_SOFT)
-    .named("Preference bonus")
+let hard = Streams::new()
+    .shifts()
+    .penalize(HardSoftScore::ONE_HARD)
+    .named("Constraint name");
+
+let soft = Streams::new()
+    .shifts()
+    .reward(HardSoftScore::ONE_SOFT)
+    .named("Preference bonus");
 ```
 
-### `penalize_hard` / `penalize_soft` / `reward_hard` / `reward_soft`
+### Score Convenience Methods
 
-Convenience methods that use the score type's unit hard or soft value.
+Use convenience methods when the constraint applies one hard or soft unit:
 
 ```rust
-.penalize_hard()
-    .named("Hard violation")
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
-.penalize_soft()
-    .named("Soft preference")
+let hard = Streams::new()
+    .shifts()
+    .penalize_hard()
+    .named("Hard violation");
+
+let soft = Streams::new()
+    .shifts()
+    .reward_soft()
+    .named("Soft preference");
 ```
 
-### `penalize_hard_with` / `penalize_soft_with` / `reward_hard_with`
-
-Apply a dynamic score impact based on the matched element.
+Use dynamic methods when the score depends on the match:
 
 ```rust
-.penalize_hard_with(|shift: &Shift| HardSoftScore::of_hard(shift.overtime_hours() as i64))
-    .named("Overtime")
-```
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
-### `penalize_with` / `reward_with`
+let overtime = Streams::new()
+    .shifts()
+    .penalize_hard_with(|shift: &Shift| HardSoftScore::of_hard(shift.overtime_hours() as i64))
+    .named("Overtime");
 
-Apply a fully custom score impact.
-
-```rust
-.penalize_with(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
-    .named("Preference")
+let preference = Streams::new()
+    .shifts()
+    .penalize_with(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
+    .named("Preference");
 ```
 
 ## Full Example
@@ -230,29 +198,30 @@ Apply a fully custom score impact.
 ```rust
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
-use ScheduleConstraintStreams;
 
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
-    let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
+    type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
     (
-        // Hard: every shift must be assigned
-        factory.clone().shifts()
+        Streams::new()
+            .shifts()
             .filter(|shift| shift.employee_idx.is_none())
-            .penalize(HardSoftScore::ONE_HARD)
+            .penalize_hard()
             .named("Unassigned shift"),
 
-        // Hard: no employee works two overlapping shifts
-        factory.clone().shifts()
+        Streams::new()
+            .shifts()
             .join(equal(|shift: &Shift| shift.employee_idx))
-            .filter(|a: &Shift, b: &Shift| a.employee_idx.is_some() && a.overlaps(b))
-            .penalize(HardSoftScore::ONE_HARD)
+            .filter(|a: &Shift, b: &Shift| {
+                a.employee_idx.is_some() && a.overlaps(b)
+            })
+            .penalize_hard()
             .named("Overlap"),
 
-        // Soft: prefer assigning employees to their preferred shifts
-        factory.shifts()
+        Streams::new()
+            .shifts()
             .filter(|shift| shift.is_preferred_by_employee())
-            .reward(HardSoftScore::ONE_SOFT)
+            .reward_soft()
             .named("Preference"),
     )
 }
@@ -260,6 +229,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
 ## See Also
 
-- [Joiners](/docs/solverforge/constraints/joiners/) — Controlling how streams are joined
-- [Collectors](/docs/solverforge/constraints/collectors/) — Aggregation functions for `group_by`
-- [Score Types](/docs/solverforge/constraints/score-types/) — Available score types
+- [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/) - scoring-only derived rows
+- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - generated collection accessors and `for_each`
+- [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/) - `if_exists`, `if_not_exists`, and `flatten_last`
+- [Score Analysis](/docs/solverforge/constraints/score-analysis/) - inspecting score contributions

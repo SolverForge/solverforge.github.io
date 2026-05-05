@@ -1,8 +1,8 @@
 ---
 title: Overview
 description:
-  What SolverForge is, how it differs from mathematical solvers, and the project
-  roadmap.
+  What SolverForge is, how it differs from mathematical solvers, and where to
+  start in the documentation.
 weight: 1
 tags: [concepts]
 ---
@@ -15,9 +15,9 @@ business rules and optimizing for your goals.
 
 ## What Problems Does It Solve?
 
-SolverForge excels at **combinatorial planning problems** — problems where a
-brute-force search is impossible (millions to billions of possibilities), but a
-good solution dramatically improves efficiency.
+SolverForge excels at **combinatorial planning problems**: problems where a
+brute-force search is impossible, but a good solution dramatically improves
+efficiency.
 
 <div class="card-grid">
   <%= render Ui::Card.new(title: "Hospital Scheduling", icon: "fa-solid fa-calendar-days") do %>
@@ -42,17 +42,16 @@ Fit items into containers efficiently.
 
 ## How Is This Different from Gurobi or CVXPY?
 
-This is a common question. **SolverForge and mathematical programming solvers
-(Gurobi, CPLEX, OR-Tools, CVXPY) solve different kinds of problems using
-different approaches.**
+SolverForge and mathematical programming solvers solve different kinds of
+problems using different modeling approaches.
 
 |                          | SolverForge                                | Mathematical Solvers (Gurobi, CVXPY)                      |
 | ------------------------ | ------------------------------------------ | --------------------------------------------------------- |
-| **Problem type**         | Constraint satisfaction & scheduling       | Linear/mixed-integer programming                          |
-| **Modeling approach**    | Business objects with rules                | Mathematical equations & matrices                         |
-| **Constraints**          | Natural language-like rules on objects     | Linear inequalities (Ax ≤ b)                              |
+| **Problem type**         | Constraint satisfaction and scheduling     | Linear/mixed-integer programming                          |
+| **Modeling approach**    | Business objects with rules                | Mathematical equations and matrices                       |
+| **Constraints**          | Rules on domain objects                    | Linear inequalities                                       |
 | **Best for**             | Scheduling, routing, assignment            | Resource allocation, network flow, portfolio optimization |
-| **Developer experience** | Write rules about "Shifts" and "Employees" | Formulate objective functions and constraint matrices     |
+| **Developer experience** | Write rules about shifts and employees     | Formulate objective functions and constraint matrices     |
 
 ### A Concrete Example
 
@@ -66,23 +65,20 @@ different approaches.**
       use solverforge::prelude::*;
       use solverforge::stream::{joiner::*, ConstraintFactory};
 
-      fn define_constraints() -> impl ConstraintSet<Plan, HardSoftDecimalScore> {
-          use PlanConstraintStreams;
-          use ShiftUnassignedFilter;
+      fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftDecimalScore> {
+          type Streams = ConstraintFactory<Schedule, HardSoftDecimalScore>;
 
-          let factory = ConstraintFactory::<Plan, HardSoftDecimalScore>::new();
-
-          let unassigned = factory.clone()
+          let unassigned = Streams::new()
               .shifts()
               .unassigned()
               .penalize(HardSoftDecimalScore::of_hard_scaled(100_000))
               .named("Unassigned shift");
 
-          let missing_skill = factory
+          let missing_skill = Streams::new()
               .shifts()
               .filter(|shift: &Shift| shift.employee_idx.is_some())
               .join((
-                  Plan::employees_slice,
+                  Streams::new().employees(),
                   equal_bi(
                       |shift: &Shift| shift.employee_idx,
                       |employee: &Employee| Some(employee.index),
@@ -101,7 +97,7 @@ different approaches.**
   </div>
   <div class="code-tabs__panel" data-tab-panel="gurobi" hidden>
     <%= render Ui::CodeBlock.new(language: "python") do %>
-      # You must translate your problem into mathematical form
+      # You must translate your problem into mathematical form.
       x = model.addVars(employees, shifts, vtype=GRB.BINARY)
       model.addConstrs(sum(x[e,s] for e in employees) == 1 for s in shifts)
       model.addConstrs(sum(x[e,s] for s in shifts) <= max_shifts for e in employees)
@@ -109,28 +105,28 @@ different approaches.**
   </div>
 </div>
 
-**The key difference:** With SolverForge, you work with domain objects (`Shift`,
-`Employee`) and express constraints as natural business rules. You don't need to
-reformulate your problem as a system of linear equations.
+With SolverForge, you work with domain objects (`Shift`, `Employee`) and
+express constraints as business rules. You do not need to reformulate the
+problem as a system of linear equations.
 
-### When to Use Each
+## When to Use Each
 
-**Use SolverForge when:**
+Use SolverForge when:
 
-- Your problem involves scheduling, routing, or assignment
-- Constraints are naturally expressed as business rules
-- The problem structure doesn't fit neatly into linear programming
-- You want readable, maintainable constraint definitions
+- your problem involves scheduling, routing, or assignment
+- constraints are naturally expressed as business rules
+- the problem structure does not fit neatly into linear programming
+- readable, maintainable constraint definitions matter
 
-**Use Gurobi/CVXPY when:**
+Use Gurobi, CPLEX, or CVXPY when:
 
-- Your problem is naturally linear or convex
-- You need provably optimal solutions with bounds
-- The problem fits the mathematical programming paradigm (LP, MIP, QP)
+- your problem is naturally linear or convex
+- you need provably optimal solutions with bounds
+- the problem fits the mathematical programming paradigm
 
-## The Developer Experience
+## Developer Experience
 
-SolverForge provides a **Rust derive-macro API** for ergonomic domain modeling:
+SolverForge provides a Rust derive-macro API for ergonomic domain modeling:
 
 ```rust
 use solverforge::prelude::*;
@@ -140,7 +136,7 @@ pub struct Shift {
     #[planning_id]
     pub id: String,
     pub required_skill: String,
-    #[planning_variable(value_range = "employees", allows_unassigned = true)]
+    #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
     pub employee_idx: Option<usize>,
 }
 
@@ -155,311 +151,20 @@ pub struct Plan {
 }
 ```
 
-You define your domain model with derive macros and attribute annotations. The
-solver figures out how to assign employees to shifts while respecting your
-constraints.
+You define the domain model with derive macros and attribute annotations. The
+solver searches assignments that satisfy hard rules and improve the configured
+score.
 
----
+## Where To Go Next
 
-# Project Status & Roadmap
-
-<%= render Ui::Callout.new do %>
-SolverForge is a **production-ready constraint solver** written
-in Rust. This documentation tracks the `solverforge` `0.10.0` core-library
-codebase and calls out CLI scaffold targets separately when an installed CLI
-intentionally lags the current runtime crate. `solverforge 0.10.0` is the
-current published runtime crate.
-<% end %>
-
-## Current Status
-
-| Component     | Status              | Description                                                      |
-| ------------- | ------------------- | ---------------------------------------------------------------- |
-| **Rust Core** | ✅ Production-ready | Native Rust constraint solver aligned with the `0.10.0` codebase |
-
-**Want to try it today?**
-
-- Start with [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
-  for the generic app shell, then continue with the
-  [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
-  or the
-  [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
-
-## What's Complete
-
-SolverForge Rust is **feature-complete** as a production constraint solver:
-
-- **Constraint Streams API**: Declarative constraint definition with `for_each`,
-  source-aware generated collection accessors, `filter`, unified `join(...)`,
-  `flatten_last`, `project(...)`, `group_by`, `balance`, `if_exists(...)`,
-  `if_not_exists(...)`, `penalize`, `reward`, and `.named(...)`
-- **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
-  HardSoftDecimalScore, BendableScore
-- **Score Analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
-  plus lower-level detailed match/explanation APIs in `solverforge-scoring`
-- **SERIO Engine**: Scoring Engine for Real-time Incremental Optimization
-- **Solver Phases**:
-  - Construction Heuristics for scalar and list-variable models
-  - Local Search with Hill Climbing, Simulated Annealing, Tabu Search, Late
-    Acceptance, and Great Deluge in the stock config surface
-  - Exhaustive Search (`branch_and_bound`, `brute_force`)
-  - Partitioned Search (multi-threaded)
-  - VND (Variable Neighborhood Descent)
-- **Move System**: Zero-allocation move types with arena allocation — Change,
-  Swap, Composite, ListChange, ListSwap, ListReverse, SubListChange,
-  SubListSwap, KOpt, ListRuin, Ruin, PillarChange, PillarSwap
-- **List Variables**: Full support for sequencing/routing problems
-- **Nearby Selection**: Distance-based move selection for large problems
-- **Balance stream**: Load-balancing constraint support without manual grouped
-  unfairness scoring
-- **SolverManager API**: Retained job lifecycle with
-  `SolverEvent::{Progress, BestSolution, PauseRequested, Paused, Resumed, Completed, Cancelled, Failed}`,
-  `SolverStatus`, exact in-process pause/resume checkpoints, retained
-  snapshots, snapshot-bound analysis, terminal-job deletion, and exact retained
-  telemetry
-- **Configuration**: stock `solver.toml` loading plus
-  `SolverConfig::load()`, `from_toml_str()`, `from_yaml_str()`, bounded scalar
-  candidate limits, grouped scalar selectors, level-aware simulated annealing,
-  and `#[planning_solution(config = "...")]` overlays that decorate the loaded
-  runtime config
-
-## Runtime Notes
-
-- **0.10.0 workspace baseline**: the core workspace version is `0.10.0` and the
-  Rust toolchain floor is `1.95`.
-- **Projected scoring rows**: `Projection` / `ProjectionSink` create bounded
-  derived rows without materializing new facts or entities. Projected self-join
-  ordering is coordinate-stable by source slot, entity index, and emission
-  index rather than sparse storage row id.
-- **Allocation-free score levels**: `Score::level_number()` is the required
-  per-level accessor; `to_level_numbers()` is the allocating vector view for
-  callers that need owned level data.
-- **Level-aware simulated annealing**: simulated annealing uses per-score-level
-  temperatures, hard-regression policy, calibration, and deterministic
-  hill-climbing behavior once cooled.
-- **Constraint metadata identity**: typed constraint metadata is keyed by full
-  `ConstraintRef`, so package-qualified constraints can share a short name
-  without collapsing into one scoring identity. Configured conflict-repair keys
-  use `ConstraintRef::full_name()` for package-qualified constraints and the
-  short name for package-less constraints.
-- **Descriptor-addressed scalar runtime assembly**: generated scalar getter and
-  setter dispatch still uses compact internal indexes, while runtime hook
-  attachment and ordering use descriptor index plus variable name.
-- **Model-owned scalar hooks**: `candidate_values`,
-  `nearby_value_candidates`, `nearby_entity_candidates`,
-  `construction_entity_order_key`, and `construction_value_order_key` declare
-  bounded scalar neighborhoods and construction ordering on the planning
-  variable itself.
-- **Indexed existence scoring for exact `usize` keys**: direct and flattened
-  `if_exists(...)` / `if_not_exists(...)` constraints keep the same public
-  stream API, but exact `usize` join keys now use dense indexed bookkeeping
-  internally. Other key types keep hashed storage.
-- **Local-search phase starts carry score context**: console telemetry now
-  renders the current score when the local-search phase starts, so the line
-  after construction shows the score local search is improving from.
-- **List-ruin search skips empty owners**: list ruin candidate generation
-  samples only entities with non-empty lists, avoiding wasted ruin attempts on
-  empty routes or sequences.
-- **Shape-aware startup telemetry**: startup logging now labels scalar solve
-  scale as average `candidates` instead of generic `values`. List-heavy solves
-  report element counts, and console output labels those solve shapes as
-  `candidates` or `elements`.
-
-- **Optional `FirstFit` keeps `None` as a real baseline**: optional scalar
-  construction now leaves a value unassigned unless a concrete assignment is
-  strictly better, matching the current `CheapestInsertion` semantics while
-  preserving eager `FirstFit` search order.
-- **Accepted-count local search retains the best accepted moves**:
-  `accepted_count_limit` caps the retained accepted candidates for final
-  selection instead of acting as an implicit early-exit threshold.
-- **Canonical construction engine**: generic runtime construction now centers on
-  the shared engine under `phase/construction/engine.rs`; pure scalar matches
-  reuse the descriptor-scalar path, while round-robin list construction uses
-  one shared implementation for runtime and builder assembly.
-- **Tighter neighborhood iteration**: `limited_neighborhood` carries move caps
-  at the neighborhood level, and `ChangeMoveSelector` keeps change-value
-  iteration lazy so cursor caps and early-stop paths avoid unnecessary
-  candidate generation.
-- **Exact retained telemetry remains authoritative**: generated, evaluated, and
-  accepted counts, not-doable filtering, acceptor rejection, forager retention,
-  hard-delta buckets, conflict-repair provider/filter/exposure counters,
-  construction slot outcomes, and generation/evaluation `Duration`s are
-  retained exactly through the solver pipeline. Any displayed `moves/s` metric
-  is still derived at the edge.
-
-## Roadmap
-
-### Phase 1: Native Solver ✅ Complete
-
-Built a complete constraint solver in Rust from the ground up:
-
-- Full metaheuristic algorithm suite
-- Incremental scoring engine (SERIO)
-- Zero-cost abstractions with inline move types
-- Derive macros for ergonomic domain modeling
-
-### Phase 2: Rust API Refinement & Production Enhancements (H1 2026)
-
-- Multi-threaded move evaluation
-- Constraint strength system
-- Performance tuning guides
-- Enterprise features
-
-### Phase 3: Python Bindings (H2 2026)
-
-Bringing the Rust solver to Python developers via PyO3:
-
-- Native extension: `pip install solverforge`
-- Pythonic API backed by the Rust core
-- Native performance without JVM overhead
-
----
-
-## How You Can Help
-
-- **Get started** — [Follow the getting started guides](/docs/getting-started/)
-  and share feedback
-- **Report issues** — Found a bug or have a suggestion?
-  [Open an issue](https://github.com/solverforge/solverforge/issues)
-- **Contribute** — PRs welcome! Check the
-  [issue tracker](https://github.com/solverforge/solverforge/issues) for good
-  first issues
-- **Spread the word** — Star the
-  [GitHub repo](https://github.com/solverforge/solverforge) and share with
-  colleagues
-
----
-
-## Technical Details
-
-<details>
-<summary><strong>Architecture (for the curious)</strong></summary>
-
-SolverForge is a **native Rust constraint solver** that delivers both developer
-ergonomics and high performance:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         solverforge                             │
-│                    (facade + re-exports)                        │
-└─────────────────────────────────────────────────────────────────┘
-        │              │              │
-        ▼              ▼              ▼
-┌──────────────┬──────────────┬──────────────┐
-│solverforge-  │solverforge-  │solverforge-  │
-│   solver     │   scoring    │   config     │
-│              │              │              │
-│ • Phases     │ • Constraint │ • TOML       │
-│ • Moves      │   Streams    │ • YAML       │
-│ • Selectors  │ • Score      │ • Builders   │
-│ • Foragers   │   Directors  │              │
-│ • Acceptors  │ • SERIO      │              │
-│ • Termination│   Engine     │              │
-│ • Manager    │              │              │
-└──────────────┴──────────────┴──────────────┘
-        │              │
-        └──────┬───────┘
-               ▼
-        ┌──────────────────────────────┐
-        │       solverforge-core       │
-        │                              │
-        │ • Score types                │
-        │ • Domain traits              │
-        │ • Descriptors                │
-        │ • Variable system            │
-        └──────────────────────────────┘
-                       │
-                       ▼
-        ┌──────────────────────────────┐
-        │      solverforge-macros      │
-        │                              │
-        │ • #[planning_solution]       │
-        │ • #[planning_entity]         │
-        │ • #[problem_fact]            │
-        └──────────────────────────────┘
-```
-
-**Why this design?**
-
-1. **Zero-cost abstractions** — Rust's type system eliminates runtime overhead.
-   Constraint streams compile to efficient machine code with no dynamic
-   dispatch.
-
-2. **Incremental scoring (SERIO)** — The Scoring Engine for Real-time
-   Incremental Optimization only recalculates affected constraints when moves
-   are evaluated, delivering 10-100x speedups.
-
-3. **Type-safe moves** — `ChangeMove<S, V>` and `SwapMove<S, V>` store values
-   inline without boxing or heap allocation. Arena allocation provides O(1)
-   per-step cleanup.
-
-4. **No garbage collection** — Predictable, low-latency performance without GC
-   pauses.
-
-5. **Modular architecture** — Each crate has a single responsibility, making the
-   codebase maintainable and testable.
-
-**The result:** You write declarative constraint logic that compiles to highly
-optimized native code.
-
-</details>
-
-<details>
-<summary><strong>What's implemented</strong></summary>
-
-**Repository**:
-[solverforge/solverforge](https://github.com/solverforge/solverforge)
-
-**Core solver features:**
-
-- **Score types**: SoftScore, HardSoftScore, HardMediumSoftScore,
-  HardSoftDecimalScore, BendableScore
-- **Domain model**: Derive macros for `#[planning_solution]`,
-  `#[planning_entity]`, `#[problem_fact]`
-- **Variable types**: scalar, shadow, and list variables
-- **Shadow variables**: `#[inverse_relation_shadow_variable]`,
-  `#[previous_element_shadow_variable]`, `#[next_element_shadow_variable]`
-- **Constraint Streams API**: `for_each`, source-aware generated collection
-  accessors, unified `join`, `flatten_last`, `project(...)`, `group_by`,
-  `balance`, `if_exists(...)`, `if_not_exists(...)`, `penalize`, `reward`, and
-  `.named()`
-- **Grouped helpers**: `count`, `sum`, and `load_balance`
-- **Score analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
-  plus lower-level detailed match/explanation APIs in `solverforge-scoring`
-
-**Solver phases and runtime:**
-
-- **Construction heuristics**: first fit, weakest fit, strongest fit, queue
-  allocators, cheapest insertion, and list-specific constructors
-- **Local search**: hill climbing, simulated annealing, tabu search, late
-  acceptance, great deluge
-- **Exhaustive search**: branch and bound and brute force
-- **Partitioned search**: Multi-threaded parallel solving
-- **VND**: Variable Neighborhood Descent
-
-**Move system:**
-
-- Basic: ChangeMove, SwapMove, CompositeMove
-- List: ListChangeMove, ListSwapMove, ListReverseMove, SubListChangeMove,
-  SubListSwapMove
-- Advanced: KOptMove, RuinMove, PillarChangeMove, PillarSwapMove
-- MoveArena: Zero-allocation move storage
-
-**Infrastructure:**
-
-- **SERIO**: Scoring Engine for Real-time Incremental Optimization
-- **SolverManager**: Retained job lifecycle API with event streaming, snapshots,
-  and pause/resume control
-- **Configuration**: stock `solver.toml` loading plus TOML/YAML parsing APIs
-- **Termination**: Time limits, step counts, score targets, unimproved step
-  detection, composites (And/Or)
-- **Nearby selection**: Distance-based move selection
-
-**Performance:**
-
-- Zero-allocation move system with arena allocation
-- Type-safe moves without boxing (`ChangeMove<S, V>`, `SwapMove<S, V>`)
-- No garbage collection pauses
-- Incremental score calculation (10-100x faster than full recalculation)
-
-</details>
+<div class="card-grid">
+  <%= render Ui::Card.new(title: "Status & Roadmap", href: relative_url('/docs/status-and-roadmap/'), icon: "fa-solid fa-road") do %>
+Current release, published package status, completed runtime surface, and roadmap.
+  <% end %>
+  <%= render Ui::Card.new(title: "Architecture", href: relative_url('/docs/architecture/'), icon: "fa-solid fa-diagram-project") do %>
+Crate responsibilities, zero-erasure design, SERIO scoring, and retained runtime pieces.
+  <% end %>
+  <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-rocket") do %>
+Start from the CLI scaffold and follow concrete hospital or delivery examples.
+  <% end %>
+</div>

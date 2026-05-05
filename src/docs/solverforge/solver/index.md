@@ -42,7 +42,7 @@ The stock generated solve path loads `solver.toml` automatically from the
 current working directory. `solverforge-config` also exposes parsing APIs when
 you want to inspect or construct configs directly.
 
-The 0.10.0 runtime uses one `ModelContext` per planning model. Generic
+The `0.11.0` release uses one `ModelContext` per planning model. Generic
 construction heuristics share that context for mixed/list-bearing work, while
 pure scalar construction uses the descriptor-scalar boundary. Local search uses
 explicit streaming defaults when `move_selector` is omitted, and scalar
@@ -63,7 +63,9 @@ User-facing rates such as `moves/s` are display-only derived values.
 ## Sections
 
 - **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, `solver.toml`, and YAML parsing
+- **[Construction](/docs/solverforge/solver/construction/)** — construction heuristics, nullable obligations, and grouped scalar construction
+- **[Local Search](/docs/solverforge/solver/local-search/)** — acceptors, foragers, selectors, and score-level annealing
 - **[Phases](/docs/solverforge/solver/phases/)** — Construction heuristic, local search, exhaustive search, and VND
-- **[Moves](/docs/solverforge/solver/moves/)** — Move types and selectors
+- **[Moves](/docs/solverforge/solver/moves/)** — selector-family guide with scalar, list, and composite subsections
 - **[Termination](/docs/solverforge/solver/termination/)** — When to stop solving
 - **[SolverManager](/docs/solverforge/solver/solver-manager/)** — Running and managing solver instances

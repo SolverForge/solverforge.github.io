@@ -21,7 +21,7 @@ Planning Solution
 └── planning_score           → Option<ScoreType>   (current quality)
 
 Planning Entity
-└── planning_variable(value_range = "facts")       (decision field)
+└── planning_variable(value_range_provider = "facts")       (decision field)
 ```
 
 ## How It Works
@@ -32,7 +32,7 @@ Planning Entity
 
 The derive macros generate implementations of `PlanningSolution`,
 `PlanningEntity`, and `ProblemFact` automatically. In the common stock runtime,
-planning variables name their value source with `value_range = "solution_field"`
+planning variables name their value source with `value_range_provider = "solution_field"`
 and `#[planning_solution]` generates typed stream accessors such as
 `factory.shifts()`.
 

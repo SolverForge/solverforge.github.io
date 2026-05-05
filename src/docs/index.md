@@ -13,6 +13,12 @@ inspect the Rust APIs behind the runtime, UI, and routing helpers.
   <%= render Ui::Card.new(title: "Overview", href: relative_url('/docs/overview/'), icon: "fa-solid fa-compass") do %>
 What SolverForge solves, when to use it, and how it differs from mathematical solvers.
   <% end %>
+  <%= render Ui::Card.new(title: "Status & Roadmap", href: relative_url('/docs/status-and-roadmap/'), icon: "fa-solid fa-road") do %>
+Current release, published package status, runtime surface, and roadmap.
+  <% end %>
+  <%= render Ui::Card.new(title: "Architecture", href: relative_url('/docs/architecture/'), icon: "fa-solid fa-diagram-project") do %>
+Crate boundaries, zero-erasure runtime design, SERIO scoring, and lifecycle pieces.
+  <% end %>
   <%= render Ui::Card.new(title: "Concepts", href: relative_url('/docs/concepts/'), icon: "fa-solid fa-lightbulb") do %>
 Core planning and optimization concepts for SolverForge users.
   <% end %>

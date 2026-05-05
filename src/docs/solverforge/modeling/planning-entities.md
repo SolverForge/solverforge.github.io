@@ -20,7 +20,7 @@ pub struct Shift {
     #[planning_id]
     pub id: usize,
     pub required_skill: String,
-    #[planning_variable(value_range = "employees", allows_unassigned = true)]
+    #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
     pub employee_id: Option<usize>,
 }
 ```
@@ -42,7 +42,7 @@ pub id: usize,
 Marks a field as a planning variable — the solver assigns values to this field.
 
 ```rust
-#[planning_variable(value_range = "employees", allows_unassigned = true)]
+#[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
 pub employee_id: Option<usize>,
 
 #[planning_variable(countable_range = "0..10")]
@@ -51,8 +51,8 @@ pub priority_bucket: i32,
 
 Common parameters:
 
-- `value_range = "employees"` or `value_range_provider = "employees"`:
-  references a field on the planning solution that supplies possible values
+- `value_range_provider = "employees"`: references a field on the planning
+  solution that supplies possible values
 - `allows_unassigned = true`: permits `None` for `Option<T>` variables
 - `countable_range = "0..10"`: declares an integer range directly on the field
 - `candidate_values = "fn_name"`: supplies an ordered bounded scalar value

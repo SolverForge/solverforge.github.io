@@ -40,7 +40,7 @@ opt-in phases.
 - facts are immutable reference data
 - entities are the records the solver changes
 - the score lives on the solution, not on each entity
-- `value_range = "field_name"` points at a solution collection
+- `value_range_provider = "field_name"` points at a solution collection
 - use `allows_unassigned = true` when `None` is a legitimate state
 - use `candidate_values` or `value_candidate_limit` when scalar value
   neighborhoods must be bounded
@@ -78,7 +78,7 @@ PlanningSolution
 └── planning_score
 
 PlanningEntity
-└── planning_variable(value_range = "facts_or_values")
+└── planning_variable(value_range_provider = "facts_or_values")
 ```
 
 ## When to leave the cheat sheet

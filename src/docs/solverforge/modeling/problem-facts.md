@@ -63,7 +63,7 @@ pub struct Shift {
     #[planning_id]
     pub id: usize,
 
-    #[planning_variable(value_range = "employees", allows_unassigned = true)]
+    #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
     pub employee_id: Option<usize>,
 }
 
@@ -74,6 +74,9 @@ pub struct Schedule {
 
     #[planning_entity_collection]
     pub shifts: Vec<Shift>,
+
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
 }
 ```
 
