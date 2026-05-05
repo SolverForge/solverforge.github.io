@@ -41,6 +41,11 @@ jobs:
           repository: SolverForge/solverforge-ui
           path: .ci/solverforge-ui
 
+      - name: Install Rust 1.95
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal
+          rustup default 1.95.0
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4
