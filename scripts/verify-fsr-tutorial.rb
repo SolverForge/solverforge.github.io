@@ -12,10 +12,10 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.0.3"
-EXPECTED_CLI_RUNTIME_VERSION = "0.10.0"
-EXPECTED_FSR_APP_CLI_VERSION = "2.0.3"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.11.0"
+EXPECTED_CLI_VERSION = "2.0.4"
+EXPECTED_CLI_RUNTIME_VERSION = "0.11.1"
+EXPECTED_FSR_APP_CLI_VERSION = "2.0.4"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.11.1"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
 
@@ -277,6 +277,7 @@ begin
   assert_file_contains(doc_page, "The Space source is the reference implementation")
   assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-core = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "[Runtime and Browser Behavior](#runtime-and-browser-behavior)")
   assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-maps = \"#{EXPECTED_MAPS_VERSION}\"")
   assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_FSR_APP_CLI_VERSION}\"")

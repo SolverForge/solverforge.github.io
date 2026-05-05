@@ -86,11 +86,11 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "2.0.3"
+cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.10.0"
-runtime_source = "crates.io: solverforge 0.10.0"
+target = "solverforge 0.11.1"
+runtime_source = "crates.io: solverforge 0.11.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
@@ -102,14 +102,12 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the published `solverforge-cli 2.0.3` scaffold target.
-Fresh generated apps start on the published `solverforge 0.10.0` runtime and
-the CLI's `solverforge-ui 0.6.5` scaffold target until the CLI runtime target
-moves.
+This example reflects the `solverforge-cli 2.0.4` scaffold target. Fresh
+generated apps start on the published `solverforge 0.11.1` runtime and the
+CLI's `solverforge-ui 0.6.5` scaffold target.
 
-The `solverforge` crate itself is published at `0.11.0`; record any app-owned
-runtime-target upgrade explicitly in that app's dependency manifest and
-`solverforge.app.toml`.
+Record any later app-owned runtime-target upgrade explicitly in that app's
+dependency manifest and `solverforge.app.toml`.
 
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:

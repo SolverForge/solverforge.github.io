@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.11.0` crate and current source
+These pages track the published `solverforge 0.11.1` crate and current source
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime until the next CLI runtime-target refresh, so check
 `solverforge --version` when starting from a scaffold.
@@ -32,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.11.0` crate declares Rust `1.95`.
+The `0.11.1` crate declares Rust `1.95`.
 
 The generated runtime now builds one `ModelContext` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -47,6 +47,12 @@ labels those solve shapes as `candidates` or `elements`.
 
 The current release tightens several public contracts:
 
+- solver configuration controls such as `SolverConfig`, `PhaseConfig`,
+  `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
+  `SolverConfigOverride`, and related enums are available directly from
+  `solverforge`
+- `RecordingDirector` is exported from the facade beside `Director` and
+  `ScoreDirector`
 - projected scoring rows use `Projection` / `ProjectionSink` for bounded
   single-source rows, and cross joins can retain one scoring row per joined
   pair with `.project(|left, right| row)`

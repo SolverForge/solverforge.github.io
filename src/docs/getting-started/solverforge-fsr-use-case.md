@@ -22,7 +22,7 @@ tags: [quickstart, rust, routing, field-service]
 7. [How Optimization Works](#how-optimization-works)
 8. [Writing Constraints](#writing-constraints)
 9. [Solver Policy](#solver-policy)
-10. [API, Routes, and Browser State](#api-routes-and-browser-state)
+10. [Runtime and Browser Behavior](#runtime-and-browser-behavior)
 11. [Making Your First Customization](#making-your-first-customization)
 12. [Testing and Validation](#testing-and-validation)
 13. [Quick Reference](#quick-reference)
@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the published SolverForge 0.11.0 dependency shape
+- keep the published SolverForge 0.11.1 dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -121,16 +121,16 @@ score analysis surface, route tables, Docker build, and tests.
 
 ### Keep the Published Dependency Shape
 
-The current finished app targets the published SolverForge 0.11 line:
+The current finished app targets the published SolverForge 0.11.1 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.11.0", features = [
+solverforge = { version = "0.11.1", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.11.0"
+solverforge-core = "0.11.1"
 solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.4"
 ```
@@ -145,11 +145,11 @@ The app contract in `solverforge.app.toml` names the current scaffold target:
 [app]
 name = "solverforge-fsr"
 starter = "neutral-shell"
-cli_version = "2.0.3"
+cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.11.0"
-runtime_source = "crates.io: solverforge 0.11.0"
+target = "solverforge 0.11.1"
+runtime_source = "crates.io: solverforge 0.11.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 
@@ -472,7 +472,7 @@ contiguous runs, or reverse a route segment.
 
 ---
 
-## API, Routes, and Browser State
+## Runtime and Browser Behavior
 
 The app keeps the standard retained SolverForge lifecycle:
 
@@ -498,6 +498,8 @@ The FSR-specific map endpoint is:
 ```text
 GET /jobs/{id}/routes
 ```
+
+### API, Routes, and Browser State
 
 `/jobs/{id}/routes` accepts the same optional
 `snapshot_revision={n}` query used by snapshots and analysis. The response

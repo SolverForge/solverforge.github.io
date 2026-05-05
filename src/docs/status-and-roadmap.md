@@ -10,19 +10,19 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.11.0` crate and calls out
+documentation tracks the published `solverforge 0.11.1` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.11.0` package is now available on crates.io; the current
-`solverforge-cli 2.0.3` scaffold still starts generated apps on the
-`solverforge 0.10.0` runtime target until the CLI runtime target moves.
+`solverforge 0.11.1` package is now available on crates.io; the published
+`solverforge-cli 2.0.4` package scaffolds generated apps on the
+`solverforge 0.11.1` runtime target.
 <% end %>
 
 ## Current Status
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.11.0` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.3` scaffolds `solverforge 0.10.0`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.11.1` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -61,12 +61,19 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.11.0 published baseline**: the core crate version is `0.11.0` and the
+- **0.11.1 published baseline**: the core crate version is `0.11.1` and the
   Rust toolchain floor remains `1.95`.
+- **Facade configuration exports**: app code can import `SolverConfig`,
+  `PhaseConfig`, `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
+  `SolverConfigOverride`, and related enums directly from `solverforge`.
+- **Facade recording director export**: extension code that needs trial-move
+  rollback can import `RecordingDirector` from the facade beside `Director` and
+  `ScoreDirector`.
 - **Joined-pair projected rows**: cross joins can use
   `.project(|left, right| row)` to retain one scoring row per joined pair.
 - **Clone-free projected paths**: projected outputs, projected self-join keys,
-  and grouped collector values no longer need `Clone` in the `0.11.0` release.
+  and grouped collector values no longer need `Clone` in the `0.11.x` release
+  line.
 - **Borrowed constraint identity**: scoring metadata preserves full
   `ConstraintRef` identity borrowed from the owning constraint.
 - **Model-owned scalar hooks**: `candidate_values`,

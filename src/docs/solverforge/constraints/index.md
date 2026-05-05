@@ -27,7 +27,7 @@ factory.shifts()                              // Select all shifts
 ```
 
 Constraints are returned as a tuple implementing `ConstraintSet<S, Sc>`, which
-the solver evaluates incrementally as it explores moves. In the `0.11.0` release
+the solver evaluates incrementally as it explores moves. In the `0.11.x` release
 line, generated accessors preserve source metadata for localized incremental
 updates, projected streams can emit retained scoring rows from one source or one
 joined pair, and lower-level constraint metadata borrows full `ConstraintRef`

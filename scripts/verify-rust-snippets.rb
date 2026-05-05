@@ -310,6 +310,7 @@ class PolicyGate
     "src/docs/getting-started/",
     "src/docs/solverforge-cli/",
     "src/reference/",
+    "src/_posts/releases/2026-05-05-solverforge-0-11-1.md",
     "src/_posts/releases/2026-05-05-solverforge-0-11-0.md"
   ].freeze
 

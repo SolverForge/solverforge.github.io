@@ -128,7 +128,7 @@ app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.11.0", features = [
+solverforge = { version = "0.11.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -147,10 +147,9 @@ chrono = { version = "0.4.44", features = ["serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-cli 2.0.3` scaffolds `solverforge 0.10.0` and
-`solverforge-ui 0.6.5`. The finished hospital app can target the published
-`solverforge 0.11.0` core crate directly, then adds the hospital-specific
-dependencies and domain model.
+`solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1` and
+`solverforge-ui 0.6.5`. The finished hospital app keeps that current core
+runtime target, then adds the hospital-specific dependencies and domain model.
 
 ### Align App Metadata
 
@@ -160,12 +159,12 @@ The current hospital app metadata is intentionally explicit:
 [app]
 name = "SolverForge Hospital"
 starter = "neutral-shell"
-cli_version = "2.0.3"
+cli_version = "2.0.4"
 
 [runtime]
 target = "SolverForge crates.io target"
 runtime_crate = "solverforge"
-runtime_version = "0.11.0"
+runtime_version = "0.11.1"
 ui_crate = "solverforge-ui"
 ui_version = "0.6.5"
 

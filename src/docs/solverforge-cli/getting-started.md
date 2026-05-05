@@ -41,6 +41,8 @@ for the generated app's Rust version requirement.
 cargo install solverforge-cli
 ```
 
+That command installs the current package published on crates.io.
+
 Update an existing install:
 
 ```bash

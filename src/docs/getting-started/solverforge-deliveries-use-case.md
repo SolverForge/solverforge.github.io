@@ -22,7 +22,7 @@ tags: [quickstart, rust, routing, deliveries]
 7. [How Optimization Works](#how-optimization-works)
 8. [Writing Constraints](#writing-constraints)
 9. [Solver Policy](#solver-policy)
-10. [API, Routes, and Browser State](#api-routes-and-browser-state)
+10. [Runtime and Browser Behavior](#runtime-and-browser-behavior)
 11. [Making Your First Customization](#making-your-first-customization)
 12. [Testing and Validation](#testing-and-validation)
 13. [Quick Reference](#quick-reference)
@@ -139,7 +139,7 @@ app's normal web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.11.0", features = [
+solverforge = { version = "0.11.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -158,11 +158,11 @@ delivery-specific catalog in `solverforge.app.toml`:
 [app]
 name = "solverforge-deliveries"
 starter = "neutral-shell"
-cli_version = "2.0.3"
+cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.11.0"
-runtime_source = "crates.io: solverforge 0.11.0"
+target = "solverforge 0.11.1"
+runtime_source = "crates.io: solverforge 0.11.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 
@@ -570,7 +570,7 @@ which route edit improves the score.
 
 ---
 
-## API, Routes, and Browser State
+## Runtime and Browser Behavior
 
 Deliveries uses the same retained lifecycle shape as the other SolverForge UI
 examples:
@@ -594,6 +594,8 @@ The delivery-specific additions are:
 GET  /jobs/{id}/routes
 POST /recommendations/delivery-insertions
 ```
+
+### API, Routes, and Browser State
 
 ### Snapshot-Bound Routes
 

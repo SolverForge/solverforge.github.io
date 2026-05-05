@@ -52,5 +52,5 @@ For cache-pinned deployments, use the 0.6.4 bundle names:
 ```
 
 `solverforge-ui 0.6.4` was the UI crate used by the `solverforge-cli 2.0.2`
-scaffold target. Current `solverforge-cli 2.0.3` scaffolds
+scaffold target. Current `solverforge-cli 2.0.4` scaffolds
 `solverforge-ui 0.6.5`.

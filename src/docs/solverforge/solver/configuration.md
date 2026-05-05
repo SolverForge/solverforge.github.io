@@ -7,8 +7,16 @@ description: >
 ---
 
 The stock generated runtime loads `solver.toml` automatically when you call
-`SolverManager::solve(...)`. The `solverforge-config` crate also exposes parsing
-helpers for TOML and YAML when you want to inspect or build configs directly.
+`SolverManager::solve(...)`. In `solverforge 0.11.1`, the `solverforge` facade
+also exports the normal configuration API directly, so app code can stay on one
+public dependency when it needs to inspect or build configs directly.
+
+```rust
+use solverforge::{
+    AcceptorConfig, ForagerConfig, MoveSelectorConfig, PhaseConfig,
+    SolverConfig, SolverConfigOverride,
+};
+```
 
 Configuration has three levels:
 
@@ -28,12 +36,16 @@ capabilities through the generated model support layer.
 ### From a TOML file
 
 ```rust
+use solverforge::SolverConfig;
+
 let config = SolverConfig::load("solver.toml").unwrap();
 ```
 
 ### From a TOML string
 
 ```rust
+use solverforge::SolverConfig;
+
 let config = SolverConfig::from_toml_str(r#"
     environment_mode = "reproducible"
     move_thread_count = 4
@@ -56,6 +68,8 @@ let config = SolverConfig::from_toml_str(r#"
 ### From YAML
 
 ```rust
+use solverforge::SolverConfig;
+
 let config = SolverConfig::from_yaml_str(r#"
 environment_mode: reproducible
 termination:

@@ -91,14 +91,14 @@ Streams::new()
     .named("Assignment capacity shortage");
 ```
 
-The `0.11.0` release keeps joined-pair projected rows retained by joined
+The `0.11.x` release line keeps joined-pair projected rows retained by joined
 coordinates, so localized updates from either side of the join can update the
 cached scoring rows without materializing facts.
 
 ## Clone-Free Rows and Keys
 
 Projected outputs, projected self-join keys, and grouped collector values no
-longer need to implement `Clone` in the `0.11.0` release. This matters for
+longer need to implement `Clone` in the `0.11.x` release line. This matters for
 heavy scoring rows whose data should stay owned by the retained scoring state
 rather than cloned through hot paths.
 

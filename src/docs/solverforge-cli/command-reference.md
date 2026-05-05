@@ -61,24 +61,23 @@ solverforge generate variable --help
 crate targets used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 2.0.3
-CLI version: 2.0.3
-Scaffold runtime target: SolverForge crate target 0.10.0
+solverforge solverforge-cli 2.0.4
+CLI version: 2.0.4
+Scaffold runtime target: SolverForge crate target 0.11.1
 Scaffold UI target: solverforge-ui 0.6.5
 Scaffold maps target: solverforge-maps 2.1.4
-Runtime source: crates.io: solverforge 0.10.0
+Runtime source: crates.io: solverforge 0.11.1
 UI source: crates.io: solverforge-ui 0.6.5
 Maps source: crates.io: solverforge-maps 2.1.4
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 2.0.3` scaffold starts on the published `solverforge 0.10.0`,
+`solverforge-cli 2.0.4` scaffold starts on the published `solverforge 0.11.1`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` crate line.
 
-The `solverforge` crate itself is published at `0.11.0`. Keep generated-app
-dependency manifests aligned with the installed CLI unless you intentionally
-upgrade that app's runtime target and validate the generated code against the
-newer core crate.
+Keep generated-app dependency manifests aligned with the installed CLI. Use the
+version output as the source of truth for the scaffold targets carried by that
+binary.
 
 ## Top-Level Commands
 

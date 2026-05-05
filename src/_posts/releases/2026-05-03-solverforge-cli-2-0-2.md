@@ -58,6 +58,6 @@ ui_source = "crates.io: solverforge-ui 0.6.4"
 maps_source = "crates.io: solverforge-maps 2.1.3"
 ```
 
-`solverforge-cli 2.0.3` supersedes this scaffold patch for new apps by keeping
-the `solverforge 0.10.0` runtime target and moving the UI/maps scaffold targets
-to `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4`.
+`solverforge-cli 2.0.4` supersedes this scaffold patch for new apps by moving
+the runtime target to `solverforge 0.11.1` and keeping the UI/maps scaffold
+targets at `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4`.
