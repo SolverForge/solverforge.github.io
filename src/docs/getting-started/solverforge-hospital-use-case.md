@@ -122,13 +122,14 @@ CLI scaffold plus manual hospital scheduling code.
 
 ### Keep the Published Dependency Shape
 
-Start from the CLI's current published scaffold line, then use the current
-published `solverforge-ui 0.6.5` crate for the UI patch line. Add the hospital
-app's normal scheduling and web/runtime dependencies:
+Start from the CLI's current published scaffold line, then move the app-owned
+runtime dependency to the current published `solverforge 0.12.0` crate. Keep the
+current published `solverforge-ui 0.6.5` crate for the UI patch line, then add
+the hospital app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.11.1", features = [
+solverforge = { version = "0.12.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -147,9 +148,10 @@ chrono = { version = "0.4.44", features = ["serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1` and
-`solverforge-ui 0.6.5`. The finished hospital app keeps that current core
-runtime target, then adds the hospital-specific dependencies and domain model.
+`solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1` and
+`solverforge-ui 0.6.5`. For this worked example, upgrade the app-owned
+`solverforge` dependency and runtime metadata to `0.12.0` after scaffolding so
+the tutorial tracks the current core runtime.
 
 ### Align App Metadata
 
@@ -164,7 +166,7 @@ cli_version = "2.0.4"
 [runtime]
 target = "SolverForge crates.io target"
 runtime_crate = "solverforge"
-runtime_version = "0.11.1"
+runtime_version = "0.12.0"
 ui_crate = "solverforge-ui"
 ui_version = "0.6.5"
 
@@ -413,7 +415,7 @@ solverforge::planning_model! {
 
     pub use care_hub::CareHub;
     pub use employee::Employee;
-    pub use plan::{Plan, PlanConstraintStreams, Shift, ShiftUnassignedFilter};
+    pub use plan::{Plan, Shift};
     // @solverforge:end domain-exports
 }
 ```

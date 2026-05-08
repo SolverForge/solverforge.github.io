@@ -3,17 +3,19 @@ title: "Constraint Factory Methods"
 linkTitle: "Constraint Factory Methods"
 weight: 12
 description: >
-  Use ConstraintFactory and generated collection accessors as the typed entry points for constraint streams.
+  Use ConstraintFactory and generated collection sources as the typed entry points for constraint streams.
 ---
 
 `ConstraintFactory<Solution, Score>` is the typed entry point for constraint
 streams. In normal application constraints, start each independent stream source
-from a fresh zero-state factory and then call the generated collection accessor,
-such as `Streams::new().shifts()` or `Streams::new().employees()`.
+from a fresh zero-state factory and pass the generated collection source to
+`for_each(...)`, such as `Streams::new().for_each(Schedule::shifts())` or
+`Streams::new().for_each(Schedule::employees())`.
 
-Use raw `for_each(...)` only for custom collection surfaces that are not
-generated from the planning solution. Generated methods carry source ownership
-metadata that raw extractor closures do not carry.
+Generated solution methods carry source ownership metadata that ad hoc
+slice-returning closures do not carry. Use `solverforge::stream::vec(...)` only
+for custom collection surfaces that are not generated from the planning
+solution.
 
 ## Standard Pattern
 
@@ -26,15 +28,15 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
     (
         Streams::new()
-            .shifts()
+            .for_each(Schedule::shifts())
             .unassigned()
             .penalize_hard()
             .named("Unassigned shift"),
 
         Streams::new()
-            .shifts()
+            .for_each(Schedule::shifts())
             .join((
-                Streams::new().employees(),
+                Streams::new().for_each(Schedule::employees()),
                 equal_bi(
                     |shift: &Shift| shift.employee_idx,
                     |employee: &Employee| Some(employee.index),
@@ -49,11 +51,10 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-The generated accessor traits live next to the model types emitted by
-`#[planning_solution]`. When constraints live in the same module as the model,
-the generated traits are already in scope. When constraints live in another
-module, import the generated traits from the model module, for example
-`use crate::domain::{ScheduleConstraintStreams, ShiftUnassignedFilter};`.
+The generated collection source methods live on the model types emitted by
+`#[planning_solution]`. When the solution type is in scope, the generated source
+methods are available as `Schedule::shifts()`, `Schedule::employees()`, and so
+on.
 
 ## `ConstraintFactory::new()`
 
@@ -79,7 +80,7 @@ let defaulted = ConstraintFactory::<Schedule, HardSoftScore>::default();
 Prefer `new()` in documentation and application code because it makes the
 solution and score binding obvious at the top of the constraint function.
 
-Generated accessors consume the factory value so stream builder types remain
+Generated stream roots consume the factory value so stream builder types remain
 concrete. `ConstraintFactory` stores no runtime solution data, so construct a
 fresh factory for each independent source:
 
@@ -87,19 +88,19 @@ fresh factory for each independent source:
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
 let unassigned = Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .unassigned()
     .penalize_hard()
     .named("Unassigned shift");
 
 let preference = Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .filter(|shift| shift.is_preferred())
     .reward_soft()
     .named("Preferred assignment");
 ```
 
-## Generated Collection Accessors
+## Generated Collection Sources
 
 For every collection field on a `#[planning_solution]`, SolverForge generates a
 method with the same name as the field:
@@ -121,24 +122,21 @@ pub struct Schedule {
 This solution generates:
 
 ```rust
-Streams::new().shifts()
-Streams::new().employees()
+Schedule::shifts();
+Schedule::employees();
 ```
 
-The generated trait name is `{Solution}ConstraintStreams`, so `Schedule` emits
-`ScheduleConstraintStreams<Sc>`. The implementation is provided for
-`ConstraintFactory<Schedule, Sc>`.
-
-Each generated method returns a `UniConstraintStream` over the collection item
-type. The stream starts with the default true filter and a source-aware
-extractor, so it can be used directly as a constraint source or as the
-right-hand collection in a keyed cross-join.
+Each generated method returns a source-aware collection extractor over the
+collection item type. Pass that extractor to `ConstraintFactory::for_each(...)`
+to start a `UniConstraintStream`. The stream starts with the default true
+filter and source ownership metadata, so it can be used directly as a
+constraint source or as the right-hand collection in a keyed cross-join.
 
 Use these methods as the first operation in a stream:
 
 ```rust
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .filter(|shift| shift.employee_idx.is_none())
     .penalize_hard()
     .named("Unassigned shift")
@@ -148,9 +146,9 @@ Use generated methods again when joining another solution collection:
 
 ```rust
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().employees(),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
             |shift: &Shift| shift.employee_idx,
             |employee: &Employee| Some(employee.index),
@@ -163,7 +161,7 @@ intentionally need a lower-level custom extractor.
 
 ## Source Metadata
 
-Generated factory methods preserve the source of each collection:
+Generated collection source methods preserve the source of each collection:
 
 | Solution field annotation | Generated source kind | Incremental meaning |
 | ------------------------- | --------------------- | ------------------- |
@@ -172,17 +170,23 @@ Generated factory methods preserve the source of each collection:
 
 That metadata matters for localized incremental scoring. Entity-source streams
 can react only to the descriptor that changed; fact-source streams remain
-stable. This is important for generated accessors used with operations such as
+stable. This is important for generated sources used with operations such as
 `join`, `if_exists`, `if_not_exists`, `project`, `flatten_last`, `balance`, and
 `unassigned`.
 
-Custom extractors passed to `for_each(...)` do not have this source metadata.
-They are still supported, but they are a lower-level API.
+Custom `vec(...)` extractors passed to `for_each(...)` do not have descriptor
+source metadata. They are still supported, but they are a lower-level API.
 
 ## `for_each(...)`
 
 `for_each(...)` starts a stream from any extractor that implements
 `CollectionExtract<Solution>`.
+
+For generated solution collections, pass the generated source method:
+
+```rust
+Streams::new().for_each(Schedule::shifts())
+```
 
 ```rust
 use solverforge::stream::vec;
@@ -192,8 +196,9 @@ Streams::new().for_each(vec(|solution: &Schedule| &solution.custom_rows))
 
 Use it when:
 
-- the collection is not a generated planning entity or problem fact collection
-- you are intentionally exposing a custom view of solution data
+- the collection is a generated planning entity or problem fact source, such as
+  `Schedule::shifts()`
+- the collection is a custom view wrapped with `vec(...)`
 - you are writing low-level scoring or runtime tests
 
 For `Vec<T>` fields, use the `vec(...)` wrapper from the stream API:
@@ -205,10 +210,10 @@ Streams::new().for_each(vec(|solution: &Schedule| &solution.custom_rows))
 ```
 
 For normal application constraints over generated solution fields, prefer the
-generated accessor:
+generated source method:
 
 ```rust
-Streams::new().shifts()
+Streams::new().for_each(Schedule::shifts())
 ```
 
 instead of:
@@ -219,30 +224,31 @@ Streams::new().for_each(vec(|solution: &Schedule| &solution.shifts))
 
 ## Generated `unassigned()`
 
-`unassigned()` is not a `ConstraintFactory` method, but it is generated for
-streams of planning entities that have exactly one `Option<_>` planning
-variable.
+`unassigned()` is not a `ConstraintFactory` method. It is available on streams
+whose planning entity has exactly one `Option<_>` planning variable with
+unassigned support.
 
 ```rust
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .unassigned()
     .penalize_hard()
     .named("Unassigned shift")
 ```
 
-The generated trait name is `{Entity}UnassignedFilter`, so `Shift` emits
-`ShiftUnassignedFilter`. Bring that trait into scope where you call
-`.unassigned()`.
+The entity derive provides the unassigned predicate, and the stream API exposes
+`.unassigned()` when that predicate exists. Normal constraint modules only need
+the entity type and the `solverforge::prelude::*` / stream imports already used
+by the surrounding constraint function.
 
 ## Projected Rows
 
-Generated accessors are the preferred source for projected scoring rows because
+Generated source methods are the preferred source for projected scoring rows because
 the projection can keep the same localized source ownership.
 
 ```rust
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .project(ShiftPenaltyProjection)
     .penalize_with(|row: &ShiftPenalty| row.score)
     .named("Shift penalty")
@@ -252,9 +258,9 @@ Joined-pair projection should also start from generated methods on both sides:
 
 ```rust
 Streams::new()
-    .assignments()
+    .for_each(Plan::assignments())
     .join((
-        Streams::new().capacities(),
+        Streams::new().for_each(Plan::capacities()),
         equal_bi(
             |assignment: &Assignment| assignment.capacity_id,
             |capacity: &Capacity| Some(capacity.id),
@@ -270,9 +276,9 @@ Streams::new()
 
 ## Naming Rules
 
-Generated factory methods use the exact Rust field names from the planning
-solution. A field named `shifts` generates `.shifts()`. A field named
-`employee_skills` generates `.employee_skills()`.
+Generated source methods use the exact Rust field names from the planning
+solution. A field named `shifts` generates `Schedule::shifts()`. A field named
+`employee_skills` generates `Schedule::employee_skills()`.
 
 The methods do not create aliases. If you rename a solution collection field,
 update every constraint that calls the generated method.
@@ -283,13 +289,9 @@ names, not these stream method names.
 ## Common Mistakes
 
 - Starting normal constraints with `Streams::new().for_each(vec(|s: &Schedule| &s.shifts))`
-  instead of `Streams::new().shifts()`.
-- Joining facts through a custom extractor or closure when `.employees()`
+  instead of `Streams::new().for_each(Schedule::shifts())`.
+- Joining facts through a custom extractor or closure when `Schedule::employees()`
   is generated.
-- Forgetting to import `{Solution}ConstraintStreams` before calling generated
-  collection methods.
-- Forgetting to import `{Entity}UnassignedFilter` before calling
-  `.unassigned()`.
 - Expecting generated method aliases that do not match the solution field name.
 - Using `for_each(...)` for projected rows that should keep localized source
   ownership.

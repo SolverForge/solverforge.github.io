@@ -7,7 +7,7 @@ description: >
 ---
 
 The stock generated runtime loads `solver.toml` automatically when you call
-`SolverManager::solve(...)`. In `solverforge 0.11.1`, the `solverforge` facade
+`SolverManager::solve(...)`. In the current release, the `solverforge` facade
 also exports the normal configuration API directly, so app code can stay on one
 public dependency when it needs to inspect or build configs directly.
 
@@ -24,12 +24,12 @@ Configuration has three levels:
 | ----- | ----- | ------------- |
 | Global config | environment mode, random seed, thread count, top-level termination | app/operator |
 | Phase config | construction, local search, exhaustive search, VND, phase-specific termination | app/operator |
-| Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups | Rust domain model |
+| Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups, coverage groups | Rust domain model |
 
 The important rule is that config selects declared capabilities. It does not
 invent model hooks. If a selector asks for nearby scalar candidates, grouped
-scalar candidates, or conflict repair providers, the model must expose those
-capabilities through the generated model support layer.
+scalar candidates, coverage groups, or conflict repair providers, the model must
+expose those capabilities through the generated model support layer.
 
 ## Loading Configuration
 
@@ -257,6 +257,28 @@ Grouped scalar construction and grouped scalar local search use `group_name`
 when the model provides a scalar group through the generated model support
 surface. Grouped local search also supports `require_hard_improvement` when a
 compound candidate must improve the hard score before it can be accepted.
+
+Coverage-first construction and coverage repair also use `group_name`, but they
+select a model-owned `CoverageGroup` rather than a `ScalarGroup`:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "coverage_first_fit"
+construction_obligation = "assign_when_candidate_exists"
+group_name = "required_shift_assignment"
+value_candidate_limit = 8
+group_candidate_limit = 64
+
+[[phases]]
+type = "local_search"
+
+[phases.move_selector]
+type = "coverage_repair_move_selector"
+group_name = "required_shift_assignment"
+max_moves_per_step = 64
+require_hard_improvement = true
+```
 
 Grouped construction example:
 

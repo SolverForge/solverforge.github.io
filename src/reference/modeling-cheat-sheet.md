@@ -30,7 +30,7 @@ right SolverForge annotation or structure.
 | list variable   | order or insertion position matters | a vehicle route or task sequence       |
 | model with both | both assignment and ordering matter | route planning with assigned operators |
 
-The current runtime builds one `ModelContext` per planning model, so mixed
+The current runtime builds one `RuntimeModel` per planning model, so mixed
 models are first-class. Generic `FirstFit` and `CheapestInsertion` already
 handle matching list work, while specialized list heuristics stay explicit
 opt-in phases.
@@ -48,6 +48,8 @@ opt-in phases.
   nearby scalar selectors
 - use `construction_entity_order_key` and `construction_value_order_key` only
   for construction-phase ordering
+- use `CoverageGroup` when nullable scalar construction must cover required
+  slots and respect capacity keys
 - keep domain-specific helper methods in ordinary Rust impl blocks
 
 ## Optional assignment

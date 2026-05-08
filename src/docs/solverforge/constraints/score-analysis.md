@@ -48,7 +48,7 @@ full per-match justifications and indictment maps, use the lower-level
 `solverforge-scoring` analysis APIs directly.
 
 Lower-level scoring metadata uses `ConstraintRef` as the constraint identity.
-In the `0.11.x` release line, analysis views borrow that identity from the owning
+Since the `0.11.x` release line, analysis views borrow that identity from the owning
 constraint rather than cloning it into public reporting types. That means
 package-qualified constraints can share a short display name without collapsing
 into one constraint during scoring, analysis, or conflict-repair lookup.

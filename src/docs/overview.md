@@ -69,16 +69,16 @@ problems using different modeling approaches.
           type Streams = ConstraintFactory<Schedule, HardSoftDecimalScore>;
 
           let unassigned = Streams::new()
-              .shifts()
+              .for_each(Schedule::shifts())
               .unassigned()
               .penalize(HardSoftDecimalScore::of_hard_scaled(100_000))
               .named("Unassigned shift");
 
           let missing_skill = Streams::new()
-              .shifts()
+              .for_each(Schedule::shifts())
               .filter(|shift: &Shift| shift.employee_idx.is_some())
               .join((
-                  Streams::new().employees(),
+                  Streams::new().for_each(Schedule::employees()),
                   equal_bi(
                       |shift: &Shift| shift.employee_idx,
                       |employee: &Employee| Some(employee.index),

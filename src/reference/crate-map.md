@@ -13,17 +13,18 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.11.1` crate and current
+This map is aligned with the published `solverforge 0.12.0` crate and current
 workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
 recording-director, and retained runtime surface, including `Projection`,
 `ProjectionSink`, `SolverConfig`, `PhaseConfig`, `MoveSelectorConfig`,
-`RecordingDirector`, cross-join `.project(|left, right| row)` projected
-scoring, collector helpers such as `count`, `sum`, and `load_balance`, plus
-advanced grouped-scalar and conflict-repair extension types. That keeps app code
-on `solverforge` unless it needs to implement lower-level solver internals
-directly.
+`RecordingDirector`, `CoverageGroup`, `CoverageGroupLimits`, cross-join
+`.project(|left, right| row)` projected scoring, collector helpers such as
+`count`, `sum`, `load_balance`, and `consecutive_runs`, plus advanced
+grouped-scalar, coverage-repair, and conflict-repair extension types. That
+keeps app code on `solverforge` unless it needs to implement lower-level solver
+internals directly.
 
 ## Workspace crates
 

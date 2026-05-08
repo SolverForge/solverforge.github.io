@@ -42,18 +42,23 @@ The stock generated solve path loads `solver.toml` automatically from the
 current working directory. `solverforge-config` also exposes parsing APIs when
 you want to inspect or construct configs directly.
 
-The `0.11.x` release line uses one `ModelContext` per planning model. Generic
-construction heuristics share that context for mixed/list-bearing work, while
-pure scalar construction uses the descriptor-scalar boundary. Local search uses
+The current release uses one `RuntimeModel` per planning model. Generic
+construction heuristics share that model for mixed/list-bearing work, while
+pure scalar construction uses the descriptor boundary. Local search uses
 explicit streaming defaults when `move_selector` is omitted, and scalar
-candidate limits, grouped scalar selectors, and score-level simulated annealing
-are expressed in `solver.toml`.
+candidate limits, grouped scalar selectors, coverage repair selectors, and
+score-level simulated annealing are expressed in `solver.toml`.
 
-The `0.11.1` facade also exports the configuration surface directly from
+The facade exports the configuration surface directly from
 `solverforge`, including `SolverConfig`, `PhaseConfig`, `MoveSelectorConfig`,
 `AcceptorConfig`, `ForagerConfig`, `SolverConfigOverride`, and related enums.
 Application code no longer needs a separate `solverforge-config` dependency for
 normal configuration construction or parsing.
+
+Coverage-first construction is available for required nullable scalar slots
+through named `CoverageGroup` declarations. Pair it with
+`coverage_repair_move_selector` when local search should prioritize uncovered
+required slots or capacity conflicts from the same group.
 
 `SolverManager` now exposes a retained job lifecycle rather than a fire-and-forget
 channel. In addition to `Progress` and `BestSolution`, you can observe

@@ -25,6 +25,7 @@ value_candidate_limit = 32
 | ---- | --- |
 | `first_fit` | assign the first doable value that improves or preserves the current construction policy |
 | `cheapest_insertion` | evaluate bounded candidates and pick the cheapest insertion |
+| `coverage_first_fit` | cover required nullable scalar slots from a named `CoverageGroup` |
 | list-specific constructors | route and sequence initialization where list work is present |
 
 Generic `FirstFit` and `CheapestInsertion` use the canonical construction
@@ -78,6 +79,70 @@ heuristics therefore track live model state instead of a phase-start snapshot.
 
 These hooks are construction-only. Local-search scalar change, pillar-change,
 and ruin/recreate selectors keep canonical bounded candidate order.
+
+## Coverage-First Construction
+
+Use coverage-first construction when the model has nullable scalar assignments
+where some slots are required, some values share capacity, and construction
+should cover every required slot that has a doable candidate.
+
+The model declares a named `CoverageGroup`:
+
+```rust
+pub(super) fn coverage_groups() -> Vec<CoverageGroup<Schedule>> {
+    vec![
+        CoverageGroup::new(
+            "required_shift_assignment",
+            Schedule::shifts().scalar("employee_idx"),
+        )
+        .with_required_slot(required_shift)
+        .with_capacity_key(employee_day_capacity)
+        .with_entity_order(shift_order)
+        .with_value_order(employee_preference),
+    ]
+}
+
+fn required_shift(_schedule: &Schedule, _shift_idx: usize) -> bool {
+    true
+}
+
+fn employee_day_capacity(
+    schedule: &Schedule,
+    shift_idx: usize,
+    employee_idx: usize,
+) -> Option<usize> {
+    Some(schedule.shifts[shift_idx].date * schedule.employees.len() + employee_idx)
+}
+
+fn shift_order(schedule: &Schedule, shift_idx: usize) -> i64 {
+    schedule.shifts[shift_idx].date as i64
+}
+
+fn employee_preference(
+    _schedule: &Schedule,
+    _shift_idx: usize,
+    employee_idx: usize,
+) -> i64 {
+    employee_idx as i64
+}
+```
+
+The solver policy selects that group by name:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "coverage_first_fit"
+construction_obligation = "assign_when_candidate_exists"
+group_name = "required_shift_assignment"
+value_candidate_limit = 8
+group_candidate_limit = 64
+```
+
+`coverage_first_fit` is different from grouped scalar construction. Coverage
+targets one nullable scalar variable and reasons about required slots and
+capacity keys. Grouped scalar construction is for arbitrary multi-scalar
+candidates that must be applied atomically.
 
 ## Grouped Scalar Construction
 

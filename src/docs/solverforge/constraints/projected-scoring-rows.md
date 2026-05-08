@@ -47,7 +47,7 @@ impl Projection<Shift> for ShiftWindows {
     }
 }
 
-factory.shifts()
+factory.for_each(Schedule::shifts())
     .project(ShiftWindows)
     .filter(|window: &WorkWindow| window.is_overtime())
     .penalize_with(|_: &WorkWindow| HardSoftScore::ONE_SOFT)
@@ -72,9 +72,9 @@ struct AssignmentCapacity {
 type Streams = ConstraintFactory<Plan, HardSoftScore>;
 
 Streams::new()
-    .assignments()
+    .for_each(Plan::assignments())
     .join((
-        Streams::new().capacities(),
+        Streams::new().for_each(Plan::capacities()),
         equal_bi(
             |assignment: &Assignment| assignment.bucket,
             |capacity: &Capacity| capacity.bucket,
@@ -91,14 +91,14 @@ Streams::new()
     .named("Assignment capacity shortage");
 ```
 
-The `0.11.x` release line keeps joined-pair projected rows retained by joined
+Since the `0.11.x` release line, joined-pair projected rows are retained by joined
 coordinates, so localized updates from either side of the join can update the
 cached scoring rows without materializing facts.
 
 ## Clone-Free Rows and Keys
 
 Projected outputs, projected self-join keys, and grouped collector values no
-longer need to implement `Clone` in the `0.11.x` release line. This matters for
+longer need to implement `Clone` since the `0.11.x` release line. This matters for
 heavy scoring rows whose data should stay owned by the retained scoring state
 rather than cloned through hot paths.
 
@@ -108,7 +108,7 @@ Projected streams can be filtered, self-joined, merged, grouped, and weighted
 like normal scoring state.
 
 ```rust
-factory.shifts()
+factory.for_each(Schedule::shifts())
     .project(ShiftWindows)
     .join(equal(|window: &WorkWindow| window.employee_id))
     .filter(|a: &WorkWindow, b: &WorkWindow| {

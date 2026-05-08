@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.11.1` crate and current source
+These pages track the published `solverforge 0.12.0` crate and current source
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime until the next CLI runtime-target refresh, so check
 `solverforge --version` when starting from a scaffold.
@@ -32,14 +32,16 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.11.1` crate declares Rust `1.95`.
+The `0.12.0` crate declares Rust `1.95`.
 
-The generated runtime now builds one `ModelContext` for each planning model.
+The generated runtime now builds one `RuntimeModel` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
 module declaration order. Generic `FirstFit` and `CheapestInsertion` use the
 canonical construction engine whenever matching list work is present, while pure
-scalar matches reuse the descriptor-scalar path. Optional scalar variables keep
-`None` when it is the best legal baseline instead of forcing an eager assignment.
+scalar matches reuse the descriptor boundary. Coverage-first construction can
+cover required nullable scalar slots through a named `CoverageGroup`, and
+optional scalar variables keep `None` when it is the best legal baseline unless
+configuration asks construction to assign whenever a candidate exists.
 
 Startup telemetry is shape-aware in the current release: scalar solves report
 average `candidates`, list solves report element counts, and console output
@@ -47,6 +49,14 @@ labels those solve shapes as `candidates` or `elements`.
 
 The current release tightens several public contracts:
 
+- generated collection sources are solution-associated methods such as
+  `Schedule::shifts()`, and stream roots use
+  `ConstraintFactory::for_each(Schedule::shifts())`
+- coverage-first construction and coverage repair are public runtime policy
+  through `CoverageGroup`, `coverage_first_fit`, and
+  `coverage_repair_move_selector`
+- `consecutive_runs(...)`, `Run`, and `Runs` are available from the prelude for
+  consecutive integer run aggregation
 - solver configuration controls such as `SolverConfig`, `PhaseConfig`,
   `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
   `SolverConfigOverride`, and related enums are available directly from
@@ -113,7 +123,7 @@ pub struct Plan {
 fn define_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
     (
         ConstraintFactory::<Plan, HardSoftScore>::new()
-            .tasks()
+            .for_each(Plan::tasks())
             .unassigned()
             .penalize_hard()
             .named("Unassigned task"),

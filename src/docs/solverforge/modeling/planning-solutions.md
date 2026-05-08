@@ -70,12 +70,13 @@ Supported score types: `SoftScore`, `HardSoftScore`, `HardMediumSoftScore`, `Har
 
 When `constraints = "..."` is present, `#[planning_solution]` also generates:
 
-- A `{Name}ConstraintStreams<Sc>` trait implemented on `ConstraintFactory`, so
-  you can write `factory.shifts()` instead of repeating `for_each(...)`
+- Collection source methods such as `Schedule::shifts()` and
+  `Schedule::employees()`, so constraints can start from
+  `factory.for_each(Schedule::shifts())` without ad hoc slice closures
 - `Solvable` for retained-job solving through `SolverManager::solve()`
 - `Analyzable` for score breakdowns via `analyze()`
 
-Generated constraint stream accessors are the default way to start constraints
+Generated source methods are the default way to start constraints
 over planning entity and problem fact collections. See
 [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/)
 for the full method contract and the lower-level `for_each(...)` escape hatch.

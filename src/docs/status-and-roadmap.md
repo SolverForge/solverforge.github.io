@@ -10,9 +10,9 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.11.1` crate and calls out
+documentation tracks the published `solverforge 0.12.0` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.11.1` package is now available on crates.io; the published
+`solverforge 0.12.0` package is available on crates.io; the published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +21,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.11.1` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.12.0` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.12.0` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -39,19 +39,19 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Completed Runtime Surface
 
-- **Constraint Streams API**: source-aware generated accessors, `for_each`,
+- **Constraint Streams API**: source-aware generated source methods, `for_each`,
   `filter`, unified `join(...)`, `flatten_last`, `project(...)`, `group_by`,
-  `balance`, `if_exists(...)`, `if_not_exists(...)`, terminal scoring methods,
-  and `.named(...)`
+  `balance`, `complement(...)`, `if_exists(...)`, `if_not_exists(...)`,
+  terminal scoring methods, and `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
   HardSoftDecimalScore, BendableScore
 - **Score Analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
   plus lower-level detailed match/explanation APIs in `solverforge-scoring`
 - **SERIO Engine**: retained incremental scoring for real-time optimization
-- **Solver Phases**: construction heuristics, local search, exhaustive search,
-  partitioned search, and VND
-- **Move System**: scalar, list, grouped scalar, conflict repair, cartesian, and
-  composite move families
+- **Solver Phases**: coverage-first construction, scalar/list construction
+  heuristics, local search, exhaustive search, partitioned search, and VND
+- **Move System**: scalar, list, grouped scalar, coverage repair, conflict
+  repair, cartesian, and composite move families
 - **SolverManager API**: retained job lifecycle with progress, best-solution,
   pause/resume, completion, cancellation, failure, snapshots, and
   snapshot-bound analysis
@@ -61,8 +61,21 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.11.1 published baseline**: the core crate version is `0.11.1` and the
+- **0.12.0 published baseline**: the core crate version is `0.12.0` and the
   Rust toolchain floor remains `1.95`.
+- **Generated source methods**: `#[planning_solution]` now exposes collection
+  sources as solution-associated functions such as `Schedule::shifts()`.
+  Constraint streams use those generated methods through
+  `ConstraintFactory::for_each(...)`.
+- **Coverage construction and repair**: `CoverageGroup` declares required
+  nullable scalar slots, capacity keys, and ordering hooks; `coverage_first_fit`
+  and `coverage_repair_move_selector` consume the named group from `solver.toml`.
+- **Consecutive run collector**: `consecutive_runs(...)` groups integer points
+  into `Runs` with per-run point and item counts, which is useful for streak
+  penalties such as consecutive work days.
+- **Public runtime names**: direct runtime assembly APIs now use
+  `RuntimeModel`, `VariableSlot`, `ScalarVariableSlot`, `ListVariableSlot`,
+  `ScalarGroup`, `ConflictRepair`, `RepairCandidate`, and `RepairLimits`.
 - **Facade configuration exports**: app code can import `SolverConfig`,
   `PhaseConfig`, `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
   `SolverConfigOverride`, and related enums directly from `solverforge`.

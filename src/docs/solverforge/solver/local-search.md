@@ -95,6 +95,18 @@ type = "swap_move_selector"
 
 For selector details, start with [Moves](/docs/solverforge/solver/moves/).
 
+Coverage repair selectors are regular local-search selectors. Use them when a
+model-owned `CoverageGroup` should repair uncovered required nullable slots or
+capacity conflicts:
+
+```toml
+[phases.move_selector]
+type = "coverage_repair_move_selector"
+group_name = "required_shift_assignment"
+max_moves_per_step = 64
+require_hard_improvement = true
+```
+
 ## Telemetry
 
 Retained status and events preserve exact generated, evaluated, accepted,

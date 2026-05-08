@@ -33,8 +33,8 @@ Planning Entity
 The derive macros generate implementations of `PlanningSolution`,
 `PlanningEntity`, and `ProblemFact` automatically. In the common stock runtime,
 planning variables name their value source with `value_range_provider = "solution_field"`
-and `#[planning_solution]` generates typed stream accessors such as
-`factory.shifts()`.
+and `#[planning_solution]` generates typed stream source methods such as
+`factory.for_each(Schedule::shifts())`.
 
 Current generated domains also declare the model boundary with
 `solverforge::planning_model!` in `src/domain/mod.rs`:

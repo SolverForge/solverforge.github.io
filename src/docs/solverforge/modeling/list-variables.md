@@ -61,7 +61,7 @@ pub struct VehicleRoutePlan {
 
 The list variable stores visit indices, not `Visit` structs directly. This keeps
 move generation and list manipulation aligned with the stock runtime and its
-shared `ModelContext`-based construction path.
+shared `RuntimeModel`-based construction path.
 
 ## Solution-Side Trait Bounds
 
@@ -91,15 +91,17 @@ domain model needs derived state such as previous/next pointers or per-route
 aggregates. When you do configure them, the canonical `ScoreDirector` invokes
 those solution hooks automatically.
 
-## Generated Helper Surface
+## Generated Runtime Surface
 
-For single-list-owner solutions, the macro still generates flat convenience
-helpers such as `list_len_static()` and `element_count()`.
+Generated public list mutation helpers such as `list_len_static()`,
+`element_count()`, and `assign_element()` are no longer part of the user-facing
+model API in the current release. Keep application code on the public modeling,
+constraint-stream, descriptor, solver, and configuration APIs instead of
+calling hidden runtime operations directly.
 
-For solutions with more than one list owner, prefer the owner-scoped helper
-surface such as `routes_list_len_static()` or `vehicles_element_count()`. Those
-methods are the unambiguous way to address a specific list owner in the current
-runtime surface.
+For constraints over list-owner entities, start from the generated solution
+source method and let the stream API preserve source ownership. The vehicle
+routing example below uses `VehicleRoutePlan::vehicles()` for that reason.
 
 ## List Moves
 
@@ -123,7 +125,7 @@ fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
 
     (
         Streams::new()
-            .vehicles()
+            .for_each(VehicleRoutePlan::vehicles())
             .filter(|v| v.total_demand() > v.capacity)
             .penalize_hard_with(|v: &Vehicle| {
                 HardSoftScore::of_hard((v.total_demand() - v.capacity) as i64)
@@ -131,7 +133,7 @@ fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
             .named("Capacity"),
 
         Streams::new()
-            .vehicles()
+            .for_each(VehicleRoutePlan::vehicles())
             .penalize_with(|v: &Vehicle| HardSoftScore::of_soft(v.total_distance()))
             .named("Distance"),
     )

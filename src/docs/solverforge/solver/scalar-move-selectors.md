@@ -3,7 +3,7 @@ title: "Scalar Move Selectors"
 linkTitle: "Scalar Selectors"
 weight: 32
 description: >
-  Scalar assignment, nearby, pillar, ruin, grouped, and conflict-repair selectors.
+  Scalar assignment, nearby, pillar, ruin, grouped, coverage, and conflict-repair selectors.
 ---
 
 Scalar selectors operate on non-list planning variables. They are the right
@@ -125,6 +125,27 @@ not-doable filtering, and hard-delta handling.
 
 ## Conflict Repair
 
+## Coverage Repair
+
+Use coverage repair when a nullable scalar target has a named `CoverageGroup`
+and local search should repair uncovered required slots or capacity conflicts.
+The selector emits compound scalar moves from that coverage model, and can use
+the same hard-improvement gate as other compound repair paths.
+
+```toml
+[phases.move_selector]
+type = "coverage_repair_move_selector"
+group_name = "required_shift_assignment"
+value_candidate_limit = 8
+max_moves_per_step = 64
+require_hard_improvement = true
+```
+
+Coverage repair pairs naturally with a preceding `coverage_first_fit`
+construction phase that selects the same `group_name`.
+
+## Conflict Repair
+
 Conflict-repair selectors build repair candidates from configured scoring
 matches. Use them when the model can explain how to repair a specific
 constraint match without fake variables or relaxed hard constraints.
@@ -159,7 +180,7 @@ name for package-less constraints.
 | `PillarChangeMove` | `pillar_change_move_selector` |
 | `PillarSwapMove` | `pillar_swap_move_selector` |
 | `RuinMove` / `RuinRecreateMove` | `ruin_recreate_move_selector` |
-| `CompoundScalarMove` | grouped scalar and compound conflict repair |
+| `CompoundScalarMove` | grouped scalar, coverage repair, and compound conflict repair |
 | `ConflictRepairMove` | conflict-repair selectors |
 
 ## See Also

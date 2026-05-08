@@ -65,11 +65,20 @@ filtering(|a: &Shift, b: &Shift| a.location.distance_to(&b.location) < 50.0)
 
 ## Using Joiners with `join`
 
-**Self-join** - pass a single `equal` joiner directly:
+**Self-join** - join the same generated source on the right side:
 
 ```rust
-factory.shifts()
-    .join(equal(|shift: &Shift| shift.employee_idx))
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::shifts()),
+        equal_bi(
+            |left: &Shift| left.employee_idx,
+            |right: &Shift| right.employee_idx,
+        ),
+    ))
 ```
 
 **Cross-join** - pass a tuple of (stream, joiner):
@@ -78,9 +87,9 @@ factory.shifts()
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().unavailability(),
+        Streams::new().for_each(Schedule::unavailability()),
         equal_bi(|shift: &Shift| shift.date, |u: &Unavailability| u.date),
     ))
 ```
@@ -92,5 +101,5 @@ Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`
 ## See Also
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) - The core stream API
-- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection accessors
+- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection sources
 - [docs.rs/solverforge](https://docs.rs/solverforge) - Full joiner API reference

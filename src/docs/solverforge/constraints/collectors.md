@@ -16,7 +16,7 @@ counts, totals, or custom imbalance data.
 Pass a collector as the second argument to `group_by`:
 
 ```rust
-factory.shifts()
+factory.for_each(Schedule::shifts())
     .group_by(
         |shift: &Shift| shift.employee_idx,   // grouping key
         count(),                              // collector
@@ -55,12 +55,59 @@ Measures load imbalance across a grouping key. Returns a `LoadBalance<K>` with u
 )
 ```
 
+### `consecutive_runs(index_fn)`
+
+Groups integer points into consecutive runs. Duplicate points increase
+`item_count()` for the run but still count as one unique point for
+`point_count()`.
+
+```rust
+factory.for_each(Schedule::shifts())
+    .filter(|shift: &Shift| shift.employee_idx.is_some())
+    .group_by(
+        |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
+        consecutive_runs(|shift: &Shift| shift.date as i64),
+    )
+    .penalize_with(|_employee_idx: &usize, runs: &Runs| {
+        let excess_days = runs
+            .runs()
+            .iter()
+            .map(|run| run.point_count().saturating_sub(5) as i64)
+            .sum();
+        HardSoftScore::of_soft(excess_days)
+    })
+    .named("Long work streaks")
+```
+
+`Run` exposes `start()`, `end()`, `point_count()`, and `item_count()`. `Runs`
+exposes `runs()`, `point_count()`, `item_count()`, `len()`, and `is_empty()`.
+
+## Complemented Groups
+
+Use `complement(...)` after `group_by(...)` when a grouped rule needs rows for
+keys that have no source matches. For example, workload fairness often needs a
+zero-count row for employees with no assigned shifts:
+
+```rust
+factory.for_each(Schedule::shifts())
+    .filter(|shift: &Shift| shift.employee_idx.is_some())
+    .group_by(
+        |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
+        count::<Shift>(),
+    )
+    .complement(Schedule::employees(), |employee: &Employee| employee.index, |_employee| 0usize)
+    .penalize_with(|_employee_idx: &usize, count: &usize| {
+        HardSoftScore::of_soft((*count as i64 - 4).abs())
+    })
+    .named("Balanced workload")
+```
+
 ## Balance Stream Operation
 
 For simple load balancing without `group_by`, use the `balance` stream operation directly:
 
 ```rust
-factory.shifts()
+factory.for_each(Schedule::shifts())
     .balance(|shift: &Shift| shift.employee_idx)
     .penalize_soft()
     .named("Fair distribution")
@@ -71,5 +118,5 @@ The key function returns `Option<K>` — `None` values (unassigned entities) are
 ## See Also
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) - The `group_by` operation
-- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection accessors
+- [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection sources
 - [docs.rs/solverforge](https://docs.rs/solverforge) - Full collector API reference

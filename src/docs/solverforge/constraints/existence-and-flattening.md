@@ -19,9 +19,9 @@ exists, or only if no matching row exists, in another collection.
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .if_exists((
-        Streams::new().unavailability(),
+        Streams::new().for_each(Schedule::unavailability()),
         equal_bi(
             |shift: &Shift| shift.employee_idx,
             |u: &Unavailability| u.employee_idx,
@@ -53,9 +53,9 @@ the constraint needs to score individual child elements.
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
 Streams::new()
-    .shifts()
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().employees(),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
             |shift: &Shift| shift.employee_idx,
             |employee: &Employee| Some(employee.id),

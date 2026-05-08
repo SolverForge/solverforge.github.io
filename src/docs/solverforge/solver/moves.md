@@ -18,6 +18,7 @@ extending SolverForge internals or writing a custom runtime path.
 | one scalar variable per entity | `change_move_selector`, then `swap_move_selector` |
 | scalar assignment with nearby domain knowledge | `nearby_change_move_selector` or `nearby_swap_move_selector` |
 | nullable scalar variables that must change as one | `grouped_scalar_move_selector` and grouped scalar construction with the same group |
+| required nullable scalar coverage | `coverage_first_fit`, then `coverage_repair_move_selector` with the same group |
 | scalar models stuck behind hard conflicts | `conflict_repair_move_selector` or `compound_conflict_repair_move_selector` |
 | vehicle routes, machine sequences, or ordered lists | `nearby_list_change_move_selector`, `nearby_list_swap_move_selector`, `list_reverse_move_selector` |
 | routing with 2-opt / 3-opt style improvements | `list_reverse_move_selector`, then `k_opt_move_selector` |
@@ -32,7 +33,7 @@ they match canonical model descriptor names, not local Rust aliases.
 
 <div class="card-grid">
   <%= render Ui::Card.new(title: "Scalar Selectors", href: relative_url('/docs/solverforge/solver/scalar-move-selectors/'), icon: "fa-solid fa-list-check") do %>
-Assignment, swap, nearby, pillar, ruin/recreate, grouped scalar, and conflict repair selectors.
+Assignment, swap, nearby, pillar, ruin/recreate, grouped scalar, coverage repair, and conflict repair selectors.
   <% end %>
   <%= render Ui::Card.new(title: "List Selectors", href: relative_url('/docs/solverforge/solver/list-move-selectors/'), icon: "fa-solid fa-route") do %>
 Route and sequence selectors: list change, list swap, sublist, reverse, K-opt, and list ruin.
@@ -99,6 +100,28 @@ type = "local_search"
 type = "grouped_scalar_move_selector"
 group_name = "task_operator_assignment"
 max_moves_per_step = 256
+require_hard_improvement = true
+```
+
+### Conflict-Directed Hard Repair
+
+### Required Coverage Repair
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "coverage_first_fit"
+construction_obligation = "assign_when_candidate_exists"
+group_name = "required_shift_assignment"
+group_candidate_limit = 64
+
+[[phases]]
+type = "local_search"
+
+[phases.move_selector]
+type = "coverage_repair_move_selector"
+group_name = "required_shift_assignment"
+max_moves_per_step = 64
 require_hard_improvement = true
 ```
 

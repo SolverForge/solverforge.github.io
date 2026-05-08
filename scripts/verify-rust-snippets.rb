@@ -168,11 +168,12 @@ end
 
 class ProfileResolver
   HISTORICAL_PROFILES = {
-    "src/_posts/releases/2026-01-15-solverforge-0-5-0.md" => "solverforge@0.5.0",
-    "src/_posts/releases/2026-01-24-solverforge-maps-1-0-0.md" => "solverforge-maps@1.0.0",
-    "src/_posts/releases/2026-04-11-solverforge-0-8-2-cumulative.md" => "solverforge@0.8.2",
-    "src/_posts/releases/2026-04-24-solverforge-0-9-0.md" => "solverforge@0.9.0",
-    "src/_posts/releases/2026-05-02-solverforge-0-10-0.md" => "solverforge@0.10.0"
+    "src/_posts/releases/2026-01-15-solverforge-0-5-x.md" => "solverforge@0.5.0",
+    "src/_posts/releases/2026-01-24-solverforge-maps-1-0-x.md" => "solverforge-maps@1.0.0",
+    "src/_posts/releases/2026-04-11-solverforge-0-8-x.md" => "solverforge@0.8.2",
+    "src/_posts/releases/2026-04-24-solverforge-0-9-x.md" => "solverforge@0.9.0",
+    "src/_posts/releases/2026-05-02-solverforge-0-10-x.md" => "solverforge@0.10.0",
+    "src/_posts/releases/2026-05-05-solverforge-0-11-x.md" => "solverforge@0.11.1"
   }.freeze
 
   KNOWN_PROFILES = %w[
@@ -183,6 +184,7 @@ class ProfileResolver
     solverforge@0.8.2
     solverforge@0.9.0
     solverforge@0.10.0
+    solverforge@0.11.1
     solverforge-maps@1.0.0
     solverforge-maps@2.1.4
   ].freeze
@@ -232,7 +234,7 @@ class ProfileResolver
     path = snippet.relpath
     return HISTORICAL_PROFILES.fetch(path) if HISTORICAL_PROFILES.key?(path)
     return "solverforge-maps-current" if path.start_with?("src/docs/solverforge-maps/")
-    return "solverforge-maps-current" if path.end_with?("2026-05-03-solverforge-maps-2-1-4.md")
+    return "solverforge-maps-current" if path.end_with?("2026-05-03-solverforge-maps-2-1-x.md")
     return "solverforge-ui-current" if path.start_with?("src/docs/solverforge-ui/")
 
     "solverforge-current"
@@ -246,6 +248,7 @@ class ProfileResolver
     return "solver-manager" if path.include?("/solver-manager.md") || code.include?("SolverManager")
     return "configuration" if path.include?("/solver/configuration.md") || code.include?("SolverConfig")
     return "projection" if path.include?("projected-scoring-rows") || code.include?("ProjectionSink") || code.include?("AssignmentCapacity")
+    return "projection" if code.include?("Plan::assignments()") || code.include?("Plan::capacities()")
     return "projection" if code.include?(".assignments()") || code.include?(".capacities()")
     return "score-types" if path.include?("/score-types.md") || code.match?(/\b(?:SoftScore|HardSoftScore|BendableScore)\b/)
     return "modeling" if path.include?("/modeling/") || path.include?("solverforge-cli/")
@@ -310,8 +313,7 @@ class PolicyGate
     "src/docs/getting-started/",
     "src/docs/solverforge-cli/",
     "src/reference/",
-    "src/_posts/releases/2026-05-05-solverforge-0-11-1.md",
-    "src/_posts/releases/2026-05-05-solverforge-0-11-0.md"
+    "src/_posts/releases/2026-05-08-solverforge-0-12-x.md"
   ].freeze
 
   def check!(snippets)
@@ -321,7 +323,8 @@ class PolicyGate
 
       code = snippet.raw_code
       stale!(snippet, "factory.clone() is forbidden in current SolverForge documentation") if code.include?("factory.clone()")
-      stale!(snippet, "raw factory.for_each(|...) closures are forbidden; use generated accessors or stream::vec") if code.match?(/factory\.for_each\s*\(\s*\|/)
+      stale!(snippet, "raw factory.for_each(|...) closures are forbidden; use generated sources or stream::vec") if code.match?(/factory\.for_each\s*\(\s*\|/)
+      stale!(snippet, "factory collection extension methods are stale; use for_each(Solution::collection())") if code.match?(/\b(?:factory|Streams::new\(\))\s*\.(?:shifts|employees|assignments|capacities|vehicles|unavailability)\(\)/)
       stale!(snippet, "value_range = is stale; use value_range_provider") if code.match?(/\bvalue_range\s*=/)
     end
   end
@@ -540,7 +543,7 @@ class SnippetRenderer
     end
 
     if code.lstrip.start_with?(".")
-      return prelude + "\n" + wrap_function("let _constraint = ConstraintFactory::<Schedule, HardSoftScore>::new().shifts()\n#{code}", snippet)
+      return prelude + "\n" + wrap_function("let _constraint = ConstraintFactory::<Schedule, HardSoftScore>::new().for_each(Schedule::shifts())\n#{code}", snippet)
     end
 
     if code.lstrip.start_with?("equal(", "equal_bi(", "less_than(", "greater_than(", "overlapping(", "filtering(")
@@ -677,7 +680,7 @@ class SnippetRenderer
 
   def core_setup(snippet)
     streams_alias = if snippet.raw_code.include?("Streams::") && !snippet.raw_code.include?("type Streams")
-                      if snippet.raw_code.include?(".assignments()") || snippet.raw_code.include?(".capacities()")
+                      if snippet.raw_code.include?("Plan::assignments()") || snippet.raw_code.include?("Plan::capacities()") || snippet.raw_code.include?(".assignments()") || snippet.raw_code.include?(".capacities()")
                         "type Streams = ConstraintFactory<Plan, HardSoftScore>;\n"
                       else
                         "type Streams = ConstraintFactory<Schedule, HardSoftScore>;\n"
@@ -861,12 +864,18 @@ class SnippetRenderer
       }
 
       impl solverforge::__internal::PlanningModelSupport for Schedule {
-          fn attach_descriptor_scalar_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
+          fn attach_descriptor_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
 
           fn attach_runtime_scalar_hooks(
-              context: solverforge::__internal::ScalarVariableContext<Self>,
-          ) -> solverforge::__internal::ScalarVariableContext<Self> {
-              context
+              slot: solverforge::__internal::ScalarVariableSlot<Self>,
+          ) -> solverforge::__internal::ScalarVariableSlot<Self> {
+              slot
+          }
+
+          fn attach_coverage_groups(
+              _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
+          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+              Vec::new()
           }
 
           fn validate_model(_descriptor: &solverforge::__internal::SolutionDescriptor) {}
@@ -887,7 +896,7 @@ class SnippetRenderer
       pub fn define_schedule_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
           (
               ConstraintFactory::<Schedule, HardSoftScore>::new()
-                  .shifts()
+                  .for_each(Schedule::shifts())
                   .unassigned()
                   .penalize_hard()
                   .named("Unassigned shift"),
@@ -991,12 +1000,18 @@ class SnippetRenderer
       }
 
       impl solverforge::__internal::PlanningModelSupport for Plan {
-          fn attach_descriptor_scalar_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
+          fn attach_descriptor_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
 
           fn attach_runtime_scalar_hooks(
-              context: solverforge::__internal::ScalarVariableContext<Self>,
-          ) -> solverforge::__internal::ScalarVariableContext<Self> {
-              context
+              slot: solverforge::__internal::ScalarVariableSlot<Self>,
+          ) -> solverforge::__internal::ScalarVariableSlot<Self> {
+              slot
+          }
+
+          fn attach_coverage_groups(
+              _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
+          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+              Vec::new()
           }
 
           fn validate_model(_descriptor: &solverforge::__internal::SolutionDescriptor) {}
@@ -1017,7 +1032,7 @@ class SnippetRenderer
       pub fn define_plan_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
           (
               ConstraintFactory::<Plan, HardSoftScore>::new()
-                  .assignments()
+                  .for_each(Plan::assignments())
                   .penalize_hard()
                   .named("Assignment placeholder"),
           )
@@ -1062,12 +1077,18 @@ class SnippetRenderer
       }
 
       impl solverforge::__internal::PlanningModelSupport for VehicleRoutePlan {
-          fn attach_descriptor_scalar_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
+          fn attach_descriptor_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
 
           fn attach_runtime_scalar_hooks(
-              context: solverforge::__internal::ScalarVariableContext<Self>,
-          ) -> solverforge::__internal::ScalarVariableContext<Self> {
-              context
+              slot: solverforge::__internal::ScalarVariableSlot<Self>,
+          ) -> solverforge::__internal::ScalarVariableSlot<Self> {
+              slot
+          }
+
+          fn attach_coverage_groups(
+              _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
+          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+              Vec::new()
           }
 
           fn validate_model(_descriptor: &solverforge::__internal::SolutionDescriptor) {}
@@ -1088,7 +1109,7 @@ class SnippetRenderer
       pub fn define_vehicle_route_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
           (
               ConstraintFactory::<VehicleRoutePlan, HardSoftScore>::new()
-                  .vehicles()
+                  .for_each(VehicleRoutePlan::vehicles())
                   .penalize_hard()
                   .named("Vehicle placeholder"),
           )
@@ -1102,7 +1123,7 @@ class SnippetRenderer
       fn define_constraints() -> impl ConstraintSet<#{type_name}, HardSoftScore> {
           (
               ConstraintFactory::<#{type_name}, HardSoftScore>::new()
-                  .shifts()
+                  .for_each(#{type_name}::shifts())
                   .penalize(HardSoftScore::ONE_HARD)
                   .named("snippet placeholder"),
           )
@@ -1115,12 +1136,18 @@ class SnippetRenderer
   def planning_model_support_impl(type_name)
     <<~RS
       impl solverforge::__internal::PlanningModelSupport for #{type_name} {
-          fn attach_descriptor_scalar_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
+          fn attach_descriptor_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
 
           fn attach_runtime_scalar_hooks(
-              context: solverforge::__internal::ScalarVariableContext<Self>,
-          ) -> solverforge::__internal::ScalarVariableContext<Self> {
-              context
+              slot: solverforge::__internal::ScalarVariableSlot<Self>,
+          ) -> solverforge::__internal::ScalarVariableSlot<Self> {
+              slot
+          }
+
+          fn attach_coverage_groups(
+              _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
+          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+              Vec::new()
           }
 
           fn validate_model(_descriptor: &solverforge::__internal::SolutionDescriptor) {}
