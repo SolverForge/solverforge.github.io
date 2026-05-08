@@ -1,14 +1,14 @@
 ---
-title: "solverforge-maps 1.0: Routing Infrastructure for VRP Solvers"
+title: "solverforge-maps 1.0.x: Routing Infrastructure for VRP Solvers"
 date: 2026-01-24
 draft: false
 tags: [rust, release]
 description: >
-  solverforge-maps 1.0 provides zero-erasure road network and routing infrastructure for VRP solvers, with OSM data, R-tree indexing, and 3-tier caching.
+  solverforge-maps 1.0.x provides zero-erasure road network and routing infrastructure for VRP solvers, with OSM data, R-tree indexing, and 3-tier caching.
 ---
 
 <%= render Ui::Callout.new(title: "Sidecar Release") do %>
-solverforge-maps is a standalone utility library that provides routing infrastructure for vehicle routing problems. It complements the main [SolverForge](/blog/releases/2026/01/15/solverforge-0-5-0/) constraint solver but can be used independently with any VRP implementation.
+solverforge-maps is a standalone utility library that provides routing infrastructure for vehicle routing problems. It complements the main [SolverForge](/blog/releases/2026/01/15/solverforge-0-5-x/) constraint solver but can be used independently with any VRP implementation.
 <% end %>
 
 We're releasing **solverforge-maps 1.0**, our Rust library for road network routing in vehicle routing problems. This library handles the map-related infrastructure that VRP solvers need: fetching road networks, computing travel time matrices, and generating route geometries.
@@ -35,7 +35,7 @@ That's it. Load a road network for your delivery locations, compute the travel t
 
 ## Key Features
 
-**Zero-Erasure Architecture**: Following the [SolverForge design philosophy](/blog/releases/2026/01/15/solverforge-0-5-0/#zero-erasure-architecture), solverforge-maps uses no `Arc`, no `Box<dyn>`, and no trait objects in hot paths. The `NetworkRef` type provides zero-cost access to cached networks via `Deref`.
+**Zero-Erasure Architecture**: Following the [SolverForge design philosophy](/blog/releases/2026/01/15/solverforge-0-5-x/#zero-erasure-architecture), solverforge-maps uses no `Arc`, no `Box<dyn>`, and no trait objects in hot paths. The `NetworkRef` type provides zero-cost access to cached networks via `Deref`.
 
 **R-Tree Spatial Indexing**: Coordinate snapping to the road network runs in O(log n) via R-tree, making it practical to route thousands of delivery points.
 

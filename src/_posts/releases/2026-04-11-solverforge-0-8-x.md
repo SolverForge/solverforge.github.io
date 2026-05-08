@@ -1,5 +1,5 @@
 ---
-title: 'SolverForge 0.8.2: CLI and Runtime Convergence'
+title: 'SolverForge 0.8.x: CLI and Runtime Convergence'
 date: 2026-04-11
 draft: false
 description: >
@@ -17,7 +17,7 @@ it does not expose `--standard`, `--scalar`, `--list`, or problem-family starter
 flags, and current planning-variable kinds are `scalar` and `list`.
 <% end %>
 
-**SolverForge 0.8.2** is a cumulative update spanning the 0.7.x and 0.8.x lines.
+**SolverForge 0.8.x** is a cumulative update spanning the 0.7.x and 0.8.x lines.
 If you last checked in at 0.6.0, the main change is that `solverforge-cli` and
 `solverforge` now form one coherent developer experience.
 

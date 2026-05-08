@@ -1,17 +1,20 @@
 ---
-title: "SolverForge 0.10.0: Coupled Scalar Search and Zero-Erasure Scoring"
+title: "SolverForge 0.10.x: Coupled Scalar Search and Zero-Erasure Scoring"
 date: 2026-05-02
 draft: false
 description: >
-  SolverForge 0.10.0 publishes the grouped-scalar runtime line: atomic coupled
+  SolverForge 0.10.x publishes the grouped-scalar runtime line: atomic coupled
   scalar construction, conflict-directed repair, level-aware simulated
   annealing, and coordinate-stable projected scoring rows.
 ---
 
-**SolverForge 0.10.0** is now available on
-[crates.io](https://crates.io/crates/solverforge/0.10.0) with API docs on
-[docs.rs](https://docs.rs/solverforge/0.10.0), and is tagged in the
+**SolverForge 0.10.x** is the grouped-scalar runtime line. It starts with
+`0.10.0`, available on [crates.io](https://crates.io/crates/solverforge/0.10.0)
+with API docs on [docs.rs](https://docs.rs/solverforge/0.10.0), and tagged in the
 [core repository](https://github.com/SolverForge/solverforge/tree/v0.10.0).
+
+Patch releases are folded into this line note instead of published as separate
+release-note pages.
 
 This release moves SolverForge past single-slot scalar repair. The 0.9 line
 made scalar/list model metadata explicit through `planning_model!`; 0.10.0 uses

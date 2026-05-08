@@ -1,16 +1,21 @@
 ---
-title: 'SolverForge 0.9.0: Manifest-Owned Models and Scalar Runtime Contracts'
+title: 'SolverForge 0.9.x: Manifest-Owned Models and Runtime Tightening'
 date: 2026-04-24
 draft: false
 description: >
-  SolverForge 0.9.0 makes the current scalar/list architecture explicit:
+  SolverForge 0.9.x makes the scalar/list architecture explicit:
   planning_model! is the canonical model manifest, scalar metadata is
-  descriptor-addressed, and generated projects now target the 0.9 runtime.
+  descriptor-addressed, and the patch line tightens scoring and local search.
 ---
 
-**SolverForge 0.9.0** is now available on
-[crates.io](https://crates.io/crates/solverforge/0.9.0) with API docs on
-[docs.rs](https://docs.rs/solverforge/0.9.0).
+**SolverForge 0.9.x** is the runtime line where the model contract becomes
+manifest-owned and scalar/list terminology becomes explicit. The line starts at
+[0.9.0](https://crates.io/crates/solverforge/0.9.0) and includes the
+[0.9.1](https://crates.io/crates/solverforge/0.9.1) runtime patch for indexed
+existence scoring and local-search startup visibility.
+
+Patch releases are folded into this line note instead of published as separate
+release-note pages.
 
 This is the release that makes the current SolverForge model contract explicit.
 The 0.8 line established retained jobs, snapshots, checkpoints, and lifecycle
@@ -28,7 +33,7 @@ optional slots, retained lifecycle controls, and browser-visible progress all
 in the same generated service. That only works if the runtime has one
 deterministic view of the model.
 
-0.9.0 moves that responsibility to the model boundary itself:
+0.9.x moves that responsibility to the model boundary itself:
 
 ```rust
 // src/domain/mod.rs
@@ -78,7 +83,7 @@ types from `src/domain/mod.rs`, and let the manifest own the model contract.
 
 ### `scalar` is the public name for non-list variables
 
-0.9.0 finishes the terminology cleanup around planning-variable shape.
+0.9.x finishes the terminology cleanup around planning-variable shape.
 
 - Use `scalar` for single-value assignment variables.
 - Use `list` for ordered planning collections.
@@ -157,6 +162,33 @@ The theme is the same as the manifest work: the runtime should reason from one
 canonical model and one canonical move identity, not from incidental construction
 details.
 
+### Exact `usize` existence keys use indexed storage
+
+Since 0.9.1, `if_exists(...)` and `if_not_exists(...)` keep the same public
+constraint-stream shape while exact `usize` join keys use dense indexed
+bookkeeping for direct and flattened existence constraints.
+
+Other key shapes, including `Option<usize>`, newtype IDs, strings, and composite
+keys, keep hashed storage. This makes common route-ID and assignment-ID checks
+cheaper without changing application constraint code.
+
+### Local-search phase starts show the score
+
+The console now shows the current score when local search starts:
+
+```text
+0.002s ▶ Local Search started │ 0hard/-50soft
+```
+
+That score is calculated before local search begins, so the first local-search
+line shows exactly what construction handed to the search phase.
+
+### List ruin skips empty owners
+
+The list-ruin selector samples only entities whose list is non-empty. Empty
+owners can still receive elements during ordinary list-change, sublist-change,
+or rebuild-style search; this only removes wasted ruin candidates.
+
 ## Breaking changes
 
 There are two public breaking areas.
@@ -193,9 +225,22 @@ For existing applications:
 4. Update custom direct scalar-runtime code to the variable-index-aware APIs.
 5. Re-run the generated app tests and any retained lifecycle checks.
 
+The latest 0.9.x patch is `solverforge 0.9.1`:
+
+```toml
+solverforge = { version = "0.9.1", features = ["serde", "console"] }
+```
+
 The crate metadata for `solverforge 0.9.0` requires Rust 1.92. Projects using
 the `console`, `serde`, `decimal`, or `verbose-logging` feature flags should keep
 those feature selections explicit in `Cargo.toml`.
+
+## Patch History
+
+| Version | Date | Notes |
+| ------- | ---- | ----- |
+| `0.9.1` | 2026-04-26 | Adds indexed exact-`usize` existence storage, local-search startup score output, and empty-owner filtering for list ruin. |
+| `0.9.0` | 2026-04-24 | Introduces `planning_model!`, scalar/list public terminology, descriptor-addressed scalar metadata, and capability-driven construction routing. |
 
 ## The current path
 
@@ -218,6 +263,6 @@ for the product shape, and the
 [hospital scheduling use case](/docs/getting-started/solverforge-hospital-use-case/)
 for a complete retained-job application built on the current stack.
 
-SolverForge 0.9.0 is the release where that stack becomes stricter in the right
+SolverForge 0.9.x is the line where that stack becomes stricter in the right
 place: the model owns its metadata, the runtime reads one canonical scalar/list
 contract, and generated applications start from the same surface users extend.

@@ -1,21 +1,21 @@
 ---
-title: 'solverforge-cli 1.1.2: Stabilized Scaffolding for the Converged Runtime'
+title: 'solverforge-cli 1.1.x: Stabilized Scaffolding for the Converged Runtime'
 date: 2026-04-12
 draft: false
 description: >
-  solverforge-cli 1.1.2 polishes the CLI/runtime integration introduced in
+  solverforge-cli 1.1.x polishes the CLI/runtime integration introduced in
   SolverForge 0.8.x, with aligned scaffold targets and improved test reliability
   for the retained lifecycle workflow.
 ---
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
-This post records the `solverforge-cli` 1.1.2 release. For current behavior,
+This post records the `solverforge-cli` 1.1.x release line. For current behavior,
 use the [solverforge-cli manual](/docs/solverforge-cli/) and run
 `solverforge --version` for the scaffold targets baked into your installed
 binary.
 <% end %>
 
-**solverforge-cli 1.1.2** is now available. This is a stabilization release
+**solverforge-cli 1.1.x** is the stabilization line
 following the CLI/runtime convergence work in SolverForge 0.8.x.
 
 ## Why this release matters

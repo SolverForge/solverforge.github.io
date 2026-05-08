@@ -1,16 +1,20 @@
 ---
-title: "solverforge-maps 2.1.4: Matrix Route Distances"
+title: "solverforge-maps 2.1.x: Matrix Route Distances"
 date: 2026-05-03
 draft: false
 description: >
-  solverforge-maps 2.1.4 stores same-path route distances next to travel-time
+  solverforge-maps 2.1.x stores same-path route distances next to travel-time
   matrix data for routing and delivery applications.
 ---
 
-**solverforge-maps 2.1.4** is available on
+**solverforge-maps 2.1.x** is the current maps line for routing and delivery
+applications. The latest patch, **2.1.4**, is available on
 [crates.io](https://crates.io/crates/solverforge-maps/2.1.4), documented on
 [docs.rs](https://docs.rs/solverforge-maps/2.1.4), and tagged in the
 [source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.1.4).
+
+Patch releases are folded into this line note instead of published as separate
+release-note pages.
 
 ## What Changed
 
@@ -51,3 +55,9 @@ let all_distances_from_depot = matrix.row_distances(0);
 Use the new distance accessors for reporting, diagnostics, mileage displays, and
 secondary route-cost views that need to stay aligned with the fastest-time
 matrix used by the solver.
+
+## Patch History
+
+| Version | Date | Notes |
+| ------- | ---- | ----- |
+| `2.1.4` | 2026-05-03 | Stores route distances beside travel-time matrix data and exposes aligned distance rows and slices. |

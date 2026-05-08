@@ -1,10 +1,10 @@
 ---
-title: "SolverForge 0.5.0: Zero-Erasure Constraint Solving"
+title: "SolverForge 0.5.x: Zero-Erasure Constraint Solving"
 date: 2026-01-15
 draft: false
 tags: [rust, release]
 description: >
-  Introducing SolverForge 0.5.0 - a general-purpose constraint solver written in native Rust with zero-erasure architecture and the SERIO incremental scoring engine.
+  Introducing the SolverForge 0.5.x line: a general-purpose constraint solver written in native Rust with zero-erasure architecture and the SERIO incremental scoring engine.
 ---
 
 <%= render Ui::Callout.new(title: "Major Release", variant: "success") do %>
