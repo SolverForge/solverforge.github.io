@@ -872,9 +872,9 @@ class SnippetRenderer
               slot
           }
 
-          fn attach_coverage_groups(
+          fn attach_scalar_groups(
               _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
-          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+          ) -> Vec<solverforge::__internal::ScalarGroupBinding<Self>> {
               Vec::new()
           }
 
@@ -1008,9 +1008,9 @@ class SnippetRenderer
               slot
           }
 
-          fn attach_coverage_groups(
+          fn attach_scalar_groups(
               _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
-          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+          ) -> Vec<solverforge::__internal::ScalarGroupBinding<Self>> {
               Vec::new()
           }
 
@@ -1085,9 +1085,9 @@ class SnippetRenderer
               slot
           }
 
-          fn attach_coverage_groups(
+          fn attach_scalar_groups(
               _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
-          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+          ) -> Vec<solverforge::__internal::ScalarGroupBinding<Self>> {
               Vec::new()
           }
 
@@ -1144,9 +1144,9 @@ class SnippetRenderer
               slot
           }
 
-          fn attach_coverage_groups(
+          fn attach_scalar_groups(
               _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
-          ) -> Vec<solverforge::__internal::CoverageGroupBinding<Self>> {
+          ) -> Vec<solverforge::__internal::ScalarGroupBinding<Self>> {
               Vec::new()
           }
 

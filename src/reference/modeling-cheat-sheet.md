@@ -48,8 +48,8 @@ opt-in phases.
   nearby scalar selectors
 - use `construction_entity_order_key` and `construction_value_order_key` only
   for construction-phase ordering
-- use `CoverageGroup` when nullable scalar construction must cover required
-  slots and respect capacity keys
+- use `ScalarGroup::assignment(...)` when nullable scalar construction must
+  cover required slots and respect capacity keys
 - keep domain-specific helper methods in ordinary Rust impl blocks
 
 ## Optional assignment

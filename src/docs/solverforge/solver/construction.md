@@ -25,7 +25,7 @@ value_candidate_limit = 32
 | ---- | --- |
 | `first_fit` | assign the first doable value that improves or preserves the current construction policy |
 | `cheapest_insertion` | evaluate bounded candidates and pick the cheapest insertion |
-| `coverage_first_fit` | cover required nullable scalar slots from a named `CoverageGroup` |
+| grouped scalar with `group_name` | cover required nullable scalar slots or apply atomic multi-scalar candidates from a named `ScalarGroup` |
 | list-specific constructors | route and sequence initialization where list work is present |
 
 Generic `FirstFit` and `CheapestInsertion` use the canonical construction
@@ -80,22 +80,38 @@ heuristics therefore track live model state instead of a phase-start snapshot.
 These hooks are construction-only. Local-search scalar change, pillar-change,
 and ruin/recreate selectors keep canonical bounded candidate order.
 
-## Coverage-First Construction
+## Assignment-Backed ScalarGroup Construction
 
-Use coverage-first construction when the model has nullable scalar assignments
-where some slots are required, some values share capacity, and construction
-should cover every required slot that has a doable candidate.
+Use assignment-backed grouped scalar construction when the model has nullable
+scalar assignments where some slots are required, some values share capacity,
+and construction should cover every required slot that has a doable candidate.
 
-The model declares a named `CoverageGroup`:
+The solution points the macro at its scalar-group provider, and the model
+declares a named assignment-backed `ScalarGroup`:
 
 ```rust
-pub(super) fn coverage_groups() -> Vec<CoverageGroup<Schedule>> {
+#[planning_solution(
+    constraints = "define_constraints",
+    scalar_groups = "scalar_groups"
+)]
+pub struct Schedule {
+    #[problem_fact_collection]
+    pub employees: Vec<Employee>,
+
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
+
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+
+pub(super) fn scalar_groups() -> Vec<ScalarGroup<Schedule>> {
     vec![
-        CoverageGroup::new(
+        ScalarGroup::assignment(
             "required_shift_assignment",
             Schedule::shifts().scalar("employee_idx"),
         )
-        .with_required_slot(required_shift)
+        .with_required_entity(required_shift)
         .with_capacity_key(employee_day_capacity)
         .with_entity_order(shift_order)
         .with_value_order(employee_preference),
@@ -111,43 +127,53 @@ fn employee_day_capacity(
     shift_idx: usize,
     employee_idx: usize,
 ) -> Option<usize> {
-    Some(schedule.shifts[shift_idx].date * schedule.employees.len() + employee_idx)
+    let shift = &schedule.shifts[shift_idx];
+    shift
+        .date
+        .checked_mul(schedule.employees.len())
+        .and_then(|base| base.checked_add(employee_idx))
 }
 
 fn shift_order(schedule: &Schedule, shift_idx: usize) -> i64 {
-    schedule.shifts[shift_idx].date as i64
+    i64::try_from(schedule.shifts[shift_idx].date).unwrap_or(i64::MAX)
 }
 
 fn employee_preference(
-    _schedule: &Schedule,
-    _shift_idx: usize,
+    schedule: &Schedule,
+    shift_idx: usize,
     employee_idx: usize,
 ) -> i64 {
-    employee_idx as i64
+    let preferred = schedule.shifts[shift_idx].date % schedule.employees.len();
+    let distance = (employee_idx + schedule.employees.len() - preferred)
+        % schedule.employees.len();
+    i64::try_from(distance).unwrap_or(i64::MAX)
 }
 ```
 
-The solver policy selects that group by name:
+The solver policy selects that group by name. In `0.12.1`, the grouped scalar
+construction path owns required-slot assignment; there is no separate
+coverage-specific phase type:
 
 ```toml
 [[phases]]
 type = "construction_heuristic"
-construction_heuristic_type = "coverage_first_fit"
+construction_heuristic_type = "first_fit"
 construction_obligation = "assign_when_candidate_exists"
 group_name = "required_shift_assignment"
 value_candidate_limit = 8
 group_candidate_limit = 64
 ```
 
-`coverage_first_fit` is different from grouped scalar construction. Coverage
-targets one nullable scalar variable and reasons about required slots and
-capacity keys. Grouped scalar construction is for arbitrary multi-scalar
-candidates that must be applied atomically.
+Required entities are handled before optional entities. Required assignments
+may displace optional occupants or move required blockers through a bounded
+augmenting path. Optional assignments remain score-improving only unless the
+model marks them required and configuration uses
+`assign_when_candidate_exists`.
 
 ## Grouped Scalar Construction
 
-Use grouped scalar construction when the legal assignment is a bundle of scalar
-edits.
+Use candidate-backed grouped scalar construction when the legal assignment is a
+custom bundle of scalar edits instead of one stock nullable-scalar assignment.
 
 ```toml
 [[phases]]
@@ -158,9 +184,10 @@ value_candidate_limit = 32
 group_candidate_limit = 128
 ```
 
-`group_name` selects a named model-provided scalar group. `group_candidate_limit`
-caps normalized grouped candidates after SolverForge removes illegal,
-duplicate, no-op, and non-frontier edits.
+`group_name` selects a named model-provided `ScalarGroup`.
+`group_candidate_limit` caps normalized grouped candidates after SolverForge
+removes illegal, duplicate, no-op, and non-frontier edits. Config limits
+override model-owned `ScalarGroup::with_limits(...)` values.
 
 ## See Also
 

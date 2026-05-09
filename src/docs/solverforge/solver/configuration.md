@@ -24,12 +24,13 @@ Configuration has three levels:
 | ----- | ----- | ------------- |
 | Global config | environment mode, random seed, thread count, top-level termination | app/operator |
 | Phase config | construction, local search, exhaustive search, VND, phase-specific termination | app/operator |
-| Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups, coverage groups | Rust domain model |
+| Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups | Rust domain model |
 
 The important rule is that config selects declared capabilities. It does not
 invent model hooks. If a selector asks for nearby scalar candidates, grouped
-scalar candidates, coverage groups, or conflict repair providers, the model must
-expose those capabilities through the generated model support layer.
+scalar candidates, assignment-backed scalar groups, or conflict repair
+providers, the model must expose those capabilities through the generated model
+support layer.
 
 ## Loading Configuration
 
@@ -258,13 +259,16 @@ when the model provides a scalar group through the generated model support
 surface. Grouped local search also supports `require_hard_improvement` when a
 compound candidate must improve the hard score before it can be accepted.
 
-Coverage-first construction and coverage repair also use `group_name`, but they
-select a model-owned `CoverageGroup` rather than a `ScalarGroup`:
+Assignment-backed scalar construction and repair use the same `group_name`
+surface. The model declares `ScalarGroup::assignment(...)`; construction
+generates stock nullable scalar assignment candidates and local search repairs
+uncovered required entities, capacity conflicts, bounded reassignments, and
+sequence/position rematches:
 
 ```toml
 [[phases]]
 type = "construction_heuristic"
-construction_heuristic_type = "coverage_first_fit"
+construction_heuristic_type = "first_fit"
 construction_obligation = "assign_when_candidate_exists"
 group_name = "required_shift_assignment"
 value_candidate_limit = 8
@@ -274,7 +278,7 @@ group_candidate_limit = 64
 type = "local_search"
 
 [phases.move_selector]
-type = "coverage_repair_move_selector"
+type = "grouped_scalar_move_selector"
 group_name = "required_shift_assignment"
 max_moves_per_step = 64
 require_hard_improvement = true

@@ -23,7 +23,6 @@ Builds an initial solution by assigning values to all planning variables. Runs f
 | `strongest_fit`                | Assigns the value that uses resources most aggressively.                                                                                                               |
 | `strongest_fit_decreasing`     | Strongest fit, processing entities by difficulty.                                                                                                                      |
 | `cheapest_insertion`           | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-scalar path.                                               |
-| `coverage_first_fit`           | Coverage-first construction over a named `CoverageGroup`; required nullable slots are covered before optional slots.                                                   |
 | `allocate_entity_from_queue`   | Queue-driven entity allocation.                                                                                                                                        |
 | `allocate_to_value_from_queue` | Queue-driven value allocation.                                                                                                                                         |
 | `list_round_robin`             | Distributes elements evenly across entities (list variables).                                                                                                          |
@@ -55,9 +54,10 @@ keep `None` when that is the best legal baseline. Use
 `assign_when_candidate_exists` only when construction must assign any doable
 candidate instead.
 
-Coverage-first construction also uses `construction_obligation`: with
-`assign_when_candidate_exists`, every required slot that has a doable candidate
-is treated as a construction obligation.
+When `group_name` selects an assignment-backed `ScalarGroup`, grouped scalar
+construction also uses `construction_obligation`: with
+`assign_when_candidate_exists`, every required nullable scalar slot that has a
+doable candidate is treated as a construction obligation.
 
 ## Local Search
 
@@ -118,19 +118,21 @@ for final selection. It does not imply early neighborhood exit. Early stop is
 still controlled by `pick_early_type` or by explicit first-improving search
 policies.
 
-Coverage repair is configured as a normal move selector:
+Assignment-backed scalar repair is configured through the grouped scalar move
+selector:
 
 ```toml
 [phases.move_selector]
-type = "coverage_repair_move_selector"
+type = "grouped_scalar_move_selector"
 group_name = "required_shift_assignment"
 max_moves_per_step = 64
 require_hard_improvement = true
 ```
 
-The selector consumes the same named `CoverageGroup` used by
-`coverage_first_fit`, then emits compound scalar repair moves for uncovered
-required slots and capacity conflicts.
+The selector consumes the same named assignment-backed `ScalarGroup` used by
+construction, then emits compound scalar repair moves for uncovered required
+slots, capacity conflicts, bounded reassignments, and sequence/position
+rematches.
 
 ### Acceptor-Specific Configuration
 

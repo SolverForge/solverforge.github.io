@@ -1,17 +1,18 @@
 ---
-title: "SolverForge 0.12.x: Coverage Construction and Clean Runtime Contracts"
+title: "SolverForge 0.12.x: Assignment-Backed Scalar Construction"
 date: 2026-05-08
 draft: false
 description: >
-  SolverForge 0.12.x publishes coverage-first construction, coverage repair,
+  SolverForge 0.12.x publishes assignment-backed grouped scalar construction,
   consecutive run collectors, cleaner generated stream sources, and renamed
   direct runtime assembly contracts.
 ---
 
 **SolverForge 0.12.x** is the current core runtime line. It starts with
 [0.12.0](https://crates.io/crates/solverforge/0.12.0), published on
-2026-05-08 with API docs on
-[docs.rs](https://docs.rs/solverforge/0.12.0).
+2026-05-08. The latest patch is
+[0.12.1](https://crates.io/crates/solverforge/0.12.1), with API docs on
+[docs.rs](https://docs.rs/solverforge/0.12.1).
 
 Patch releases are folded into this line note. Use the latest 0.12.x patch for
 new direct Cargo projects, and keep generated-app scaffold targets explicit by
@@ -39,19 +40,35 @@ leaving `ConstraintFactory` as the zero-state stream builder. Use
 `solverforge::stream::vec(...)` only for custom collection surfaces that are not
 generated from the planning solution.
 
-### Coverage-first construction is a stock runtime path
+### Assignment-backed ScalarGroup is the required-slot path
 
-`CoverageGroup` declares a required nullable scalar coverage target. The group
-can identify required slots, capacity conflicts, entity order, and value order:
+`ScalarGroup::assignment(...)` declares a required nullable scalar target. The
+group can identify required entities, capacity conflicts, sequence/position
+metadata, entity order, and value order:
 
 ```rust
-pub(super) fn coverage_groups() -> Vec<CoverageGroup<Schedule>> {
+#[planning_solution(
+    constraints = "define_constraints",
+    scalar_groups = "scalar_groups"
+)]
+pub struct Schedule {
+    #[problem_fact_collection]
+    pub employees: Vec<Employee>,
+
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
+
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+
+pub(super) fn scalar_groups() -> Vec<ScalarGroup<Schedule>> {
     vec![
-        CoverageGroup::new(
+        ScalarGroup::assignment(
             "required_shift_assignment",
             Schedule::shifts().scalar("employee_idx"),
         )
-        .with_required_slot(required_shift)
+        .with_required_entity(required_shift)
         .with_capacity_key(employee_day_capacity)
         .with_entity_order(shift_order)
         .with_value_order(employee_preference),
@@ -67,19 +84,26 @@ fn employee_day_capacity(
     shift_idx: usize,
     employee_idx: usize,
 ) -> Option<usize> {
-    Some(schedule.shifts[shift_idx].date * schedule.employees.len() + employee_idx)
+    let shift = &schedule.shifts[shift_idx];
+    shift
+        .date
+        .checked_mul(schedule.employees.len())
+        .and_then(|base| base.checked_add(employee_idx))
 }
 
 fn shift_order(schedule: &Schedule, shift_idx: usize) -> i64 {
-    schedule.shifts[shift_idx].date as i64
+    i64::try_from(schedule.shifts[shift_idx].date).unwrap_or(i64::MAX)
 }
 
 fn employee_preference(
-    _schedule: &Schedule,
-    _shift_idx: usize,
+    schedule: &Schedule,
+    shift_idx: usize,
     employee_idx: usize,
 ) -> i64 {
-    employee_idx as i64
+    let preferred = schedule.shifts[shift_idx].date % schedule.employees.len();
+    let distance = (employee_idx + schedule.employees.len() - preferred)
+        % schedule.employees.len();
+    i64::try_from(distance).unwrap_or(i64::MAX)
 }
 ```
 
@@ -88,32 +112,36 @@ The solver policy selects that group from `solver.toml`:
 ```toml
 [[phases]]
 type = "construction_heuristic"
-construction_heuristic_type = "coverage_first_fit"
+construction_heuristic_type = "first_fit"
 construction_obligation = "assign_when_candidate_exists"
 group_name = "required_shift_assignment"
 value_candidate_limit = 8
 group_candidate_limit = 64
 ```
 
-Use coverage-first construction when the model says, "cover every required slot
-that has a doable candidate." Use grouped scalar construction for arbitrary
-multi-scalar candidates that must be applied atomically.
+In `0.12.1`, required-slot coverage is no longer a separate coverage-specific
+group or phase. It is an assignment-backed `ScalarGroup` routed through the
+same grouped construction engine as custom compound candidates.
+Required entities are filled before optional entities; required assignments may
+displace optional occupants or move required blockers through bounded
+augmenting paths.
 
-### Coverage repair joins the selector family
+### Assignment repair uses grouped scalar selectors
 
-Local search can repair the same coverage group:
+Local search repairs the same assignment-backed scalar group:
 
 ```toml
 [phases.move_selector]
-type = "coverage_repair_move_selector"
+type = "grouped_scalar_move_selector"
 group_name = "required_shift_assignment"
 max_moves_per_step = 64
 require_hard_improvement = true
 ```
 
-The selector emits compound scalar moves for uncovered required slots and
-capacity conflicts. The hard-improvement gate is the same one used by grouped
-scalar, conflict-repair, cartesian, and VND repair paths.
+The selector emits compound scalar moves for unassigned required entities,
+capacity conflicts, bounded reassignments, and bounded sequence/position
+rematches. The hard-improvement gate is the same one used by grouped scalar,
+conflict-repair, cartesian, and VND repair paths.
 
 ### Consecutive run collection is built in
 
@@ -184,14 +212,14 @@ surface.
 For direct Cargo projects:
 
 ```toml
-solverforge = { version = "0.12.0", features = ["serde", "console"] }
+solverforge = { version = "0.12.1", features = ["serde", "console"] }
 ```
 
 If you write custom incremental constraints that need lower-level identities,
 the companion workspace crates are also published at the same 0.12.x patch:
 
 ```toml
-solverforge-core = "0.12.0"
+solverforge-core = "0.12.1"
 ```
 
 For generated apps, confirm the installed CLI target:
@@ -221,6 +249,7 @@ core crate.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.12.1` | 2026-05-09 | Folds coverage into assignment-backed `ScalarGroup` declarations, routes required nullable assignment construction through grouped scalar construction, and uses `grouped_scalar_move_selector` for assignment repair. |
 | `0.12.0` | 2026-05-08 | Adds coverage-first construction, coverage repair, consecutive run collection, generated source-method stream roots, declarative scalar planning contracts, and clearer direct runtime assembly names. |
 
 ## Documentation Changes
@@ -233,11 +262,11 @@ The docs tree now tracks the 0.12.x runtime surface:
 - [Collectors](/docs/solverforge/constraints/collectors/) documents
   `consecutive_runs(...)`, `Run`, `Runs`, and complemented grouped counts.
 - [Construction](/docs/solverforge/solver/construction/) covers
-  `CoverageGroup` and `coverage_first_fit`.
+  assignment-backed `ScalarGroup` construction.
 - [Scalar Move Selectors](/docs/solverforge/solver/scalar-move-selectors/)
-  includes `coverage_repair_move_selector`.
+  includes assignment-backed `grouped_scalar_move_selector` repair.
 - [List Variables](/docs/solverforge/modeling/list-variables/) removes public
   guidance around generated list mutation helpers.
 - [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.12.0` runtime from the still-older `solverforge-cli 2.0.4`
+  `solverforge 0.12.1` runtime from the still-older `solverforge-cli 2.0.4`
   scaffold target.

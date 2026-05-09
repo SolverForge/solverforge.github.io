@@ -46,8 +46,8 @@ The current release uses one `RuntimeModel` per planning model. Generic
 construction heuristics share that model for mixed/list-bearing work, while
 pure scalar construction uses the descriptor boundary. Local search uses
 explicit streaming defaults when `move_selector` is omitted, and scalar
-candidate limits, grouped scalar selectors, coverage repair selectors, and
-score-level simulated annealing are expressed in `solver.toml`.
+candidate limits, assignment-backed grouped scalar selectors, conflict repair
+selectors, and score-level simulated annealing are expressed in `solver.toml`.
 
 The facade exports the configuration surface directly from
 `solverforge`, including `SolverConfig`, `PhaseConfig`, `MoveSelectorConfig`,
@@ -55,10 +55,11 @@ The facade exports the configuration surface directly from
 Application code no longer needs a separate `solverforge-config` dependency for
 normal configuration construction or parsing.
 
-Coverage-first construction is available for required nullable scalar slots
-through named `CoverageGroup` declarations. Pair it with
-`coverage_repair_move_selector` when local search should prioritize uncovered
-required slots or capacity conflicts from the same group.
+Assignment-backed grouped scalar construction is available for required
+nullable scalar slots through named `ScalarGroup::assignment(...)`
+declarations. Pair it with `grouped_scalar_move_selector` when local search
+should prioritize uncovered required slots, capacity conflicts, bounded
+reassignments, or sequence/position rematches from the same group.
 
 `SolverManager` now exposes a retained job lifecycle rather than a fire-and-forget
 channel. In addition to `Progress` and `BestSolution`, you can observe

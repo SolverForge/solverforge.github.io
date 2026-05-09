@@ -59,7 +59,7 @@ construction heuristics already understand mixed scalar-plus-list problems.
 | ordering behavior                  | introduce a planning list and list-aware constraints                                                 |
 | bounded scalar neighborhoods       | declare `candidate_values`, `nearby_value_candidates`, or `nearby_entity_candidates` on the variable |
 | scalar construction ordering       | declare `construction_entity_order_key` or `construction_value_order_key` on the variable            |
-| required nullable-slot coverage    | declare a `CoverageGroup` and select it from `solver.toml`                                           |
+| required nullable-slot coverage    | declare an assignment-backed `ScalarGroup` and select it from `solver.toml`                          |
 | richer scoring context             | add immutable facts or derived helper methods instead of shoving logic into constraints              |
 | validation or import normalization | add app-side builders or conversion layers before solving                                            |
 

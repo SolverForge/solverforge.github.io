@@ -123,13 +123,13 @@ CLI scaffold plus manual hospital scheduling code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the current published `solverforge 0.12.0` crate. Keep the
+runtime dependency to the current published `solverforge 0.12.1` crate. Keep the
 current published `solverforge-ui 0.6.5` crate for the UI patch line, then add
 the hospital app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.12.0", features = [
+solverforge = { version = "0.12.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -150,7 +150,7 @@ parking_lot = "0.12.5"
 
 `solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1` and
 `solverforge-ui 0.6.5`. For this worked example, upgrade the app-owned
-`solverforge` dependency and runtime metadata to `0.12.0` after scaffolding so
+`solverforge` dependency and runtime metadata to `0.12.1` after scaffolding so
 the tutorial tracks the current core runtime.
 
 ### Align App Metadata
@@ -166,7 +166,7 @@ cli_version = "2.0.4"
 [runtime]
 target = "SolverForge crates.io target"
 runtime_crate = "solverforge"
-runtime_version = "0.12.0"
+runtime_version = "0.12.1"
 ui_crate = "solverforge-ui"
 ui_version = "0.6.5"
 

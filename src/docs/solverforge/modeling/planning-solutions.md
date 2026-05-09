@@ -15,7 +15,10 @@ and score field.
 ```rust
 use solverforge::prelude::*;
 
-#[planning_solution(constraints = "crate::constraints::define_constraints")]
+#[planning_solution(
+    constraints = "crate::constraints::define_constraints",
+    scalar_groups = "crate::domain::scalar_groups"
+)]
 pub struct Schedule {
     #[problem_fact_collection]
     pub employees: Vec<Employee>,
@@ -33,6 +36,9 @@ pub struct Schedule {
 
 The `constraints` parameter is optional, but it is what enables the generated
 `Solvable` and `Analyzable` implementations used by the stock runtime.
+`scalar_groups` is optional; use it when the model declares candidate-backed or
+assignment-backed `ScalarGroup` values for grouped construction and grouped
+scalar local search.
 
 ## Field Attributes
 

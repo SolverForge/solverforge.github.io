@@ -10,9 +10,9 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.12.0` crate and calls out
+documentation tracks the published `solverforge 0.12.1` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.12.0` package is available on crates.io; the published
+`solverforge 0.12.1` package is available on crates.io; the published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +21,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.12.0` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.12.0` runtime |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.12.1` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.12.1` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -48,10 +48,11 @@ published crates.io and CLI scaffold targets separately. The public
 - **Score Analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
   plus lower-level detailed match/explanation APIs in `solverforge-scoring`
 - **SERIO Engine**: retained incremental scoring for real-time optimization
-- **Solver Phases**: coverage-first construction, scalar/list construction
-  heuristics, local search, exhaustive search, partitioned search, and VND
-- **Move System**: scalar, list, grouped scalar, coverage repair, conflict
-  repair, cartesian, and composite move families
+- **Solver Phases**: scalar/list construction heuristics, assignment-backed
+  grouped scalar construction, local search, exhaustive search, partitioned
+  search, and VND
+- **Move System**: scalar, list, grouped scalar, assignment repair,
+  conflict repair, cartesian, and composite move families
 - **SolverManager API**: retained job lifecycle with progress, best-solution,
   pause/resume, completion, cancellation, failure, snapshots, and
   snapshot-bound analysis
@@ -61,15 +62,16 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.12.0 published baseline**: the core crate version is `0.12.0` and the
+- **0.12.1 published baseline**: the core crate version is `0.12.1` and the
   Rust toolchain floor remains `1.95`.
 - **Generated source methods**: `#[planning_solution]` now exposes collection
   sources as solution-associated functions such as `Schedule::shifts()`.
   Constraint streams use those generated methods through
   `ConstraintFactory::for_each(...)`.
-- **Coverage construction and repair**: `CoverageGroup` declares required
-  nullable scalar slots, capacity keys, and ordering hooks; `coverage_first_fit`
-  and `coverage_repair_move_selector` consume the named group from `solver.toml`.
+- **Assignment-backed scalar groups**: `ScalarGroup::assignment(...)` declares
+  required nullable scalar slots, capacity keys, sequence/position hooks, and
+  construction ordering; grouped construction and `grouped_scalar_move_selector`
+  consume the same `group_name` from `solver.toml`.
 - **Consecutive run collector**: `consecutive_runs(...)` groups integer points
   into `Runs` with per-run point and item counts, which is useful for streak
   penalties such as consecutive work days.
