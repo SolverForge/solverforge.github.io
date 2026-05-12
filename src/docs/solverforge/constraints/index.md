@@ -27,14 +27,15 @@ factory.for_each(Schedule::shifts())                              // Select all 
 ```
 
 Constraints are returned as a tuple implementing `ConstraintSet<S, Sc>`, which
-the solver evaluates incrementally as it explores moves. In the `0.12.x` release
-line, generated solution sources such as `Schedule::shifts()` preserve source
-metadata for localized incremental updates. Projected streams can emit retained
-scoring rows from one source or one joined pair, grouped streams can use
-`consecutive_runs(...)`, and lower-level constraint metadata borrows full
-`ConstraintRef` identity from the owning constraint. Package-qualified
-constraints use `ConstraintRef::full_name()` as the configured key;
-package-less constraints use the short name.
+the solver evaluates incrementally as it explores moves. Generated solution
+sources such as `Schedule::shifts()` preserve source metadata for localized
+incremental updates. Projected streams can emit retained scoring rows from one
+source or one joined pair, grouped streams can use collectors such as
+`consecutive_runs(...)`, `collect_vec(...)`, and `indexed_presence(...)`, and
+lower-level constraint metadata borrows full `ConstraintRef` identity from the
+owning constraint. Package-qualified constraints use
+`ConstraintRef::full_name()` as the configured key; package-less constraints use
+the short name.
 
 ## Sections
 

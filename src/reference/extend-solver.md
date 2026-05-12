@@ -38,8 +38,14 @@ If `move_selector` is omitted, the stock runtime stays intentionally narrow:
 - scalar-only models default to `ChangeMoveSelector`
   plus `SwapMoveSelector`
 - list-only models default to `NearbyListChangeMoveSelector(20)`,
-  `NearbyListSwapMoveSelector(20)`, and `ListReverseMoveSelector`
+  `NearbyListSwapMoveSelector(20)`, `SublistChangeMoveSelector`,
+  `SublistSwapMoveSelector`, and `ListReverseMoveSelector`, with k-opt and list
+  ruin enabled only when their hooks exist
 - mixed models use the list defaults first, then scalar defaults
+
+Assignment-owned scalar variables stay on their grouped scalar selector path.
+Plain scalar defaults and conflict-repair defaults exclude slots owned by an
+assignment-backed `ScalarGroup`.
 
 `limited_neighborhood` is the tool for putting a hard cap on one neighborhood
 that is otherwise too broad. It is not a substitute for understanding the
@@ -52,10 +58,10 @@ search policy you are expressing.
 | construction phase choice             | initial feasibility and seed quality                          |
 | local search acceptor                 | exploration vs greediness                                     |
 | move selector choice                  | neighborhood breadth and cost                                 |
-| `accepted_count_limit`                | how many accepted candidates are retained for final selection |
+| accepted-count `limit`                | finite accepted-candidate horizon for one selector step |
 | `value_candidate_limit`               | bounded scalar value generation for selectors that support it |
 | termination limits                    | wall time, unimproved steps, or best-score goals              |
-| VND / exhaustive / partitioned search | explicit advanced search strategies, not a default reflex     |
+| VND / typed exact / partitioned search | explicit advanced search strategies, not a default reflex     |
 
 Nearby scalar selectors require model-declared candidate hooks. Use
 `nearby_value_candidates` for nearby change, `nearby_entity_candidates` for
@@ -74,6 +80,12 @@ Write custom solver code when one of these is true:
 
 If you go there, keep the blast radius small. Prefer one app-side extension over
 forking the scaffold or bypassing the retained runtime wholesale.
+
+Custom search is compiled into the solution with
+`#[planning_solution(search = "...")]`; `solver.toml` names registered phases
+instead of loading arbitrary runtime classes. Partitioned search similarly
+requires a typed `SolutionPartitioner`, not a partition count guessed from the
+outside.
 
 ## Telemetry and lifecycle expectations
 

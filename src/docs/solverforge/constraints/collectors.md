@@ -68,7 +68,7 @@ factory.for_each(Schedule::shifts())
         |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
         consecutive_runs(|shift: &Shift| shift.date as i64),
     )
-    .penalize_with(|_employee_idx: &usize, runs: &Runs| {
+    .penalize(|_employee_idx: &usize, runs: &Runs| {
         let excess_days = runs
             .runs()
             .iter()
@@ -81,6 +81,39 @@ factory.for_each(Schedule::shifts())
 
 `Run` exposes `start()`, `end()`, `point_count()`, and `item_count()`. `Runs`
 exposes `runs()`, `point_count()`, `item_count()`, `len()`, and `is_empty()`.
+
+### `collect_vec(mapper)`
+
+Collects mapped values for each group and returns a `CollectedVec<T>`.
+The collector owns values once and can retract them exactly during incremental
+updates, so `T` does not need `Copy`, `Clone`, or `PartialEq` just to
+participate in grouped scoring.
+
+```rust
+.group_by(
+    |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
+    collect_vec(|shift: &Shift| shift.required_skill.clone()),
+)
+.penalize(|_employee_idx: &usize, labels: &CollectedVec<String>| {
+    HardSoftScore::of_soft(labels.len().saturating_sub(5) as i64)
+})
+```
+
+### `indexed_presence(index_fn)`
+
+Tracks active ordinal positions and exposes both presence and complement runs.
+Use it when a rule needs to know which slots are covered and which slots are
+missing.
+
+```rust
+.group_by(
+    |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
+    indexed_presence(|shift: &Shift| shift.date as i64),
+)
+.penalize(|_employee_idx: &usize, presence: &IndexedPresence| {
+    HardSoftScore::of_soft(presence.complement_runs(0..7).len() as i64)
+})
+```
 
 ## Complemented Groups
 
@@ -96,7 +129,7 @@ factory.for_each(Schedule::shifts())
         count::<Shift>(),
     )
     .complement(Schedule::employees(), |employee: &Employee| employee.index, |_employee| 0usize)
-    .penalize_with(|_employee_idx: &usize, count: &usize| {
+    .penalize(|_employee_idx: &usize, count: &usize| {
         HardSoftScore::of_soft((*count as i64 - 4).abs())
     })
     .named("Balanced workload")
@@ -109,7 +142,7 @@ For simple load balancing without `group_by`, use the `balance` stream operation
 ```rust
 factory.for_each(Schedule::shifts())
     .balance(|shift: &Shift| shift.employee_idx)
-    .penalize_soft()
+    .penalize(HardSoftScore::ONE_SOFT)
     .named("Fair distribution")
 ```
 

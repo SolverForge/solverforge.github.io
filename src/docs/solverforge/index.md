@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.12.1` crate and current source
+These pages track the published `solverforge 0.13.0` crate and current source
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime until the next CLI runtime-target refresh, so check
 `solverforge --version` when starting from a scaffold.
@@ -32,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.12.1` crate declares Rust `1.95`.
+The `0.13.0` crate declares Rust `1.95`.
 
 The generated runtime now builds one `RuntimeModel` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -56,14 +56,17 @@ The current release tightens several public contracts:
 - assignment-backed grouped scalar construction and repair are public runtime
   policy through `ScalarGroup::assignment(...)`, grouped construction
   `group_name`, and `grouped_scalar_move_selector`
-- `consecutive_runs(...)`, `Run`, and `Runs` are available from the prelude for
-  consecutive integer run aggregation
+- `collect_vec(...)`, `consecutive_runs(...)`, `indexed_presence(...)`,
+  `CollectedVec`, `IndexedPresence`, `Run`, and `Runs` are available from the
+  prelude for grouped collection, streak, and ordinal-presence rules
+- scoring terminals use `penalize(score)`, `reward(score)`, typed dynamic
+  closures, `fixed_weight(...)`, and `hard_weight(...)`; the former
+  `penalize_hard`, `penalize_with`, and `reward_soft` helper family is no
+  longer part of the current stream API
 - solver configuration controls such as `SolverConfig`, `PhaseConfig`,
   `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
   `SolverConfigOverride`, and related enums are available directly from
   `solverforge`
-- `RecordingDirector` is exported from the facade beside `Director` and
-  `ScoreDirector`
 - projected scoring rows use `Projection` / `ProjectionSink` for bounded
   single-source rows, and cross joins can retain one scoring row per joined
   pair with `.project(|left, right| row)`
@@ -78,9 +81,14 @@ The current release tightens several public contracts:
 - nearby scalar neighborhoods are bounded model capabilities through
   `nearby_value_candidates` and `nearby_entity_candidates`; distance meters rank
   or filter those candidates, but do not discover them
-- default local-search neighborhoods are explicit streaming defaults: scalar
-  change plus swap, list nearby-change plus nearby-swap plus reverse, and mixed
-  models concatenate list defaults before scalar defaults
+- default local-search neighborhoods are explicit streaming defaults: nearby
+  scalar selectors when hooks exist, scalar change/swap fallbacks for
+  non-assignment-owned slots, list nearby-change, nearby-swap, sublist,
+  reverse, optional k-opt/list-ruin when hooks exist, and grouped-scalar or
+  conflict-repair selectors only when the model declares them
+- typed custom search is compiled into the solution with
+  `#[planning_solution(search = "...")]`; config names registered phases
+  instead of loading arbitrary runtime classes
 - retained telemetry preserves exact generated, evaluated, accepted,
   not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
   and construction-slot counters plus generation and evaluation durations;
@@ -126,7 +134,7 @@ fn define_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
         ConstraintFactory::<Plan, HardSoftScore>::new()
             .for_each(Plan::tasks())
             .unassigned()
-            .penalize_hard()
+            .penalize(HardSoftScore::ONE_HARD)
             .named("Unassigned task"),
     )
 }

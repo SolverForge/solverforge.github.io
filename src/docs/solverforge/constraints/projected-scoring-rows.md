@@ -50,7 +50,7 @@ impl Projection<Shift> for ShiftWindows {
 factory.for_each(Schedule::shifts())
     .project(ShiftWindows)
     .filter(|window: &WorkWindow| window.is_overtime())
-    .penalize_with(|_: &WorkWindow| HardSoftScore::ONE_SOFT)
+    .penalize(|_: &WorkWindow| HardSoftScore::ONE_SOFT)
     .named("Projected overtime");
 ```
 
@@ -85,9 +85,9 @@ Streams::new()
         demand: assignment.demand,
         capacity: capacity.amount,
     })
-    .penalize_hard_with(|row: &AssignmentCapacity| {
+    .penalize(hard_weight(|row: &AssignmentCapacity| {
         HardSoftScore::of_hard((row.demand - row.capacity).max(0))
-    })
+    }))
     .named("Assignment capacity shortage");
 ```
 
@@ -114,7 +114,9 @@ factory.for_each(Schedule::shifts())
     .filter(|a: &WorkWindow, b: &WorkWindow| {
         a.shift_id != b.shift_id && a.overlaps(b)
     })
-    .penalize_with(|_: &WorkWindow, _: &WorkWindow| HardSoftScore::ONE_HARD)
+    .penalize(hard_weight(|_: &WorkWindow, _: &WorkWindow| {
+        HardSoftScore::ONE_HARD
+    }))
     .named("Projected overlap");
 ```
 

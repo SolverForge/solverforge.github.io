@@ -72,9 +72,12 @@ type = "accepted_count"
 limit = 4
 ```
 
-`accepted_count_limit` and the accepted-count forager retain the best accepted
-candidates for final selection. They do not cap candidate generation. Use
-`limited_neighborhood` when a selector itself is too broad before scoring.
+The accepted-count forager stops the current selector step after collecting
+`limit` accepted candidates, then picks the best candidate inside that finite
+horizon. It is the default for broad stock models because it lets streaming
+selectors improve incumbents under short budgets. Use `best_score` when you
+intentionally want a full-neighborhood greedy scan, and use
+`limited_neighborhood` when a selector itself needs a hard pre-scoring cap.
 
 ## Move Selector
 
@@ -95,6 +98,11 @@ type = "swap_move_selector"
 
 For selector details, start with [Moves](/docs/solverforge/solver/moves/).
 
+Union selectors can use `sequential`, `round_robin`,
+`rotating_round_robin`, or `stratified_random` selection order. The current
+stock defaults use fair ordering for broad unions so no child neighborhood owns
+the prefix indefinitely.
+
 Assignment-backed grouped scalar selectors are regular local-search selectors.
 Use them when a model-owned `ScalarGroup::assignment(...)` should repair
 uncovered required nullable slots, capacity conflicts, bounded reassignments,
@@ -114,6 +122,26 @@ Retained status and events preserve exact generated, evaluated, accepted,
 not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
 and construction-slot counters plus generation and evaluation durations.
 Displayed `moves/s` is a human-facing derived value.
+
+## Variable Neighborhood Descent
+
+VND is configured as `local_search_type = "variable_neighborhood_descent"` on a
+local-search phase. It uses ordered `neighborhoods` and does not combine with
+`acceptor`, `forager`, or `move_selector` in the same phase.
+
+```toml
+[[phases]]
+type = "local_search"
+local_search_type = "variable_neighborhood_descent"
+
+[[phases.neighborhoods]]
+type = "change_move_selector"
+variable_name = "employee_idx"
+
+[[phases.neighborhoods]]
+type = "swap_move_selector"
+variable_name = "employee_idx"
+```
 
 ## See Also
 

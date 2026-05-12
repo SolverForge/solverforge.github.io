@@ -136,7 +136,7 @@ factory.for_each(Schedule::shifts())
 ```
 
 See [Collectors](/docs/solverforge/constraints/collectors/) for `count`, `sum`,
-`load_balance`, and `consecutive_runs`.
+`load_balance`, `consecutive_runs`, `collect_vec`, and `indexed_presence`.
 
 ### `balance`
 
@@ -169,37 +169,40 @@ let soft = Streams::new()
     .named("Preference bonus");
 ```
 
-### Score Convenience Methods
-
-Use convenience methods when the constraint applies one hard or soft unit:
+Use fixed score values when the constraint applies one hard or soft unit:
 
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
 let hard = Streams::new()
     .for_each(Schedule::shifts())
-    .penalize_hard()
+    .penalize(HardSoftScore::ONE_HARD)
     .named("Hard violation");
 
 let soft = Streams::new()
     .for_each(Schedule::shifts())
-    .reward_soft()
+    .reward(HardSoftScore::ONE_SOFT)
     .named("Soft preference");
 ```
 
-Use dynamic methods when the score depends on the match:
+Use a typed dynamic closure when the score depends on the match. Dynamic
+closure weights are non-hard metadata by default; wrap the closure in
+`hard_weight(...)` when score analysis and conflict repair should classify the
+constraint as hard.
 
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
 let overtime = Streams::new()
     .for_each(Schedule::shifts())
-    .penalize_hard_with(|shift: &Shift| HardSoftScore::of_hard(shift.overtime_hours() as i64))
+    .penalize(hard_weight(|shift: &Shift| {
+        HardSoftScore::of_hard(shift.overtime_hours() as i64)
+    }))
     .named("Overtime");
 
 let preference = Streams::new()
     .for_each(Schedule::shifts())
-    .penalize_with(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
+    .penalize(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
     .named("Preference");
 ```
 
@@ -216,7 +219,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
         Streams::new()
             .for_each(Schedule::shifts())
             .filter(|shift| shift.employee_idx.is_none())
-            .penalize_hard()
+            .penalize(HardSoftScore::ONE_HARD)
             .named("Unassigned shift"),
 
         Streams::new()
@@ -231,13 +234,13 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
             .filter(|a: &Shift, b: &Shift| {
                 a.id < b.id && a.employee_idx.is_some() && a.overlaps(b)
             })
-            .penalize_hard()
+            .penalize(HardSoftScore::ONE_HARD)
             .named("Overlap"),
 
         Streams::new()
             .for_each(Schedule::shifts())
             .filter(|shift| shift.is_preferred_by_employee())
-            .reward_soft()
+            .reward(HardSoftScore::ONE_SOFT)
             .named("Preference"),
     )
 }

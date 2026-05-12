@@ -78,8 +78,9 @@ max_nearby = 20
 ```
 
 `selected_count_limit` caps emitted candidates before scoring. It is different
-from `accepted_count_limit`, which controls how many accepted candidates the
-forager retains for final selection.
+from the accepted-count forager `limit`, which stops a selector step after that
+many accepted candidates and then picks the best candidate inside that finite
+horizon.
 
 ## Lower-Level Building Blocks
 

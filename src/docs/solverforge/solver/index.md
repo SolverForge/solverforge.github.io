@@ -77,7 +77,7 @@ User-facing rates such as `moves/s` are display-only derived values.
 - **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, `solver.toml`, and YAML parsing
 - **[Construction](/docs/solverforge/solver/construction/)** — construction heuristics, nullable obligations, and grouped scalar construction
 - **[Local Search](/docs/solverforge/solver/local-search/)** — acceptors, foragers, selectors, and score-level annealing
-- **[Phases](/docs/solverforge/solver/phases/)** — Construction heuristic, local search, exhaustive search, and VND
+- **[Phases](/docs/solverforge/solver/phases/)** — Construction heuristic, local search, VND, typed exact search, and partitioned search
 - **[Moves](/docs/solverforge/solver/moves/)** — selector-family guide with scalar, list, and composite subsections
 - **[Termination](/docs/solverforge/solver/termination/)** — When to stop solving
 - **[SolverManager](/docs/solverforge/solver/solver-manager/)** — Running and managing solver instances

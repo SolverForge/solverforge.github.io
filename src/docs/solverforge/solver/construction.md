@@ -150,9 +150,9 @@ fn employee_preference(
 }
 ```
 
-The solver policy selects that group by name. In `0.12.1`, the grouped scalar
-construction path owns required-slot assignment; there is no separate
-coverage-specific phase type:
+The solver policy selects that group by name. The grouped scalar construction
+path owns required-slot assignment; there is no separate coverage-specific
+phase type:
 
 ```toml
 [[phases]]

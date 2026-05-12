@@ -3,7 +3,7 @@ title: "Solver Phases"
 linkTitle: "Phases"
 weight: 20
 description: >
-  Construction heuristic, local search, exhaustive search, partitioned search, and VND.
+  Construction heuristic, local search, VND, typed exact search, and partitioned search.
 ---
 
 The solver runs phases in sequence. Each phase uses a different strategy to improve the solution.
@@ -109,14 +109,13 @@ type = "change_move_selector"
 variable_name = "employee_id"
 
 [phases.forager]
-accepted_count_limit = 32
-pick_early_type = "never"
+type = "accepted_count"
+limit = 32
 ```
 
-`accepted_count_limit` now caps how many accepted candidates the forager retains
-for final selection. It does not imply early neighborhood exit. Early stop is
-still controlled by `pick_early_type` or by explicit first-improving search
-policies.
+The accepted-count forager stops the current selector step after collecting
+`limit` accepted candidates, then picks the best candidate inside that step
+horizon. Use `best_score` when you intentionally want a full-neighborhood scan.
 
 Assignment-backed scalar repair is configured through the grouped scalar move
 selector:
@@ -175,12 +174,14 @@ late_acceptance_size = 400
 
 ## Variable Neighborhood Descent
 
-VND runs several neighborhoods in sequence and restarts from the first
-neighborhood whenever an improvement is found.
+Variable Neighborhood Descent is an ordered-neighborhood local-search type. It
+runs several neighborhoods in sequence and restarts from the first neighborhood
+whenever an improvement is found.
 
 ```toml
 [[phases]]
-type = "vnd"
+type = "local_search"
+local_search_type = "variable_neighborhood_descent"
 
 [[phases.neighborhoods]]
 type = "change_move_selector"
@@ -204,37 +205,43 @@ type = "change_move_selector"
 variable_name = "employee_id"
 ```
 
-## Exhaustive Search
+## Typed Exact Search
 
-Explores the entire search space systematically. Only practical for small problems.
+Exact tree search exists as a typed extension point for small finite spaces.
+It is not a stock `solver.toml` phase that can be built from generated scalar
+slots alone. Register exact search as a named custom phase through
+`#[planning_solution(search = "...")]`, then order that compiled-in phase from
+config.
 
-### Branch and Bound
+The lower-level API exposes `ExhaustiveSearchPhase`, `ExhaustiveSearchConfig`,
+`ExplorationType`, and `SimpleDecider` for applications that own the concrete
+decider. Use this path only when the domain can provide a real exact-search
+state expansion and pruning strategy.
 
 ```toml
 [[phases]]
-type = "exhaustive_search"
-exhaustive_search_type = "branch_and_bound"
+type = "custom"
+name = "small_exact_search"
 ```
-
-| Type               | Description                                                                    |
-| ------------------ | ------------------------------------------------------------------------------ |
-| `branch_and_bound` | Prunes branches that can't improve — memory efficient, finds solutions quickly |
-| `brute_force`      | Explores every possibility                                                     |
-
-### Score Bounder
-
-Use a `ScoreBounder` to prune branches that can't improve on the best known solution, dramatically reducing the search space.
 
 ## Partitioned Search
 
-Partitioned search exists in the lower-level solver API as
-`PartitionedSearchPhase`. It splits the problem into independent partitions and
-solves them in parallel, and the low-level phase now reuses the canonical
-scoring lifecycle for child scopes and merged results.
+Partitioned search is available when the application provides a typed
+`SolutionPartitioner` that splits and merges independent subproblems. SolverForge
+does not infer safe partitions from a count.
 
-The stock `solver.toml` runtime does **not** expose `partitioned_search` as a
-declarative phase today. Use the lower-level Rust API when you need custom
-partitioning strategies or explicit partition-thread control.
+```toml
+[[phases]]
+type = "partitioned_search"
+partitioner = "by_vehicle"
+thread_count = "auto"
+log_progress = true
+```
+
+Partition children inherit cancellation, remaining time, environment mode,
+in-phase limits, and deterministic child seeds. Retained-job publication stays
+on the parent full-solution scope; pause checkpoints are emitted only by the
+parent.
 
 ## Typical Phase Configuration
 
@@ -257,7 +264,7 @@ For better results, try tabu search or simulated annealing as the acceptor.
 ## See Also
 
 - [Construction](/docs/solverforge/solver/construction/) — Initial solution policy
-- [Local Search](/docs/solverforge/solver/local-search/) — Acceptors, foragers, and selector placement
+- [Local Search](/docs/solverforge/solver/local-search/) — Acceptors, foragers, selector placement, and VND
 - [Moves](/docs/solverforge/solver/moves/) — Move types used by local search
 - [Termination](/docs/solverforge/solver/termination/) — Stopping conditions for phases
 - [Configuration](/docs/solverforge/solver/configuration/) — Runtime configuration format

@@ -173,7 +173,8 @@ class ProfileResolver
     "src/_posts/releases/2026-04-11-solverforge-0-8-x.md" => "solverforge@0.8.2",
     "src/_posts/releases/2026-04-24-solverforge-0-9-x.md" => "solverforge@0.9.0",
     "src/_posts/releases/2026-05-02-solverforge-0-10-x.md" => "solverforge@0.10.0",
-    "src/_posts/releases/2026-05-05-solverforge-0-11-x.md" => "solverforge@0.11.1"
+    "src/_posts/releases/2026-05-05-solverforge-0-11-x.md" => "solverforge@0.11.1",
+    "src/_posts/releases/2026-05-08-solverforge-0-12-x.md" => "solverforge@0.12.1"
   }.freeze
 
   KNOWN_PROFILES = %w[
@@ -185,6 +186,7 @@ class ProfileResolver
     solverforge@0.9.0
     solverforge@0.10.0
     solverforge@0.11.1
+    solverforge@0.12.1
     solverforge-maps@1.0.0
     solverforge-maps@2.1.4
   ].freeze
@@ -313,7 +315,7 @@ class PolicyGate
     "src/docs/getting-started/",
     "src/docs/solverforge-cli/",
     "src/reference/",
-    "src/_posts/releases/2026-05-08-solverforge-0-12-x.md"
+    "src/_posts/releases/2026-05-12-solverforge-0-13-x.md"
   ].freeze
 
   def check!(snippets)
@@ -326,6 +328,7 @@ class PolicyGate
       stale!(snippet, "raw factory.for_each(|...) closures are forbidden; use generated sources or stream::vec") if code.match?(/factory\.for_each\s*\(\s*\|/)
       stale!(snippet, "factory collection extension methods are stale; use for_each(Solution::collection())") if code.match?(/\b(?:factory|Streams::new\(\))\s*\.(?:shifts|employees|assignments|capacities|vehicles|unavailability)\(\)/)
       stale!(snippet, "value_range = is stale; use value_range_provider") if code.match?(/\bvalue_range\s*=/)
+      stale!(snippet, "legacy scoring helper terminals are stale; use penalize(...), reward(...), hard_weight(...), or fixed_weight(...)") if code.match?(/\.(?:penalize_hard|penalize_soft|reward_hard|reward_soft|penalize_with|reward_with|penalize_hard_with|reward_hard_with)\s*\(/)
     end
   end
 
@@ -898,7 +901,7 @@ class SnippetRenderer
               ConstraintFactory::<Schedule, HardSoftScore>::new()
                   .for_each(Schedule::shifts())
                   .unassigned()
-                  .penalize_hard()
+                  .penalize(HardSoftScore::ONE_HARD)
                   .named("Unassigned shift"),
           )
       }
@@ -1033,7 +1036,7 @@ class SnippetRenderer
           (
               ConstraintFactory::<Plan, HardSoftScore>::new()
                   .for_each(Plan::assignments())
-                  .penalize_hard()
+                  .penalize(HardSoftScore::ONE_HARD)
                   .named("Assignment placeholder"),
           )
       }
@@ -1110,7 +1113,7 @@ class SnippetRenderer
           (
               ConstraintFactory::<VehicleRoutePlan, HardSoftScore>::new()
                   .for_each(VehicleRoutePlan::vehicles())
-                  .penalize_hard()
+                  .penalize(HardSoftScore::ONE_HARD)
                   .named("Vehicle placeholder"),
           )
       }

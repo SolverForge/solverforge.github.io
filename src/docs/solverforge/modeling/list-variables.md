@@ -127,14 +127,14 @@ fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
         Streams::new()
             .for_each(VehicleRoutePlan::vehicles())
             .filter(|v| v.total_demand() > v.capacity)
-            .penalize_hard_with(|v: &Vehicle| {
+            .penalize(hard_weight(|v: &Vehicle| {
                 HardSoftScore::of_hard((v.total_demand() - v.capacity) as i64)
-            })
+            }))
             .named("Capacity"),
 
         Streams::new()
             .for_each(VehicleRoutePlan::vehicles())
-            .penalize_with(|v: &Vehicle| HardSoftScore::of_soft(v.total_distance()))
+            .penalize(|v: &Vehicle| HardSoftScore::of_soft(v.total_distance()))
             .named("Distance"),
     )
 }

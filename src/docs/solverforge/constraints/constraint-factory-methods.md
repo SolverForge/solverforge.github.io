@@ -30,7 +30,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
         Streams::new()
             .for_each(Schedule::shifts())
             .unassigned()
-            .penalize_hard()
+            .penalize(HardSoftScore::ONE_HARD)
             .named("Unassigned shift"),
 
         Streams::new()
@@ -45,7 +45,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
             .filter(|shift: &Shift, employee: &Employee| {
                 !employee.skills.contains(&shift.required_skill)
             })
-            .penalize_hard()
+            .penalize(HardSoftScore::ONE_HARD)
             .named("Missing skill"),
     )
 }
@@ -90,13 +90,13 @@ type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 let unassigned = Streams::new()
     .for_each(Schedule::shifts())
     .unassigned()
-    .penalize_hard()
+    .penalize(HardSoftScore::ONE_HARD)
     .named("Unassigned shift");
 
 let preference = Streams::new()
     .for_each(Schedule::shifts())
     .filter(|shift| shift.is_preferred())
-    .reward_soft()
+    .reward(HardSoftScore::ONE_SOFT)
     .named("Preferred assignment");
 ```
 
@@ -138,7 +138,7 @@ Use these methods as the first operation in a stream:
 Streams::new()
     .for_each(Schedule::shifts())
     .filter(|shift| shift.employee_idx.is_none())
-    .penalize_hard()
+    .penalize(HardSoftScore::ONE_HARD)
     .named("Unassigned shift")
 ```
 
@@ -232,7 +232,7 @@ unassigned support.
 Streams::new()
     .for_each(Schedule::shifts())
     .unassigned()
-    .penalize_hard()
+    .penalize(HardSoftScore::ONE_HARD)
     .named("Unassigned shift")
 ```
 
@@ -250,7 +250,7 @@ the projection can keep the same localized source ownership.
 Streams::new()
     .for_each(Schedule::shifts())
     .project(ShiftPenaltyProjection)
-    .penalize_with(|row: &ShiftPenalty| row.score)
+    .penalize(|row: &ShiftPenalty| row.score)
     .named("Shift penalty")
 ```
 
@@ -270,7 +270,7 @@ Streams::new()
         assignment_id: assignment.id,
         score: HardSoftScore::of_hard((assignment.demand - capacity.amount).max(0)),
     })
-    .penalize_with(|row: &CapacityViolation| row.score)
+    .penalize(hard_weight(|row: &CapacityViolation| row.score))
     .named("Capacity violation")
 ```
 

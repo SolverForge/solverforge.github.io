@@ -8,15 +8,16 @@ description: >
   direct runtime assembly contracts.
 ---
 
-**SolverForge 0.12.x** is the current core runtime line. It starts with
+**SolverForge 0.12.x** is the assignment-backed scalar construction runtime
+line. It starts with
 [0.12.0](https://crates.io/crates/solverforge/0.12.0), published on
 2026-05-08. The latest patch is
 [0.12.1](https://crates.io/crates/solverforge/0.12.1), with API docs on
 [docs.rs](https://docs.rs/solverforge/0.12.1).
 
-Patch releases are folded into this line note. Use the latest 0.12.x patch for
-new direct Cargo projects, and keep generated-app scaffold targets explicit by
-checking the installed `solverforge-cli` output.
+Patch releases are folded into this line note. Use the latest 0.12.x patch only
+when you are intentionally staying on the 0.12 line, and keep generated-app
+scaffold targets explicit by checking the installed `solverforge-cli` output.
 
 ## What Changed
 
@@ -254,7 +255,7 @@ core crate.
 
 ## Documentation Changes
 
-The docs tree now tracks the 0.12.x runtime surface:
+At the time of this release, the docs tree tracked the 0.12.x runtime surface:
 
 - [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/)
   shows `ConstraintFactory::for_each(Schedule::shifts())` as the normal stream
@@ -267,6 +268,6 @@ The docs tree now tracks the 0.12.x runtime surface:
   includes assignment-backed `grouped_scalar_move_selector` repair.
 - [List Variables](/docs/solverforge/modeling/list-variables/) removes public
   guidance around generated list mutation helpers.
-- [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.12.1` runtime from the still-older `solverforge-cli 2.0.4`
+- [Status & Roadmap](/docs/status-and-roadmap/) separated the published
+  `solverforge 0.12.1` runtime from the then-current `solverforge-cli 2.0.4`
   scaffold target.

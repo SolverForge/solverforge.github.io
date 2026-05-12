@@ -23,7 +23,7 @@ Configuration has three levels:
 | Level | Scope | Typical owner |
 | ----- | ----- | ------------- |
 | Global config | environment mode, random seed, thread count, top-level termination | app/operator |
-| Phase config | construction, local search, exhaustive search, VND, phase-specific termination | app/operator |
+| Phase config | construction, local search, VND via `local_search_type`, partitioned search, custom phase names, phase-specific termination | app/operator |
 | Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups | Rust domain model |
 
 The important rule is that config selects declared capabilities. It does not
@@ -137,8 +137,8 @@ Controls multi-threaded move evaluation.
 
 ```toml
 move_thread_count = 4        # Fixed thread count
-move_thread_count = "auto"   # Use available cores
-move_thread_count = "none"   # Single-threaded (default)
+move_thread_count = "auto"   # Use available cores (default)
+move_thread_count = "none"   # Single-threaded
 ```
 
 ### Random Seed
@@ -245,9 +245,9 @@ type = "change_move_selector"
 variable_name = "employee_id"
 ```
 
-That cap applies to the wrapped neighborhood itself. It is not a replacement
-for `accepted_count_limit`, which only controls how many accepted moves the
-forager retains for final selection.
+That cap applies to the wrapped neighborhood itself. It is separate from the
+accepted-count forager `limit`, which stops a selector step after that many
+accepted candidates and then picks the best candidate inside that step horizon.
 
 Scalar `change_move_selector`, `nearby_change_move_selector`,
 `pillar_change_move_selector`, and `ruin_recreate_move_selector` accept
@@ -310,7 +310,9 @@ Conflict-repair selectors configure `constraints` by exact scoring metadata
 identity. Use `ConstraintRef::full_name()` for package-qualified constraints and
 the short name for package-less constraints. With `include_soft_matches = false`,
 soft constraints are rejected before providers run; setting it to `true`
-explicitly allows soft repair providers.
+explicitly allows soft repair providers. Conflict repair operates on
+non-assignment-owned scalar variables; assignment-backed scalar slots stay on
+their owning grouped scalar selector path.
 
 Compound repair example:
 
@@ -323,6 +325,52 @@ max_repairs_per_match = 32
 max_moves_per_step = 256
 require_hard_improvement = true
 ```
+
+### Variable Neighborhood Descent
+
+VND is a local-search type, not a standalone `type = "vnd"` phase:
+
+```toml
+[[phases]]
+type = "local_search"
+local_search_type = "variable_neighborhood_descent"
+
+[[phases.neighborhoods]]
+type = "change_move_selector"
+variable_name = "employee_id"
+
+[[phases.neighborhoods]]
+type = "swap_move_selector"
+variable_name = "employee_id"
+```
+
+The `variable_neighborhood_descent` mode uses ordered `neighborhoods` and rejects
+`acceptor`, `forager`, and `move_selector`. The default `acceptor_forager`
+local-search mode uses `acceptor`, `forager`, and `move_selector`.
+
+### Partitioned And Custom Search
+
+`partitioned_search` requires a named partitioner compiled into the solution's
+typed search surface. SolverForge does not infer partitions from a count:
+
+```toml
+[[phases]]
+type = "partitioned_search"
+partitioner = "by_vehicle"
+thread_count = "auto"
+log_progress = true
+```
+
+Custom phases are also compiled into the solution with
+`#[planning_solution(search = "...")]` and selected by name:
+
+```toml
+[[phases]]
+type = "custom"
+name = "weekend_repair"
+```
+
+There is no arbitrary `custom_phase_class` loader or erased plugin registry.
 
 ### Construction Obligation
 

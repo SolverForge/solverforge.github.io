@@ -10,9 +10,9 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.12.1` crate and calls out
+documentation tracks the published `solverforge 0.13.0` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.12.1` package is available on crates.io; the published
+`solverforge 0.13.0` package is available on crates.io; the published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +21,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.12.1` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.12.1` runtime |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.13.0` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.13.0` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -42,15 +42,16 @@ published crates.io and CLI scaffold targets separately. The public
 - **Constraint Streams API**: source-aware generated source methods, `for_each`,
   `filter`, unified `join(...)`, `flatten_last`, `project(...)`, `group_by`,
   `balance`, `complement(...)`, `if_exists(...)`, `if_not_exists(...)`,
-  terminal scoring methods, and `.named(...)`
+  `collect_vec(...)`, `indexed_presence(...)`, explicit score weighting, and
+  `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
   HardSoftDecimalScore, BendableScore
 - **Score Analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
   plus lower-level detailed match/explanation APIs in `solverforge-scoring`
 - **SERIO Engine**: retained incremental scoring for real-time optimization
 - **Solver Phases**: scalar/list construction heuristics, assignment-backed
-  grouped scalar construction, local search, exhaustive search, partitioned
-  search, and VND
+  grouped scalar construction, streaming local search, VND as a local-search
+  type, and typed custom, exact, or partitioned search extensions
 - **Move System**: scalar, list, grouped scalar, assignment repair,
   conflict repair, cartesian, and composite move families
 - **SolverManager API**: retained job lifecycle with progress, best-solution,
@@ -62,7 +63,7 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.12.1 published baseline**: the core crate version is `0.12.1` and the
+- **0.13.0 published baseline**: the core crate version is `0.13.0` and the
   Rust toolchain floor remains `1.95`.
 - **Generated source methods**: `#[planning_solution]` now exposes collection
   sources as solution-associated functions such as `Schedule::shifts()`.
@@ -72,18 +73,23 @@ published crates.io and CLI scaffold targets separately. The public
   required nullable scalar slots, capacity keys, sequence/position hooks, and
   construction ordering; grouped construction and `grouped_scalar_move_selector`
   consume the same `group_name` from `solver.toml`.
-- **Consecutive run collector**: `consecutive_runs(...)` groups integer points
-  into `Runs` with per-run point and item counts, which is useful for streak
-  penalties such as consecutive work days.
-- **Public runtime names**: direct runtime assembly APIs now use
-  `RuntimeModel`, `VariableSlot`, `ScalarVariableSlot`, `ListVariableSlot`,
-  `ScalarGroup`, `ConflictRepair`, `RepairCandidate`, and `RepairLimits`.
+- **Collectors**: `consecutive_runs(...)`, `collect_vec(...)`, and
+  `indexed_presence(...)` cover streaks, owned grouped payloads, and ordinal
+  presence/complement checks.
+- **Scoring terminals**: the current stream surface uses `penalize(score)`,
+  `reward(score)`, typed dynamic closures, `fixed_weight(...)`, and
+  `hard_weight(...)`; the older `penalize_hard`, `penalize_with`, and
+  `reward_soft` helper family is historical.
+- **Public runtime names**: direct runtime assembly APIs use `RuntimeModel`,
+  `VariableSlot`, `ScalarVariableSlot`, `ListVariableSlot`, `ScalarGroup`,
+  `ScalarAssignmentRule`, `ConflictRepair`, `RepairCandidate`, and
+  `RepairLimits`.
 - **Facade configuration exports**: app code can import `SolverConfig`,
   `PhaseConfig`, `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
   `SolverConfigOverride`, and related enums directly from `solverforge`.
-- **Facade recording director export**: extension code that needs trial-move
-  rollback can import `RecordingDirector` from the facade beside `Director` and
-  `ScoreDirector`.
+- **Typed custom search**: solutions can compile in search code with
+  `#[planning_solution(search = "...")]`, register named phases through
+  `SearchContext`, and order those names from `solver.toml`.
 - **Joined-pair projected rows**: cross joins can use
   `.project(|left, right| row)` to retain one scoring row per joined pair.
 - **Clone-free projected paths**: projected outputs, projected self-join keys,
@@ -95,6 +101,9 @@ published crates.io and CLI scaffold targets separately. The public
   `nearby_value_candidates`, `nearby_entity_candidates`,
   `construction_entity_order_key`, and `construction_value_order_key` declare
   bounded scalar neighborhoods and construction ordering on the model.
+- **Model-aware defaults**: omitted runtime config builds construction plus one
+  streaming local-search phase; omitted `move_selector` values use typed
+  scalar/list/grouped defaults rather than prebuilding broad neighborhoods.
 - **Exact retained telemetry**: generated, evaluated, accepted, not-doable,
   acceptor-rejected, forager-ignored, hard-delta, conflict-repair, and
   construction-slot counters are retained as authoritative counters.

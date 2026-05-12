@@ -27,7 +27,7 @@ Streams::new()
             |u: &Unavailability| u.employee_idx,
         ),
     ))
-    .penalize_hard()
+    .penalize(HardSoftScore::ONE_HARD)
     .named("Unavailable employee");
 ```
 
