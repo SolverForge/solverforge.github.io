@@ -48,6 +48,27 @@ const initializeDocsSidebar = () => {
   window.addEventListener("hashchange", activate)
 }
 
+const initializeTestimonialSliders = () => {
+  document.querySelectorAll("[data-testimonial-slider]").forEach(slider => {
+    const slides = [...slider.querySelectorAll("[data-testimonial-slide]")]
+    if (slides.length < 2) return
+
+    let activeIndex = 0
+
+    const activate = index => {
+      activeIndex = (index + slides.length) % slides.length
+      slides.forEach((slide, slideIndex) => {
+        const active = slideIndex === activeIndex
+        slide.hidden = !active
+        slide.classList.toggle("is-active", active)
+      })
+    }
+
+    activate(0)
+    window.setInterval(() => activate(activeIndex + 1), 3000)
+  })
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const toggle = document.querySelector("[data-nav-toggle]")
   const menu = document.querySelector("[data-nav-menu]")
@@ -80,5 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   initializeDocsSidebar()
+  initializeTestimonialSliders()
   initializeSearch()
 })

@@ -472,7 +472,8 @@ h3 {
   gap: 0.65rem;
 }
 
-.home-section .ui-callout + .ui-card {
+.home-section .ui-callout + .ui-card,
+.home-section .testimonial-slider + .ui-card {
   display: block;
   margin-top: 0.9rem;
 }
@@ -498,6 +499,42 @@ h3 {
 .ui-callout__title {
   margin: 0 0 0.35rem;
   font-weight: 700;
+}
+
+.testimonial-slider {
+  margin: 1.5rem 0;
+}
+
+.testimonial-slider__viewport {
+  border-radius: var(--sf-radius-sm);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  background: rgba(16, 185, 129, 0.14);
+  min-height: 12.5rem;
+  overflow: hidden;
+}
+
+.testimonial-slider__slide {
+  display: grid;
+  align-content: center;
+  gap: 0.8rem;
+  min-height: 12.5rem;
+  margin: 0;
+  padding: 1.35rem;
+}
+
+.testimonial-slider__slide[hidden] {
+  display: none;
+}
+
+.testimonial-slider blockquote {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.testimonial-slider figcaption {
+  font-size: 0.92rem;
 }
 
 .docs-shell {

@@ -111,10 +111,17 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
 
     <div>
       <p class="page-shell__eyebrow">In practice</p>
-      <div class="ui-callout ui-callout--success">
-        <p class="ui-callout__title">Operator feedback</p>
-        <p>I have incorporated SolverForge in my new Rust application for staff scheduling and it's working like a charm, A+</p>
-        <p><strong>Fawaz Halwani</strong>, Pathologist, The Ottawa Hospital</p>
+      <div class="testimonial-slider" data-testimonial-slider>
+        <div class="testimonial-slider__viewport" aria-live="polite">
+          <figure class="testimonial-slider__slide is-active" data-testimonial-slide>
+            <blockquote>"Working like a charm, A+"</blockquote>
+            <figcaption><strong>Dr. Fawaz Halwani</strong>, Pathologist, The Ottawa Hospital</figcaption>
+          </figure>
+          <figure class="testimonial-slider__slide" data-testimonial-slide hidden>
+            <blockquote>"High-level abstractions, zero-cost implementation. A masterclass in Rust architecture."</blockquote>
+            <figcaption><strong>Prof. Benjamin Abel</strong>, Computer Science, Côte d'Azur University, Nice</figcaption>
+          </figure>
+        </div>
       </div>
       <%= render Ui::Card.new(title: "About SolverForge", href: relative_url('/about/'), icon: "fa-solid fa-circle-info") do %>
 See the problems SolverForge is built for and how the open source work is maintained.
