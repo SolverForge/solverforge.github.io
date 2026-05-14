@@ -13,9 +13,9 @@ weight: 2
 
 <%= render Ui::Callout.new(title: "Current onboarding path") do %>
 Start with **`solverforge-cli`** for the generic project shell. Then continue
-with the **SolverForge Hospital Use Case**, **SolverForge Deliveries Use
-Case**, or **SolverForge FSR Use Case** if you want one concrete worked example
-that goes further.
+with the **SolverForge Hospital Use Case**, **SolverForge Lessons Use Case**,
+**SolverForge Deliveries Use Case**, or **SolverForge FSR Use Case** if you
+want one concrete worked example that goes further.
 <% end %>
 
 ## Start Here
@@ -27,6 +27,10 @@ Install `solverforge-cli`, scaffold a new project, run the server, and extend th
   <%= render Ui::Card.new(title: "SolverForge Hospital Use Case", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
 Follow a longer worked example that carries the generic CLI shell into a
 concrete hospital planning application.
+  <% end %>
+  <%= render Ui::Card.new(title: "SolverForge Lessons Use Case", href: relative_url('/docs/getting-started/solverforge-lessons-use-case/'), icon: "fa-solid fa-school") do %>
+Study a lesson-timetabling example with teachers, cohorts, rooms, weekly
+timeslots, two scalar variables, retained jobs, and timetable views.
   <% end %>
   <%= render Ui::Card.new(title: "SolverForge Deliveries Use Case", href: relative_url('/docs/getting-started/solverforge-deliveries-use-case/'), icon: "fa-solid fa-route") do %>
 Study a route-optimization example with list variables, road-network data,
@@ -72,6 +76,7 @@ generation and `solverforge.app.toml` after scaffolding.
 
 - [CLI onboarding guide](/docs/solverforge-cli/getting-started/)
 - [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
+- [SolverForge Lessons Use Case](/docs/getting-started/solverforge-lessons-use-case/)
 - [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
 - [SolverForge FSR Use Case](/docs/getting-started/solverforge-fsr-use-case/)
 - [SolverForge API documentation](https://docs.rs/solverforge)

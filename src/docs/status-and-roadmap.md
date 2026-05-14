@@ -30,10 +30,11 @@ published crates.io and CLI scaffold targets separately. The public
 
 - Start with [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
   for the generic app shell.
-- Continue with the
-  [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
-  or the
-  [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/).
+- Continue with the worked use-case bundle:
+  [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
+  [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
+  [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
+  [FSR](/docs/getting-started/solverforge-fsr-use-case/).
 - Use [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)
   when scoring needs retained rows derived from source entities or joined pairs.
 

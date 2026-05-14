@@ -21,7 +21,7 @@ What SolverForge solves, when to use it, and how it differs from mathematical so
 Current release, published package status, runtime surface, and roadmap.
   <% end %>
   <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-terminal") do %>
-Start with the CLI shell, then continue into a complete hospital, deliveries, or field-service use case.
+Start with the CLI shell, then continue into a complete hospital, lessons, deliveries, or field-service use case.
   <% end %>
 </div>
 
@@ -30,6 +30,9 @@ Start with the CLI shell, then continue into a complete hospital, deliveries, or
 <div class="card-grid">
   <%= render Ui::Card.new(title: "Hospital Use Case", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
 Scalar assignment, retained jobs, schedule constraints, and browser updates in one worked app.
+  <% end %>
+  <%= render Ui::Card.new(title: "Lessons Use Case", href: relative_url('/docs/getting-started/solverforge-lessons-use-case/'), icon: "fa-solid fa-school") do %>
+Lesson timetabling with teachers, cohorts, rooms, two scalar variables, retained jobs, and timetable views.
   <% end %>
   <%= render Ui::Card.new(title: "Deliveries Use Case", href: relative_url('/docs/getting-started/solverforge-deliveries-use-case/'), icon: "fa-solid fa-route") do %>
 List-variable vehicle routing with maps, retained snapshots, and insertion recommendations.

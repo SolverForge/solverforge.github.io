@@ -35,7 +35,7 @@ Start here to understand the problem types, solver fit, and current runtime line
   <%= render Ui::Card.new(title: "CLI quickstart", href: relative_url('/docs/solverforge-cli/getting-started/'), icon: "fa-solid fa-terminal") do %>
 Install the CLI, scaffold a runnable app, and make the first model change.
   <% end %>
-  <%= render Ui::Card.new(title: "Hospital use case", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
-Follow a concrete scheduling example from scaffold to solver-driven browser updates.
+  <%= render Ui::Card.new(title: "Worked use cases", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-layer-group") do %>
+Follow hospital, lessons, deliveries, and field-service examples from scaffold to solver-driven browser updates.
   <% end %>
 </div>

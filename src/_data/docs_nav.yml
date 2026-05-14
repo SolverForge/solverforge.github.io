@@ -34,6 +34,21 @@ docs:
             href: /docs/getting-started/solverforge-hospital-use-case/#solver-policy
           - title: Runtime
             href: /docs/getting-started/solverforge-hospital-use-case/#runtime-and-browser-behavior
+      - title: SolverForge Lessons Use Case
+        href: /docs/getting-started/solverforge-lessons-use-case/
+        children:
+          - title: Setup
+            href: /docs/getting-started/solverforge-lessons-use-case/#getting-started
+          - title: Data Model
+            href: /docs/getting-started/solverforge-lessons-use-case/#understanding-the-data-model
+          - title: Demo Dataset
+            href: /docs/getting-started/solverforge-lessons-use-case/#the-demo-dataset
+          - title: Constraints
+            href: /docs/getting-started/solverforge-lessons-use-case/#writing-constraints
+          - title: Solver Policy
+            href: /docs/getting-started/solverforge-lessons-use-case/#solver-policy
+          - title: Runtime
+            href: /docs/getting-started/solverforge-lessons-use-case/#runtime-and-browser-behavior
       - title: SolverForge Deliveries Use Case
         href: /docs/getting-started/solverforge-deliveries-use-case/
         children:

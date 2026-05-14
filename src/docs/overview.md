@@ -26,7 +26,7 @@ Assign hospital staff to shifts based on skills, availability, and labor regulat
   <%= render Ui::Card.new(title: "Vehicle Routing", icon: "fa-solid fa-route") do %>
 Plan delivery routes that minimize travel time while meeting time windows.
   <% end %>
-  <%= render Ui::Card.new(title: "School Timetabling", icon: "fa-solid fa-school") do %>
+  <%= render Ui::Card.new(title: "School Timetabling", href: relative_url('/docs/getting-started/solverforge-lessons-use-case/'), icon: "fa-solid fa-school") do %>
 Schedule lessons to rooms and timeslots without conflicts.
   <% end %>
   <%= render Ui::Card.new(title: "Task Assignment", icon: "fa-solid fa-list-check") do %>
@@ -165,6 +165,6 @@ Current release, published package status, completed runtime surface, and roadma
 Crate responsibilities, zero-erasure design, SERIO scoring, and retained runtime pieces.
   <% end %>
   <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-rocket") do %>
-Start from the CLI scaffold and follow concrete hospital or delivery examples.
+Start from the CLI scaffold and follow concrete hospital, lessons, delivery, or field-service examples.
   <% end %>
 </div>

@@ -160,3 +160,4 @@ anything.
 - [Moves](/docs/solverforge/solver/moves/) — Move types including list-specific moves
 - [Planning Entities](/docs/solverforge/modeling/planning-entities/) — Shadow variable attributes
 - [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/) — List-variable vehicle routing with road-network scoring
+- [SolverForge FSR Use Case](/docs/getting-started/solverforge-fsr-use-case/) — List-variable technician routing with skills, parts, and route geometry

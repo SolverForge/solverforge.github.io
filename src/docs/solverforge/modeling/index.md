@@ -75,3 +75,4 @@ means Rust module declaration order is not a modeling contract.
 
 - [docs.rs/solverforge](https://docs.rs/solverforge) — Full API reference
 - [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/) — Concrete worked example built on the generic CLI scaffold
+- [SolverForge Lessons Use Case](/docs/getting-started/solverforge-lessons-use-case/) — Two scalar planning variables on one lesson entity

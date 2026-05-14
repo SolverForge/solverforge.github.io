@@ -32,9 +32,9 @@ Use road-network data, route geometry, and travel-time matrices when distance an
 
 ## How It Works
 
-The best way to judge SolverForge is through complete applications. These two
-examples show how real planning questions become typed model objects, solver
-variables, constraints, retained jobs, and browser behavior.
+The best way to judge SolverForge is through complete applications. These
+worked examples show how real planning questions become typed model objects,
+solver variables, constraints, retained jobs, and browser behavior.
 
 <div class="card-grid">
   <%= render Ui::Card.new(title: "Hospital scheduling", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
@@ -46,6 +46,15 @@ variables, constraints, retained jobs, and browser behavior.
 - 50 employees
 - 688 shifts
   <% end %>
+  <%= render Ui::Card.new(title: "Lesson timetabling", href: relative_url('/docs/getting-started/solverforge-lessons-use-case/'), icon: "fa-solid fa-school") do %>
+"Given lessons, teachers, student groups, rooms, and weekly timeslots, which timeslot and room should each lesson receive?"
+
+- `Lesson` is the planning entity.
+- `Lesson.timeslot_idx` and `Lesson.room_idx` are scalar planning variables.
+- `LARGE`
+- 300 lessons
+- 40 weekly timeslots
+  <% end %>
   <%= render Ui::Card.new(title: "Delivery routing", href: relative_url('/docs/getting-started/solverforge-deliveries-use-case/'), icon: "fa-solid fa-route") do %>
 "Given depots, vehicles, delivery stops, capacities, and time windows, which vehicle should visit each delivery and in what order?"
 
@@ -54,6 +63,15 @@ variables, constraints, retained jobs, and browser behavior.
 - `Vehicle.delivery_order` is the list planning variable.
 - `PHILADELPHIA` (default)
 - `FIRENZE`
+  <% end %>
+  <%= render Ui::Card.new(title: "Field-service routing", href: relative_url('/docs/getting-started/solverforge-fsr-use-case/'), icon: "fa-solid fa-screwdriver-wrench") do %>
+"Given technicians, service visits, skills, parts, shifts, territories, and road-network travel, which technician should serve each visit and in what order?"
+
+- `ServiceVisit` is a problem fact.
+- `TechnicianRoute.visits` is the list planning variable.
+- `STANDARD`
+- 6 technicians
+- 48 service visits
   <% end %>
 </div>
 
@@ -75,8 +93,8 @@ release.
   <%= render Ui::Card.new(title: "Read the overview", href: relative_url('/docs/overview/'), icon: "fa-solid fa-compass") do %>
 Understand the planning problems SolverForge handles and when another solver style is a better fit.
   <% end %>
-  <%= render Ui::Card.new(title: "Run a worked example", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
-Inspect a hospital scheduling app with skills, availability, retained jobs, snapshots, and browser updates.
+  <%= render Ui::Card.new(title: "Run a worked example", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-calendar-days") do %>
+Inspect hospital, lessons, deliveries, and field-service apps with retained jobs, snapshots, and browser updates.
   <% end %>
   <%= render Ui::Card.new(title: "Inspect the source", href: "https://github.com/SolverForge", icon: "fa-brands fa-github") do %>
 Review the crates, examples, releases, and issue history before depending on the work.

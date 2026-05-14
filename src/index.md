@@ -17,15 +17,15 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
       <a class="button button--primary" href="<%= relative_url '/docs/solverforge-cli/getting-started/' %>">
         Start with solverforge-cli <i class="fa-solid fa-arrow-right"></i>
       </a>
-      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/solverforge-hospital-use-case/' %>">
-        Continue with the Hospital Use Case <i class="fa-solid fa-book-open"></i>
+      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/' %>">
+        Browse the Use Cases <i class="fa-solid fa-book-open"></i>
       </a>
     </div>
 
     <div class="home-proof">
       <span>Runnable app scaffold</span>
       <span>Readable domain constraints</span>
-      <span>Hospital and delivery examples</span>
+      <span>Hospital, lessons, delivery, and FSR examples</span>
     </div>
   </section>
 
@@ -38,7 +38,7 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
       </p>
       <div class="card-grid">
         <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-rocket") do %>
-Start with the generic CLI path, then continue into one concrete hospital walkthrough.
+Start with the generic CLI path, then continue into a concrete worked example.
         <% end %>
         <%= render Ui::Card.new(title: "Reference", href: relative_url('/reference/'), icon: "fa-solid fa-book") do %>
 Check the crate map, modeling checklist, and extension guidance before choosing an implementation path.

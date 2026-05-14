@@ -90,5 +90,7 @@ PlanningEntity
   matching your real app.
 - Go to [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
   for one concrete worked example built on top of `solverforge-cli`.
+- Go to [SolverForge Lessons Use Case](/docs/getting-started/solverforge-lessons-use-case/)
+  for a scalar model with two planning variables on one entity.
 - Go to [SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/)
   for a list-variable routing example with maps and retained jobs.
