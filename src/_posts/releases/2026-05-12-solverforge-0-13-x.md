@@ -4,19 +4,21 @@ date: 2026-05-12
 draft: false
 description: >
   SolverForge 0.13.x publishes streaming model-aware search defaults, typed
-  custom search registration, owned grouped collectors, and the explicit
-  scoring terminal surface.
+  custom search registration, match-shape collectors, direct cross-join
+  grouping, and the explicit scoring terminal surface.
 ---
 
 **SolverForge 0.13.x** is the current core runtime line. It starts with
 [0.13.0](https://crates.io/crates/solverforge/0.13.0), published on
 2026-05-12, with API docs on
-[docs.rs](https://docs.rs/solverforge/0.13.0).
+[docs.rs](https://docs.rs/solverforge/0.13.0). The current patch is
+[0.13.1](https://crates.io/crates/solverforge/0.13.1), published on
+2026-05-14, with API docs at [docs.rs](https://docs.rs/solverforge/0.13.1).
 
 The release is not a CLI scaffold refresh. `solverforge-cli 2.0.4` still
 scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and
 `solverforge-maps 2.1.4`. Direct Cargo projects and deliberately upgraded
-generated apps can target the published `solverforge 0.13.0` crate.
+generated apps can target the published `solverforge 0.13.1` crate.
 
 ## What Changed
 
@@ -65,6 +67,53 @@ not need `Copy`, `Clone`, or `PartialEq` just to be collected.
 `indexed_presence(...)` adds a stock ordinal-presence collector for rules that
 need covered and missing ranges. It pairs with the existing `count`, `sum`,
 `load_balance`, and `consecutive_runs` collectors.
+
+In `0.13.1`, collectors are generic over the stream match shape. The public
+collector trait is `Collector<Input>`, so the same stock collector protocol
+works for unary rows, projected rows, and joined pairs. Direct cross joins can
+now group joined pairs without materializing projected rows first:
+
+```rust
+type Streams = ConstraintFactory<Plan, HardSoftScore>;
+
+Streams::new()
+    .for_each(Plan::assignments())
+    .join((
+        Streams::new().for_each(Plan::capacities()),
+        equal_bi(
+            |assignment: &Assignment| assignment.capacity_id,
+            |capacity: &Capacity| Some(capacity.id),
+        ),
+    ))
+    .group_by(
+        |assignment: &Assignment, capacity: &Capacity| (assignment.id, capacity.id),
+        sum(|(assignment, capacity): (&Assignment, &Capacity)| {
+            capacity.amount - assignment.demand
+        }),
+    )
+    .penalize(hard_weight(|_key: &(usize, usize), shortage: &i64| {
+        HardSoftScore::of_hard((-*shortage).max(0))
+    }))
+    .named("Capacity shortage");
+```
+
+Projected grouped streams can also continue into `complement(...)` or
+`complement_with_key(...)`, so supply/demand rules can group retained scoring
+rows and still produce explicit rows for missing keys.
+
+### Joined filters use source indexes
+
+`0.13.1` fixes the last placeholder index path in joined filters. Low-level
+Bi/Tri/Quad/Penta filter traits now receive semantic source indexes for the
+rows being tested. Same-source joins use entity indexes, cross joins use left
+and right source indexes, flattened rows use the left source index and owning
+right-side source index, and projected self-joins use each projected row's
+primary owner entity index.
+
+Normal fluent `.filter(|a, b| ...)` predicates remain entity-oriented. This
+matters when you implement low-level scoring extensions, inspect retained match
+identity, or depend on localized incremental updates across direct cross,
+projected, flattened, and higher-arity joins.
 
 ### Default search is streaming-first
 
@@ -140,14 +189,14 @@ search when an application owns the concrete decider.
 For direct Cargo projects:
 
 ```toml
-solverforge = { version = "0.13.0", features = ["serde", "console"] }
+solverforge = { version = "0.13.1", features = ["serde", "console"] }
 ```
 
 If you write custom incremental constraints that need lower-level identities,
 the companion workspace crates are also published at the same 0.13.x patch:
 
 ```toml
-solverforge-core = "0.13.0"
+solverforge-core = "0.13.1"
 ```
 
 For generated apps, confirm the installed CLI target:
@@ -177,6 +226,7 @@ newer core crate.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.13.1` | 2026-05-14 | Generalizes collectors to `Collector<Input>`, adds direct cross-join grouping, allows projected grouped complements, and preserves semantic source indexes for joined filters. |
 | `0.13.0` | 2026-05-12 | Adds `collect_vec` and `indexed_presence`, exposes explicit weight wrappers, restores generated constraint-stream convenience traits, moves VND under local search, adds typed custom search registration, and makes default search streaming-first. |
 
 ## Documentation Changes
@@ -184,14 +234,17 @@ newer core crate.
 The docs tree now tracks the 0.13.x runtime surface:
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/)
-  shows the current `penalize(...)` / `reward(...)` terminal API.
+  shows the current `penalize(...)` / `reward(...)` terminal API, direct
+  cross-join grouping, and the index-aware joined filter contract.
 - [Collectors](/docs/solverforge/constraints/collectors/) documents
-  `collect_vec(...)` and `indexed_presence(...)` beside the existing
-  collectors.
+  `collect_vec(...)`, `indexed_presence(...)`, and the generic
+  `Collector<Input>` match-shape contract beside the existing collectors.
+- [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)
+  covers projected grouped complements.
 - [Configuration](/docs/solverforge/solver/configuration/) covers VND as
   `local_search_type`, typed `custom` phase names, and named partitioners.
 - [Local Search](/docs/solverforge/solver/local-search/) explains the
   accepted-count horizon and fair union selector ordering.
 - [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.13.0` runtime from the still-current
+  `solverforge 0.13.1` runtime from the still-current
   `solverforge-cli 2.0.4` scaffold target.
