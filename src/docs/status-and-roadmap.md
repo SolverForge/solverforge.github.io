@@ -10,9 +10,9 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.13.0` crate and calls out
+documentation tracks the published `solverforge 0.13.1` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.13.0` package is available on crates.io; the published
+`solverforge 0.13.1` package is available on crates.io; the published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +21,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.13.0` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.13.0` runtime |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.13.1` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.13.1` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -40,8 +40,9 @@ published crates.io and CLI scaffold targets separately. The public
 ## Completed Runtime Surface
 
 - **Constraint Streams API**: source-aware generated source methods, `for_each`,
-  `filter`, unified `join(...)`, `flatten_last`, `project(...)`, `group_by`,
-  `balance`, `complement(...)`, `if_exists(...)`, `if_not_exists(...)`,
+  `filter`, unified `join(...)`, direct cross-join `group_by(...)`,
+  `flatten_last`, `project(...)`, projected grouped complements, `balance`,
+  `complement(...)`, `if_exists(...)`, `if_not_exists(...)`,
   `collect_vec(...)`, `indexed_presence(...)`, explicit score weighting, and
   `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
@@ -63,7 +64,7 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.13.0 published baseline**: the core crate version is `0.13.0` and the
+- **0.13.1 published baseline**: the core crate version is `0.13.1` and the
   Rust toolchain floor remains `1.95`.
 - **Generated source methods**: `#[planning_solution]` now exposes collection
   sources as solution-associated functions such as `Schedule::shifts()`.
@@ -75,7 +76,9 @@ published crates.io and CLI scaffold targets separately. The public
   consume the same `group_name` from `solver.toml`.
 - **Collectors**: `consecutive_runs(...)`, `collect_vec(...)`, and
   `indexed_presence(...)` cover streaks, owned grouped payloads, and ordinal
-  presence/complement checks.
+  presence/complement checks. The underlying `Collector<Input>` contract is
+  generic over the stream match shape, so unary rows, projected rows, and direct
+  cross-join pairs use the same collector protocol.
 - **Scoring terminals**: the current stream surface uses `penalize(score)`,
   `reward(score)`, typed dynamic closures, `fixed_weight(...)`, and
   `hard_weight(...)`; the older `penalize_hard`, `penalize_with`, and
@@ -92,9 +95,15 @@ published crates.io and CLI scaffold targets separately. The public
   `SearchContext`, and order those names from `solver.toml`.
 - **Joined-pair projected rows**: cross joins can use
   `.project(|left, right| row)` to retain one scoring row per joined pair.
+- **Direct cross-join grouping**: cross joins can group joined pairs with
+  `.group_by(|left, right| key, collector)` without projecting first.
+- **Projected grouped complements**: projected grouped streams can continue into
+  `complement(...)` or `complement_with_key(...)` for missing-key scoring rows.
 - **Clone-free projected paths**: projected outputs, projected self-join keys,
   and grouped collector values no longer need `Clone` in the `0.11.x` release
   line.
+- **Joined filter indexes**: low-level joined filters receive semantic source
+  indexes for direct, grouped, projected, flattened, and higher-arity joins.
 - **Borrowed constraint identity**: scoring metadata preserves full
   `ConstraintRef` identity borrowed from the owning constraint.
 - **Model-owned scalar hooks**: `candidate_values`,

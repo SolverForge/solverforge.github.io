@@ -77,7 +77,7 @@ That output is versioned with the installed CLI. The current
 
 Keep generated-app dependency manifests aligned with the installed CLI. Use the
 version output as the source of truth for the scaffold targets carried by that
-binary. The current standalone runtime crate is `solverforge 0.13.0`; upgrading
+binary. The current standalone runtime crate is `solverforge 0.13.1`; upgrading
 a generated app to that runtime is an app-owned dependency and
 `solverforge.app.toml` change until a newer CLI scaffold target is published.
 

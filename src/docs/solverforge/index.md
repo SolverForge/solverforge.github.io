@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.13.0` crate and current source
+These pages track the published `solverforge 0.13.1` crate and current source
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime until the next CLI runtime-target refresh, so check
 `solverforge --version` when starting from a scaffold.
@@ -32,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.13.0` crate declares Rust `1.95`.
+The `0.13.1` crate declares Rust `1.95`.
 
 The generated runtime now builds one `RuntimeModel` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -58,7 +58,9 @@ The current release tightens several public contracts:
   `group_name`, and `grouped_scalar_move_selector`
 - `collect_vec(...)`, `consecutive_runs(...)`, `indexed_presence(...)`,
   `CollectedVec`, `IndexedPresence`, `Run`, and `Runs` are available from the
-  prelude for grouped collection, streak, and ordinal-presence rules
+  prelude for grouped collection, streak, and ordinal-presence rules; their
+  shared `Collector<Input>` contract covers unary rows, projected rows, and
+  joined cross-join pairs
 - scoring terminals use `penalize(score)`, `reward(score)`, typed dynamic
   closures, `fixed_weight(...)`, and `hard_weight(...)`; the former
   `penalize_hard`, `penalize_with`, and `reward_soft` helper family is no
@@ -68,12 +70,14 @@ The current release tightens several public contracts:
   `SolverConfigOverride`, and related enums are available directly from
   `solverforge`
 - projected scoring rows use `Projection` / `ProjectionSink` for bounded
-  single-source rows, and cross joins can retain one scoring row per joined
-  pair with `.project(|left, right| row)`
+  single-source rows, and cross joins can either group joined pairs directly
+  with `.group_by(|left, right| key, collector)` or retain one scoring row per
+  joined pair with `.project(|left, right| row)`
 - projected outputs, projected self-join keys, and grouped collector values no
   longer require `Clone`
 - projected self-join ordering is coordinate-stable by source ownership and
-  emission index
+  emission index, with low-level joined filters receiving primary owner entity
+  indexes rather than retained storage row IDs
 - scalar construction order is model-owned through
   `construction_entity_order_key` and `construction_value_order_key`; those
   hooks are evaluated against the live working solution at each construction
