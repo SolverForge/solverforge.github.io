@@ -547,7 +547,7 @@ h3 {
 .docs-shell__sidebar {
   position: sticky;
   top: 6rem;
-  height: fit-content;
+  align-self: start;
   min-width: 0;
 }
 
@@ -557,6 +557,10 @@ h3 {
 }
 
 .docs-sidebar {
+  max-height: calc(100dvh - 9rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   padding: 1.1rem;
   border-radius: var(--sf-radius);
   border: 1px solid var(--sf-border);
@@ -1146,7 +1150,14 @@ h3 {
 
   .docs-shell__sidebar {
     position: static;
+    max-height: none;
+    overflow: visible;
     order: 2;
+  }
+
+  .docs-sidebar {
+    max-height: none;
+    overflow: visible;
   }
 
   .docs-shell__content {
