@@ -74,7 +74,7 @@ factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 | `join` | Combine rows from the same stream or a second stream |
 | `project` | Create retained scoring-only rows |
 | `flatten_last` | Expand a collection carried by the last joined item |
-| `group_by` | Group rows and apply a collector |
+| `group_by` | Group unary rows, projected rows, or cross-join pairs and apply a collector |
 | `balance` | Score load balance without manual grouped unfairness logic |
 | `complement` | Fill missing grouped keys from a generated fact or entity source |
 | `if_exists` / `if_not_exists` | Keep rows based on matching rows in another collection |
@@ -125,6 +125,12 @@ Streams::new()
 See [Joiners](/docs/solverforge/constraints/joiners/) for joiner types and
 composition.
 
+After a cross join, choose the operation that matches the rule:
+
+- score the joined pair directly with `penalize(...)` or `reward(...)`
+- group joined pairs directly with `.group_by(|left, right| key, collector)`
+- emit one retained scoring row per pair with `.project(|left, right| row)`
+
 ### `group_by`
 
 ```rust
@@ -137,6 +143,28 @@ factory.for_each(Schedule::shifts())
 
 See [Collectors](/docs/solverforge/constraints/collectors/) for `count`, `sum`,
 `load_balance`, `consecutive_runs`, `collect_vec`, and `indexed_presence`.
+
+Cross-join streams can group pairs without a projection step. The key function
+receives the joined values as separate arguments, while the collector receives
+the stream match shape as one tuple:
+
+```rust
+type Streams = ConstraintFactory<Plan, HardSoftScore>;
+
+Streams::new()
+    .for_each(Plan::assignments())
+    .join((
+        Streams::new().for_each(Plan::capacities()),
+        equal_bi(
+            |assignment: &Assignment| assignment.capacity_id,
+            |capacity: &Capacity| Some(capacity.id),
+        ),
+    ))
+    .group_by(
+        |assignment: &Assignment, capacity: &Capacity| (assignment.id, capacity.id),
+        count(),
+    )
+```
 
 ### `balance`
 
@@ -205,6 +233,21 @@ let preference = Streams::new()
     .penalize(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
     .named("Preference");
 ```
+
+## Joined Filter Indexes
+
+Normal `.filter(...)` predicates stay value-oriented. The lower-level retained
+filter contract also receives semantic source indexes so localized incremental
+scoring can retract and re-evaluate the correct joined rows:
+
+- same-source joins pass canonical entity indexes
+- cross joins pass the left and right source indexes
+- flattened rows pass the left source index and the owning right-side source
+  index
+- projected self-joins pass each projected row's primary owner entity index
+
+This matters for advanced scoring extensions and retained match inspection; it
+does not change ordinary fluent `.filter(|a, b| ...)` application code.
 
 ## Full Example
 

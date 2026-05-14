@@ -153,7 +153,8 @@ Combine two streams by matching on joiners. The current API uses one unified `.j
 A condition for matching items in joins, such as `equal`, `equal_bi`, or `overlapping`.
 
 ### group_by
-Aggregate items by key with collectors.
+Aggregate unary rows, projected rows, or cross-join pairs by key with
+collectors.
 
 ### flatten_last
 Flatten the final element of a tuple stream into a child collection, then continue matching on the flattened values.
@@ -165,7 +166,9 @@ Compute load imbalance directly from a uni-stream without manually writing `grou
 Keep or reject items based on whether matching items exist in another collection.
 
 ### Collector
-Aggregation function used with `group_by(...)`, such as `count`, `sum`, or `load_balance`.
+Aggregation function used with `group_by(...)`, such as `count`, `sum`, or
+`load_balance`. Current collectors use `Collector<Input>`, where `Input` is the
+stream match shape being grouped.
 
 ### penalize / reward
 Apply score impact for matching items.

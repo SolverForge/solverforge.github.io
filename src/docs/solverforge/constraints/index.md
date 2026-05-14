@@ -32,6 +32,7 @@ sources such as `Schedule::shifts()` preserve source metadata for localized
 incremental updates. Projected streams can emit retained scoring rows from one
 source or one joined pair, grouped streams can use collectors such as
 `consecutive_runs(...)`, `collect_vec(...)`, and `indexed_presence(...)`, and
+direct cross joins can group joined pairs without projecting them first. The
 lower-level constraint metadata borrows full `ConstraintRef` identity from the
 owning constraint. Package-qualified constraints use
 `ConstraintRef::full_name()` as the configured key; package-less constraints use

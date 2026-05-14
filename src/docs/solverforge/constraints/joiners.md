@@ -94,9 +94,17 @@ Streams::new()
     ))
 ```
 
+After a cross join, the stream can score pairs directly, group the joined pairs
+with `.group_by(|left, right| key, collector)`, or project each pair into a
+retained scoring row with `.project(|left, right| row)`.
+
 ## Performance Note
 
 Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`) are much faster than `filtering` because they use index lookups instead of iterating all pairs. Prefer indexed joiners where possible and only use `filtering` for conditions that can't be expressed with indexed joiners.
+
+Low-level joined filters receive semantic source indexes in the current runtime.
+The fluent `filtering(|left, right| ...)` and `.filter(|left, right| ...)`
+closures remain value-oriented.
 
 ## See Also
 

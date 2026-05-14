@@ -11,6 +11,12 @@ transform a stream of individual matches into grouped summaries. For simple
 fairness rules, prefer `balance(...)`; use collectors when you need explicit
 counts, totals, or custom imbalance data.
 
+In the current release, the collector trait is `Collector<Input>`. `Input` is
+the borrowed stream match shape: unary and projected grouping pass `&A` or
+`&Out`, while direct cross-join grouping passes `(&A, &B)`. Stock collectors
+such as `count`, `sum`, `collect_vec`, `consecutive_runs`, and
+`indexed_presence` use the same protocol across those shapes.
+
 ## Using Collectors
 
 Pass a collector as the second argument to `group_by`:
@@ -42,6 +48,28 @@ Sums numeric values in each group. The mapper extracts the value to sum.
 ```rust
 .group_by(|s: &Shift| s.employee_idx, sum(|s: &Shift| s.hours))
 // → (key, i64)
+```
+
+For direct cross-join grouping, the mapper receives the joined pair as a tuple:
+
+```rust
+type Streams = ConstraintFactory<Plan, HardSoftScore>;
+
+Streams::new()
+    .for_each(Plan::assignments())
+    .join((
+        Streams::new().for_each(Plan::capacities()),
+        equal_bi(
+            |assignment: &Assignment| assignment.capacity_id,
+            |capacity: &Capacity| Some(capacity.id),
+        ),
+    ))
+    .group_by(
+        |assignment: &Assignment, _capacity: &Capacity| assignment.bucket,
+        sum(|(assignment, capacity): (&Assignment, &Capacity)| {
+            capacity.amount - assignment.demand
+        }),
+    )
 ```
 
 ### `load_balance(key_fn, metric_fn)`
@@ -126,7 +154,7 @@ factory.for_each(Schedule::shifts())
     .filter(|shift: &Shift| shift.employee_idx.is_some())
     .group_by(
         |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
-        count::<Shift>(),
+        count(),
     )
     .complement(Schedule::employees(), |employee: &Employee| employee.index, |_employee| 0usize)
     .penalize(|_employee_idx: &usize, count: &usize| {
@@ -134,6 +162,9 @@ factory.for_each(Schedule::shifts())
     })
     .named("Balanced workload")
 ```
+
+Projected grouped streams can also use `complement(...)` after grouping when
+the source rows were created by `project(...)`.
 
 ## Balance Stream Operation
 

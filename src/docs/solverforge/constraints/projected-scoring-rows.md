@@ -95,6 +95,27 @@ Since the `0.11.x` release line, joined-pair projected rows are retained by join
 coordinates, so localized updates from either side of the join can update the
 cached scoring rows without materializing facts.
 
+If the rule only needs an aggregate over joined pairs, use direct cross-join
+grouping instead:
+
+```rust
+Streams::new()
+    .for_each(Plan::assignments())
+    .join((
+        Streams::new().for_each(Plan::capacities()),
+        equal_bi(
+            |assignment: &Assignment| assignment.capacity_id,
+            |capacity: &Capacity| Some(capacity.id),
+        ),
+    ))
+    .group_by(
+        |assignment: &Assignment, capacity: &Capacity| assignment.bucket,
+        sum(|(assignment, capacity): (&Assignment, &Capacity)| {
+            capacity.amount - assignment.demand
+        }),
+    )
+```
+
 ## Clone-Free Rows and Keys
 
 Projected outputs, projected self-join keys, and grouped collector values no
@@ -123,6 +144,31 @@ factory.for_each(Schedule::shifts())
 Self-join ordering is coordinate-stable. It follows source ownership and emit
 index instead of sparse storage row IDs, so row reuse does not define pair
 orientation.
+
+Low-level projected self-join filters receive each projected row's primary owner
+entity index, not the retained storage row ID. The fluent `.filter(|a, b| ...)`
+shape remains unchanged for normal application constraints.
+
+## Projected Group Complements
+
+Projected streams can be grouped and then complemented against a generated
+fact or entity source. Use this when the projected rows represent demand,
+coverage, or usage and the constraint also needs explicit rows for keys with no
+projected matches.
+
+```rust
+factory.for_each(Schedule::shifts())
+    .project(ShiftWindows)
+    .group_by(
+        |window: &WorkWindow| window.employee_id.unwrap_or(usize::MAX),
+        count(),
+    )
+    .complement(Schedule::employees(), |employee: &Employee| employee.index, |_employee| 0usize)
+    .penalize(|_employee_idx: &usize, count: &usize| {
+        HardSoftScore::of_soft((*count as i64 - 4).abs())
+    })
+    .named("Projected workload balance")
+```
 
 ## Boundaries
 
