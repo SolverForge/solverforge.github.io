@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the checked-in SolverForge 0.14.0 use-case dependency shape
+- keep the checked-in SolverForge 0.14.1 use-case dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -122,16 +122,16 @@ score analysis surface, route tables, Docker build, and tests.
 ### Keep the Published Dependency Shape
 
 The current checked-in FSR use-case source targets the published SolverForge
-0.14.0 line:
+0.14.1 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.14.0", features = [
+solverforge = { version = "0.14.1", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.14.0"
+solverforge-core = "0.14.1"
 solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.4"
 
@@ -166,8 +166,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.14.0"
-runtime_source = "crates.io: solverforge 0.14.0"
+target = "solverforge 0.14.1"
+runtime_source = "crates.io: solverforge 0.14.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 

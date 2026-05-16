@@ -36,7 +36,7 @@ published crates.io and CLI scaffold targets separately. The public
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides stay
   aligned to the checked-in use-case bundle, which currently pins
-  `solverforge 0.14.0`.
+  `solverforge 0.14.1`.
 - Use [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)
   when scoring needs retained rows derived from source entities or joined pairs.
 

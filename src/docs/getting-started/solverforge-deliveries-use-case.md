@@ -134,14 +134,14 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the `solverforge 0.14.0` crate used by the checked-in
+runtime dependency to the `solverforge 0.14.1` crate used by the checked-in
 delivery use-case source. Keep the published `solverforge-ui 0.6.5` and
 `solverforge-maps 2.1.4` crates for the companion release lines, then add the
 delivery app's normal web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.14.0", features = [
+solverforge = { version = "0.14.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -179,8 +179,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.14.0"
-runtime_source = "crates.io: solverforge 0.14.0"
+target = "solverforge 0.14.1"
+runtime_source = "crates.io: solverforge 0.14.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 
@@ -405,10 +405,10 @@ pub struct Vehicle {
         solution_trait = "crate::domain::DeliveryRoutingSolution",
         distance_meter = "solverforge::cvrp::MatrixDistanceMeter",
         intra_distance_meter = "solverforge::cvrp::MatrixIntraDistanceMeter",
-        route_get_fn = "crate::domain::get_delivery_route",
-        route_set_fn = "crate::domain::replace_delivery_route",
-        route_depot_fn = "crate::domain::delivery_route_depot",
-        route_distance_fn = "crate::domain::delivery_route_distance",
+        route_get_fn = "solverforge::cvrp::get_route",
+        route_set_fn = "solverforge::cvrp::replace_route",
+        route_depot_fn = "solverforge::cvrp::depot_for_entity",
+        route_distance_fn = "solverforge::cvrp::route_distance",
         route_feasible_fn = "crate::domain::delivery_route_feasible"
     )]
     pub delivery_order: Vec<usize>,
@@ -416,10 +416,11 @@ pub struct Vehicle {
 ```
 
 The route hooks are shared by Clarke-Wright construction and k-opt
-improvement. They receive the route owner so app-owned depot, distance, and
-feasibility checks stay bound to the vehicle whose route context scored the
-candidate. The article-level point is still simple: the route is an ordered
-list of delivery IDs, not a copied list of delivery structs.
+improvement. The current app uses stock CVRP helpers for route get/set, depot,
+and distance lookup, then keeps feasibility app-owned because time windows,
+unreachable legs, and prepared route caches live in the delivery domain. The
+article-level point is still simple: the route is an ordered list of delivery
+IDs, not a copied list of delivery structs.
 
 ### Plan as Routing Solution
 
