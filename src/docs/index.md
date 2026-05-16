@@ -68,6 +68,9 @@ Road-network loading, routing, matrices, route geometry, and map-backed planning
   <%= render Ui::Card.new(title: "solverforge-ui", href: relative_url('/docs/solverforge-ui/'), icon: "fa-solid fa-display") do %>
 Frontend assets, lifecycle adapters, retained-job controls, and scheduling views.
   <% end %>
+  <%= render Ui::Card.new(title: "solverforge-bench", href: relative_url('/docs/solverforge-bench/'), icon: "fa-solid fa-chart-line") do %>
+Benchmark harness, CVRP and employee-scheduling runs, TOML configuration, and PostgreSQL result storage.
+  <% end %>
   <%= render Ui::Card.new(title: "Crate & Runtime Map", href: relative_url('/reference/crate-map/'), icon: "fa-solid fa-diagram-project") do %>
 Which crate or companion repository owns each part of the runtime surface.
   <% end %>

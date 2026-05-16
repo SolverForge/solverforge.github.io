@@ -176,3 +176,5 @@ docs:
         href: /docs/solverforge-ui/scheduling-views/
       - title: Integration & Assets
         href: /docs/solverforge-ui/integration-assets/
+  - title: solverforge-bench
+    href: /docs/solverforge-bench/
