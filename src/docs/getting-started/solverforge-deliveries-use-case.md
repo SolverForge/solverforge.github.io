@@ -134,10 +134,10 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the current published `solverforge 0.14.0` crate. Keep the
-current published `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4` crates for
-the companion release lines, then add the delivery app's normal web/runtime
-dependencies:
+runtime dependency to the `solverforge 0.14.0` crate used by the checked-in
+delivery use-case source. Keep the published `solverforge-ui 0.6.5` and
+`solverforge-maps 2.1.4` crates for the companion release lines, then add the
+delivery app's normal web/runtime dependencies:
 
 ```toml
 [dependencies]

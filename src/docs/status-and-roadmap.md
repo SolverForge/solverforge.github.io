@@ -10,9 +10,9 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.14.0` crate and calls out
+documentation tracks the published `solverforge 0.14.1` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.14.0` package is available on crates.io; the published
+`solverforge 0.14.1` package is available on crates.io; the published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +21,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.14.0` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.14.0` runtime |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.14.1` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.14.1` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -34,7 +34,9 @@ published crates.io and CLI scaffold targets separately. The public
   [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
-  [FSR](/docs/getting-started/solverforge-fsr-use-case/).
+  [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides stay
+  aligned to the checked-in use-case bundle, which currently pins
+  `solverforge 0.14.0`.
 - Use [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)
   when scoring needs retained rows derived from source entities or joined pairs.
 
@@ -66,7 +68,7 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.14.0 published baseline**: the core crate version is `0.14.0` and the
+- **0.14.1 published baseline**: the core crate version is `0.14.1` and the
   Rust toolchain floor remains `1.95`.
 - **Generated source methods**: `#[planning_solution]` now exposes collection
   sources as solution-associated functions such as `Schedule::shifts()`.
@@ -113,9 +115,10 @@ published crates.io and CLI scaffold targets separately. The public
 - **Joined filter indexes**: low-level joined filters receive semantic source
   indexes for direct, grouped, projected, flattened, and higher-arity joins.
 - **Owner-aware route hooks**: list construction uses shared route hooks
-  `route_get_fn`, `route_set_fn`, `route_depot_fn`, `route_distance_fn`, and
-  `route_feasible_fn` for Clarke-Wright and k-opt, and Clarke-Wright keeps
-  merged routes bound to the owner whose route context scored them.
+  `route_get_fn`, `route_set_fn`, `route_depot_fn`,
+  `route_metric_class_fn`, `route_distance_fn`, and `route_feasible_fn` for
+  Clarke-Wright and k-opt. Clarke-Wright can compute savings once per shared
+  route metric class while keeping final feasibility checks owner-specific.
 - **Borrowed constraint identity**: scoring metadata preserves full
   `ConstraintRef` identity borrowed from the owning constraint.
 - **Model-owned scalar hooks**: `candidate_values`,

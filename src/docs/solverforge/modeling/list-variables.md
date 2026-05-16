@@ -94,6 +94,7 @@ Clarke-Wright construction and k-opt improvement:
     route_get_fn = "solverforge::cvrp::get_route",
     route_set_fn = "solverforge::cvrp::replace_route",
     route_depot_fn = "solverforge::cvrp::depot_for_entity",
+    route_metric_class_fn = "solverforge::cvrp::route_metric_class",
     route_distance_fn = "solverforge::cvrp::route_distance",
     route_feasible_fn = "solverforge::cvrp::route_feasible"
 )]
@@ -104,6 +105,9 @@ The hooks receive the route owner, so heterogeneous fleets can score and check
 routes against the correct depot, distance matrix, capacity, and time-window
 context. Avoid the older split between Clarke-Wright-only and k-opt-only hook
 names; the current public contract is the owner-aware `route_*` hook family.
+Use `route_metric_class_fn` when several owners share the same depot and
+distance behavior. Clarke-Wright computes savings once per metric class, then
+still asks `route_feasible_fn` for each candidate owner before assigning routes.
 
 ## Shadow Updates
 

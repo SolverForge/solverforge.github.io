@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.14.0` crate and current
+This map is aligned with the published `solverforge 0.14.1` crate and current
 workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -27,8 +27,9 @@ weight helpers such as `fixed_weight` and `hard_weight`, collector helpers such
 as `count`, `sum`, `load_balance`, `consecutive_runs`, `collect_vec`, and
 `indexed_presence`, plus advanced grouped-scalar assignment, conflict-repair
 extension types, and owner-aware CVRP route helpers such as
-`route_distance` and `route_feasible`. That keeps app code on `solverforge`
-unless it needs to implement lower-level solver internals directly.
+`route_metric_class`, `route_distance`, and `route_feasible`. That keeps app
+code on `solverforge` unless it needs to implement lower-level solver internals
+directly.
 
 ## Workspace crates
 

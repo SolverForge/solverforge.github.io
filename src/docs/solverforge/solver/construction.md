@@ -34,10 +34,12 @@ descriptor-scalar construction path.
 
 List-specific construction such as Clarke-Wright consumes the owner-aware route
 hooks declared on the list variable: `route_get_fn`, `route_set_fn`,
-`route_depot_fn`, `route_distance_fn`, and `route_feasible_fn`. These hooks are
-shared with k-opt route improvement, so route distance and feasibility stay
-bound to the owner whose depot, matrix, capacity, and time-window context scored
-the route.
+`route_depot_fn`, optional `route_metric_class_fn`, `route_distance_fn`, and
+`route_feasible_fn`. These hooks are shared with k-opt route improvement, so
+route distance and feasibility stay bound to the owner whose depot, matrix,
+capacity, and time-window context scored the route. When a metric-class hook is
+present, Clarke-Wright computes savings once per class of owners with identical
+depot and route-distance behavior, then keeps feasibility owner-specific.
 
 ## Nullable Construction Obligation
 

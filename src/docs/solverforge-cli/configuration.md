@@ -108,9 +108,9 @@ CLI's `solverforge-ui 0.6.5` scaffold target.
 
 Record any later app-owned runtime-target upgrade explicitly in that app's
 dependency manifest and `solverforge.app.toml`. The current standalone
-`solverforge` runtime is `0.14.0`, so a manually upgraded generated app should
-record `target = "solverforge 0.14.0"` and
-`runtime_source = "crates.io: solverforge 0.14.0"`.
+`solverforge` runtime is `0.14.1`, so a manually upgraded generated app should
+record `target = "solverforge 0.14.1"` and
+`runtime_source = "crates.io: solverforge 0.14.1"`.
 
 As you generate facts, entities, variables, and constraints, the CLI also keeps
 these structural arrays in sync:

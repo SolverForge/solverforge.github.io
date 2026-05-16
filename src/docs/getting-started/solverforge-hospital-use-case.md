@@ -123,9 +123,10 @@ CLI scaffold plus manual hospital scheduling code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the current published `solverforge 0.14.0` crate. Keep the
-current published `solverforge-ui 0.6.5` crate for the UI patch line, then add
-the hospital app's normal scheduling and web/runtime dependencies:
+runtime dependency to the `solverforge 0.14.0` crate used by the checked-in
+hospital use-case source. Keep the published `solverforge-ui 0.6.5` crate for
+the UI patch line, then add the hospital app's normal scheduling and
+web/runtime dependencies:
 
 ```toml
 [dependencies]
@@ -151,7 +152,7 @@ parking_lot = "0.12.5"
 `solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1` and
 `solverforge-ui 0.6.5`. For this worked example, upgrade the app-owned
 `solverforge` dependency and runtime metadata to `0.14.0` after scaffolding so
-the tutorial tracks the current core runtime.
+the tutorial tracks the current checked-in use-case runtime.
 
 ### Align App Metadata
 
