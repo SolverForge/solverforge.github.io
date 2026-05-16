@@ -134,20 +134,36 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the current published `solverforge 0.13.1` crate. Keep the
+runtime dependency to the current published `solverforge 0.14.0` crate. Keep the
 current published `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4` crates for
 the companion release lines, then add the delivery app's normal web/runtime
 dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.13.1", features = [
+solverforge = { version = "0.14.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
 solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.4"
+
+# Web server
+axum = "0.8.9"
+tokio = { version = "1.52.3", features = ["full"] }
+tokio-stream = { version = "0.1.18", features = ["sync"] }
+tower-http = { version = "0.6.10", features = ["fs", "cors"] }
+tower = "0.5.3"
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+rand = "0.10.1"
+
+# Utilities
+uuid = { version = "1.23.1", features = ["v4", "serde"] }
+parking_lot = "0.12.5"
 ```
 
 Fresh scaffolds also start with generic demo sample data:
@@ -163,8 +179,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.13.1"
-runtime_source = "crates.io: solverforge 0.13.1"
+target = "solverforge 0.14.0"
+runtime_source = "crates.io: solverforge 0.14.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 
@@ -388,16 +404,22 @@ pub struct Vehicle {
         element_collection = "deliveries",
         solution_trait = "crate::domain::DeliveryRoutingSolution",
         distance_meter = "solverforge::cvrp::MatrixDistanceMeter",
-        intra_distance_meter = "solverforge::cvrp::MatrixIntraDistanceMeter"
+        intra_distance_meter = "solverforge::cvrp::MatrixIntraDistanceMeter",
+        route_get_fn = "crate::domain::get_delivery_route",
+        route_set_fn = "crate::domain::replace_delivery_route",
+        route_depot_fn = "crate::domain::delivery_route_depot",
+        route_distance_fn = "crate::domain::delivery_route_distance",
+        route_feasible_fn = "crate::domain::delivery_route_feasible"
     )]
     pub delivery_order: Vec<usize>,
 }
 ```
 
-The real attribute in the repo names the full set of Clarke-Wright and k-opt
-hooks. Those hook comments explain the local contract. The article-level point
-is simpler: the route is an ordered list of delivery IDs, not a copied list of
-delivery structs.
+The route hooks are shared by Clarke-Wright construction and k-opt
+improvement. They receive the route owner so app-owned depot, distance, and
+feasibility checks stay bound to the vehicle whose route context scored the
+candidate. The article-level point is still simple: the route is an ordered
+list of delivery IDs, not a copied list of delivery structs.
 
 ### Plan as Routing Solution
 

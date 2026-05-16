@@ -116,6 +116,12 @@ Streams::new()
     )
 ```
 
+Direct cross-join grouped streams can also continue into `complement(...)` when
+the rule needs default rows for target keys with no joined matches. Keep a
+joined-pair projection for scoring rows that need their own named retained
+shape; use direct grouping and complementing when the aggregate itself is the
+row.
+
 ## Clone-Free Rows and Keys
 
 Projected outputs, projected self-join keys, and grouped collector values no
@@ -149,7 +155,7 @@ Low-level projected self-join filters receive each projected row's primary owner
 entity index, not the retained storage row ID. The fluent `.filter(|a, b| ...)`
 shape remains unchanged for normal application constraints.
 
-## Projected Group Complements
+## Group Complements
 
 Projected streams can be grouped and then complemented against a generated
 fact or entity source. Use this when the projected rows represent demand,

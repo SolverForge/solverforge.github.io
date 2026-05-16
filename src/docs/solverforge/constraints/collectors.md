@@ -166,6 +166,33 @@ factory.for_each(Schedule::shifts())
 Projected grouped streams can also use `complement(...)` after grouping when
 the source rows were created by `project(...)`.
 
+Direct cross-join grouped streams can also use `complement(...)` after grouping.
+This is useful when the group key comes from a joined target and the rule needs
+default rows for targets that have no matching left-side rows:
+
+```rust
+type Streams = ConstraintFactory<Plan, HardSoftScore>;
+
+Streams::new()
+    .for_each(Plan::assignments())
+    .join((
+        Streams::new().for_each(Plan::capacities()),
+        equal_bi(
+            |assignment: &Assignment| assignment.capacity_id,
+            |capacity: &Capacity| Some(capacity.id),
+        ),
+    ))
+    .group_by(
+        |_assignment: &Assignment, capacity: &Capacity| capacity.id,
+        sum(|(assignment, _capacity): (&Assignment, &Capacity)| assignment.demand),
+    )
+    .complement(
+        Plan::capacities(),
+        |capacity: &Capacity| capacity.id,
+        |_capacity: &Capacity| 0i64,
+    )
+```
+
 ## Balance Stream Operation
 
 For simple load balancing without `group_by`, use the `balance` stream operation directly:

@@ -80,6 +80,31 @@ pub visits: Vec<usize>,
 Use `solution_trait` only when stock list-variable helpers must see an explicit
 extra trait on the solution type.
 
+## Route Construction Hooks
+
+Routing-style list variables can expose one shared route hook set for
+Clarke-Wright construction and k-opt improvement:
+
+```rust
+#[planning_list_variable(
+    element_collection = "visits",
+    solution_trait = "solverforge::cvrp::VrpSolution",
+    distance_meter = "solverforge::cvrp::MatrixDistanceMeter",
+    intra_distance_meter = "solverforge::cvrp::MatrixIntraDistanceMeter",
+    route_get_fn = "solverforge::cvrp::get_route",
+    route_set_fn = "solverforge::cvrp::replace_route",
+    route_depot_fn = "solverforge::cvrp::depot_for_entity",
+    route_distance_fn = "solverforge::cvrp::route_distance",
+    route_feasible_fn = "solverforge::cvrp::route_feasible"
+)]
+pub visits: Vec<usize>,
+```
+
+The hooks receive the route owner, so heterogeneous fleets can score and check
+routes against the correct depot, distance matrix, capacity, and time-window
+context. Avoid the older split between Clarke-Wright-only and k-opt-only hook
+names; the current public contract is the owner-aware `route_*` hook family.
+
 ## Shadow Updates
 
 Advanced predecessor, successor, inverse, and aggregate updates are configured

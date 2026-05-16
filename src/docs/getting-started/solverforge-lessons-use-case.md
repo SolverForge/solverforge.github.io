@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the published SolverForge 0.13.1 dependency shape
+- keep the published SolverForge 0.14.0 dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -118,16 +118,32 @@ surface, Docker build, and validation commands.
 
 ### Keep the Published Dependency Shape
 
-The current tutorial targets the published SolverForge 0.13.1 line:
+The current tutorial targets the published SolverForge 0.14.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.13.1", features = [
+solverforge = { version = "0.14.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
 solverforge-ui = "0.6.5"
+
+# Web server
+axum = "0.8.9"
+tokio = { version = "1.52.1", features = ["full"] }
+tokio-stream = { version = "0.1.18", features = ["sync"] }
+tower-http = { version = "0.6.8", features = ["fs", "cors"] }
+tower = "0.5.3"
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+
+# Utilities
+uuid = { version = "1.23.1", features = ["v4", "serde"] }
+parking_lot = "0.12.5"
+chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
@@ -141,8 +157,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.13.1"
-runtime_source = "crates.io: solverforge 0.13.1"
+target = "solverforge 0.14.0"
+runtime_source = "crates.io: solverforge 0.14.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]

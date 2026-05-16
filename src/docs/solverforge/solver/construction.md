@@ -32,6 +32,13 @@ Generic `FirstFit` and `CheapestInsertion` use the canonical construction
 engine when matching list work is present. Pure scalar targets use the
 descriptor-scalar construction path.
 
+List-specific construction such as Clarke-Wright consumes the owner-aware route
+hooks declared on the list variable: `route_get_fn`, `route_set_fn`,
+`route_depot_fn`, `route_distance_fn`, and `route_feasible_fn`. These hooks are
+shared with k-opt route improvement, so route distance and feasibility stay
+bound to the owner whose depot, matrix, capacity, and time-window context scored
+the route.
+
 ## Nullable Construction Obligation
 
 Nullable scalar variables default to `preserve_unassigned`: construction may

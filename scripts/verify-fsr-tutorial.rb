@@ -15,7 +15,7 @@ SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
 EXPECTED_CLI_VERSION = "2.0.4"
 EXPECTED_CLI_RUNTIME_VERSION = "0.11.1"
 EXPECTED_FSR_APP_CLI_VERSION = "2.0.4"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.13.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.14.0"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
 
@@ -260,6 +260,19 @@ begin
     log "Skipping concrete FSR app checks; set SOLVERFORGE_FSR_REPO to enable them."
   end
 
+  usecases_repo = discover_repo("SOLVERFORGE_USECASES_REPO", [
+    File.join(Dir.home, "dev/solverforge/solverforge-usecases"),
+    "/srv/lab/dev/solverforge/solverforge-usecases",
+    File.join(SITE_ROOT, "../solverforge-usecases"),
+    File.join(SITE_ROOT, "../../solverforge-usecases")
+  ])
+
+  if usecases_repo
+    log "Using use-case bundle repo: #{usecases_repo}"
+  else
+    log "Skipping use-case bundle checks; set SOLVERFORGE_USECASES_REPO to enable them."
+  end
+
   doc_page = File.join(SITE_ROOT, "src/docs/getting-started/solverforge-fsr-use-case.md")
   hub_page = File.join(SITE_ROOT, "src/docs/getting-started/index.md")
   search_surface = File.join(SITE_ROOT, "src/_components/shared/search_surface.rb")
@@ -285,6 +298,10 @@ begin
   assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
+  assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
+  assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
+  assert_file_contains(doc_page, "default_size = \"standard\"")
+  assert_file_contains(doc_page, "available_sizes = [\"standard\"]")
   assert_file_contains(doc_page, "solverforge generate fact location")
   assert_file_contains(doc_page, "solverforge generate fact service_visit")
   assert_file_contains(doc_page, "solverforge generate fact travel_leg")
@@ -321,6 +338,21 @@ begin
   assert_file_not_contains(doc_page, "cd ~/")
   assert_file_not_contains(doc_page, "/srv/lab/dev/")
   assert_file_not_contains(doc_page, "solverforge generate solution plan")
+
+  if usecases_repo
+    fsr_bundle = File.join(usecases_repo, "uc-fsr")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-core = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\"")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
+    assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "default_size = \"standard\"")
+    assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "score = \"HardSoftScore\"")
+    assert_file_contains(File.join(fsr_bundle, "src/domain/technician_route.rs"), "#[planning_list_variable(element_collection = \"service_visits\")]")
+    assert_file_contains(File.join(fsr_bundle, "solver.toml"), "type = \"sublist_change_move_selector\"")
+    assert_file_contains(File.join(fsr_bundle, "solver.toml"), "type = \"list_reverse_move_selector\"")
+  end
 
   assert_rendered_h1_count
 

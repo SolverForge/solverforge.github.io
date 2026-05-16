@@ -10,9 +10,9 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.13.1` crate and calls out
+documentation tracks the published `solverforge 0.14.0` crate and calls out
 published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.13.1` package is available on crates.io; the published
+`solverforge 0.14.0` package is available on crates.io; the published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +21,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.13.1` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.13.1` runtime |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.14.0` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.14.0` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -42,8 +42,9 @@ published crates.io and CLI scaffold targets separately. The public
 
 - **Constraint Streams API**: source-aware generated source methods, `for_each`,
   `filter`, unified `join(...)`, direct cross-join `group_by(...)`,
-  `flatten_last`, `project(...)`, projected grouped complements, `balance`,
-  `complement(...)`, `if_exists(...)`, `if_not_exists(...)`,
+  direct cross-join grouped complements, `flatten_last`, `project(...)`,
+  projected grouped complements, `balance`, `complement(...)`,
+  `if_exists(...)`, `if_not_exists(...)`,
   `collect_vec(...)`, `indexed_presence(...)`, explicit score weighting, and
   `.named(...)`
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
@@ -65,7 +66,7 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.13.1 published baseline**: the core crate version is `0.13.1` and the
+- **0.14.0 published baseline**: the core crate version is `0.14.0` and the
   Rust toolchain floor remains `1.95`.
 - **Generated source methods**: `#[planning_solution]` now exposes collection
   sources as solution-associated functions such as `Schedule::shifts()`.
@@ -100,11 +101,21 @@ published crates.io and CLI scaffold targets separately. The public
   `.group_by(|left, right| key, collector)` without projecting first.
 - **Projected grouped complements**: projected grouped streams can continue into
   `complement(...)` or `complement_with_key(...)` for missing-key scoring rows.
+- **Direct cross-join grouped complements**: direct cross joins can group joined
+  pairs and then call `complement(...)` against a generated fact or entity
+  source for zero-match target rows.
+- **Filtered keyed joins**: filtered right-hand join sources, flattened keyed
+  targets, custom keyed extractors, and filtered complement sources retain only
+  rows that still satisfy their source filters.
 - **Clone-free projected paths**: projected outputs, projected self-join keys,
   and grouped collector values no longer need `Clone` in the `0.11.x` release
   line.
 - **Joined filter indexes**: low-level joined filters receive semantic source
   indexes for direct, grouped, projected, flattened, and higher-arity joins.
+- **Owner-aware route hooks**: list construction uses shared route hooks
+  `route_get_fn`, `route_set_fn`, `route_depot_fn`, `route_distance_fn`, and
+  `route_feasible_fn` for Clarke-Wright and k-opt, and Clarke-Wright keeps
+  merged routes bound to the owner whose route context scored them.
 - **Borrowed constraint identity**: scoring metadata preserves full
   `ConstraintRef` identity borrowed from the owning constraint.
 - **Model-owned scalar hooks**: `candidate_values`,

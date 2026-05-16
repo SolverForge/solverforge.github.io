@@ -76,7 +76,7 @@ factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 | `flatten_last` | Expand a collection carried by the last joined item |
 | `group_by` | Group unary rows, projected rows, or cross-join pairs and apply a collector |
 | `balance` | Score load balance without manual grouped unfairness logic |
-| `complement` | Fill missing grouped keys from a generated fact or entity source |
+| `complement` | Fill missing grouped keys from a generated fact or entity source after unary, projected, or direct cross-join grouping |
 | `if_exists` / `if_not_exists` | Keep rows based on matching rows in another collection |
 
 ### `filter`
@@ -165,6 +165,36 @@ Streams::new()
         count(),
     )
 ```
+
+Grouped cross-join streams can continue into `complement(...)` when the rule
+needs a row for target keys that have no joined matches:
+
+```rust
+type Streams = ConstraintFactory<Plan, HardSoftScore>;
+
+Streams::new()
+    .for_each(Plan::assignments())
+    .join((
+        Streams::new().for_each(Plan::capacities()),
+        equal_bi(
+            |assignment: &Assignment| assignment.capacity_id,
+            |capacity: &Capacity| Some(capacity.id),
+        ),
+    ))
+    .group_by(
+        |_assignment: &Assignment, capacity: &Capacity| capacity.id,
+        sum(|(assignment, _capacity): (&Assignment, &Capacity)| assignment.demand),
+    )
+    .complement(
+        Plan::capacities(),
+        |capacity: &Capacity| capacity.id,
+        |_capacity: &Capacity| 0i64,
+    )
+```
+
+Filters on the left source, right source, and complement source are preserved
+inside retained keyed join state. That means a filtered right-hand join source
+or flattened keyed target does not leak excluded rows into incremental scoring.
 
 ### `balance`
 

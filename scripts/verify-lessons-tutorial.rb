@@ -3,7 +3,7 @@
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_RUNTIME_VERSION = "0.13.1"
+EXPECTED_RUNTIME_VERSION = "0.14.0"
 EXPECTED_UI_VERSION = "0.6.5"
 EXPECTED_CLI_VERSION = "2.0.4"
 
@@ -69,6 +69,8 @@ assert_file_contains(doc_page, "https://huggingface.co/spaces/SolverForge/solver
 assert_file_contains(doc_page, "solverforge #{EXPECTED_RUNTIME_VERSION}")
 assert_file_contains(doc_page, "solverforge-ui #{EXPECTED_UI_VERSION}")
 assert_file_contains(doc_page, "solverforge-cli #{EXPECTED_CLI_VERSION}")
+assert_file_contains(doc_page, "tokio = { version = \"1.52.1\", features = [\"full\"] }")
+assert_file_contains(doc_page, "tower-http = { version = \"0.6.8\", features = [\"fs\", \"cors\"] }")
 assert_file_contains(doc_page, "HardMediumSoftScore")
 assert_file_contains(doc_page, "300 lessons")
 assert_file_contains(doc_page, "40 weekly timeslots")
@@ -93,6 +95,8 @@ if usecases_repo
   lessons_root = File.join(usecases_repo, "uc-lessons")
   assert_file_contains(File.join(lessons_root, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\"")
   assert_file_contains(File.join(lessons_root, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_UI_VERSION}\"")
+  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "tokio = { version = \"1.52.1\", features = [\"full\"] }")
+  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "tower-http = { version = \"0.6.8\", features = [\"fs\", \"cors\"] }")
   assert_file_contains(File.join(lessons_root, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
   assert_file_contains(File.join(lessons_root, "solverforge.app.toml"), "score = \"HardMediumSoftScore\"")
   assert_file_contains(File.join(lessons_root, "solver.toml"), "construction_heuristic_type = \"cheapest_insertion\"")

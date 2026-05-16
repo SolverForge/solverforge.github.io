@@ -95,6 +95,13 @@ variable_name = "visits"
 k = 3
 ```
 
+Clarke-Wright construction and k-opt improvement use the same owner-aware
+route hook family on `#[planning_list_variable]`: `route_get_fn`,
+`route_set_fn`, `route_depot_fn`, `route_distance_fn`, and
+`route_feasible_fn`. The owner argument is part of the contract; distance and
+feasibility should be evaluated in the vehicle, route, or machine context that
+will own the candidate route.
+
 ## List Ruin
 
 `list_ruin_move_selector` removes a bounded number of list elements and

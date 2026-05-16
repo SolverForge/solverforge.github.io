@@ -8,7 +8,7 @@ require "shellwords"
 require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
-DEFAULT_SOLVERFORGE_RS_REPO = "/srv/lab/dev/solverforge/solverforge-rs"
+DEFAULT_SOLVERFORGE_RS_REPO = "/srv/lab/dev/solverforge/solverforge"
 DEFAULT_SOLVERFORGE_MAPS_REPO = "/srv/lab/dev/solverforge/solverforge-maps"
 DEFAULT_SOLVERFORGE_UI_REPO = "/srv/lab/dev/solverforge/solverforge-ui"
 
@@ -174,7 +174,8 @@ class ProfileResolver
     "src/_posts/releases/2026-04-24-solverforge-0-9-x.md" => "solverforge@0.9.0",
     "src/_posts/releases/2026-05-02-solverforge-0-10-x.md" => "solverforge@0.10.0",
     "src/_posts/releases/2026-05-05-solverforge-0-11-x.md" => "solverforge@0.11.1",
-    "src/_posts/releases/2026-05-08-solverforge-0-12-x.md" => "solverforge@0.12.1"
+    "src/_posts/releases/2026-05-08-solverforge-0-12-x.md" => "solverforge@0.12.1",
+    "src/_posts/releases/2026-05-12-solverforge-0-13-x.md" => "solverforge@0.13.1"
   }.freeze
 
   KNOWN_PROFILES = %w[
@@ -187,6 +188,7 @@ class ProfileResolver
     solverforge@0.10.0
     solverforge@0.11.1
     solverforge@0.12.1
+    solverforge@0.13.1
     solverforge-maps@1.0.0
     solverforge-maps@2.1.4
   ].freeze
@@ -315,7 +317,7 @@ class PolicyGate
     "src/docs/getting-started/",
     "src/docs/solverforge-cli/",
     "src/reference/",
-    "src/_posts/releases/2026-05-12-solverforge-0-13-x.md"
+    "src/_posts/releases/2026-05-16-solverforge-0-14-x.md"
   ].freeze
 
   def check!(snippets)

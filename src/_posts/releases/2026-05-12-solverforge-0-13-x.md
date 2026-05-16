@@ -8,14 +8,14 @@ description: >
   grouping, and the explicit scoring terminal surface.
 ---
 
-**SolverForge 0.13.x** is the current core runtime line. It starts with
+**SolverForge 0.13.x** was the previous core runtime line. It starts with
 [0.13.0](https://crates.io/crates/solverforge/0.13.0), published on
 2026-05-12, with API docs on
-[docs.rs](https://docs.rs/solverforge/0.13.0). The current patch is
+[docs.rs](https://docs.rs/solverforge/0.13.0). The 0.13.x patch is
 [0.13.1](https://crates.io/crates/solverforge/0.13.1), published on
 2026-05-14, with API docs at [docs.rs](https://docs.rs/solverforge/0.13.1).
 
-The release is not a CLI scaffold refresh. `solverforge-cli 2.0.4` still
+The release was not a CLI scaffold refresh. `solverforge-cli 2.0.4` still
 scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and
 `solverforge-maps 2.1.4`. Direct Cargo projects and deliberately upgraded
 generated apps can target the published `solverforge 0.13.1` crate.
@@ -231,7 +231,7 @@ newer core crate.
 
 ## Documentation Changes
 
-The docs tree now tracks the 0.13.x runtime surface:
+At publication, the docs tree was updated for the 0.13.x runtime surface:
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/)
   shows the current `penalize(...)` / `reward(...)` terminal API, direct
@@ -246,5 +246,5 @@ The docs tree now tracks the 0.13.x runtime surface:
 - [Local Search](/docs/solverforge/solver/local-search/) explains the
   accepted-count horizon and fair union selector ordering.
 - [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.13.1` runtime from the still-current
-  `solverforge-cli 2.0.4` scaffold target.
+  `solverforge 0.13.1` runtime from the `solverforge-cli 2.0.4` scaffold
+  target that was current at publication time.

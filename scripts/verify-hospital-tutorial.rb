@@ -14,7 +14,7 @@ SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
 EXPECTED_CLI_VERSION = "2.0.4"
 EXPECTED_CLI_RUNTIME_VERSION = "0.11.1"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.13.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.14.0"
 EXPECTED_CLI_UI_VERSION = "0.6.5"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
@@ -247,6 +247,19 @@ begin
     log "Skipping live hospital app checks; set SOLVERFORGE_HOSPITAL_REPO to enable them."
   end
 
+  usecases_repo = discover_repo("SOLVERFORGE_USECASES_REPO", [
+    File.join(Dir.home, "dev/solverforge/solverforge-usecases"),
+    "/srv/lab/dev/solverforge/solverforge-usecases",
+    File.join(SITE_ROOT, "../solverforge-usecases"),
+    File.join(SITE_ROOT, "../../solverforge-usecases")
+  ])
+
+  if usecases_repo
+    log "Using use-case bundle repo: #{usecases_repo}"
+  else
+    log "Skipping use-case bundle checks; set SOLVERFORGE_USECASES_REPO to enable them."
+  end
+
   doc_page = File.join(SITE_ROOT, "src/docs/getting-started/solverforge-hospital-use-case.md")
   hub_page = File.join(SITE_ROOT, "src/docs/getting-started/index.md")
   home_page = File.join(SITE_ROOT, "src/index.md")
@@ -284,6 +297,8 @@ begin
   assert_file_contains(doc_page, "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_crate = \"solverforge-ui\"")
   assert_file_contains(doc_page, "ui_version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+  assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
+  assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
   assert_file_contains(doc_page, "HardSoftDecimalScore")
   assert_file_contains(doc_page, "current hospital model with `Employee`, `CareHub`,")
   assert_file_contains(doc_page, "employee_idx")
@@ -300,6 +315,18 @@ begin
   assert_file_not_contains(doc_page, "cd ~/")
   assert_file_not_contains(doc_page, "/srv/lab/dev/")
   assert_file_not_contains(doc_page, "solverforge generate solution plan")
+
+  if usecases_repo
+    hospital_bundle = File.join(usecases_repo, "uc-hospital")
+    assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+    assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
+    assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
+    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "score = \"HardSoftDecimalScore\"")
+    assert_file_contains(File.join(hospital_bundle, "solver.toml"), "construction_heuristic_type = \"cheapest_insertion\"")
+    assert_file_contains(File.join(hospital_bundle, "src/domain/plan.rs"), "pub employee_idx: Option<usize>")
+  end
 
   assert_rendered_h1_count
 

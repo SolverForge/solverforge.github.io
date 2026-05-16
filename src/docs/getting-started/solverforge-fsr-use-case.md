@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the published SolverForge 0.13.1 dependency shape
+- keep the published SolverForge 0.14.0 dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -121,18 +121,33 @@ score analysis surface, route tables, Docker build, and tests.
 
 ### Keep the Published Dependency Shape
 
-The current tutorial targets the published SolverForge 0.13.1 line:
+The current tutorial targets the published SolverForge 0.14.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.13.1", features = [
+solverforge = { version = "0.14.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.13.1"
+solverforge-core = "0.14.0"
 solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.4"
+
+# Web server
+axum = "0.8.9"
+tokio = { version = "1.52.3", features = ["full"] }
+tokio-stream = { version = "0.1.18", features = ["sync"] }
+tower-http = { version = "0.6.10", features = ["fs", "cors"] }
+tower = "0.5.3"
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+
+# Utilities
+uuid = { version = "1.23.1", features = ["v4", "serde"] }
+parking_lot = "0.12.5"
 ```
 
 `solverforge-core` is a direct dependency because this app writes custom
@@ -150,10 +165,14 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.13.1"
-runtime_source = "crates.io: solverforge 0.13.1"
+target = "solverforge 0.14.0"
+runtime_source = "crates.io: solverforge 0.14.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
+
+[demo]
+default_size = "standard"
+available_sizes = ["standard"]
 
 [solution]
 name = "FieldServicePlan"

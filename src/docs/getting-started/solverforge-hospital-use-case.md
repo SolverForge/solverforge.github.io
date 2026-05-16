@@ -123,13 +123,13 @@ CLI scaffold plus manual hospital scheduling code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the current published `solverforge 0.13.1` crate. Keep the
+runtime dependency to the current published `solverforge 0.14.0` crate. Keep the
 current published `solverforge-ui 0.6.5` crate for the UI patch line, then add
 the hospital app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.13.1", features = [
+solverforge = { version = "0.14.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -138,9 +138,9 @@ solverforge-ui = "0.6.5"
 rand = "0.10.1"
 
 axum = "0.8.9"
-tokio = { version = "1.52.1", features = ["full"] }
+tokio = { version = "1.52.3", features = ["full"] }
 tokio-stream = { version = "0.1.18", features = ["sync"] }
-tower-http = { version = "0.6.8", features = ["fs", "cors"] }
+tower-http = { version = "0.6.10", features = ["fs", "cors"] }
 tower = "0.5.3"
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
@@ -150,7 +150,7 @@ parking_lot = "0.12.5"
 
 `solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1` and
 `solverforge-ui 0.6.5`. For this worked example, upgrade the app-owned
-`solverforge` dependency and runtime metadata to `0.13.1` after scaffolding so
+`solverforge` dependency and runtime metadata to `0.14.0` after scaffolding so
 the tutorial tracks the current core runtime.
 
 ### Align App Metadata
@@ -166,7 +166,7 @@ cli_version = "2.0.4"
 [runtime]
 target = "SolverForge crates.io target"
 runtime_crate = "solverforge"
-runtime_version = "0.13.1"
+runtime_version = "0.14.0"
 ui_crate = "solverforge-ui"
 ui_version = "0.6.5"
 

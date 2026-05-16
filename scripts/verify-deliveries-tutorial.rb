@@ -14,7 +14,7 @@ SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
 EXPECTED_CLI_VERSION = "2.0.4"
 EXPECTED_CLI_RUNTIME_VERSION = "0.11.1"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.13.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.14.0"
 EXPECTED_CLI_UI_VERSION = "0.6.5"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
@@ -277,6 +277,19 @@ begin
     log "Skipping concrete deliveries repo checks; set SOLVERFORGE_DELIVERIES_REPO to enable them."
   end
 
+  usecases_repo = discover_repo("SOLVERFORGE_USECASES_REPO", [
+    File.join(Dir.home, "dev/solverforge/solverforge-usecases"),
+    "/srv/lab/dev/solverforge/solverforge-usecases",
+    File.join(SITE_ROOT, "../solverforge-usecases"),
+    File.join(SITE_ROOT, "../../solverforge-usecases")
+  ])
+
+  if usecases_repo
+    log "Using use-case bundle repo: #{usecases_repo}"
+  else
+    log "Skipping use-case bundle checks; set SOLVERFORGE_USECASES_REPO to enable them."
+  end
+
   doc_page = File.join(SITE_ROOT, "src/docs/getting-started/solverforge-deliveries-use-case.md")
   hub_page = File.join(SITE_ROOT, "src/docs/getting-started/index.md")
   search_surface = File.join(SITE_ROOT, "src/_components/shared/search_surface.rb")
@@ -318,6 +331,13 @@ begin
   assert_file_contains(doc_page, "PHILADELPHIA")
   assert_file_contains(doc_page, "HARTFORD")
   assert_file_contains(doc_page, "FIRENZE")
+  assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
+  assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
+  assert_file_contains(doc_page, "route_get_fn = \"crate::domain::get_delivery_route\"")
+  assert_file_contains(doc_page, "route_set_fn = \"crate::domain::replace_delivery_route\"")
+  assert_file_contains(doc_page, "route_depot_fn = \"crate::domain::delivery_route_depot\"")
+  assert_file_contains(doc_page, "route_distance_fn = \"crate::domain::delivery_route_distance\"")
+  assert_file_contains(doc_page, "route_feasible_fn = \"crate::domain::delivery_route_feasible\"")
 
   assert_file_not_contains(doc_page, "Local sibling checkouts")
   assert_file_not_contains(doc_page, "sibling local path dependencies")
@@ -331,6 +351,21 @@ begin
   assert_file_not_contains(doc_page, "cd ~/")
   assert_file_not_contains(doc_page, "/srv/lab/dev/")
   assert_file_not_contains(doc_page, "solverforge generate solution plan")
+
+  if usecases_repo
+    deliveries_bundle = File.join(usecases_repo, "uc-deliveries")
+    assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+    assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "solverforge-maps = \"#{EXPECTED_MAPS_VERSION}\"")
+    assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
+    assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
+    assert_file_contains(File.join(deliveries_bundle, "solverforge.app.toml"), "default_size = \"PHILADELPHIA\"")
+    assert_file_contains(File.join(deliveries_bundle, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(deliveries_bundle, "src/domain/vehicle.rs"), "route_get_fn = \"crate::domain::get_delivery_route\"")
+    assert_file_contains(File.join(deliveries_bundle, "src/domain/vehicle.rs"), "route_feasible_fn = \"crate::domain::delivery_route_feasible\"")
+    assert_file_contains(File.join(deliveries_bundle, "solver.toml"), "construction_heuristic_type = \"list_clarke_wright\"")
+    assert_file_contains(File.join(deliveries_bundle, "solver.toml"), "type = \"k_opt_move_selector\"")
+  end
 
   assert_rendered_h1_count
 
