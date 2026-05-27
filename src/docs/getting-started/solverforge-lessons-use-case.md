@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the checked-in SolverForge 0.14.1 use-case dependency shape
+- keep the checked-in SolverForge 0.15.0 use-case dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -63,7 +63,7 @@ implementation.
 
 ### Prerequisites
 
-- Rust `1.95+`, matching the current published SolverForge app line
+- Rust `1.95+`, matching the checked-in SolverForge use-case runtime line
 - `cargo` and a stable Rust toolchain
 - Basic Rust knowledge: structs, enums, traits, modules, derive macros
 - Familiarity with HTTP APIs
@@ -119,11 +119,11 @@ surface, Docker build, and validation commands.
 ### Keep the Published Dependency Shape
 
 The current checked-in Lessons use-case source targets the published
-SolverForge 0.14.1 line:
+SolverForge 0.15.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.14.1", features = [
+solverforge = { version = "0.15.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -158,8 +158,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.14.1"
-runtime_source = "crates.io: solverforge 0.14.1"
+target = "solverforge 0.15.0"
+runtime_source = "crates.io: solverforge 0.15.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]

@@ -79,7 +79,7 @@ hook, cache, and route exists.
 - Familiarity with HTTP APIs
 - Comfort with command-line work
 - Node.js if you want to run the frontend and browser tests
-- Rust `1.95+`, matching the current published `solverforge` crate line
+- Rust `1.95+`, matching the checked-in SolverForge use-case runtime line
 
 ---
 
@@ -134,14 +134,14 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the `solverforge 0.14.1` crate used by the checked-in
+runtime dependency to the `solverforge 0.15.0` crate used by the checked-in
 delivery use-case source. Keep the published `solverforge-ui 0.6.5` and
 `solverforge-maps 2.1.4` crates for the companion release lines, then add the
 delivery app's normal web/runtime dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.14.1", features = [
+solverforge = { version = "0.15.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -179,8 +179,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.14.1"
-runtime_source = "crates.io: solverforge 0.14.1"
+target = "solverforge 0.15.0"
+runtime_source = "crates.io: solverforge 0.15.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 

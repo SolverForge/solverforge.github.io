@@ -51,11 +51,13 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the checked-in SolverForge 0.14.1 use-case dependency shape
+- keep the checked-in SolverForge 0.15.0 use-case dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
 - see where Bergamo OSM data becomes the travel-leg matrix used by constraints
+- see how route shadow values let stock SolverForge constraint streams score
+  route-wide business rules
 - read the ten route constraints in their intended order
 - use retained jobs, snapshots, analysis, SSE, and `/jobs/{id}/routes`
 - validate the app locally before publishing the Space
@@ -66,7 +68,7 @@ the full implementation.
 
 ### Prerequisites
 
-- Rust `1.95+`, matching the current published SolverForge app line
+- Rust `1.95+`, matching the checked-in SolverForge use-case runtime line
 - `cargo` and a stable Rust toolchain
 - Basic Rust knowledge: structs, enums, traits, modules, derive macros
 - Familiarity with HTTP APIs
@@ -122,16 +124,16 @@ score analysis surface, route tables, Docker build, and tests.
 ### Keep the Published Dependency Shape
 
 The current checked-in FSR use-case source targets the published SolverForge
-0.14.1 line:
+0.15.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.14.1", features = [
+solverforge = { version = "0.15.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.14.1"
+solverforge-core = "0.15.0"
 solverforge-ui = "0.6.5"
 solverforge-maps = "2.1.4"
 
@@ -151,9 +153,11 @@ uuid = { version = "1.23.1", features = ["v4", "serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-core` is a direct dependency because this app writes custom
-incremental constraints that hold `ConstraintRef`. Most generated applications
-only need the top-level `solverforge` facade.
+The checked-in FSR bundle keeps `solverforge-core` pinned beside the facade so
+its low-level runtime helpers stay on the same release line. The scoring code
+itself now uses stock `ConstraintFactory` streams over `TechnicianRoute` rows
+and route shadow values; most generated applications only need the top-level
+`solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
 `solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1`, so upgrade this
@@ -166,8 +170,8 @@ starter = "neutral-shell"
 cli_version = "2.0.4"
 
 [runtime]
-target = "solverforge 0.14.1"
-runtime_source = "crates.io: solverforge 0.14.1"
+target = "solverforge 0.15.0"
+runtime_source = "crates.io: solverforge 0.15.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 maps_source = "crates.io: solverforge-maps 2.1.4"
 
@@ -213,7 +217,8 @@ repository then supplies the field-service-specific work:
   catalog masks
 - the road-network fetch and matrix build using `solverforge-maps`
 - `TravelLeg` facts derived from matrix duration, distance, and reachability
-- custom incremental constraints over whole technician routes
+- route shadow fields on `TechnicianRoute`
+- stock `ConstraintFactory` constraints over those route shadows
 - `/jobs/{id}/routes` for snapshot-bound map geometry
 - a browser workspace with map, route list, timeline, raw data, and score
   analysis views
@@ -313,8 +318,8 @@ The finished app's core path is:
    and territory.
 3. `TechnicianRoute` is the planning entity.
 4. `TechnicianRoute.visits` is the list planning variable.
-5. `TravelLeg` stores matrix duration, distance, and reachability.
-6. `FieldServicePlan` is the planning solution.
+5. `FieldServicePlan` refreshes route shadow values after list-variable edits.
+6. `TravelLeg` stores matrix duration, distance, and reachability.
 7. `generate(STANDARD)` builds the initial Bergamo plan.
 8. `prepare_routing(&mut plan)` loads or fetches the OSM road graph and
    computes the travel matrix.
@@ -338,8 +343,9 @@ Open `src/domain/` in the finished repository.
 | `location.rs` | Problem fact for depots and customer locations, stored as integer microdegrees with `lat()` and `lng()` helpers |
 | `service_visit.rs` | Problem fact for service job identity, customer, location index, duration, time window, required skill mask, required parts mask, priority, and territory |
 | `travel_leg.rs` | Problem fact for from-location, to-location, duration, distance, and reachability |
-| `technician_route.rs` | Planning entity for technician identity, depot indexes, shift bounds, maximum route minutes, skill mask, inventory mask, territory, and `visits` |
-| `field_service_plan.rs` | Planning solution with `locations`, `service_visits`, `travel_legs`, `technician_routes`, and `score` |
+| `technician_route.rs` | Planning entity for technician identity, depot indexes, shift bounds, maximum route minutes, skill mask, inventory mask, territory, `visits`, and route shadow fields |
+| `route_metrics.rs` | Shared route walk that turns ordered visits into travel, reachability, skill, parts, time-window, workload, territory, and priority-slack counters |
+| `field_service_plan.rs` | Planning solution with `locations`, `service_visits`, `travel_legs`, `technician_routes`, `score`, and the list-variable shadow refresh hook |
 | `mod.rs` | Domain exports |
 
 ### Service Visits Are Problem Facts
@@ -380,6 +386,36 @@ planning entity and keeps route edits small.
 
 Constraints use those facts to decide whether a route is feasible and how much
 travel it carries.
+
+### Route Shadows Bridge Lists and Streams
+
+Several business rules need the same expensive route walk. Rather than keeping
+that walk inside a custom constraint adapter, the v0.15.0 use-case stores the
+derived measurements on `TechnicianRoute` as cascading shadow variables:
+
+- invalid and valid visit counts
+- scored and unreachable travel-leg counts
+- missing skill and missing part counts
+- late visits and late minutes
+- overtime minutes
+- travel seconds and distance meters
+- service, waiting, route, and finish minutes
+- territory matches
+- priority slack
+
+`FieldServicePlan` declares the list-variable update hook:
+
+```rust
+#[shadow_variable_updates(
+    list_owner = "technician_routes",
+    post_update_listener = "refresh_technician_route_shadows"
+)]
+```
+
+When SolverForge changes a route, `refresh_technician_route_shadows()` calls
+`route_stats()` and copies the fresh counters onto the route. The constraint
+files can then stay declarative: each one streams `technician_routes()`,
+filters on the relevant shadow field, and applies a hard or soft score impact.
 
 ---
 
@@ -454,10 +490,19 @@ Open `src/constraints/`.
 | `territory_affinity` | Soft | Rewards visits inside the technician's territory |
 | `priority_slack` | Soft | Rewards high-priority visits served with slack before the deadline |
 
-Most route constraints share `RouteConstraint`, a custom incremental constraint
-adapter that evaluates one technician route at a time and reports standard
-SolverForge score-analysis metadata. `assigned_visits` is separate because it
-must reason about coverage across all routes.
+`assigned_visits` is the cross-route coverage rule. It streams
+`service_visits()`, flattens `TechnicianRoute.visits`, and uses
+`if_not_exists(...)` to penalize service visits that do not appear in any route.
+
+The other nine rules stream `technician_routes()` and score the route shadow
+values refreshed by `FieldServicePlan`. For example, `reachable_legs` reads
+`route.reachability_violations()`, `required_skills` reads
+`route_missing_skill_visits`, `minimize_travel` reads `travel_penalty()`, and
+`priority_slack` rewards `route_priority_slack`.
+
+That is the v0.15.0 teaching point: whole-route business measurements can live
+as domain shadow values, while the scoring rules remain stock SolverForge
+constraint streams with normal score-analysis metadata.
 
 Read the hard rules first. They define whether the dispatch plan is usable.
 Then read the soft rules. They define which usable route plan is preferred.
@@ -594,8 +639,11 @@ solverforge generate constraint emergency_response --unary --hard
 ```
 
 Then implement the rule in `src/constraints/emergency_response.rs` and add it
-to the assembled constraint set. Keep hard constraints for requirements and soft
-constraints for preferences.
+to the assembled constraint set. If the rule needs another whole-route
+measurement, add it to `RouteStats`, copy it through
+`TechnicianRoute::apply_route_stats()`, and score the resulting shadow field
+from a stock `ConstraintFactory` stream. Keep hard constraints for requirements
+and soft constraints for preferences.
 
 ---
 
@@ -642,6 +690,7 @@ curl http://localhost:7860/demo-data
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |
 | List planning variable | `src/domain/technician_route.rs` |
+| Route shadows and scoring counters | `src/domain/route_metrics.rs` |
 | Service jobs | `src/domain/service_visit.rs` |
 | Road-network matrix facts | `src/domain/travel_leg.rs` |
 | Demo data and route preparation | `src/data/data_seed.rs` |

@@ -15,7 +15,7 @@ SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
 EXPECTED_CLI_VERSION = "2.0.4"
 EXPECTED_CLI_RUNTIME_VERSION = "0.11.1"
 EXPECTED_FSR_APP_CLI_VERSION = "2.0.4"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.14.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.15.0"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
 
@@ -323,7 +323,11 @@ begin
   assert_file_contains(doc_page, "prepare_routing(&mut plan)")
   assert_file_contains(doc_page, "/jobs/{id}/routes")
   assert_file_contains(doc_page, "snapshot_revision={n}")
-  assert_file_contains(doc_page, "RouteConstraint")
+  assert_file_contains(doc_page, "route shadow values")
+  assert_file_contains(doc_page, "stock `ConstraintFactory` streams")
+  assert_file_contains(doc_page, "refresh_technician_route_shadows")
+  assert_file_contains(doc_page, "if_not_exists(...)")
+  assert_file_contains(doc_page, "RouteStats")
   assert_file_contains(doc_page, "make ci-local")
 
   assert_file_not_contains(doc_page, "Local sibling checkouts")
@@ -338,6 +342,8 @@ begin
   assert_file_not_contains(doc_page, "cd ~/")
   assert_file_not_contains(doc_page, "/srv/lab/dev/")
   assert_file_not_contains(doc_page, "solverforge generate solution plan")
+  assert_file_not_contains(doc_page, "RouteConstraint")
+  assert_file_not_contains(doc_page, "custom incremental constraints over whole technician routes")
 
   if usecases_repo
     fsr_bundle = File.join(usecases_repo, "uc-fsr")
@@ -350,6 +356,16 @@ begin
     assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "default_size = \"standard\"")
     assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "score = \"HardSoftScore\"")
     assert_file_contains(File.join(fsr_bundle, "src/domain/technician_route.rs"), "#[planning_list_variable(element_collection = \"service_visits\")]")
+    assert_file_contains(File.join(fsr_bundle, "src/domain/technician_route.rs"), "#[cascading_update_shadow_variable]")
+    assert_file_contains(File.join(fsr_bundle, "src/domain/technician_route.rs"), "pub fn apply_route_stats")
+    assert_file_contains(File.join(fsr_bundle, "src/domain/field_service_plan.rs"), "#[shadow_variable_updates(")
+    assert_file_contains(File.join(fsr_bundle, "src/domain/field_service_plan.rs"), "post_update_listener = \"refresh_technician_route_shadows\"")
+    assert_file_contains(File.join(fsr_bundle, "src/domain/route_metrics.rs"), "pub fn route_stats")
+    assert_file_contains(File.join(fsr_bundle, "src/constraints/mod.rs"), "`ConstraintFactory` streams")
+    assert_file_contains(File.join(fsr_bundle, "src/constraints/reachable_legs.rs"), ".technician_routes()")
+    assert_file_contains(File.join(fsr_bundle, "src/constraints/assigned_visits.rs"), ".if_not_exists((")
+    fail!("FSR bundle still has removed route_constraint.rs") if File.exist?(File.join(fsr_bundle, "src/constraints/route_constraint.rs"))
+    fail!("FSR bundle still has removed constraints/route_metrics.rs") if File.exist?(File.join(fsr_bundle, "src/constraints/route_metrics.rs"))
     assert_file_contains(File.join(fsr_bundle, "solver.toml"), "type = \"sublist_change_move_selector\"")
     assert_file_contains(File.join(fsr_bundle, "solver.toml"), "type = \"list_reverse_move_selector\"")
   end
@@ -449,15 +465,24 @@ begin
     assert_file_contains(File.join(fsr_repo, "src/domain/mod.rs"), "solverforge::planning_model!")
     assert_file_contains(File.join(fsr_repo, "src/domain/field_service_plan.rs"), "pub service_visits:")
     assert_file_contains(File.join(fsr_repo, "src/domain/field_service_plan.rs"), "pub technician_routes:")
+    assert_file_contains(File.join(fsr_repo, "src/domain/field_service_plan.rs"), "#[shadow_variable_updates(")
+    assert_file_contains(File.join(fsr_repo, "src/domain/field_service_plan.rs"), "post_update_listener = \"refresh_technician_route_shadows\"")
     assert_file_contains(File.join(fsr_repo, "src/domain/technician_route.rs"), "#[planning_list_variable(")
     assert_file_contains(File.join(fsr_repo, "src/domain/technician_route.rs"), "pub visits: Vec<usize>")
+    assert_file_contains(File.join(fsr_repo, "src/domain/technician_route.rs"), "#[cascading_update_shadow_variable]")
+    assert_file_contains(File.join(fsr_repo, "src/domain/technician_route.rs"), "pub fn apply_route_stats")
     assert_file_contains(File.join(fsr_repo, "src/domain/service_visit.rs"), "pub struct ServiceVisit")
     assert_file_contains(File.join(fsr_repo, "src/domain/travel_leg.rs"), "pub struct TravelLeg")
+    assert_file_contains(File.join(fsr_repo, "src/domain/route_metrics.rs"), "pub fn route_stats")
     assert_file_contains(File.join(fsr_repo, "src/data/data_seed.rs"), "pub async fn prepare_routing")
     assert_file_contains(File.join(fsr_repo, "src/data/data_seed.rs"), "cache_dir(PathBuf::from(\".osm_cache/field-service-routing/bergamo\"))")
     assert_file_contains(File.join(fsr_repo, "src/data/data_seed.rs"), "DemoData::Standard => \"STANDARD\"")
     assert_file_contains(File.join(fsr_repo, "src/constraints/mod.rs"), "pub fn create_constraints()")
-    assert_file_contains(File.join(fsr_repo, "src/constraints/route_constraint.rs"), "pub struct RouteConstraint")
+    assert_file_contains(File.join(fsr_repo, "src/constraints/mod.rs"), "`ConstraintFactory` streams")
+    assert_file_contains(File.join(fsr_repo, "src/constraints/reachable_legs.rs"), ".technician_routes()")
+    assert_file_contains(File.join(fsr_repo, "src/constraints/assigned_visits.rs"), ".if_not_exists((")
+    fail!("FSR app still has removed route_constraint.rs") if File.exist?(File.join(fsr_repo, "src/constraints/route_constraint.rs"))
+    fail!("FSR app still has removed constraints/route_metrics.rs") if File.exist?(File.join(fsr_repo, "src/constraints/route_metrics.rs"))
     assert_file_contains(File.join(fsr_repo, "src/api/routes.rs"), ".route(\"/jobs/{id}/routes\", get(get_routes))")
     assert_file_contains(File.join(fsr_repo, "src/api/routes.rs"), ".route(\"/jobs/{id}/events\", get(sse::events))")
     assert_file_contains(File.join(fsr_repo, "src/api/route_dto.rs"), "pub struct JobRoutesDto")
