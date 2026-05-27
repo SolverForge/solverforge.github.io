@@ -98,6 +98,8 @@ That means:
 - selector telemetry carries stable selector indexes and labels for
   local-search and VND diagnosis
 - generation and evaluation durations stay exact in the event stream
+- move-label telemetry and the bounded applied-move trace belong to runtime
+  diagnostics, not benchmark-only instrumentation
 - `moves/s` is a display-only derived metric at the UI edge
 - pause, resume, snapshot fetch, and analysis should use the retained
   `SolverManager` contract rather than ad-hoc channels

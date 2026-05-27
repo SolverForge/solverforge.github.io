@@ -56,6 +56,12 @@ Configured constraint keys match that metadata exactly: package-qualified
 constraints use `ConstraintRef::full_name()` strings, while package-less
 constraints use the short name.
 
+Constraint node sharing does not collapse analysis rows. When
+`#[solverforge_constraints]` emits one shared grouped node for several terminal
+constraints, each terminal still contributes its own constraint metadata,
+score, match count, and detailed explanation. The shared node only removes
+duplicate retained update work.
+
 ## Use Cases
 
 - **Debugging constraints**: Find which constraints fire and why

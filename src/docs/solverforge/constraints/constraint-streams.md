@@ -12,13 +12,17 @@ the stream, and terminate with a scoring impact.
 
 ## Defining Constraints
 
-Constraints are defined as a function that returns a tuple of constraint
-objects. The `#[planning_solution]` macro wires this up automatically.
+Constraints are defined as a function that returns a constraint set, usually a
+tuple of fluent terminal constraints. The `#[planning_solution]` macro wires
+this up automatically. Use `#[solverforge_constraints]` when the function owns
+reusable stream bindings or grouped chains that should be compiled as one
+shared retained node.
 
 ```rust
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
 
+#[solverforge_constraints]
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
 
@@ -33,8 +37,9 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
 Each constraint builder chain produces an `IncrementalUniConstraint`,
 `IncrementalBiConstraint`, or related constraint object through `.named()`.
-Return them as a tuple; SolverForge implements `ConstraintSet` for tuples of up
-to 16 constraints.
+Return them as a tuple; SolverForge implements `ConstraintSet` for singleton
+incremental constraints and for nested typed constraint sets, with tuple support
+up to 32 members.
 
 ## Source Operations
 
@@ -196,6 +201,48 @@ Filters on the left source, right source, and complement source are preserved
 inside retained keyed join state. That means a filtered right-hand join source
 or flattened keyed target does not leak excluded rows into incremental scoring.
 
+## Constraint Node Sharing
+
+`#[solverforge_constraints]` gives the macro crate a whole-function compiler
+boundary while preserving normal fluent Rust authoring. When repeated grouped
+terminals reuse the same local grouped stream binding, SolverForge updates one
+retained node and refreshes separate terminal scorers from that shared state:
+
+```rust
+#[solverforge_constraints]
+fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+    let shift_count_by_employee = Streams::new()
+        .for_each(Schedule::shifts())
+        .filter(|shift: &Shift| shift.employee_idx.is_some())
+        .group_by(
+            |shift: &Shift| shift.employee_idx.unwrap_or(usize::MAX),
+            count(),
+        );
+
+    (
+        shift_count_by_employee
+            .penalize(|_employee_idx: &usize, count: &usize| {
+                HardSoftScore::of_soft((*count as i64 - 5).max(0))
+            })
+            .named("Too many shifts"),
+        shift_count_by_employee
+            .reward(|_employee_idx: &usize, count: &usize| {
+                HardSoftScore::of_soft((*count as i64).min(5))
+            })
+            .named("Assigned shifts"),
+    )
+}
+```
+
+Supported sharing covers grouped, projected grouped, direct cross grouped, and
+complemented grouped streams. The compiler is conservative: same-binding reuse
+shares directly, and separately written chains share only when their grouped
+stream expression is syntax-proved identical inside the annotated function.
+Opaque or mixed shapes that cannot be proven stay on the ordinary Rust path.
+There is no public `share` or cache API.
+
 ### `balance`
 
 `balance` calculates load imbalance across a grouping key. The key function
@@ -285,6 +332,7 @@ does not change ordinary fluent `.filter(|a, b| ...)` application code.
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
 
+#[solverforge_constraints]
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 

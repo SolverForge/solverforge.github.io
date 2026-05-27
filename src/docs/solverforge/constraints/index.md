@@ -35,14 +35,21 @@ source or one joined pair, grouped streams can use collectors such as
 direct cross joins can group joined pairs without projecting them first. Direct
 cross-join groups can also call `complement(...)` against generated target
 sources, and filtered keyed joins retain the filter contract on both sides of
-the join. The lower-level constraint metadata borrows full `ConstraintRef`
-identity from the owning constraint. Package-qualified constraints use
+the join.
+
+Annotate reusable constraint functions with `#[solverforge_constraints]` when
+the same grouped stream feeds multiple named terminal constraints. SolverForge
+then shares the retained grouped node work while keeping each terminal
+constraint's name, ordering, metadata, and explanation independent. The
+lower-level constraint metadata borrows full `ConstraintRef` identity from the
+owning constraint. Package-qualified constraints use
 `ConstraintRef::full_name()` as the configured key; package-less constraints use
 the short name.
 
 ## Sections
 
 - **[Constraint Streams](/docs/solverforge/constraints/constraint-streams/)** - The core stream API
+- **[Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)** - `#[solverforge_constraints]` and repeated grouped terminal sharing
 - **[Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/)** - `ConstraintFactory`, generated collection sources, and lower-level `for_each`
 - **[Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)** - Scoring-only rows from `Projection` types or joined-pair `.project(...)`
 - **[Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/)** - `if_exists`, `if_not_exists`, and `flatten_last`

@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.14.1` crate and current source
+These pages track the published `solverforge 0.15.0` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime until the next CLI runtime-target refresh, so check
 `solverforge --version` when starting from a scaffold.
@@ -32,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.14.1` crate declares Rust `1.95`.
+The `0.15.0` crate declares Rust `1.95`.
 
 The generated runtime now builds one `RuntimeModel` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -50,6 +50,11 @@ labels those solve shapes as `candidates` or `elements`.
 
 The current release tightens several public contracts:
 
+- `#[solverforge_constraints]` is the canonical constraint-function attribute
+  when a function reuses grouped streams. Reused same-binding grouped streams
+  and syntax-proved identical grouped chains share one retained node while each
+  `.named(...)` terminal keeps its own identity, ordering, metadata, and score
+  explanation
 - generated collection sources are solution-associated methods such as
   `Schedule::shifts()`, and stream roots use
   `ConstraintFactory::for_each(Schedule::shifts())`
@@ -95,6 +100,10 @@ The current release tightens several public contracts:
   non-assignment-owned slots, list nearby-change, nearby-swap, sublist,
   reverse, optional k-opt/list-ruin when hooks exist, and grouped-scalar or
   conflict-repair selectors only when the model declares them
+- assignment-backed grouped scalar search includes bounded value-window swaps,
+  longer window swaps, same-sequence run-gap swaps, block reassignments,
+  optional run releases, and value rotations without weakening the assignment
+  hard constraints
 - list construction shares owner-aware route hooks across Clarke-Wright and
   k-opt: `route_get_fn`, `route_set_fn`, `route_depot_fn`,
   `route_metric_class_fn`, `route_distance_fn`, and `route_feasible_fn`.
@@ -105,8 +114,8 @@ The current release tightens several public contracts:
   instead of loading arbitrary runtime classes
 - retained telemetry preserves exact generated, evaluated, accepted,
   not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-  and construction-slot counters plus generation and evaluation durations;
-  `moves/s` is only a display metric
+  construction-slot, move-label, and bounded applied-move trace counters plus
+  generation and evaluation durations; `moves/s` is only a display metric
 
 ## Minimal Example
 
@@ -143,6 +152,7 @@ pub struct Plan {
     pub score: Option<HardSoftScore>,
 }
 
+#[solverforge_constraints]
 fn define_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
     (
         ConstraintFactory::<Plan, HardSoftScore>::new()
@@ -193,8 +203,10 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge](https://docs.rs/solverforge). Source-line API maps for
-the local workspace live in the repository `crates/*/WIREFRAME.md` files.
+[docs.rs/solverforge](https://docs.rs/solverforge). docs.rs can briefly lag the
+crate registry after a release; the `0.15.0` crate is the source of truth once
+crates.io has accepted the package. Source-line API maps for the local
+workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections
 

@@ -39,7 +39,11 @@ evaluated, accepted, not-doable, acceptor-rejected, forager-ignored,
 hard-improving, hard-neutral, hard-worse, conflict-repair, and construction-slot
 counts together with generation and evaluation durations. `SelectorTelemetry`
 also carries `selector_index` and `selector_label` so local-search and VND
-diagnostics can tie those counters back to the active neighborhood. Any
+diagnostics can tie those counters back to the active neighborhood.
+`MoveTelemetry` aggregates the same search path by static move label, and the
+bounded applied-move trace records the first applied move steps with selected
+candidate index, per-step generated/evaluated/accepted counts, ignored accepted
+moves, score delta, and hard feasibility before and after the move. Any
 displayed `moves/s` value is derived at the edge rather than stored as the
 canonical runtime metric.
 

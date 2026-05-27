@@ -173,11 +173,14 @@ value_candidate_limit = 8
 group_candidate_limit = 64
 ```
 
-Required entities are handled before optional entities. Required assignments
-may displace optional occupants or move required blockers through a bounded
-augmenting path. Optional assignments remain score-improving only unless the
-model marks them required and configuration uses
-`assign_when_candidate_exists`.
+Required entities are handled before optional entities. Required assignment
+construction uses a hard-first batched fill path for dense required coverage,
+so required slots with doable candidates are completed even when an ordinary
+time or move budget has already expired. It still respects external pause,
+cancel, and parent-yield control. Required assignments may displace optional
+occupants or move required blockers through bounded augmenting paths. Optional
+assignments remain score-improving only unless the model marks them required
+and configuration uses `assign_when_candidate_exists`.
 
 ## Grouped Scalar Construction
 

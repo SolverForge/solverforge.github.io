@@ -9,6 +9,7 @@ require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
 DEFAULT_SOLVERFORGE_RS_REPO = "/srv/lab/dev/solverforge/solverforge"
+DEFAULT_SOLVERFORGE_RS_REF = "v0.15.0"
 DEFAULT_SOLVERFORGE_MAPS_REPO = "/srv/lab/dev/solverforge/solverforge-maps"
 DEFAULT_SOLVERFORGE_UI_REPO = "/srv/lab/dev/solverforge/solverforge-ui"
 
@@ -175,7 +176,8 @@ class ProfileResolver
     "src/_posts/releases/2026-05-02-solverforge-0-10-x.md" => "solverforge@0.10.0",
     "src/_posts/releases/2026-05-05-solverforge-0-11-x.md" => "solverforge@0.11.1",
     "src/_posts/releases/2026-05-08-solverforge-0-12-x.md" => "solverforge@0.12.1",
-    "src/_posts/releases/2026-05-12-solverforge-0-13-x.md" => "solverforge@0.13.1"
+    "src/_posts/releases/2026-05-12-solverforge-0-13-x.md" => "solverforge@0.13.1",
+    "src/_posts/releases/2026-05-16-solverforge-0-14-x.md" => "solverforge@0.14.1"
   }.freeze
 
   KNOWN_PROFILES = %w[
@@ -189,6 +191,7 @@ class ProfileResolver
     solverforge@0.11.1
     solverforge@0.12.1
     solverforge@0.13.1
+    solverforge@0.14.1
     solverforge-maps@1.0.0
     solverforge-maps@2.1.4
   ].freeze
@@ -317,7 +320,7 @@ class PolicyGate
     "src/docs/getting-started/",
     "src/docs/solverforge-cli/",
     "src/reference/",
-    "src/_posts/releases/2026-05-16-solverforge-0-14-x.md"
+    "src/_posts/releases/2026-05-23-solverforge-0-15-x.md"
   ].freeze
 
   def check!(snippets)
@@ -392,8 +395,16 @@ class CargoWorkspaceBuilder
     case profile
     when "solverforge-current"
       repo = ENV.fetch("SOLVERFORGE_RS_REPO", DEFAULT_SOLVERFORGE_RS_REPO)
-      solverforge_path = File.join(repo, "crates/solverforge")
-      require_path!(solverforge_path, "SOLVERFORGE_RS_REPO")
+      require_path!(repo, "SOLVERFORGE_RS_REPO")
+      ref = ENV.fetch("SOLVERFORGE_RS_REF", DEFAULT_SOLVERFORGE_RS_REF)
+      solverforge_dependency =
+        if ref.strip.empty? || ref == "path"
+          solverforge_path = File.join(repo, "crates/solverforge")
+          require_path!(solverforge_path, "SOLVERFORGE_RS_REPO")
+          %(solverforge = { path = "#{solverforge_path}" })
+        else
+          %(solverforge = { git = "file://#{repo}", tag = "#{ref}", package = "solverforge" })
+        end
       <<~TOML
         [package]
         name = "#{package_name}"
@@ -401,7 +412,7 @@ class CargoWorkspaceBuilder
         edition = "2021"
 
         [dependencies]
-        solverforge = { path = "#{solverforge_path}" }
+        #{solverforge_dependency}
         tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "sync"] }
       TOML
     when "solverforge-maps-current"

@@ -59,7 +59,8 @@ Assignment-backed grouped scalar construction is available for required
 nullable scalar slots through named `ScalarGroup::assignment(...)`
 declarations. Pair it with `grouped_scalar_move_selector` when local search
 should prioritize uncovered required slots, capacity conflicts, bounded
-reassignments, or sequence/position rematches from the same group.
+reassignments, same-sequence run-gap repairs, value-window swaps, optional
+occupant releases, block reassignments, or value rotations from the same group.
 
 `SolverManager` now exposes a retained job lifecycle rather than a fire-and-forget
 channel. In addition to `Progress` and `BestSolution`, you can observe
@@ -69,8 +70,11 @@ inspect `SolverStatus`, and fetch or analyze retained snapshots by
 
 Retained telemetry carries exact generated, evaluated, accepted, not-doable,
 acceptor-rejected, forager-ignored, hard-delta, conflict-repair, and
-construction-slot counters plus generation and evaluation durations.
-User-facing rates such as `moves/s` are display-only derived values.
+construction-slot counters plus generation and evaluation durations. The 0.15.0
+runtime also carries per-move-label telemetry and a bounded applied-move trace
+with selected candidate index, per-step candidate counts, score delta, and
+hard-feasibility before/after. User-facing rates such as `moves/s` are
+display-only derived values.
 
 ## Sections
 

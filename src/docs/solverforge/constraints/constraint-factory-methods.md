@@ -23,6 +23,7 @@ solution.
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
 
+#[solverforge_constraints]
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 

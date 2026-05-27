@@ -106,7 +106,8 @@ the prefix indefinitely.
 Assignment-backed grouped scalar selectors are regular local-search selectors.
 Use them when a model-owned `ScalarGroup::assignment(...)` should repair
 uncovered required nullable slots, capacity conflicts, bounded reassignments,
-or sequence/position rematches:
+same-sequence run gaps, value-window swaps, block reassignments, optional
+occupant releases, or value rotations:
 
 ```toml
 [phases.move_selector]
@@ -121,7 +122,13 @@ require_hard_improvement = true
 Retained status and events preserve exact generated, evaluated, accepted,
 not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
 and construction-slot counters plus generation and evaluation durations.
-Displayed `moves/s` is a human-facing derived value.
+Per-move-label telemetry reports generated, evaluated, accepted, applied,
+not-doable, acceptor-rejected, forager-ignored, score-improving, score-equal,
+score-worse, rejected-improving, and applied score-improvement totals. The
+bounded applied-move trace records the selected candidate index, per-step
+generated/evaluated/accepted/ignored counts, score delta, and hard feasibility
+before and after the applied move. Displayed `moves/s` is a human-facing
+derived value.
 
 ## Variable Neighborhood Descent
 

@@ -118,6 +118,8 @@ docs:
         children:
           - title: Constraint Streams
             href: /docs/solverforge/constraints/constraint-streams/
+          - title: Node Sharing
+            href: /docs/solverforge/constraints/node-sharing/
           - title: Constraint Factory Methods
             href: /docs/solverforge/constraints/constraint-factory-methods/
           - title: Projected Scoring Rows
