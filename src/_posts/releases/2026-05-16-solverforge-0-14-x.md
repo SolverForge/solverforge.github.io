@@ -8,11 +8,11 @@ description: >
   route metric classes for Clarke-Wright construction.
 ---
 
-**SolverForge 0.14.x** is the current core runtime line. It starts with
+**SolverForge 0.14.x** was the previous core runtime line. It starts with
 [v0.14.0](https://github.com/SolverForge/solverforge/releases/tag/v0.14.0),
-tagged at `27329bd` and published on 2026-05-16. The current patch is
+tagged at `27329bd` and published on 2026-05-16. The final patch is
 [v0.14.1](https://github.com/SolverForge/solverforge/releases/tag/v0.14.1),
-tagged at `446b35e` and published on 2026-05-16. The current crate is available
+tagged at `446b35e` and published on 2026-05-16. The final 0.14.x crate is available
 as [solverforge 0.14.1](https://crates.io/crates/solverforge/0.14.1) on
 crates.io, with API docs at [docs.rs](https://docs.rs/solverforge/0.14.1).
 
@@ -163,7 +163,7 @@ newer core crate.
 
 ## Documentation Changes
 
-The docs tree now tracks the 0.14.1 runtime surface:
+At publication, the docs tree was updated for the 0.14.1 runtime surface:
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/)
   shows complemented direct cross-join groups and the filtered joined-source
@@ -177,5 +177,5 @@ The docs tree now tracks the 0.14.1 runtime surface:
   [List Move Selectors](/docs/solverforge/solver/list-move-selectors/) document
   the unified owner-aware route hooks and optional route metric classes.
 - [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.14.1` runtime from the still-current
+  `solverforge 0.14.1` runtime from the then-current
   `solverforge-cli 2.0.4` scaffold target.

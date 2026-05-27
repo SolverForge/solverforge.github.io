@@ -10,9 +10,10 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.14.1` crate and calls out
-published crates.io and CLI scaffold targets separately. The public
-`solverforge 0.14.1` package is available on crates.io; the published
+documentation tracks the published `solverforge 0.15.0` crate and calls out
+published crates.io, docs.rs, and CLI scaffold targets separately. The public
+`solverforge 0.15.0` package is available on crates.io; docs.rs can briefly lag
+while it builds the newest Rustdoc pages. The published
 `solverforge-cli 2.0.4` package scaffolds generated apps on the
 `solverforge 0.11.1` runtime target.
 <% end %>
@@ -21,8 +22,8 @@ published crates.io and CLI scaffold targets separately. The public
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.14.1` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.14.1` runtime |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.15.0` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.15.0` runtime |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -36,7 +37,11 @@ published crates.io and CLI scaffold targets separately. The public
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides stay
   aligned to the checked-in use-case bundle, which currently pins
-  `solverforge 0.14.1`.
+  `solverforge 0.15.0`; the FSR guide also reflects the bundle's move to
+  route shadow values scored by stock `ConstraintFactory` streams.
+- Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
+  when a constraint function reuses the same grouped stream across several
+  named terminal constraints.
 - Use [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)
   when scoring needs retained rows derived from source entities or joined pairs.
 
@@ -49,6 +54,10 @@ published crates.io and CLI scaffold targets separately. The public
   `if_exists(...)`, `if_not_exists(...)`,
   `collect_vec(...)`, `indexed_presence(...)`, explicit score weighting, and
   `.named(...)`
+- **Constraint Compiler Node Sharing**: `#[solverforge_constraints]` can share
+  grouped, projected grouped, direct cross grouped, and complemented grouped
+  stream nodes across repeated terminal constraints while preserving terminal
+  names, order, metadata, and score explanation
 - **Score Types**: SoftScore, HardSoftScore, HardMediumSoftScore,
   HardSoftDecimalScore, BendableScore
 - **Score Analysis**: facade-level `ScoreAnalysis` and `ConstraintAnalysis`,
@@ -68,8 +77,13 @@ published crates.io and CLI scaffold targets separately. The public
 
 ## Runtime Notes
 
-- **0.14.1 published baseline**: the core crate version is `0.14.1` and the
+- **0.15.0 published baseline**: the core crate version is `0.15.0` and the
   Rust toolchain floor remains `1.95`.
+- **Constraint node sharing**: annotate reusable constraint factory functions
+  with `#[solverforge_constraints]`. Reused same-binding grouped streams and
+  syntax-proved identical grouped chains share retained incremental node work;
+  separate terminal constraints keep their own names, impact direction,
+  metadata, and explanation rows.
 - **Generated source methods**: `#[planning_solution]` now exposes collection
   sources as solution-associated functions such as `Schedule::shifts()`.
   Constraint streams use those generated methods through
@@ -119,6 +133,11 @@ published crates.io and CLI scaffold targets separately. The public
   `route_metric_class_fn`, `route_distance_fn`, and `route_feasible_fn` for
   Clarke-Wright and k-opt. Clarke-Wright can compute savings once per shared
   route metric class while keeping final feasibility checks owner-specific.
+- **Assignment value-pattern neighborhoods**: assignment-backed grouped scalar
+  local search includes bounded value-window swaps, longer value-window swaps,
+  same-sequence run-gap swaps, block reassignments, optional run releases, and
+  three-value rotations. Required assignment construction still has a hard-first
+  batched fill path for required slots.
 - **Borrowed constraint identity**: scoring metadata preserves full
   `ConstraintRef` identity borrowed from the owning constraint.
 - **Model-owned scalar hooks**: `candidate_values`,
@@ -129,8 +148,9 @@ published crates.io and CLI scaffold targets separately. The public
   streaming local-search phase; omitted `move_selector` values use typed
   scalar/list/grouped defaults rather than prebuilding broad neighborhoods.
 - **Exact retained telemetry**: generated, evaluated, accepted, not-doable,
-  acceptor-rejected, forager-ignored, hard-delta, conflict-repair, and
-  construction-slot counters are retained as authoritative counters.
+  acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
+  construction-slot, move-label, and bounded applied-move trace counters are
+  retained as authoritative counters.
 
 ## Roadmap
 
