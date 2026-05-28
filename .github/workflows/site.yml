@@ -28,6 +28,7 @@ jobs:
         with:
           repository: SolverForge/solverforge
           path: .ci/solverforge-rs
+          fetch-depth: 0
 
       - name: Checkout SolverForge maps source
         uses: actions/checkout@v4
