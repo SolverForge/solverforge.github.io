@@ -17,16 +17,16 @@ use the scaffold targets baked into the binary you have installed; run
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It
-creates one neutral app shell, then lets you grow that shell with scalar and
-list planning variables, or both in one app, using generator commands and
-ordinary Rust edits.
+creates a neutral `web`, `api`, or `cli` shell, then lets you grow that shell
+with scalar and list planning variables, or both in one app, using generator
+commands and ordinary Rust edits.
 
 The CLI owns project bootstrap and code generation. The generated application
 then uses:
 
 - `solverforge` for domain modeling and solving
-- `solverforge-ui` for the shipped frontend and retained-job lifecycle
-- `solverforge-maps` for map and routing integration in generated projects
+- `solverforge-ui` for the shipped frontend in web-shell projects
+- `solverforge-maps` for map and routing integration in web-shell projects
 
 ## Mental Model
 
@@ -34,11 +34,11 @@ Think of the CLI as a project shaper, not as a separate modeling language.
 
 | Layer | Owner | What changes there |
 | ----- | ----- | ------------------ |
-| Scaffold shell | `solverforge new` | Axum app, retained-job API, frontend shell, config files |
+| Scaffold shell | `solverforge new` | Web, API, or CLI shell, config files, and app metadata |
 | Domain model | CLI generators plus Rust edits | facts, entities, scalar variables, list variables, solution type |
 | Constraint logic | generated skeletons, then user Rust | real hard and soft scoring rules |
 | Runtime search | `solver.toml` | phases, acceptors, selectors, termination, candidate limits |
-| App metadata | CLI synchronization | `solverforge.app.toml` and `static/generated/ui-model.json` |
+| App metadata | CLI synchronization | `solverforge.app.toml` and, for web shells, `static/generated/ui-model.json` |
 
 The generated shell is intentionally neutral. You do not choose `scalar`,
 `list`, or `mixed` at project creation time. You add scalar and list planning
@@ -48,10 +48,11 @@ variables as the domain earns them, and the app metadata follows the Rust model.
 
 - A neutral scaffold that starts runnable instead of forcing a tutorial-shaped
   problem-class choice
-- A generated Axum backend with retained jobs, typed SSE events, snapshots,
-  analysis, pause, resume, cancel, and delete flows
+- `web`, `api`, and `cli` generated shells selected by `solverforge new --shell`
+- A generated Axum backend for web/API shells with retained jobs, typed SSE
+  events, snapshots, analysis, pause, resume, cancel, and delete flows
 - Generator commands for facts, entities, variables, constraints, solution
-  types, score types, and demo data
+  types, score types, scalar groups, conflict repairs, and demo data
 - A CLI-maintained app contract in `solverforge.app.toml`
 - A frontend that composes shipped `solverforge-ui` assets rather than
   vendoring a template-specific asset pipeline
@@ -68,6 +69,7 @@ solverforge generate fact employee --field skill:String
 solverforge generate entity shift --field starts_at:String --field ends_at:String
 solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --allows-unassigned
 solverforge generate constraint no_overlap --pair --hard
+solverforge generate conflict-repair no_overlap --provider repair_no_overlap --skip-solver-config
 solverforge generate data --size standard
 solverforge check
 solverforge test
@@ -125,7 +127,7 @@ solverforge generate constraint no_overlap --pair --hard
 solverforge generate data --size large
 ```
 
-The generated shell is intentionally thin. It starts with a neutral `Plan`
+The default web shell is intentionally thin. It starts with a neutral `Plan`
 solution, solver lifecycle routes, `solverforge-ui`-backed frontend assets, and
 no domain-specific assumptions beyond the SolverForge runtime contract.
 
@@ -144,7 +146,8 @@ they are not replacements for the CLI-first project model.
 The CLI keeps generated structure coherent, but it does not decide the planning
 model for you.
 
-- It scaffolds facts, entities, variables, constraints, demo data, and metadata.
+- It scaffolds facts, entities, variables, constraints, scalar groups, conflict
+  repairs, demo data, and metadata.
 - It keeps managed blocks and `solverforge.app.toml` synchronized.
 - It does not infer business rules from field names.
 - It does not make generated constraint TODOs correct.

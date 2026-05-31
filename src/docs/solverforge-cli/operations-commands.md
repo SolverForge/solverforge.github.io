@@ -8,8 +8,8 @@ weight: 8
 # Operations Commands
 
 Operations commands do not change the domain model structure. They inspect the
-generated app, validate the working tree, run tests, show routes, edit runtime
-configuration, or emit shell integration files.
+generated app, validate the working tree, run tests, show web/API routes, edit
+runtime configuration, or emit shell integration files.
 
 ## `solverforge info`
 
@@ -17,9 +17,10 @@ configuration, or emit shell integration files.
 solverforge info [OPTIONS]
 ```
 
-Prints the project name, planning solution type, score type, entities, facts,
-scalar and list solvable fields, constraints, and whether `solver.toml` exists.
-It requires a generated-style `src/domain/` directory.
+Prints the project name, shell, planning solution type, score type, entities,
+facts, scalar and list solvable fields, constraints, model resources, and
+whether `solver.toml` exists. It requires a generated-style `src/domain/`
+directory.
 
 ## `solverforge check`
 
@@ -37,6 +38,7 @@ Validates:
 | constraint modules in `src/constraints/mod.rs` exist | Errors for missing files |
 | `solver.toml` exists                                 | Warns if missing |
 | entities have solvable fields                        | Warns for entities with no scalar or list variable |
+| scalar-group and conflict-repair references          | Errors when generated model-resource refs are stale |
 
 ## `solverforge routes`
 
@@ -46,7 +48,7 @@ solverforge routes [OPTIONS]
 
 Searches for `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs`, then
 parses Axum `.route("...", method(handler))` calls and prints a
-`METHOD / PATH / HANDLER` table.
+`METHOD / PATH / HANDLER` table. This applies to web and API shells.
 
 ## `solverforge test`
 
@@ -89,7 +91,7 @@ Examples:
 ```bash
 solverforge config show
 solverforge config set termination.seconds_spent_limit 60
-solverforge config set phases.acceptor.type late_acceptance
+solverforge config set environment_mode reproducible
 ```
 
 ### `config show`

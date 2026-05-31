@@ -160,14 +160,15 @@ and route shadow values; most generated applications only need the top-level
 `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1`, so upgrade this
-metadata with the dependency when following the current tutorial:
+`solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0`, so the generated
+baseline already matches the current tutorial runtime:
 
 ```toml
 [app]
 name = "solverforge-fsr"
 starter = "neutral-shell"
-cli_version = "2.0.4"
+shell = "web"
+cli_version = "2.2.0"
 
 [runtime]
 target = "solverforge 0.15.0"

@@ -9,7 +9,8 @@ description: >
 
 <%= render Ui::Callout.new do %>
 This section tracks the published `solverforge-maps 2.1.4` crate. The current
-`solverforge-cli 2.0.4` scaffold target also uses `solverforge-maps 2.1.4`.
+`solverforge-cli 2.2.0` web scaffold target also uses
+`solverforge-maps 2.1.4`.
 <% end %>
 
 `solverforge-maps` is SolverForge's Rust library for map-backed routing workflows. It is designed for vehicle routing and similar optimization problems where you need to turn geographic coordinates into travel times, same-path route distances, route geometries, and network diagnostics.

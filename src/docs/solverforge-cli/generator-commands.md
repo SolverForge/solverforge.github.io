@@ -2,7 +2,7 @@
 title: Generator Commands
 description: >
   Add and remove facts, entities, variables, constraints, scores, solutions,
-  and demo data in generated SolverForge apps.
+  model resources, and demo data in generated SolverForge apps.
 weight: 7
 ---
 
@@ -30,6 +30,8 @@ Subcommands:
 | `variable`   | Add a scalar or list planning variable to an existing entity |
 | `score`      | Change the score type in the existing planning solution |
 | `data`       | Regenerate compiler-owned demo data from the project model |
+| `scalar-group` | Declare a SolverForge scalar group for coupled scalar construction/search |
+| `conflict-repair` | Declare a conflict repair provider for a constraint |
 
 ### `generate fact`
 
@@ -85,12 +87,20 @@ solverforge generate variable [OPTIONS] --entity <ENTITY_TYPE> --kind <KIND> <FI
 | `--range <FACT_COLLECTION>`    | Required for `--kind scalar`; source fact collection |
 | `--elements <FACT_COLLECTION>` | Required for `--kind list`; list element collection |
 | `--allows-unassigned`          | Scalar only; generate an optional assignment |
+| `--candidate-values <FN_PATH>` | Scalar only; candidate value hook |
+| `--nearby-value-candidates <FN_PATH>` | Scalar only; nearby value hook |
+| `--nearby-entity-candidates <FN_PATH>` | Scalar only; nearby entity hook |
+| `--nearby-value-distance-meter <FN_PATH>` | Scalar only; nearby value distance meter |
+| `--nearby-entity-distance-meter <FN_PATH>` | Scalar only; nearby entity distance meter |
+| `--construction-entity-order-key <FN_PATH>` | Scalar only; construction entity ordering |
+| `--construction-value-order-key <FN_PATH>` | Scalar only; construction value ordering |
 
 `standard` is not a variable kind. It is only the default demo data size label
 used by `solverforge.app.toml`.
 
 ```bash
 solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --allows-unassigned
+solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --candidate-values employee_candidates
 solverforge generate variable stops --entity Route --kind list --elements visits
 ```
 
@@ -186,6 +196,75 @@ solverforge generate data --size large
 solverforge generate data --mode stub
 ```
 
+### `generate scalar-group`
+
+```text
+solverforge generate scalar-group [OPTIONS] <NAME>
+```
+
+Scalar groups are opt-in runtime model resources for coupled scalar
+construction and search.
+
+Target options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `--assignment <ENTITY.FIELD>` | Assignment-backed scalar target; the target must allow unassigned values |
+| `--candidates <FN_PATH>` | Candidate-backed provider function |
+| `--target <ENTITY.FIELD>` | Candidate-backed scalar target; repeat for multi-target groups |
+
+Assignment hook options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `--required-entity <FN_PATH>` | Decide whether an entity must be assigned |
+| `--capacity-key <FN_PATH>` | Return a capacity bucket for entity/value pairs |
+| `--assignment-rule <FN_PATH>` | Filter legal pairwise assignments |
+| `--position-key <FN_PATH>` | Return sequence position for an entity |
+| `--sequence-key <FN_PATH>` | Return sequence key for entity/value pairs |
+| `--entity-order <FN_PATH>` | Rank entity construction order |
+| `--value-order <FN_PATH>` | Rank candidate value order |
+
+Limit and write options:
+
+| Option | Meaning |
+| ------ | ------- |
+| `--value-candidate-limit <N>` | Limit candidate values per scalar target |
+| `--group-candidate-limit <N>` | Limit grouped construction candidates |
+| `--max-moves-per-step <N>` | Limit grouped scalar local-search moves per step |
+| `--max-augmenting-depth <N>` | Limit augmenting-path depth for assignment groups |
+| `--max-rematch-size <N>` | Limit rematch size for assignment groups |
+| `--skip-solver-config` | Do not add matching `solver.toml` phases |
+
+Examples:
+
+```bash
+solverforge generate scalar-group required_assignment --assignment Task.resource_idx --required-entity required_task
+solverforge generate scalar-group paired_assignment --candidates paired_candidates --target Task.primary_idx --target Task.secondary_idx
+```
+
+### `generate conflict-repair`
+
+```text
+solverforge generate conflict-repair [OPTIONS] --provider <FN_PATH> <CONSTRAINT>
+```
+
+| Option | Meaning |
+| ------ | ------- |
+| `--provider <FN_PATH>` | Repair provider function path |
+| `--selector <SELECTOR>` | Move selector kind to add to `solver.toml`; `compound` or `conflict`, default `compound` |
+| `--max-matches-per-step <N>` | Limit conflict matches per step |
+| `--max-repairs-per-match <N>` | Limit repairs per matched conflict |
+| `--max-moves-per-step <N>` | Limit emitted repair moves per step |
+| `--include-soft-matches` | Allow selectors to match soft-constraint conflicts |
+| `--skip-solver-config` | Do not add a matching `solver.toml` phase |
+
+Example:
+
+```bash
+solverforge generate conflict-repair required_assignment --provider repair_required_assignment
+```
+
 ## `solverforge destroy`
 
 ```text
@@ -209,11 +288,15 @@ Subcommands:
 | `variable`   | `solverforge destroy [OPTIONS] variable --entity <ENTITY_TYPE> <FIELD>` | Remove a planning variable field from an entity |
 | `fact`       | `solverforge destroy [OPTIONS] fact <NAME>` | Remove a problem fact and unwire its solution collection |
 | `constraint` | `solverforge destroy [OPTIONS] constraint <NAME>` | Remove a constraint module and registry entry |
+| `scalar-group` | `solverforge destroy [OPTIONS] scalar-group <NAME>` | Remove a scalar group declaration |
+| `conflict-repair` | `solverforge destroy [OPTIONS] conflict-repair <NAME>` | Remove a conflict repair declaration |
 
 ```bash
 solverforge destroy entity shift
 solverforge destroy --yes constraint no_overlap
 solverforge destroy -y variable --entity Task resource_idx
+solverforge destroy --yes scalar-group required_assignment
+solverforge destroy --yes conflict-repair required_assignment
 ```
 
 ## See Also

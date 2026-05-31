@@ -64,7 +64,7 @@ solverforge config show
 
 ```bash
 solverforge config set termination.seconds_spent_limit 60
-solverforge config set phases.acceptor.type late_acceptance
+solverforge config set environment_mode reproducible
 ```
 
 `solverforge config set` uses dotted key paths and parses values as:
@@ -86,11 +86,12 @@ Fresh projects also start with an app spec like this:
 [app]
 name = "my-scheduler"
 starter = "neutral-shell"
-cli_version = "2.0.4"
+shell = "web"
+cli_version = "2.2.0"
 
 [runtime]
-target = "solverforge 0.11.1"
-runtime_source = "crates.io: solverforge 0.11.1"
+target = "solverforge 0.15.0"
+runtime_source = "crates.io: solverforge 0.15.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
@@ -102,23 +103,22 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 2.0.4` scaffold target. Fresh
-generated apps start on the published `solverforge 0.11.1` runtime and the
+This example reflects the `solverforge-cli 2.2.0` web scaffold target. Fresh
+web generated apps start on the published `solverforge 0.15.0` runtime and the
 CLI's `solverforge-ui 0.6.5` scaffold target.
 
-Record any later app-owned runtime-target upgrade explicitly in that app's
-dependency manifest and `solverforge.app.toml`. The current standalone
-`solverforge` runtime is `0.15.0`, so a manually upgraded generated app should
-record `target = "solverforge 0.15.0"` and
-`runtime_source = "crates.io: solverforge 0.15.0"`.
+Record any later app-owned target changes explicitly in that app's dependency
+manifest and `solverforge.app.toml`.
 
-As you generate facts, entities, variables, and constraints, the CLI also keeps
-these structural arrays in sync:
+As you generate facts, entities, variables, constraints, scalar groups, and
+conflict repairs, the CLI also keeps these structural arrays in sync:
 
 - `[[facts]]`
 - `[[entities]]`
 - `[[variables]]`
 - `[[constraints]]`
+- `[[scalar_groups]]`
+- `[[conflict_repairs]]`
 
 ### What the App Spec Is For
 
@@ -126,9 +126,10 @@ these structural arrays in sync:
 metadata used to:
 
 - record scaffold provenance and targets
+- record the selected generated shell as `web`, `api`, or `cli`
 - store demo defaults
-- describe collections and solvable fields for the frontend
-- produce `static/generated/ui-model.json`
+- describe collections and solvable fields for web frontends
+- produce `static/generated/ui-model.json` for web-shell projects
 
 The primary modeling source still lives in:
 
@@ -141,6 +142,7 @@ Safe manual edits:
 
 - app name or metadata when you understand the consequences
 - demo default size if you want to change the default dataset surfaced by the UI
+- app title and labels when you understand how the frontend reads them
 
 Use caution with:
 
@@ -148,6 +150,8 @@ Use caution with:
 - `[[entities]]`
 - `[[variables]]`
 - `[[constraints]]`
+- `[[scalar_groups]]`
+- `[[conflict_repairs]]`
 
 Those sections are synchronized from the generated code and may be rewritten by
 future CLI operations.
@@ -171,6 +175,9 @@ Scalar and list variables become different view kinds:
 - list -> `kind: "list"`
 
 Do not hand-edit this file. It is generated output.
+
+API and CLI shell projects do not generate `static/generated/ui-model.json` or
+the web frontend assets.
 
 ### `static/sf-config.json`
 
@@ -205,9 +212,10 @@ This reports:
 - source labels for each dependency line
 
 In generated apps, the crate versions are pinned in `Cargo.toml`, while the app
-spec records the runtime and UI target labels plus their sources. The maps
-dependency is pinned in `Cargo.toml` and surfaced in `solverforge --version`,
-but it is not currently duplicated into the app spec's `[runtime]` block.
+spec records the runtime target label and source. Web-shell apps also record the
+UI source. The maps dependency is pinned in the web-shell `Cargo.toml` and
+surfaced in `solverforge --version`, but it is not currently duplicated into
+the app spec's `[runtime]` block.
 
 ## Practical Rule of Thumb
 

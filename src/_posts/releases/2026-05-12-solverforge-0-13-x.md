@@ -15,8 +15,9 @@ description: >
 [0.13.1](https://crates.io/crates/solverforge/0.13.1), published on
 2026-05-14, with API docs at [docs.rs](https://docs.rs/solverforge/0.13.1).
 
-The release was not a CLI scaffold refresh. `solverforge-cli 2.0.4` still
-scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and
+The release was not a CLI scaffold refresh. At the time,
+`solverforge-cli 2.0.4` scaffolded `solverforge 0.11.1`,
+`solverforge-ui 0.6.5`, and
 `solverforge-maps 2.1.4`. Direct Cargo projects and deliberately upgraded
 generated apps can target the published `solverforge 0.13.1` crate.
 
@@ -205,7 +206,7 @@ For generated apps, confirm the installed CLI target:
 solverforge --version
 ```
 
-`solverforge-cli 2.0.4` still reports:
+At the time of this release, `solverforge-cli 2.0.4` reported:
 
 ```text
 CLI version: 2.0.4
@@ -246,5 +247,6 @@ At publication, the docs tree was updated for the 0.13.x runtime surface:
 - [Local Search](/docs/solverforge/solver/local-search/) explains the
   accepted-count horizon and fair union selector ordering.
 - [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.13.1` runtime from the `solverforge-cli 2.0.4` scaffold
+  `solverforge 0.13.1` runtime from the then-current
+  `solverforge-cli 2.0.4` scaffold
   target that was current at publication time.

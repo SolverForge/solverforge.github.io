@@ -14,8 +14,8 @@ documentation tracks the published `solverforge 0.15.0` crate and calls out
 published crates.io, docs.rs, and CLI scaffold targets separately. The public
 `solverforge 0.15.0` package is available on crates.io; docs.rs can briefly lag
 while it builds the newest Rustdoc pages. The published
-`solverforge-cli 2.0.4` package scaffolds generated apps on the
-`solverforge 0.11.1` runtime target.
+`solverforge-cli 2.2.0` package scaffolds generated apps on the
+`solverforge 0.15.0` runtime target.
 <% end %>
 
 ## Current Status
@@ -23,7 +23,7 @@ while it builds the newest Rustdoc pages. The published
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.15.0` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.0.4` scaffolds `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; generated apps can be manually upgraded to the published `0.15.0` runtime |
+| **CLI Scaffold** | Published | `solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -36,7 +36,8 @@ while it builds the newest Rustdoc pages. The published
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides stay
-  aligned to the checked-in use-case bundle, which currently pins
+  aligned to the checked-in use-case bundle and the current
+  `solverforge-cli 2.2.0` scaffold target, which both use
   `solverforge 0.15.0`; the FSR guide also reflects the bundle's move to
   route shadow values scored by stock `ConstraintFactory` streams.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)

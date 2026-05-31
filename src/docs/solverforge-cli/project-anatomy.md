@@ -9,7 +9,7 @@ weight: 2
 # Project Anatomy
 
 Fresh `solverforge-cli` projects are intentionally small, but they are not just
-"hello world" shells. The scaffold already includes:
+"hello world" shells. The default web scaffold already includes:
 
 - an Axum backend
 - retained solver-job routes and SSE
@@ -20,7 +20,7 @@ Fresh `solverforge-cli` projects are intentionally small, but they are not just
 
 ## Top-Level Layout
 
-A new neutral shell looks like this:
+A new neutral web shell looks like this:
 
 ```text
 my-scheduler/
@@ -59,6 +59,11 @@ my-scheduler/
 | `static/generated/ui-model.json` | Derived UI metadata generated from `solverforge.app.toml` |
 | `static/sf-config.json` | Lightweight frontend config payload with app title and subtitle |
 
+`solverforge new --shell api` keeps the Axum API and omits `static/`,
+`solverforge-ui`, and `solverforge-maps`. `solverforge new --shell cli` emits a
+command-line app without Axum, static frontend assets, UI, or maps
+dependencies.
+
 ## Ownership Boundaries
 
 The most important rule is that not every generated file should be treated the
@@ -74,6 +79,7 @@ same way.
 | `static/generated/ui-model.json` | CLI | Derived file; do not hand-edit |
 | `solverforge.app.toml` | Shared, mostly CLI-owned | Treat structural model sections as generated metadata |
 | `src/domain/plan.rs` and generated entity files | Shared | Safe to extend, but keep the managed markers intact |
+| `solver.toml` generated resource region | CLI | Keep the `# @solverforge:begin solver-config` region intact when model-resource generators own it |
 
 ## Managed Markers
 
@@ -115,7 +121,8 @@ entities.
 
 ## Generated API Surface
 
-After scaffolding, `solverforge routes` already lists endpoints for:
+After scaffolding a web or API shell, `solverforge routes` already lists
+endpoints for:
 
 - health and app info
 - demo data listing and retrieval
@@ -151,6 +158,7 @@ The scaffold frontend does not vendor a separate npm app. Instead, it:
 - mounts the shipped `solverforge-ui` assets
 
 This keeps the default generated project thin while still shipping a usable UI.
+API and CLI shells deliberately omit these frontend files.
 
 ## Advanced Customization
 

@@ -1,5 +1,5 @@
 ---
-title: "solverforge-cli 2.0.x: One Entry Point and Current Scaffold Targets"
+title: "solverforge-cli 2.0.x: One Entry Point and Explicit Scaffold Targets"
 date: 2026-04-24
 draft: false
 description: >
@@ -8,10 +8,11 @@ description: >
   CLI-owned runtime, UI, and maps targets.
 ---
 
-**solverforge-cli 2.0.x** is the current CLI line for generated SolverForge
-apps. It starts with the 2.0.0 command-surface cleanup and currently scaffolds
-new projects on `solverforge 0.11.1`, `solverforge-ui 0.6.5`, and
-`solverforge-maps 2.1.4`.
+**solverforge-cli 2.0.x** was the CLI line that introduced the neutral
+generated app shell and explicit scaffold target reporting. It is now
+superseded by [solverforge-cli 2.2.x](/blog/releases/2026/05/31/solverforge-cli-2-2-x/).
+The last 2.0.x patch scaffolds new projects on `solverforge 0.11.1`,
+`solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
 
 Patch releases are folded into this line note instead of published as separate
 release-note pages.
@@ -45,7 +46,7 @@ SolverForge apps now share the same generated shell:
 The domain shape belongs inside the generated project, not in a scaffold-family
 choice before the project exists. CLI 2.0.0 commits to that model.
 
-## Current scaffold targets
+## 2.0.4 scaffold targets
 
 `solverforge-cli` is its own versioned product. The CLI package version and the
 crate versions used by newly scaffolded projects are deliberately reported
@@ -195,8 +196,7 @@ Use the [solverforge-cli manual](/docs/solverforge-cli/) for command details,
 the [command reference](/docs/solverforge-cli/command-reference/) for exact
 options, and the
 [hospital scheduling use case](/docs/getting-started/solverforge-hospital-use-case/)
-for a complete current app that deliberately upgrades the runtime dependency
-while keeping scaffold targets explicit.
+for a complete current app on the latest scaffold target.
 
 solverforge-cli 2.0.0 is the line where the CLI stops pretending that scaffold
 families are the product. The product is the generated SolverForge app: one

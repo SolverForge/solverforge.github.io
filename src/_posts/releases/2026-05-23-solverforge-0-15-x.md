@@ -15,12 +15,10 @@ published by GitHub Actions on 2026-05-23, and available as
 crates.io accepted the facade package at `2026-05-23T07:40:59Z`; docs.rs can
 briefly remain on the prior Rustdoc build while it processes the new package.
 
-The release is a core runtime release, not a CLI scaffold refresh.
-`solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1`,
+The original runtime release was not a CLI scaffold refresh. As of
+`solverforge-cli 2.2.0`, fresh generated apps now target `solverforge 0.15.0`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`. The checked-in
-`solverforge-usecases` bundle now targets `solverforge 0.15.0`. Direct Cargo
-projects and deliberately upgraded generated apps can target the published
-`solverforge 0.15.0` crate.
+`solverforge-usecases` bundle also targets `solverforge 0.15.0`.
 
 ## What Changed
 
@@ -156,22 +154,22 @@ For generated apps, confirm the installed CLI target:
 solverforge --version
 ```
 
-`solverforge-cli 2.0.4` still reports:
+The current `solverforge-cli 2.2.0` reports:
 
 ```text
-CLI version: 2.0.4
-Scaffold runtime target: SolverForge crate target 0.11.1
+CLI version: 2.2.0
+Scaffold runtime target: SolverForge crate target 0.15.0
 Scaffold UI target: solverforge-ui 0.6.5
 Scaffold maps target: solverforge-maps 2.1.4
-Runtime source: crates.io: solverforge 0.11.1
+Runtime source: crates.io: solverforge 0.15.0
 UI source: crates.io: solverforge-ui 0.6.5
 Maps source: crates.io: solverforge-maps 2.1.4
 ```
 
-Generated apps created with that CLI start on `solverforge 0.11.1`. Move a
-generated app to `solverforge 0.15.0` only when you are deliberately upgrading
-that app's runtime dependency and validating the generated code against the
-newer core crate.
+Generated apps created with the current CLI start on `solverforge 0.15.0`.
+Move older generated apps to `solverforge 0.15.0` only when you are
+deliberately upgrading that app's runtime dependency and validating the
+generated code against the newer core crate.
 
 ## Patch History
 
@@ -196,10 +194,9 @@ The docs tree now tracks the 0.15.0 runtime surface:
 - [Local Search](/docs/solverforge/solver/local-search/) and
   [SolverManager](/docs/solverforge/solver/solver-manager/) document
   move-label telemetry and bounded applied-move traces.
-- [Status & Roadmap](/docs/status-and-roadmap/) separates the published
-  `solverforge 0.15.0` runtime from the still-current
-  `solverforge-cli 2.0.4` scaffold target and the checked-in 0.15.0 use-case
-  bundle.
+- [Status & Roadmap](/docs/status-and-roadmap/) records the published
+  `solverforge 0.15.0` runtime, the current `solverforge-cli 2.2.0` scaffold
+  target, and the checked-in 0.15.0 use-case bundle.
 - The worked use-case tutorials track the current `solverforge-usecases`
   bundle. In particular, the FSR tutorial now documents the 0.15.0 migration
   from app-local route constraint adapters to route shadow values scored by

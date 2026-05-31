@@ -229,7 +229,7 @@ For generated apps, confirm the installed CLI target:
 solverforge --version
 ```
 
-`solverforge-cli 2.0.4` still reports:
+At the time of this release, `solverforge-cli 2.0.4` reported:
 
 ```text
 CLI version: 2.0.4

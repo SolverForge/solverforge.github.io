@@ -43,8 +43,8 @@ equivalent to the matching nested `--help` form.
 
 | Group | Commands | Purpose |
 | ----- | -------- | ------- |
-| [Scaffold Commands](/docs/solverforge-cli/scaffold-commands/) | `new`, `server` | Create and run a generated app shell |
-| [Generator Commands](/docs/solverforge-cli/generator-commands/) | `generate`, `destroy` | Add, remove, and resync generated domain resources |
+| [Scaffold Commands](/docs/solverforge-cli/scaffold-commands/) | `new`, `server` | Create and run generated web, API, or CLI shells |
+| [Generator Commands](/docs/solverforge-cli/generator-commands/) | `generate`, `destroy` | Add, remove, and resync generated domain and model resources |
 | [Operations Commands](/docs/solverforge-cli/operations-commands/) | `info`, `check`, `test`, `routes`, `config`, `completions`, `help` | Inspect, validate, test, configure, and integrate the app |
 
 ## Version And Help
@@ -61,31 +61,30 @@ solverforge generate variable --help
 crate targets used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 2.0.4
-CLI version: 2.0.4
-Scaffold runtime target: SolverForge crate target 0.11.1
+solverforge solverforge-cli 2.2.0
+CLI version: 2.2.0
+Scaffold runtime target: SolverForge crate target 0.15.0
 Scaffold UI target: solverforge-ui 0.6.5
 Scaffold maps target: solverforge-maps 2.1.4
-Runtime source: crates.io: solverforge 0.11.1
+Runtime source: crates.io: solverforge 0.15.0
 UI source: crates.io: solverforge-ui 0.6.5
 Maps source: crates.io: solverforge-maps 2.1.4
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 2.0.4` scaffold starts on the published `solverforge 0.11.1`,
+`solverforge-cli 2.2.0` scaffold starts on the published `solverforge 0.15.0`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` crate line.
 
 Keep generated-app dependency manifests aligned with the installed CLI. Use the
 version output as the source of truth for the scaffold targets carried by that
-binary. The current standalone runtime crate is `solverforge 0.15.0`; upgrading
-a generated app to that runtime is an app-owned dependency and
-`solverforge.app.toml` change until a newer CLI scaffold target is published.
+binary. App-specific dependency changes still belong in that generated app's
+manifest and `solverforge.app.toml`.
 
 ## Top-Level Commands
 
 | Command       | Purpose |
 | ------------- | ------- |
-| `new`         | Scaffold a new neutral SolverForge project |
+| `new`         | Scaffold a new SolverForge project shell |
 | `generate`    | Add a generated resource to the current project |
 | `destroy`     | Remove a generated resource from the current project |
 | `server`      | Start the generated development server |

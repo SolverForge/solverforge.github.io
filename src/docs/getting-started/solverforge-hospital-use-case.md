@@ -122,11 +122,10 @@ CLI scaffold plus manual hospital scheduling code.
 
 ### Keep the Published Dependency Shape
 
-Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the `solverforge 0.15.0` crate used by the checked-in
-hospital use-case source. Keep the published `solverforge-ui 0.6.5` crate for
-the UI patch line, then add the hospital app's normal scheduling and
-web/runtime dependencies:
+Start from the CLI's current published scaffold line, which now targets the
+`solverforge 0.15.0` crate used by the checked-in hospital use-case source.
+Keep the published `solverforge-ui 0.6.5` crate for the UI patch line, then add
+the hospital app's normal scheduling and web/runtime dependencies:
 
 ```toml
 [dependencies]
@@ -149,10 +148,9 @@ chrono = { version = "0.4.44", features = ["serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1` and
-`solverforge-ui 0.6.5`. For this worked example, upgrade the app-owned
-`solverforge` dependency and runtime metadata to `0.15.0` after scaffolding so
-the tutorial tracks the current checked-in use-case runtime.
+`solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0` and
+`solverforge-ui 0.6.5`, so the generated baseline already matches the current
+checked-in use-case runtime before the tutorial adds hospital-specific code.
 
 ### Align App Metadata
 
@@ -162,7 +160,8 @@ The current hospital app metadata is intentionally explicit:
 [app]
 name = "SolverForge Hospital"
 starter = "neutral-shell"
-cli_version = "2.0.4"
+shell = "web"
+cli_version = "2.2.0"
 
 [runtime]
 target = "SolverForge crates.io target"

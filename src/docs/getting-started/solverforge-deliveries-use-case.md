@@ -133,11 +133,11 @@ delivery-routing code.
 
 ### Keep the Published Dependency Shape
 
-Start from the CLI's current published scaffold line, then move the app-owned
-runtime dependency to the `solverforge 0.15.0` crate used by the checked-in
-delivery use-case source. Keep the published `solverforge-ui 0.6.5` and
-`solverforge-maps 2.1.4` crates for the companion release lines, then add the
-delivery app's normal web/runtime dependencies:
+Start from the CLI's current published scaffold line, which now targets the
+`solverforge 0.15.0` crate used by the checked-in delivery use-case source.
+Keep the published `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4` crates
+for the companion release lines, then add the delivery app's normal web/runtime
+dependencies:
 
 ```toml
 [dependencies]
@@ -176,7 +176,8 @@ delivery-specific catalog in `solverforge.app.toml`:
 [app]
 name = "solverforge-deliveries"
 starter = "neutral-shell"
-cli_version = "2.0.4"
+shell = "web"
+cli_version = "2.2.0"
 
 [runtime]
 target = "solverforge 0.15.0"
@@ -204,7 +205,7 @@ That metadata matters because this example teaches the current public
 integration: SolverForge core, SolverForge UI, and SolverForge Maps working
 together in one released-crate app. The CLI scaffold target remains recorded
 separately in `solverforge --version`, so you can tell what the generator
-produced before the app-owned runtime upgrade.
+produced before the app-specific delivery code was added.
 
 ### Generate the Managed Seams
 

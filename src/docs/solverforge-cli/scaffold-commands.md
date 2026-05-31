@@ -7,7 +7,7 @@ weight: 6
 
 # Scaffold Commands
 
-Scaffold commands create and run the generated app shell. They do not choose a
+Scaffold commands create and run generated app shells. They do not choose a
 problem class; scalar and list planning variables are added later through
 generator commands.
 
@@ -17,9 +17,11 @@ generator commands.
 solverforge new [OPTIONS] <NAME>
 ```
 
-Creates one neutral project shell. There are no public problem-class flags such
-as `--scalar`, `--list`, or `--mixed`; scalar and list planning variables are
-created after scaffolding with `solverforge generate ...`.
+Creates one neutral project shell. The default shell is `web`; use `--shell api`
+for an HTTP API without static frontend assets, or `--shell cli` for a command
+line app. There are no public problem-class flags such as `--scalar`, `--list`,
+or `--mixed`; scalar and list planning variables are created after scaffolding
+with `solverforge generate ...`.
 
 Arguments:
 
@@ -31,6 +33,7 @@ Options:
 
 | Option          | Meaning                                |
 | --------------- | -------------------------------------- |
+| `--shell <SHELL>` | Generated shell: `web`, `api`, or `cli`; default `web` |
 | `--skip-git`    | Skip `git init` and the initial commit |
 | `--skip-readme` | Do not generate `README.md`            |
 
@@ -47,6 +50,8 @@ Example:
 
 ```bash
 solverforge new my-optimizer
+solverforge new api-optimizer --shell api
+solverforge new batch-optimizer --shell cli
 ```
 
 ## `solverforge server`
@@ -62,7 +67,8 @@ Options:
 | `-p, --port <PORT>` | Set the `PORT` environment variable for the generated server; default `7860` |
 | `--debug`           | Run `cargo run` instead of `cargo run --release` |
 
-By default the command runs the generated app with `cargo run --release`.
+By default the command runs web and API generated apps with
+`cargo run --release`. CLI-shell projects run directly with `cargo run`.
 
 Examples:
 

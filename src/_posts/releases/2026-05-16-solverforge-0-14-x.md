@@ -17,7 +17,8 @@ as [solverforge 0.14.1](https://crates.io/crates/solverforge/0.14.1) on
 crates.io, with API docs at [docs.rs](https://docs.rs/solverforge/0.14.1).
 
 The release is a core runtime release, not a CLI scaffold refresh.
-`solverforge-cli 2.0.4` still scaffolds `solverforge 0.11.1`,
+At the time of this runtime release, `solverforge-cli 2.0.4` scaffolded
+`solverforge 0.11.1`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`. Direct Cargo projects
 and deliberately upgraded generated apps can target the published
 `solverforge 0.14.1` crate.
@@ -137,7 +138,7 @@ For generated apps, confirm the installed CLI target:
 solverforge --version
 ```
 
-`solverforge-cli 2.0.4` still reports:
+At the time of this release, `solverforge-cli 2.0.4` reported:
 
 ```text
 CLI version: 2.0.4

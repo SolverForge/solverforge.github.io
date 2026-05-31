@@ -2,7 +2,7 @@
 title: Modeling & Generation
 description: >
   Facts, entities, scalar variables, list variables, constraints, data
-  generation, and destroy flows in solverforge-cli.
+  generation, model-resource generation, and destroy flows in solverforge-cli.
 weight: 3
 ---
 
@@ -17,8 +17,9 @@ The current workflow is:
 2. define entities
 3. add scalar or list planning variables
 4. add or replace constraints
-5. regenerate demo data
-6. iterate on solver behavior and frontend presentation
+5. declare scalar groups or conflict repairs when the runtime model needs them
+6. regenerate demo data
+7. iterate on solver behavior and frontend presentation
 
 ## Generator Ownership
 
@@ -32,7 +33,7 @@ The CLI writes code, but not every generated line has the same ownership model.
 | `src/constraints/*.rs` | creates skeleton stream patterns | replace placeholder predicates and weights |
 | `solverforge.app.toml` | syncs structural metadata | treat as derived scaffold contract |
 | `static/generated/ui-model.json` | rewrites frontend model metadata | do not hand-edit |
-| `solver.toml` | starts with defaults and can be edited through `config` helpers | own search policy explicitly |
+| `solver.toml` | starts with defaults and can receive model-resource refs | own search policy explicitly |
 
 When a generator uses managed markers, keep the `@solverforge:begin` and
 `@solverforge:end` comments intact. They are the boundary that lets future CLI
@@ -47,6 +48,8 @@ operations patch generated regions without taking over the whole file.
 | one selected value per entity | `solverforge generate variable ... --kind scalar ...` |
 | an ordered sequence owned by an entity | `solverforge generate variable ... --kind list ...` |
 | a hard or soft scoring rule skeleton | `solverforge generate constraint ...` |
+| coupled scalar construction or grouped scalar search | `solverforge generate scalar-group ...` |
+| constraint-specific repair moves | `solverforge generate conflict-repair ...` |
 | deterministic sample data | `solverforge generate data --size ...` |
 | a different score type | `solverforge generate score ...` |
 
@@ -133,6 +136,16 @@ Useful flags:
 - `--kind scalar` - scalar assignment variable
 - `--range <FACT_COLLECTION>` - value range collection name
 - `--allows-unassigned` - allow `None`
+- `--candidate-values <FN_PATH>` - app-owned candidate-value hook
+- `--nearby-value-candidates <FN_PATH>` - app-owned nearby value hook
+- `--nearby-entity-candidates <FN_PATH>` - app-owned nearby entity hook
+- `--nearby-value-distance-meter <FN_PATH>` - app-owned value distance meter
+- `--nearby-entity-distance-meter <FN_PATH>` - app-owned entity distance meter
+- `--construction-entity-order-key <FN_PATH>` - app-owned construction entity ordering
+- `--construction-value-order-key <FN_PATH>` - app-owned construction value ordering
+
+Hook flags only write modeling metadata and keep `solverforge.app.toml`
+synchronized. The referenced Rust functions are still application code.
 
 `standard` is not a variable kind in the current CLI. It remains only as the
 default demo data size label.
@@ -229,6 +242,70 @@ Important: generated constraint files are not finished logic. They are
 deliberately scaffolded placeholders. Replace the TODO text and placeholder
 conditions before you treat the constraint as real.
 
+## Scalar Groups
+
+Scalar groups describe coupled scalar construction and search resources that
+the runtime can consume from `solver.toml`.
+
+Assignment-backed group:
+
+```bash
+solverforge generate scalar-group required_assignment \
+  --assignment Task.resource_idx \
+  --required-entity required_task \
+  --capacity-key resource_capacity
+```
+
+Candidate-backed group:
+
+```bash
+solverforge generate scalar-group paired_assignment \
+  --candidates paired_candidates \
+  --target Task.primary_idx \
+  --target Task.secondary_idx
+```
+
+Useful flags:
+
+- `--assignment <ENTITY.FIELD>` - declare one nullable scalar assignment target
+- `--candidates <FN_PATH>` - app-owned grouped candidate provider
+- `--target <ENTITY.FIELD>` - candidate-backed scalar target; repeatable
+- `--required-entity <FN_PATH>` - assignment hook for required nullable slots
+- `--capacity-key <FN_PATH>` - assignment hook for capacity buckets
+- `--assignment-rule <FN_PATH>` - assignment hook for legal pairwise assignments
+- `--position-key <FN_PATH>` and `--sequence-key <FN_PATH>` - assignment sequence hooks
+- `--entity-order <FN_PATH>` and `--value-order <FN_PATH>` - construction ordering hooks
+- `--value-candidate-limit <N>`, `--group-candidate-limit <N>`, and
+  `--max-moves-per-step <N>` - generated limit metadata
+- `--skip-solver-config` - skip the generated `solver.toml` region
+
+By default the command writes scalar-group metadata to `solverforge.app.toml`,
+adds hook stubs and `ScalarGroup` declarations to the planning solution, and
+synchronizes grouped construction and search refs in the CLI-managed
+`# @solverforge:begin solver-config` region.
+
+## Conflict Repairs
+
+Conflict repairs connect a named constraint to an app-owned repair provider:
+
+```bash
+solverforge generate conflict-repair required_assignment \
+  --provider repair_required_assignment
+```
+
+Useful flags:
+
+- `--provider <FN_PATH>` - required app-owned repair provider
+- `--selector compound|conflict` - generated selector kind; default `compound`
+- `--max-matches-per-step <N>` - limit matched conflicts
+- `--max-repairs-per-match <N>` - limit repair candidates per conflict
+- `--max-moves-per-step <N>` - limit emitted repair moves
+- `--include-soft-matches` - allow soft-constraint conflicts
+- `--skip-solver-config` - skip the generated `solver.toml` phase
+
+Constraint IDs are exact snake_case IDs. Destroy refuses to remove a conflict
+repair while user-authored `solver.toml` still references it.
+
 ## Demo Data
 
 Generate or refresh compiler-owned demo data:
@@ -268,6 +345,8 @@ solverforge destroy entity task
 solverforge destroy variable --entity Task resource_idx
 solverforge destroy fact resource
 solverforge destroy constraint no_overlap
+solverforge destroy scalar-group required_assignment
+solverforge destroy conflict-repair required_assignment
 solverforge destroy solution
 ```
 
@@ -283,6 +362,7 @@ Destroy operations update the same managed surfaces used by generation:
 - planning solution collections
 - constraint registry
 - synchronized app metadata
+- CLI-managed solver config refs for scalar groups and conflict repairs
 
 ## Best Practices
 

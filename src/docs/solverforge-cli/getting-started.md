@@ -25,13 +25,13 @@ or the [SolverForge FSR Use Case](/docs/getting-started/solverforge-fsr-use-case
 
 ## Prerequisites
 
-- Rust stable `1.80+` to build the CLI itself
+- Rust stable `1.95+` to build the CLI itself
 - The Rust toolchain required by the scaffolded runtime target reported by
   `solverforge --version`
 - Cargo
 - A working C toolchain for Rust dependencies on your platform
 
-The CLI crate itself declares `rust-version = "1.80"`. Generated applications
+The CLI crate itself declares `rust-version = "1.95"`. Generated applications
 compile against the scaffolded SolverForge crate targets reported by
 `solverforge --version`; use the runtime crate metadata as the source of truth
 for the generated app's Rust version requirement.
@@ -76,7 +76,7 @@ The output includes:
 
 ## Create a New Project
 
-The `new` command always creates a neutral shell:
+The `new` command creates a neutral shell:
 
 ```bash
 solverforge new my-scheduler
@@ -85,17 +85,23 @@ cd my-scheduler
 
 Useful options:
 
+- `--shell web|api|cli` - choose the generated shell; `web` is the default
 - `--skip-git` - do not run `git init` or create the initial commit
 - `--skip-readme` - do not generate `README.md`
 
 Fresh output includes a short "next steps" block and reminds you that the
-generated shell already contains:
+default web generated shell already contains:
 
 - one neutral app shell for scalar and list modeling
 - retained lifecycle routes and UI wiring
 - typed SSE events
 - `solverforge.app.toml` as the scaffold contract
 - `solver.toml` as the solver search configuration layer
+
+Use `--shell api` when you want the Axum API without static frontend assets.
+Use `--shell cli` when you want a command-line app rather than an HTTP server.
+The shell choice is recorded in `[app].shell`; it is not a scalar, list, or
+mixed model selector.
 
 ## Run the Local Server
 
@@ -114,7 +120,7 @@ Useful options:
 
 Open `http://localhost:7860` in your browser.
 
-The generated project serves:
+The default web generated project serves:
 
 - the `solverforge-ui` asset bundle
 - a neutral frontend in `static/app.js`
@@ -218,6 +224,22 @@ solverforge generate variable stops \
   --elements visits
 ```
 
+Scalar variables can also declare hook metadata for app-owned candidate and
+ordering functions:
+
+```bash
+solverforge generate variable resource_idx \
+  --entity Task \
+  --kind scalar \
+  --range resources \
+  --candidate-values resource_candidates \
+  --construction-entity-order-key task_priority \
+  --construction-value-order-key resource_priority
+```
+
+Those flags write `#[planning_variable(...)]` metadata and synchronize it into
+`solverforge.app.toml`; you still own the referenced Rust functions.
+
 ### Add Constraints
 
 ```bash
@@ -245,6 +267,24 @@ replace them with real domain logic.
 Treat the generated file as a compile-time wiring aid. It gives you the module,
 constraint name, score shape, and stream pattern; you still own the real
 predicate, join keys, weights, and hard/soft decision.
+
+### Add Model Resources
+
+When the runtime model needs coupled scalar construction/search or
+constraint-specific repair moves, declare those resources explicitly:
+
+```bash
+solverforge generate scalar-group required_assignment \
+  --assignment Task.resource_idx \
+  --required-entity required_task
+
+solverforge generate conflict-repair required_assignment \
+  --provider repair_required_assignment
+```
+
+By default these commands synchronize `solver.toml` inside the CLI-managed
+`# @solverforge:begin solver-config` region. Use `--skip-solver-config` only
+when you want to write those phase and selector references yourself.
 
 ### Generate Demo Data
 
@@ -310,8 +350,8 @@ solverforge routes
 ```
 
 This parses `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs` and lists the
-generated routes. It is a quick way to verify whether your app still exposes the
-retained lifecycle and demo data surface you expect.
+generated routes. It is a quick way to verify whether a web or API shell still
+exposes the retained lifecycle and demo data surface you expect.
 
 ### Manage Solver Configuration
 
@@ -337,6 +377,8 @@ the `destroy` command before the resource subcommand.
 solverforge destroy --yes entity task
 solverforge destroy --yes constraint no_overlap
 solverforge destroy --yes variable --entity Task resource_idx
+solverforge destroy --yes scalar-group required_assignment
+solverforge destroy --yes conflict-repair required_assignment
 solverforge destroy --yes fact employee
 solverforge destroy --yes solution
 ```
