@@ -167,4 +167,7 @@ Crate responsibilities, zero-erasure design, SERIO scoring, and retained runtime
   <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-rocket") do %>
 Start from the CLI scaffold and follow concrete hospital, lessons, delivery, or field-service examples.
   <% end %>
+  <%= render Ui::Card.new(title: "Python", href: relative_url('/docs/solverforge-python/'), icon: "fa-solid fa-code") do %>
+Install the PyPI package and author SolverForge models with Python classes, decorators, and callbacks.
+  <% end %>
 </div>

@@ -6,10 +6,10 @@ menu: { main: { weight: 20 } }
 
 <h1>Documentation</h1>
 
-Use these docs to learn what SolverForge solves, scaffold a working app, and
-inspect the Rust APIs behind the runtime, UI, and routing helpers. Section
-indexes orient the tree; deep links take you straight to the implementation
-surface.
+Use these docs to learn what SolverForge solves, scaffold a working app, author
+models from Rust or Python, and inspect the APIs behind the runtime, UI, and
+routing helpers. Section indexes orient the tree; deep links take you straight
+to the implementation surface.
 
 ## Start Here
 
@@ -22,6 +22,9 @@ Current release, published package status, runtime surface, and roadmap.
   <% end %>
   <%= render Ui::Card.new(title: "Getting Started", href: relative_url('/docs/getting-started/'), icon: "fa-solid fa-terminal") do %>
 Start with the CLI shell, then continue into a complete hospital, lessons, deliveries, or field-service use case.
+  <% end %>
+  <%= render Ui::Card.new(title: "Python", href: relative_url('/docs/solverforge-python/'), icon: "fa-solid fa-code") do %>
+Install the `solverforge` PyPI package, write Python models with decorators and callbacks, and run the native SolverForge engine.
   <% end %>
 </div>
 

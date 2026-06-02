@@ -99,6 +99,19 @@ docs:
             href: /docs/solverforge-cli/generator-commands/
           - title: Operations Commands
             href: /docs/solverforge-cli/operations-commands/
+  - title: SolverForge Python
+    href: /docs/solverforge-python/
+    children:
+      - title: Getting Started
+        href: /docs/solverforge-python/getting-started/
+      - title: Modeling
+        href: /docs/solverforge-python/modeling/
+      - title: Constraints
+        href: /docs/solverforge-python/constraints/
+      - title: Solving & Runtime
+        href: /docs/solverforge-python/solving-and-runtime/
+      - title: Hospital Example
+        href: /docs/solverforge-python/hospital-example/
   - title: SolverForge
     href: /docs/solverforge/
     children:
