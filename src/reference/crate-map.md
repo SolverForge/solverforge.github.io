@@ -52,12 +52,15 @@ directly.
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
+| `solverforge-py`   | dynamic Python bindings published as the `solverforge` PyPI package | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
 ## Practical dependency rules
 
 - Start with `solverforge-cli` to scaffold the app shell.
+- Start with the PyPI `solverforge` package when the application surface is
+  Python and you do not need a generated Rust web/API/CLI shell.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
 - Keep scalar/list model declarations in the `planning_model!` manifest and
@@ -69,6 +72,9 @@ directly.
 - Add `solverforge-ui` only if the product needs retained-job UI flows.
 - Add `solverforge-maps` only if routing or map-backed costs are part of the
   planning model.
+- Use `solverforge-py` for Python classes, decorators, callbacks, and retained
+  jobs over the native Rust engine; do not mix it with historical Java-backed
+  PyPI examples.
 - Reach into `solverforge-solver` directly only when configuration and the
   public facade stop being enough.
 
@@ -77,6 +83,7 @@ directly.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
+| Python-authored planner            | PyPI `solverforge` package from `solverforge-py`        |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |
@@ -89,9 +96,12 @@ directly.
   the extension point exists.
 - Do not treat `solverforge-ui` or `solverforge-maps` as part of this
   repository's workspace; they are companion repos with their own release lines.
+- Do not treat old PyPI `solverforge` examples that mention `SolverFactory`,
+  `PlanningVariable`, or Java services as current Python binding docs.
 
 ## See also
 
 - [SolverForge docs](/docs/solverforge/)
+- [SolverForge Python docs](/docs/solverforge-python/)
 - [Integration Boundaries](/reference/integration-surfaces/)
 - [Modeling Cheat Sheet](/reference/modeling-cheat-sheet/)

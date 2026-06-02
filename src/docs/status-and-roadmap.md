@@ -11,11 +11,12 @@ weight: 2
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
 documentation tracks the published `solverforge 0.15.0` crate and calls out
-published crates.io, docs.rs, and CLI scaffold targets separately. The public
-`solverforge 0.15.0` package is available on crates.io; docs.rs can briefly lag
-while it builds the newest Rustdoc pages. The published
+published crates.io, docs.rs, CLI scaffold targets, and Python bindings
+separately. The public `solverforge 0.15.0` package is available on crates.io;
+docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
 `solverforge-cli 2.2.0` package scaffolds generated apps on the
-`solverforge 0.15.0` runtime target.
+`solverforge 0.15.0` runtime target. The published Python package is
+`solverforge 0.4.0` on PyPI and targets CPython 3.14.
 <% end %>
 
 ## Current Status
@@ -24,6 +25,7 @@ while it builds the newest Rustdoc pages. The published
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.15.0` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
+| **Python** | Published | PyPI `solverforge 0.4.0` provides dynamic CPython 3.14 bindings backed by the Rust SolverForge engine |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -31,6 +33,9 @@ while it builds the newest Rustdoc pages. The published
 
 - Start with [solverforge-cli Getting Started](/docs/solverforge-cli/getting-started/)
   for the generic app shell.
+- Use [SolverForge Python](/docs/solverforge-python/) when you want to define
+  models with Python classes, decorators, and callbacks while using the native
+  SolverForge engine.
 - Continue with the worked use-case bundle:
   [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
@@ -75,6 +80,26 @@ while it builds the newest Rustdoc pages. The published
 - **Configuration**: stock `solver.toml`, TOML/YAML parsing helpers, bounded
   scalar candidates, grouped scalar selectors, level-aware simulated annealing,
   and per-solution config overlays
+
+## Python Binding Surface
+
+- **Published package**: `solverforge 0.4.0` is live on PyPI with CPython 3.14
+  wheels for macOS arm64, manylinux x86_64, and Windows x86_64, plus a source
+  distribution.
+- **Architecture**: Python authors models with classes, decorators, functions,
+  and lambdas. Rust owns the working dynamic state, SolverForge search, scoring,
+  snapshots, and retained job lifecycle.
+- **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
+  `SolverManager(config=None)`.
+- **Constraint surface**: callback-authored unary streams, binary stream-level
+  joins, grouped counts, balance scoring, fixed or callback-computed weights,
+  and `joiner.equal(...)` / `joiner.equal_bi(...)`.
+- **Dynamic move parity**: supported scalar and list local-search selectors,
+  including grouped scalar, conflict repair, compound conflict repair, k-opt,
+  list ruin, union, limited neighborhood, and two-child cartesian composition.
+- **Package boundary**: the wheel installs the core package and native extension.
+  Source-checkout examples, including the hospital FastAPI app, stay in the
+  repository and source distribution.
 
 ## Runtime Notes
 
@@ -166,10 +191,18 @@ Current work focuses on tightening public API contracts, making scoring and
 runtime paths easier to explain, and keeping source, docs, examples, and CLI
 scaffolds aligned as releases move.
 
-### Language Bindings
+### Python Binding
 
-Python and other language bindings remain future-facing. The Rust core remains
-the source of truth for solver behavior and docs.
+The first dynamic Python binding architecture is published as
+`solverforge 0.4.0` on PyPI. Current work after publication is refinement:
+clearer docs, compatibility hardening, and honest expansion only where the
+public Rust bridge supports the behavior.
+
+### Additional Language Bindings
+
+Other language bindings remain future-facing. The Rust core remains the source
+of truth for solver behavior, while Python is the first published dynamic
+binding.
 
 ## How You Can Help
 

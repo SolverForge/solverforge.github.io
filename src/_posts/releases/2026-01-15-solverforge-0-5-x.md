@@ -333,9 +333,16 @@ For a current concrete example, read the **[SolverForge Hospital Use Case](/docs
 
 The quickstarts repository will continue to grow with more examples covering different problem types and solver features.
 
-## Python Bindings Coming Soon
+## Python Bindings Update
 
-While SolverForge is now a native Rust solver, we remain committed to multi-language accessibility. **Python bindings are under active development** at [github.com/solverforge/solverforge-py](https://github.com/solverforge/solverforge-py) and will be released later this month (late January 2026).
+SolverForge Python is now published as `solverforge 0.4.0` on PyPI. See the
+current [SolverForge Python docs](/docs/solverforge-python/) for installation,
+modeling, constraints, and retained runtime details.
+
+At the time of this release, Python bindings were still in development at
+[github.com/solverforge/solverforge-py](https://github.com/solverforge/solverforge-py).
+The published package now provides dynamic Python bindings backed by the native
+SolverForge engine.
 
 The architectural shift to native Rust was a major undertaking, and we chose to focus on getting the core solver right before building language bridges. The Python bindings will provide idiomatic Python APIs backed by SolverForge's zero-erasure engine, giving Python developers native constraint solving performance with familiar syntax.
 
@@ -369,7 +376,7 @@ The journey from FFI experiments to native Rust solver has been challenging, but
 - [SolverForge on GitHub](https://github.com/solverforge/solverforge)
 - [Quickstarts Repository](https://github.com/solverforge/solverforge-quickstarts)
 - [API Documentation](https://docs.rs/solverforge)
-- [Python Bindings (Coming Soon)](https://github.com/solverforge/solverforge-py)
+- [SolverForge Python docs](/docs/solverforge-python/)
 - [Why Java Interop is Difficult](/blog/technical/2025/12/30/why-java-interop-is-difficult/)
 - [JPype Performance Challenges](/blog/technical/2025/12/24/order-picking-quickstart-jpype-performance/)
 - [Python Architecture Lessons](/blog/technical/2025/12/06/python-constraint-solver-architecture/)
