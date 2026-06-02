@@ -1,21 +1,17 @@
 ---
 title: "Python Hospital Example"
 description: >
-  Source-checkout FastAPI hospital scheduling example, retained job lifecycle,
-  public dataset shape, and UI/API boundaries.
+  FastAPI hospital scheduling example, retained job lifecycle, public dataset
+  shape, and UI/API surface.
 ---
 
 # Python Hospital Example
 
-`examples/solverforge_hospital` in
-[SolverForge/solverforge-py](https://github.com/SolverForge/solverforge-py)
-is the larger Python example. It mirrors the public hospital scheduling use
-case with Python model classes, callback constraints, retained jobs, FastAPI
-routes, and static UI assets.
+The Python repository includes a FastAPI hospital scheduling demo at
+`examples/solverforge_hospital`. It uses Python model classes, callback
+constraints, retained jobs, API routes, and static UI assets.
 
-The example is source-checkout material. It is included in the source
-distribution for reproducible builds and development, but it is not installed
-into the runtime wheel.
+Clone the repository when you want to run the full demo app.
 
 ## What It Demonstrates
 
@@ -25,8 +21,7 @@ into the runtime wheel.
 - A `SolverManager` backed retained lifecycle
 - Snapshot and analysis endpoints
 - Pause, resume, cancel, and delete controls
-- A static app that renders schedules by location and by employee
-- A generated `ui-model.json` and `sf-config.json` for the example UI
+- Schedule views by location and by employee
 
 ## Dataset Shape
 
@@ -60,10 +55,10 @@ The FastAPI app exposes:
 | `POST /jobs/{id}/cancel` | request cancellation |
 | `DELETE /jobs/{id}` | delete retained job state |
 
-The browser reads authoritative retained lifecycle state from the backend. It
-does not infer solver status locally.
+The browser reads retained lifecycle state from the backend for status,
+snapshots, analysis, and job controls.
 
-## Run From A Source Checkout
+## Run The Demo
 
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
@@ -77,7 +72,3 @@ For a terminal solve:
 ```bash
 make hospital-solve
 ```
-
-Use the repository's own `README.md`, `WIREFRAME.md`, and `docs/` files for
-maintainer-level details. The published website keeps this page focused on the
-public example surface and integration boundary.

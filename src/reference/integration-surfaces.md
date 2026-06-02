@@ -15,7 +15,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 |---|---|---|
 | `solverforge` runtime | domain modeling, constraints, solving, retained lifecycle | project scaffolding, web components, routing datasets |
 | `solverforge-cli` | app bootstrap and code generation | runtime truth, UI state, solver lifecycle semantics |
-| `solverforge-py` | Python decorators, callback binding, PyO3 bridge, Python package distribution | Rust macro API replacement, private runtime internals, generated Rust |
+| `solverforge-py` | Python decorators, callback binding, PyO3 bridge, Python package distribution | Rust crate docs, scaffold generation, web UI, route data |
 | `solverforge-ui` | retained-job UI controls and frontend components | solver search logic, scoring rules, route-cost computation |
 | `solverforge-maps` | routing, map tiles, matrices, and road-network helpers | generic solver lifecycle, scaffold generation |
 | your app | business rules, imports, APIs, persistence, product behavior | generic runtime internals that belong upstream |

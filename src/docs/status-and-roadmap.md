@@ -81,14 +81,11 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
   scalar candidates, grouped scalar selectors, level-aware simulated annealing,
   and per-solution config overlays
 
-## Python Binding Surface
+## Python Package
 
-- **Published package**: `solverforge 0.4.0` is live on PyPI with CPython 3.14
-  wheels for macOS arm64, manylinux x86_64, and Windows x86_64, plus a source
-  distribution.
-- **Architecture**: Python authors models with classes, decorators, functions,
-  and lambdas. Rust owns the working dynamic state, SolverForge search, scoring,
-  snapshots, and retained job lifecycle.
+- **Install**: `python3.14 -m pip install solverforge`.
+- **Modeling**: Python classes, decorators, scalar variables, list variables,
+  and callback constraints.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
   `SolverManager(config=None)`.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
@@ -97,9 +94,6 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
 - **Dynamic move parity**: supported scalar and list local-search selectors,
   including grouped scalar, conflict repair, compound conflict repair, k-opt,
   list ruin, union, limited neighborhood, and two-child cartesian composition.
-- **Package boundary**: the wheel installs the core package and native extension.
-  Source-checkout examples, including the hospital FastAPI app, stay in the
-  repository and source distribution.
 
 ## Runtime Notes
 
@@ -191,12 +185,11 @@ Current work focuses on tightening public API contracts, making scoring and
 runtime paths easier to explain, and keeping source, docs, examples, and CLI
 scaffolds aligned as releases move.
 
-### Python Binding
+### Python Package
 
-The first dynamic Python binding architecture is published as
-`solverforge 0.4.0` on PyPI. Current work after publication is refinement:
-clearer docs, compatibility hardening, and honest expansion only where the
-public Rust bridge supports the behavior.
+`solverforge 0.4.0` is available on PyPI for CPython 3.14. Current work focuses
+on examples, compatibility hardening, and exposing more Python APIs where the
+runtime supports them.
 
 ### Additional Language Bindings
 

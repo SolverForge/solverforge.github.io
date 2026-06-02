@@ -7,13 +7,13 @@ description: >
 
 # Python Getting Started
 
-This guide starts from the published PyPI package. Use it when you want Python
-authoring over the native SolverForge engine.
+This guide installs SolverForge Python, defines a small shift-assignment model,
+solves it, and shows the equivalent config forms.
 
 ## Prerequisites
 
 - CPython 3.14
-- Rust 1.95.0 only when building from source instead of installing a wheel
+- Rust 1.95.0 only if pip needs to build from source
 
 Create an isolated environment:
 
@@ -86,9 +86,8 @@ print(solved.score)
 print([shift.nurse for shift in solved.shifts])
 ```
 
-`Solver.solve(...)` imports the Python object graph into Rust-owned dynamic
-state, runs SolverForge, then writes the solved variables and score back to a
-Python solution object.
+`Solver.solve(...)` reads the Python object graph, runs SolverForge, then writes
+the solved variables and score back to a Python solution object.
 
 ## Analyze A Solution
 
@@ -146,4 +145,4 @@ load `solver.toml` from the current directory if it exists.
 - Use [Solving & Runtime](/docs/solverforge-python/solving-and-runtime/) for
   retained jobs and dynamic selector configuration.
 - Use [Hospital Example](/docs/solverforge-python/hospital-example/) for the
-  larger source-checkout example.
+  larger FastAPI demo.

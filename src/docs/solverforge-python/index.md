@@ -4,24 +4,21 @@ linkTitle: "Python"
 icon: fa-solid fa-code
 weight: 10
 description: >
-  Dynamic Python bindings for SolverForge, published as the solverforge package
-  on PyPI.
+  Build SolverForge planning models in Python and solve them with the native
+  SolverForge engine.
 ---
 
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge 0.4.0` Python package. It
-targets CPython 3.14, ships a PyO3 native extension backed by the Rust
-SolverForge engine, and is published on PyPI as three CPython 3.14 wheels plus
-one source distribution.
+Install SolverForge Python with `python3.14 -m pip install solverforge`.
+The current package is `solverforge 0.4.0` and requires CPython 3.14.
 <% end %>
 
 SolverForge Python lets Python users define planning models with ordinary
-classes, decorators, functions, and lambdas. The package does not generate Rust,
-does not use a string-parsed constraint language, and does not require a Java
-service. Python owns model authoring; Rust owns the working solver state,
-search, scoring, snapshots, and retained job lifecycle.
+classes, decorators, functions, and lambdas. Decorators mark planning entities,
+variables, and solutions. Constraint providers return Python callback-based
+rules. The solve still runs through the native SolverForge engine.
 
 ## Installation
 
@@ -29,59 +26,35 @@ search, scoring, snapshots, and retained job lifecycle.
 python3.14 -m pip install solverforge
 ```
 
-The current wheel contains the public `solverforge` package, the native
-`solverforge._native` extension, type stubs, and package metadata. Source
-checkout examples, including the hospital FastAPI app, are maintained in the
-repository and source distribution rather than installed into the runtime wheel.
+## Basic Workflow
 
-If pip builds from source, the build uses Rust 1.95.0 and `maturin`.
+1. Define facts and planning entities as Python classes.
+2. Mark scalar or list planning variables on entity classes.
+3. Add a `@planning_solution(...)` class that owns the collections.
+4. Write constraint callbacks with `ConstraintFactory`.
+5. Call `Solver.solve(...)` for a direct solve or `SolverManager` for retained
+   jobs, snapshots, pause, resume, and cancel.
 
-## What It Provides
+## API Surface
 
-- Python decorators for `@planning_solution`, `@planning_entity`,
-  `@problem_fact`, `@constraint_provider`, `@scalar_group`, and
-  `@conflict_repair`
-- Planning fields for `planning_id`, `planning_variable`, and
-  `planning_list_variable`
-- Score families for `SoftScore`, `HardSoftScore`,
-  `HardSoftDecimalScore`, and `HardMediumSoftScore`
-- Callback-authored constraints through `ConstraintFactory`
-- Synchronous solving with `Solver.solve(...)`
-- Score evaluation with `Solver.analyze(...)`
-- Retained jobs with `SolverManager`, including status, events, snapshots,
-  pause, resume, cancel, and delete
-- Config loading from explicit `SolverConfig`, dictionaries, or a local
-  `solver.toml`
+| Use | API |
+| --- | --- |
+| Model classes | `@planning_solution`, `@planning_entity`, `@problem_fact` |
+| Planning fields | `planning_id`, `planning_variable`, `planning_list_variable` |
+| Constraints | `@constraint_provider`, `ConstraintFactory`, `joiner` |
+| Scores | `SoftScore`, `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore` |
+| Direct solve | `Solver.solve(...)`, `Solver.analyze(...)` |
+| Retained jobs | `SolverManager` |
+| Runtime config | `SolverConfig`, dictionaries, or `solver.toml` |
 
-## Mental Model
-
-| Layer | Python owns | Rust owns |
-| ----- | ----------- | --------- |
-| Domain model | classes, collections, field declarations, type hints | schema import into dynamic state |
-| Constraints | Python callbacks and stream plans | native evaluation, score conversion, localized state |
-| Solving | solution objects and optional config | construction, local search, move application, telemetry |
-| Retained lifecycle | manager calls and exported snapshots | job state, events, pause/resume/cancel, retained clones |
-
-The Rust macro-generated API remains the performance ceiling. The Python path
-is the dynamic binding path for teams that need Python authoring while keeping
-the solver engine and mutable working state in Rust.
-
-## Current Package Status
+## Package Details
 
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
 | Version | `0.4.0` |
 | Python requirement | `>=3.14` |
-| Wheel targets | macOS arm64, manylinux x86_64, Windows x86_64 |
-| Source distribution | Published |
 | Repository | [SolverForge/solverforge-py](https://github.com/SolverForge/solverforge-py) |
-
-`0.4.0` is the first release from the current dynamic binding architecture. It
-intentionally supersedes older incompatible `0.2.x` and `0.3.0` artifacts in
-the same PyPI namespace. Those older artifacts exposed APIs such as
-`SolverFactory`, `PlanningVariable`, and Java-backed service requirements that
-are not part of the current package.
 
 ## Sections
 
@@ -95,12 +68,9 @@ are not part of the current package.
   synchronous solves, score analysis, solver config, retained jobs, and dynamic
   move support
 - **[Hospital Example](/docs/solverforge-python/hospital-example/)** - the
-  source-checkout FastAPI example, retained lifecycle endpoints, dataset shape,
-  and UI boundary
+  FastAPI example, retained lifecycle endpoints, and public dataset shape
 
-## External References
+## Links
 
 - [PyPI package](https://pypi.org/project/solverforge/)
 - [Python repository](https://github.com/SolverForge/solverforge-py)
-- [PyPI release run](https://github.com/SolverForge/solverforge-py/actions/runs/26798126888)
-- [TestPyPI release run](https://github.com/SolverForge/solverforge-py/actions/runs/26798017478)

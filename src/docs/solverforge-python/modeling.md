@@ -7,9 +7,9 @@ description: >
 
 # Python Modeling
 
-SolverForge Python models are normal Python object graphs. The decorators and
-field descriptors attach SolverForge metadata; your constructors still own the
-actual data.
+SolverForge Python models are normal Python object graphs. Decorators and field
+descriptors mark the parts SolverForge should solve; constructors still own the
+data you pass in.
 
 ## Decorators
 
@@ -87,7 +87,7 @@ Initialize `score` to `None`. SolverForge writes the calculated score back after
 
 ## Score Families
 
-The current package supports:
+Supported score families:
 
 - `SoftScore`
 - `HardSoftScore`
@@ -130,16 +130,14 @@ class DispatchPlan:
         self.score = None
 ```
 
-Dynamic list construction and list local-search selectors run through the Rust
-SolverForge runtime. Python owns the domain objects and callback hooks; Rust
-owns the mutable working state during the solve.
+List construction and list local-search selectors work with the same
+`Solver.solve(...)` and `SolverManager` entry points as scalar models.
 
-## Modeling Boundaries
+## Before Solving
 
-- Do not use older PyPI examples that mention `SolverFactory`,
-  `PlanningVariable`, or Java services. Those belong to incompatible historical
-  artifacts.
-- Do not add a symbolic expression DSL around constraints. The current package
-  uses Python callback functions and lambdas.
-- Keep validation, parsing, and persistence in application code. SolverForge
-  expects an object graph that is already meaningful for solving.
+- Match each scalar variable's `value_range_provider` to a collection on the
+  solution object.
+- Match each list variable's `element_collection` to a collection on the
+  solution object.
+- Initialize `score` to `None`.
+- Validate and normalize input data before calling the solver.

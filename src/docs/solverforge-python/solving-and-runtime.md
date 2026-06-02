@@ -13,8 +13,7 @@ SolverForge Python has two runtime entry points:
 - `SolverManager` for retained jobs, lifecycle events, snapshots, pause,
   resume, cancel, and delete
 
-Both paths use the native SolverForge runtime through the dynamic Python
-binding.
+Both paths run the native SolverForge engine.
 
 ## Synchronous Solve
 
@@ -22,9 +21,8 @@ binding.
 solved = Solver.solve(schedule)
 ```
 
-`Solver.solve(...)` builds the schema, imports the Python data into Rust-owned
-dynamic state, runs SolverForge, then exports the solved assignments and score
-back to Python.
+`Solver.solve(...)` reads the Python model, runs the solver, then returns a
+solution object with updated planning variables and score.
 
 Pass config explicitly when the solve needs a seed, termination budget, or
 custom phase list:
@@ -116,8 +114,7 @@ The manager exposes:
 | `cancel(job_id)` | request cancellation |
 | `delete(job_id)` | remove retained job state |
 
-Snapshots are exported from Rust-owned retained state, so consumers should treat
-them as point-in-time Python objects.
+Treat snapshots as point-in-time Python objects.
 
 ## Dynamic Move Support
 
@@ -155,7 +152,7 @@ Selector combinators available to Python dynamic models:
 Grouped scalar and conflict-repair selectors require Python callbacks declared
 on the solution with `@scalar_group(...)` and `@conflict_repair(...)`.
 
-## Callback And Threading Boundary
+## Callback Threading
 
 Python callbacks must be deterministic for the same solution state. The native
 extension may invoke callbacks repeatedly during scoring and search. On

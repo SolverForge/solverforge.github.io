@@ -7,8 +7,9 @@ description: >
 
 # Python Constraints
 
-Python constraints are callback-authored stream plans. A constraint provider
-receives a `ConstraintFactory` and returns a list of named plans.
+A constraint provider receives a `ConstraintFactory` and returns a list of named
+rules. Each rule starts from an entity stream, filters or joins rows, assigns a
+penalty or reward, and ends with `.named(...)`.
 
 ```python
 @constraint_provider
@@ -21,9 +22,8 @@ def constraints(factory: ConstraintFactory):
     ]
 ```
 
-Callbacks are the authoring surface. SolverForge imports the stream plan into
-Rust, owns the working solution state, and invokes Python callbacks when the
-dynamic constraint path needs them.
+Use small callback functions or lambdas for the business rule itself. Keep data
+loading, validation, and reporting outside the constraint provider.
 
 ## Supported Stream Shapes
 
@@ -106,8 +106,7 @@ stream receives the grouped key and the count for that key.
 )
 ```
 
-This is a grouped-count surface. It is not the full Rust constraint-stream
-collector API.
+Use grouped counts for simple capacity, frequency, or load rules.
 
 ## Balance
 
@@ -151,17 +150,14 @@ solution score family:
 )
 ```
 
-## Unsupported Top-Level Methods
+## Python Stream API
 
-These top-level `ConstraintFactory` methods are explicit unsupported methods in
-the current Python package:
+Use stream-level `for_each(...).join(...)` and
+`for_each(...).group_by(...)` for joins and grouped counts. These top-level
+factory methods are not Python APIs yet:
 
 - `ConstraintFactory.join(...)`
 - `ConstraintFactory.group_by(...)`
 - `ConstraintFactory.if_exists(...)`
 - `ConstraintFactory.if_not_exists(...)`
 - `ConstraintFactory.flattened(...)`
-
-Use stream-level `for_each(...).join(...)` and
-`for_each(...).group_by(...)` for the supported join and grouped-count
-surfaces.
