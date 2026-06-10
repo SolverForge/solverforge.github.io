@@ -123,8 +123,9 @@ For cache-pinned deployments, use the current versioned bundles:
 <script src="/sf/sf.0.6.5.js"></script>
 ```
 
-`solverforge-cli 2.2.0` scaffolds `solverforge-ui 0.6.5`, so new generated apps
-start on the latest 0.6.x UI patch.
+The `solverforge-cli 2.2.1` source line and latest published
+`solverforge-cli 2.2.0` package both scaffold `solverforge-ui 0.6.5`, so new
+generated apps start on the latest 0.6.x UI patch.
 
 ## Patch History
 
