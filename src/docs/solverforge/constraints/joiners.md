@@ -14,7 +14,7 @@ relevant combinations.
 
 ### `equal`
 
-For self-joins (pairing items from the same collection), takes a single key extractor:
+For symmetric self-joins, takes a single key extractor:
 
 ```rust
 equal(|shift: &Shift| shift.employee_idx)
@@ -22,7 +22,8 @@ equal(|shift: &Shift| shift.employee_idx)
 
 ### `equal_bi`
 
-For cross-joins (pairing items from two different collections), takes two key extractors:
+For cross-joins or directed projected self-joins, takes separate left and right
+key extractors:
 
 ```rust
 equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx)
@@ -98,6 +99,10 @@ After a cross join, the stream can score pairs directly, group the joined pairs
 with `.group_by(|left, right| key, collector)`, or project each pair into a
 retained scoring row with `.project(|left, right| row)`.
 
+After a projected stream, `join(equal(|row| key))` creates a symmetric
+projected self-join. `join(equal_bi(left_key, right_key))` creates a directed
+projected self-join where row orientation is part of the rule.
+
 ## Performance Note
 
 Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`) are much faster than `filtering` because they use index lookups instead of iterating all pairs. Prefer indexed joiners where possible and only use `filtering` for conditions that can't be expressed with indexed joiners.
@@ -110,4 +115,5 @@ closures remain value-oriented.
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) - The core stream API
 - [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection sources
+- [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/) - Directed projected self-joins
 - [docs.rs/solverforge](https://docs.rs/solverforge) - Full joiner API reference

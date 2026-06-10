@@ -71,6 +71,34 @@ variable_name = "visits"
 max_sublist_size = 4
 ```
 
+## Permutation and Precedence
+
+`list_permute_move_selector` permutes a contiguous window within one list. Use
+it when small reorderings matter but full k-opt routing semantics are not the
+right model.
+
+```toml
+[phases.move_selector]
+type = "list_permute_move_selector"
+variable_name = "operations"
+min_window_size = 2
+max_window_size = 5
+```
+
+`list_precedence_move_selector` is for list variables that expose
+`precedence_duration_fn` and `precedence_successors_fn` through
+`#[planning_list_variable]`. It generates critical-path, singleton critical-node,
+and critical-sublist support moves for precedence makespan models, while normal
+list change, swap, reverse, sublist, ruin, and k-opt selectors use the same
+precedence graph to reject cycle-forming same-route candidates.
+
+```toml
+[phases.move_selector]
+type = "list_precedence_move_selector"
+entity_class = "Route"
+variable_name = "operations"
+```
+
 ## Route Improvement
 
 ### `list_reverse_move_selector`
@@ -126,11 +154,13 @@ routes or sequences do not consume ruin attempts.
 | --------- | --------------- |
 | `ListChangeMove` | list change and nearby list change |
 | `ListSwapMove` | list swap and nearby list swap |
+| `ListPermuteMove` | list permute |
 | `SublistChangeMove` | sublist change |
 | `SublistSwapMove` | sublist swap |
 | `ListReverseMove` | list reverse |
 | `KOptMove` | K-opt |
 | `ListRuinMove` | list ruin |
+| `ListMoveUnion` support moves | list precedence |
 
 ## See Also
 

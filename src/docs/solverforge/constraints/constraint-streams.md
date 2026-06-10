@@ -136,6 +136,11 @@ After a cross join, choose the operation that matches the rule:
 - group joined pairs directly with `.group_by(|left, right| key, collector)`
 - emit one retained scoring row per pair with `.project(|left, right| row)`
 
+After `.project(...)`, the projected stream can self-join retained scoring rows.
+Use `equal(|row| key)` for symmetric same-key pairs and
+`equal_bi(left_key, right_key)` for directed same-output row relationships such
+as parent-child or predecessor-successor rows.
+
 ### `group_by`
 
 ```rust
@@ -321,7 +326,8 @@ scoring can retract and re-evaluate the correct joined rows:
 - cross joins pass the left and right source indexes
 - flattened rows pass the left source index and the owning right-side source
   index
-- projected self-joins pass each projected row's primary owner entity index
+- projected self-joins, including directed projected self-joins, pass each
+  projected row's primary owner entity index
 
 This matters for advanced scoring extensions and retained match inspection; it
 does not change ordinary fluent `.filter(|a, b| ...)` application code.

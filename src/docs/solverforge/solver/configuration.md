@@ -231,6 +231,27 @@ Nearby scalar selectors require model-declared candidate hooks on the matching
 `nearby_swap_move_selector`. Distance meters only rank or filter those bounded
 candidates.
 
+List selectors likewise select declared list capabilities. `list_permute_move_selector`
+permutes a bounded window in one list. `list_precedence_move_selector` targets
+list variables that expose `precedence_duration_fn` and
+`precedence_successors_fn` hooks through `#[planning_list_variable]`; it streams
+critical-path support moves for generic precedence makespan models.
+
+```toml
+[phases.move_selector]
+type = "list_permute_move_selector"
+variable_name = "operations"
+min_window_size = 2
+max_window_size = 5
+```
+
+```toml
+[phases.move_selector]
+type = "list_precedence_move_selector"
+entity_class = "Route"
+variable_name = "operations"
+```
+
 When you need to cap one neighborhood deliberately, use the
 `limited_neighborhood` selector variant and wrap the concrete selector inside
 it:

@@ -17,6 +17,7 @@ entities change.
 | ------------ | --- | ----- |
 | One source row | `.project(NamedProjection)` | Up to `MAX_EMITS` rows per source row |
 | One retained joined pair | `.project(|left, right| row)` | Exactly one row per joined pair |
+| Two retained projected rows | `.join(equal(...))` or `.join(equal_bi(...))` | Symmetric or directed row pairs |
 
 Single-source projections use a named `Projection<A>` type. Joined-pair
 projection uses the existing cross-join `.project(...)` verb with a closure.
@@ -132,7 +133,8 @@ rather than cloned through hot paths.
 ## Self-Joins
 
 Projected streams can be filtered, self-joined, merged, grouped, and weighted
-like normal scoring state.
+like normal scoring state. Use `equal(...)` when both sides use the same key
+and each unordered pair should be considered once.
 
 ```rust
 factory.for_each(Schedule::shifts())
@@ -150,6 +152,25 @@ factory.for_each(Schedule::shifts())
 Self-join ordering is coordinate-stable. It follows source ownership and emit
 index instead of sparse storage row IDs, so row reuse does not define pair
 orientation.
+
+Use `equal_bi(left_key, right_key)` when the projected rows have the same output
+type but the relationship is oriented. The retained scorer evaluates directed
+left/right pairs where the left key equals the right key and skips only the
+same retained row. Reciprocal rows therefore count as two matches when both
+directions satisfy the keys.
+
+```rust
+factory.for_each(Schedule::shifts())
+    .project(ShiftWindows)
+    .join(equal_bi(
+        |left: &WorkWindow| Some(left.shift_id),
+        |right: &WorkWindow| right.employee_id,
+    ))
+    .penalize(hard_weight(|_: &WorkWindow, _: &WorkWindow| {
+        HardSoftScore::ONE_HARD
+    }))
+    .named("Projected directed relationship");
+```
 
 Low-level projected self-join filters receive each projected row's primary owner
 entity index, not the retained storage row ID. The fluent `.filter(|a, b| ...)`

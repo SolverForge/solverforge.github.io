@@ -21,6 +21,7 @@ extending SolverForge internals or writing a custom runtime path.
 | required nullable scalar coverage | grouped scalar construction, then `grouped_scalar_move_selector` with the same assignment-backed group |
 | scalar models stuck behind hard conflicts | `conflict_repair_move_selector` or `compound_conflict_repair_move_selector` |
 | vehicle routes, machine sequences, or ordered lists | `nearby_list_change_move_selector`, `nearby_list_swap_move_selector`, `list_reverse_move_selector` |
+| precedence-constrained ordered lists | `list_precedence_move_selector`, plus ordinary list selectors that respect precedence hooks |
 | routing with 2-opt / 3-opt style improvements | `list_reverse_move_selector`, then `k_opt_move_selector` |
 | large-neighborhood search | `ruin_recreate_move_selector` for scalar variables or `list_ruin_move_selector` for lists |
 | controlled broad neighborhoods | `limited_neighborhood`, `union_move_selector`, or `cartesian_product_move_selector` |
@@ -36,7 +37,7 @@ they match canonical model descriptor names, not local Rust aliases.
 Assignment, swap, nearby, pillar, ruin/recreate, grouped scalar assignment, and conflict repair selectors.
   <% end %>
   <%= render Ui::Card.new(title: "List Selectors", href: relative_url('/docs/solverforge/solver/list-move-selectors/'), icon: "fa-solid fa-route") do %>
-Route and sequence selectors: list change, list swap, sublist, reverse, K-opt, and list ruin.
+Route and sequence selectors: list change, list swap, permute, precedence, sublist, reverse, K-opt, and list ruin.
   <% end %>
   <%= render Ui::Card.new(title: "Composite Selectors", href: relative_url('/docs/solverforge/solver/composite-move-selectors/'), icon: "fa-solid fa-layer-group") do %>
 Move storage, union, cartesian, limited neighborhoods, and lower-level building blocks.
@@ -82,6 +83,24 @@ max_nearby = 16
 [[phases.move_selector.selectors]]
 type = "list_reverse_move_selector"
 variable_name = "visits"
+```
+
+### Precedence-Aware Ordered Lists
+
+```toml
+[phases.move_selector]
+type = "union_move_selector"
+selection_order = "round_robin"
+
+[[phases.move_selector.selectors]]
+type = "list_precedence_move_selector"
+variable_name = "operations"
+
+[[phases.move_selector.selectors]]
+type = "list_permute_move_selector"
+variable_name = "operations"
+min_window_size = 2
+max_window_size = 5
 ```
 
 ### Coupled Nullable Scalar Decisions

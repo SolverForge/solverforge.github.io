@@ -47,7 +47,8 @@ construction heuristics share that model for mixed/list-bearing work, while
 pure scalar construction uses the descriptor boundary. Local search uses
 explicit streaming defaults when `move_selector` is omitted, and scalar
 candidate limits, assignment-backed grouped scalar selectors, conflict repair
-selectors, and score-level simulated annealing are expressed in `solver.toml`.
+selectors, list permutation, precedence-list selectors, and score-level
+simulated annealing are expressed in `solver.toml`.
 
 The facade exports the configuration surface directly from
 `solverforge`, including `SolverConfig`, `PhaseConfig`, `MoveSelectorConfig`,
@@ -70,8 +71,8 @@ inspect `SolverStatus`, and fetch or analyze retained snapshots by
 
 Retained telemetry carries exact generated, evaluated, accepted, not-doable,
 acceptor-rejected, forager-ignored, hard-delta, conflict-repair, and
-construction-slot counters plus generation and evaluation durations. The 0.15.0
-runtime also carries per-move-label telemetry and a bounded applied-move trace
+construction-slot counters plus generation and evaluation durations. The
+current runtime also carries per-move-label telemetry and a bounded applied-move trace
 with selected candidate index, per-step candidate counts, score delta, and
 hard-feasibility before/after. User-facing rates such as `moves/s` are
 display-only derived values.

@@ -39,8 +39,9 @@ If `move_selector` is omitted, the stock runtime stays intentionally narrow:
   plus `SwapMoveSelector`
 - list-only models default to `NearbyListChangeMoveSelector(20)`,
   `NearbyListSwapMoveSelector(20)`, `SublistChangeMoveSelector`,
-  `SublistSwapMoveSelector`, and `ListReverseMoveSelector`, with k-opt and list
-  ruin enabled only when their hooks exist
+  `SublistSwapMoveSelector`, and `ListReverseMoveSelector`, with k-opt, list
+  ruin, list permutation, and precedence-list support enabled only when their
+  hooks or model metadata make them applicable
 - mixed models use the list defaults first, then scalar defaults
 
 Assignment-owned scalar variables stay on their grouped scalar selector path.

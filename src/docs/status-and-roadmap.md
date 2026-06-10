@@ -10,21 +10,22 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.15.0` crate and calls out
+documentation tracks the published `solverforge 0.15.2` crate and calls out
 published crates.io, docs.rs, CLI scaffold targets, and Python bindings
-separately. The public `solverforge 0.15.0` package is available on crates.io;
+separately. The public `solverforge 0.15.2` package is available on crates.io;
 docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
 `solverforge-cli 2.2.0` package scaffolds generated apps on the
-`solverforge 0.15.0` runtime target. The published Python package is
-`solverforge 0.4.0` on PyPI and targets CPython 3.14.
+`solverforge 0.15.0` runtime target; the CI-green GitHub source line is
+`solverforge-cli 2.2.1` and scaffolds `solverforge 0.15.1`. The published
+Python package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
 <% end %>
 
 ## Current Status
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.15.0` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.15.2` |
+| **CLI Scaffold** | Source current; package pending | GitHub main `solverforge-cli 2.2.1` scaffolds `solverforge 0.15.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; crates.io still serves `solverforge-cli 2.2.0` |
 | **Python** | Published | PyPI `solverforge 0.4.0` provides dynamic CPython 3.14 bindings backed by the Rust SolverForge engine |
 | **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
@@ -41,15 +42,15 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides stay
-  aligned to the checked-in use-case bundle and the current
-  `solverforge-cli 2.2.0` scaffold target, which both use
-  `solverforge 0.15.0`; the FSR guide also reflects the bundle's move to
-  route shadow values scored by stock `ConstraintFactory` streams.
+  aligned to the checked-in use-case bundle on `solverforge 0.15.0`; they are
+  intentionally not part of the 0.15.2 runtime or 2.2.1 CLI scaffold refresh
+  yet.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
 - Use [Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)
-  when scoring needs retained rows derived from source entities or joined pairs.
+  when scoring needs retained rows derived from source entities, joined pairs,
+  or oriented relationships between projected rows.
 
 ## Completed Runtime Surface
 
@@ -60,6 +61,9 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
   `if_exists(...)`, `if_not_exists(...)`,
   `collect_vec(...)`, `indexed_presence(...)`, explicit score weighting, and
   `.named(...)`
+- **Projected Scoring Rows**: bounded single-source rows, joined-pair projected
+  rows, symmetric projected self-joins through `equal(...)`, and directed
+  projected self-joins through `equal_bi(left_key, right_key)`
 - **Constraint Compiler Node Sharing**: `#[solverforge_constraints]` can share
   grouped, projected grouped, direct cross grouped, and complemented grouped
   stream nodes across repeated terminal constraints while preserving terminal
@@ -71,7 +75,8 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
 - **SERIO Engine**: retained incremental scoring for real-time optimization
 - **Solver Phases**: scalar/list construction heuristics, assignment-backed
   grouped scalar construction, streaming local search, VND as a local-search
-  type, and typed custom, exact, or partitioned search extensions
+  type, precedence-list neighborhoods, and typed custom, exact, or partitioned
+  search extensions
 - **Move System**: scalar, list, grouped scalar, assignment repair,
   conflict repair, cartesian, and composite move families
 - **SolverManager API**: retained job lifecycle with progress, best-solution,
@@ -97,8 +102,15 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
 
 ## Runtime Notes
 
-- **0.15.0 published baseline**: the core crate version is `0.15.0` and the
-  Rust toolchain floor remains `1.95`.
+- **0.15.2 published baseline**: the core crate version is `0.15.2` and the
+  Rust toolchain floor remains `1.95`. The CI-green `solverforge-cli 2.2.1`
+  source line targets `solverforge 0.15.1`; the published
+  `solverforge-cli 2.2.0` package and checked-in use-case bundle still target
+  `solverforge 0.15.0` until their next publish or runtime-target refresh.
+- **Dynamic bridge crate**: `solverforge-bridge` carries host-language binding
+  contracts for logical entity/fact/variable IDs, dynamic score families, and
+  descriptor-resolved scalar/list slots. Python remains the first published
+  binding, but the bridge contract is a Rust workspace crate.
 - **Constraint node sharing**: annotate reusable constraint factory functions
   with `#[solverforge_constraints]`. Reused same-binding grouped streams and
   syntax-proved identical grouped chains share retained incremental node work;
@@ -133,6 +145,10 @@ docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
   `SearchContext`, and order those names from `solver.toml`.
 - **Joined-pair projected rows**: cross joins can use
   `.project(|left, right| row)` to retain one scoring row per joined pair.
+- **Directed projected self-joins**: projected rows can use
+  `.join(equal_bi(left_key, right_key))` when the left and right side of a
+  same-row-type relationship are semantically different, such as parent-child
+  projected rows.
 - **Direct cross-join grouping**: cross joins can group joined pairs with
   `.group_by(|left, right| key, collector)` without projecting first.
 - **Projected grouped complements**: projected grouped streams can continue into

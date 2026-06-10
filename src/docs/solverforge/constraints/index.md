@@ -32,10 +32,11 @@ sources such as `Schedule::shifts()` preserve source metadata for localized
 incremental updates. Projected streams can emit retained scoring rows from one
 source or one joined pair, grouped streams can use collectors such as
 `consecutive_runs(...)`, `collect_vec(...)`, and `indexed_presence(...)`, and
-direct cross joins can group joined pairs without projecting them first. Direct
-cross-join groups can also call `complement(...)` against generated target
-sources, and filtered keyed joins retain the filter contract on both sides of
-the join.
+projected self-joins can be symmetric with `equal(...)` or directed with
+`equal_bi(left_key, right_key)`. Direct cross joins can group joined pairs
+without projecting them first. Direct cross-join groups can also call
+`complement(...)` against generated target sources, and filtered keyed joins
+retain the filter contract on both sides of the join.
 
 Annotate reusable constraint functions with `#[solverforge_constraints]` when
 the same grouped stream feeds multiple named terminal constraints. SolverForge
@@ -51,7 +52,7 @@ the short name.
 - **[Constraint Streams](/docs/solverforge/constraints/constraint-streams/)** - The core stream API
 - **[Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)** - `#[solverforge_constraints]` and repeated grouped terminal sharing
 - **[Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/)** - `ConstraintFactory`, generated collection sources, and lower-level `for_each`
-- **[Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)** - Scoring-only rows from `Projection` types or joined-pair `.project(...)`
+- **[Projected Scoring Rows](/docs/solverforge/constraints/projected-scoring-rows/)** - Scoring-only rows, joined-pair `.project(...)`, and directed projected self-joins
 - **[Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/)** - `if_exists`, `if_not_exists`, and `flatten_last`
 - **[Joiners](/docs/solverforge/constraints/joiners/)** - Combining multiple entity streams
 - **[Collectors](/docs/solverforge/constraints/collectors/)** - Aggregation functions for `group_by`

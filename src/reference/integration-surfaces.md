@@ -14,6 +14,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 | Component | Owns | Should not own |
 |---|---|---|
 | `solverforge` runtime | domain modeling, constraints, solving, retained lifecycle | project scaffolding, web components, routing datasets |
+| `solverforge-bridge` | dynamic binding contracts, logical model IDs, dynamic score and slot surfaces | Python UX, scaffold templates, solver policy |
 | `solverforge-cli` | app bootstrap and code generation | runtime truth, UI state, solver lifecycle semantics |
 | `solverforge-py` | Python decorators, callback binding, PyO3 bridge, Python package distribution | Rust crate docs, scaffold generation, web UI, route data |
 | `solverforge-ui` | retained-job UI controls and frontend components | solver search logic, scoring rules, route-cost computation |

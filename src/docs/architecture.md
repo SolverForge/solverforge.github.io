@@ -21,6 +21,7 @@ solverforge
 ├── solverforge-scoring  constraint streams and SERIO scoring
 ├── solverforge-config   TOML/YAML config model and builders
 ├── solverforge-solver   phases, moves, selectors, runtime, manager
+├── solverforge-bridge   dynamic host-language binding contracts
 ├── solverforge-console  tracing-driven console output
 └── solverforge-cvrp     route-centric helpers and distance meters
 ```
@@ -54,7 +55,19 @@ metadata so localized updates hit the right planning-entity collection.
 
 Projected scoring rows are retained inside this layer. They are useful when a
 constraint needs a scoring-only row from one source entity or one joined pair
-without materializing a problem fact.
+without materializing a problem fact. The current projected stream surface
+distinguishes symmetric self-joins from directed same-row-type joins so
+parent-child, predecessor-successor, and similar oriented scoring rows keep
+their left/right semantics.
+
+## Dynamic Bridge
+
+`solverforge-bridge` owns the Rust contracts used by host-language bindings:
+stable logical entity, fact, and variable IDs; dynamic score-family values; and
+descriptor-resolved scalar/list slots. Binding layers can build dynamic models
+without depending on Rust `TypeId` as their public identity model, while the
+solver still resolves those logical IDs to descriptor indexes before
+construction, local search, and score-director notifications.
 
 ## Constraint Compiler
 

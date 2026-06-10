@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.15.0` crate and current release
+These pages track the published `solverforge 0.15.2` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime until the next CLI runtime-target refresh, so check
 `solverforge --version` when starting from a scaffold.
@@ -32,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.15.0` crate declares Rust `1.95`.
+The `0.15.2` crate declares Rust `1.95`.
 
 The generated runtime now builds one `RuntimeModel` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -74,10 +74,16 @@ The current release tightens several public contracts:
   `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
   `SolverConfigOverride`, and related enums are available directly from
   `solverforge`
+- `solverforge::bridge` re-exports host-language binding contracts for logical
+  entity/fact/variable IDs, dynamic score families, and descriptor-resolved
+  dynamic scalar/list slots
 - projected scoring rows use `Projection` / `ProjectionSink` for bounded
   single-source rows, and cross joins can either group joined pairs directly
   with `.group_by(|left, right| key, collector)` or retain one scoring row per
   joined pair with `.project(|left, right| row)`
+- projected streams support symmetric self-joins with `equal(|row| key)` and
+  directed same-output joins with `equal_bi(left_key, right_key)` when pair
+  orientation is part of the rule
 - direct cross-join grouped streams can call `complement(...)` against a
   generated fact or entity source, so missing target keys produce explicit
   default rows without a projected-row detour
@@ -109,6 +115,10 @@ The current release tightens several public contracts:
   `route_metric_class_fn`, `route_distance_fn`, and `route_feasible_fn`.
   Owners in the same route metric class share depot and distance behavior for
   Clarke-Wright savings, while route feasibility remains owner-specific
+- list variables can declare fixed element ownership, construction element
+  ordering, and fixed precedence hooks; the stock runtime exposes
+  `ListPrecedenceMakespanConstraint`, `list_permute_move_selector`, and
+  `list_precedence_move_selector` for generic precedence-list models
 - typed custom search is compiled into the solution with
   `#[planning_solution(search = "...")]`; config names registered phases
   instead of loading arbitrary runtime classes
@@ -204,7 +214,7 @@ fn main() {
 
 Full published API documentation is available on
 [docs.rs/solverforge](https://docs.rs/solverforge). docs.rs can briefly lag the
-crate registry after a release; the `0.15.0` crate is the source of truth once
+crate registry after a release; the `0.15.2` crate is the source of truth once
 crates.io has accepted the package. Source-line API maps for the local
 workspace live in the repository `crates/*/WIREFRAME.md` files.
 

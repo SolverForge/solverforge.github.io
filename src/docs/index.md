@@ -55,7 +55,7 @@ Generated accessors, source-aware streams, joins, projections, collections, and 
 `solver.toml`, phase configuration, move selectors, acceptors, foragers, and facade exports.
   <% end %>
   <%= render Ui::Card.new(title: "Projected Scoring Rows", href: relative_url('/docs/solverforge/constraints/projected-scoring-rows/'), icon: "fa-solid fa-table-list") do %>
-Retained scoring-only rows from projection types and joined-pair `.project(...)`.
+Retained scoring-only rows from projections, joined pairs, and directed self-joins.
   <% end %>
   <%= render Ui::Card.new(title: "SolverManager", href: relative_url('/docs/solverforge/solver/solver-manager/'), icon: "fa-solid fa-arrows-rotate") do %>
 Retained solve lifecycle, snapshots, events, analysis, pause, resume, cancel, and delete.

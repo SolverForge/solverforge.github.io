@@ -109,6 +109,33 @@ Use `route_metric_class_fn` when several owners share the same depot and
 distance behavior. Clarke-Wright computes savings once per metric class, then
 still asks `route_feasible_fn` for each candidate owner before assigning routes.
 
+## Ownership and Precedence Hooks
+
+List variables can also declare plain stock hooks for fixed ownership,
+construction order, and precedence-aware sequencing:
+
+```rust
+#[planning_list_variable(
+    element_collection = "operations",
+    element_owner_fn = "operation_owner",
+    construction_element_order_key = "operation_construction_order",
+    precedence_duration_fn = "operation_duration",
+    precedence_successors_fn = "operation_successors"
+)]
+pub operations: Vec<usize>,
+```
+
+`element_owner_fn` returns `Some(owner_index)` when an element is fixed to one
+list owner and `None` when the element is unrestricted. Construction,
+Clarke-Wright, ruin/recreate, and owner-changing list neighborhoods consume the
+same normalized owner relation, so an element fixed to a different owner is not
+silently moved.
+
+`construction_element_order_key` affects list construction only. Precedence
+hooks expose element durations and fixed successor arcs to the stock
+`ListPrecedenceMakespanConstraint` and `list_precedence_move_selector`; they do
+not introduce a benchmark-specific adapter or a new public selector trait.
+
 ## Shadow Updates
 
 Advanced predecessor, successor, inverse, and aggregate updates are configured
@@ -140,11 +167,13 @@ The solver uses specialized moves for list variables:
 | ------------------- | ------------------------------------------------------------------ |
 | `ListChangeMove`    | Move an element from one list to another (or within the same list) |
 | `ListSwapMove`      | Swap two elements between or within lists                          |
+| `ListPermuteMove`   | Permute a contiguous window inside one list                        |
 | `ListReverseMove`   | Reverse a subsequence within a list                                |
 | `SubListChangeMove` | Move a contiguous subsequence to another position                  |
 | `SubListSwapMove`   | Swap two contiguous subsequences                                   |
 | `KOptMove`          | K-opt style moves for routing problems                             |
 | `RuinMove`          | Remove elements and reinsert them (ruin-and-recreate)              |
+| precedence support  | Critical-path precedence repairs for list variables with precedence hooks |
 
 ## Example: Vehicle Routing Constraint
 
@@ -176,6 +205,8 @@ solving, that is expressed through `move_selector` variants such as:
 
 - `nearby_list_change_move_selector`
 - `nearby_list_swap_move_selector`
+- `list_permute_move_selector`
+- `list_precedence_move_selector`
 - `k_opt_move_selector`
 - `list_ruin_move_selector`
 
