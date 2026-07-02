@@ -17,10 +17,11 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the published `solverforge 0.15.2` crate and current release
+These pages track the `solverforge 0.17.2` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
-runtime until the next CLI runtime-target refresh, so check
-`solverforge --version` when starting from a scaffold.
+runtime; the published `solverforge-cli 2.2.2` package scaffolds
+`solverforge 0.15.2`, so check `solverforge --version` when starting from a
+scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
@@ -32,7 +33,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.15.2` crate declares Rust `1.95`.
+The `0.17.2` crate declares Rust `1.95`.
 
 The generated runtime now builds one `RuntimeModel` for each planning model.
 Scalar metadata is resolved by descriptor index and variable name, not by Rust
@@ -61,6 +62,10 @@ The current release tightens several public contracts:
 - assignment-backed grouped scalar construction and repair are public runtime
   policy through `ScalarGroup::assignment(...)`, grouped construction
   `group_name`, and `grouped_scalar_move_selector`
+- solver construction internals that advanced integrations use directly now
+  expose `GroupedScalarCursor`, `GroupedScalarSelector`,
+  `ScalarAssignmentMoveCursor`, `ScalarAssignmentMoveOptions`, and
+  `ScalarAssignmentRequiredStreamingCursor` from the public solver surface
 - `collect_vec(...)`, `consecutive_runs(...)`, `indexed_presence(...)`,
   `CollectedVec`, `IndexedPresence`, `Run`, and `Runs` are available from the
   prelude for grouped collection, streak, and ordinal-presence rules; their
@@ -110,15 +115,31 @@ The current release tightens several public contracts:
   longer window swaps, same-sequence run-gap swaps, block reassignments,
   optional run releases, and value rotations without weakening the assignment
   hard constraints
-- list construction shares owner-aware route hooks across Clarke-Wright and
-  k-opt: `route_get_fn`, `route_set_fn`, `route_depot_fn`,
-  `route_metric_class_fn`, `route_distance_fn`, and `route_feasible_fn`.
-  Owners in the same route metric class share depot and distance behavior for
-  Clarke-Wright savings, while route feasibility remains owner-specific
+- stock CVRP route lists can now declare
+  `#[planning_list_variable(element_collection = "...", domain = "cvrp")]`.
+  The profile expands to `solverforge::cvrp::VrpSolution`, the stock CVRP
+  distance meters, route hooks, savings hooks, and savings metric class.
+  Route-local phases such as k-opt use strict stock CVRP feasibility, while
+  Clarke-Wright construction uses relaxed savings admissibility so capacity and
+  time-window violations can still be compared by the score model
+- stock CVRP distance hooks reject unreachable travel-time legs in strict route
+  feasibility and convert unreachable or malformed distance entries into a
+  large finite construction/search cost instead of panicking or overflowing
+- route-distance arithmetic used by Clarke-Wright and k-opt is clamped, so
+  unreachable or extreme matrix values stay in the solver's scoring domain
+- custom routing domains can still omit `domain = "cvrp"` and wire
+  `route_hooks`, `savings_hooks`, and optional `savings_metric_class_fn`
+  explicitly when they need non-CVRP semantics or different construction
+  pruning policies
+- `ListClarkeWright` construction completes unmatched route elements instead
+  of dropping them when no saving merge can place them
 - list variables can declare fixed element ownership, construction element
   ordering, and fixed precedence hooks; the stock runtime exposes
   `ListPrecedenceMakespanConstraint`, `list_permute_move_selector`, and
-  `list_precedence_move_selector` for generic precedence-list models
+  `list_precedence_move_selector` for generic precedence-list models.
+  Cheapest-insertion list construction uses precedence duration/successor hooks
+  to dispatch downstream-critical unassigned elements earlier when the hooks
+  are present
 - typed custom search is compiled into the solution with
   `#[planning_solution(search = "...")]`; config names registered phases
   instead of loading arbitrary runtime classes
@@ -214,7 +235,7 @@ fn main() {
 
 Full published API documentation is available on
 [docs.rs/solverforge](https://docs.rs/solverforge). docs.rs can briefly lag the
-crate registry after a release; the `0.15.2` crate is the source of truth once
+crate registry after a release; the `0.17.2` crate is the source of truth once
 crates.io has accepted the package. Source-line API maps for the local
 workspace live in the repository `crates/*/WIREFRAME.md` files.
 

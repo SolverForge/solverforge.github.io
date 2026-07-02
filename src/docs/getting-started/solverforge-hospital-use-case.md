@@ -122,14 +122,15 @@ CLI scaffold plus manual hospital scheduling code.
 
 ### Keep the Published Dependency Shape
 
-Start from the CLI's current published scaffold line, which now targets the
-`solverforge 0.15.0` crate used by the checked-in hospital use-case source.
-Keep the published `solverforge-ui 0.6.5` crate for the UI patch line, then add
-the hospital app's normal scheduling and web/runtime dependencies:
+Start from the CLI's current published scaffold line, then treat the finished
+hospital app as an app-owned runtime upgrade. `solverforge-cli 2.2.2` scaffolds
+`solverforge 0.15.2`; the current hospital reference app targets the published
+`solverforge 0.17.1` runtime while keeping `solverforge-ui 0.6.5` for the
+shipped web-shell assets:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.15.0", features = [
+solverforge = { version = "0.17.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -148,9 +149,9 @@ chrono = { version = "0.4.44", features = ["serde"] }
 parking_lot = "0.12.5"
 ```
 
-`solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0` and
-`solverforge-ui 0.6.5`, so the generated baseline already matches the current
-checked-in use-case runtime before the tutorial adds hospital-specific code.
+The generated baseline records the CLI scaffold target. The finished hospital
+app records its app-owned runtime target separately in `solverforge.app.toml`
+after the hospital-specific domain, data, API, and frontend code is added.
 
 ### Align App Metadata
 
@@ -161,14 +162,12 @@ The current hospital app metadata is intentionally explicit:
 name = "SolverForge Hospital"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "2.2.0"
+cli_version = "2.2.2"
 
 [runtime]
-target = "SolverForge crates.io target"
-runtime_crate = "solverforge"
-runtime_version = "0.15.0"
-ui_crate = "solverforge-ui"
-ui_version = "0.6.5"
+target = "solverforge 0.17.1"
+runtime_source = "crates.io: solverforge 0.17.1"
+ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
 default_size = "large"

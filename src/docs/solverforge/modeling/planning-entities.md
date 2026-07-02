@@ -88,6 +88,9 @@ Common parameters:
 
 - `element_collection = "visits"`: names the solution collection that contains
   all list elements
+- `domain = "cvrp"`: uses the stock CVRP profile for route-list models,
+  including the CVRP solution trait, distance meters, route hooks, savings
+  hooks, and savings metric class
 - `solution_trait = "path::Trait"`: adds an explicit solution-side trait bound
   for generated stock list-variable helpers when meters or route utilities need
   richer solution context

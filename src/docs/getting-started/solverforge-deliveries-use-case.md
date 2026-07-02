@@ -133,15 +133,15 @@ delivery-routing code.
 
 ### Keep the Published Dependency Shape
 
-Start from the CLI's current published scaffold line, which now targets the
-`solverforge 0.15.0` crate used by the checked-in delivery use-case source.
-Keep the published `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4` crates
-for the companion release lines, then add the delivery app's normal web/runtime
-dependencies:
+Start from the CLI's current published scaffold line, then treat the finished
+delivery app as an app-owned runtime upgrade. `solverforge-cli 2.2.2` scaffolds
+`solverforge 0.15.2`; the current delivery reference app targets the published
+`solverforge 0.17.1` runtime while keeping the `solverforge-ui 0.6.5` and
+`solverforge-maps 2.1.4` companion lines:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.15.0", features = [
+solverforge = { version = "0.17.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -177,13 +177,12 @@ delivery-specific catalog in `solverforge.app.toml`:
 name = "solverforge-deliveries"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "2.2.0"
+cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.15.0"
-runtime_source = "crates.io: solverforge 0.15.0"
+target = "solverforge 0.17.1"
+runtime_source = "crates.io: solverforge 0.17.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
-maps_source = "crates.io: solverforge-maps 2.1.4"
 
 [demo]
 default_size = "PHILADELPHIA"
@@ -203,9 +202,9 @@ score = "HardSoftScore"
 
 That metadata matters because this example teaches the current public
 integration: SolverForge core, SolverForge UI, and SolverForge Maps working
-together in one released-crate app. The CLI scaffold target remains recorded
-separately in `solverforge --version`, so you can tell what the generator
-produced before the app-specific delivery code was added.
+together in one released-crate app. The CLI scaffold target remains visible in
+`solverforge --version`, while `solverforge.app.toml` records the app-owned
+runtime dependency after the delivery-specific code is added.
 
 ### Generate the Managed Seams
 
@@ -247,7 +246,7 @@ finished frontend. The app code then supplies the routing meaning:
 - replace the generated `Delivery` fact with stop data, coordinates, demand, and
   time windows
 - replace the generated `Vehicle` entity with depot data, the `delivery_order`
-  list variable, CVRP hook attributes, and route shadow fields
+  list variable, CVRP profile, and route shadow fields
 - expand `Plan` with `routing_mode`, `view_state`, route preparation caches, and
   the list-variable shadow update hook
 - add `CoordValue`, preview types, and `src/domain/route_metrics/`
@@ -337,7 +336,8 @@ path is:
 3. `Vehicle.delivery_order` is the list planning variable.
 4. `PlanDto::to_domain()` normalizes transport data back into dense route IDs.
 5. `prepare_plan()` builds travel matrices and per-vehicle routing caches.
-6. CVRP hooks let SolverForge construction and k-opt read those caches.
+6. The stock CVRP list profile lets SolverForge construction and k-opt read
+   those caches.
 7. Route shadows convert ordered visits into demand, travel, lateness, and
    unreachable-leg totals.
 8. Constraints score assignment coverage, capacity, time windows, and travel
@@ -362,11 +362,11 @@ The domain splits responsibility this way:
 - `vehicle.rs`
   depot, capacity, route list, and route shadow values
 - `plan.rs`
-  planning solution, routing mode, list shadow refresh, and CVRP solution hooks
+  planning solution, routing mode, list shadow refresh, and CVRP solution data
 - `preview.rs`
   browser-facing preview state
 - `route_metrics/`
-  preparation, CVRP hooks, metrics, scoring previews, route geometry, and
+  preparation, CVRP route metrics, scoring previews, route geometry, and
   insertion ranking
 - `mod.rs`
   the `planning_model!` manifest and exports
@@ -403,23 +403,17 @@ pub struct Vehicle {
     pub capacity: i32,
     #[planning_list_variable(
         element_collection = "deliveries",
-        solution_trait = "crate::domain::DeliveryRoutingSolution",
-        distance_meter = "solverforge::cvrp::MatrixDistanceMeter",
-        intra_distance_meter = "solverforge::cvrp::MatrixIntraDistanceMeter",
-        route_get_fn = "solverforge::cvrp::get_route",
-        route_set_fn = "solverforge::cvrp::replace_route",
-        route_depot_fn = "solverforge::cvrp::depot_for_entity",
-        route_distance_fn = "solverforge::cvrp::route_distance",
-        route_feasible_fn = "crate::domain::delivery_route_feasible"
+        domain = "cvrp"
     )]
     pub delivery_order: Vec<usize>,
 }
 ```
 
-The route hooks are shared by Clarke-Wright construction and k-opt
-improvement. The current app uses stock CVRP helpers for route get/set, depot,
-and distance lookup, then keeps feasibility app-owned because time windows,
-unreachable legs, and prepared route caches live in the delivery domain. The
+The CVRP domain profile is stock SolverForge 0.17.1. It expands to the
+`VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
+assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
+metric class. The delivery app now keeps city-level routing preparation in the
+domain while letting the macro wire the standard CVRP route-list profile. The
 article-level point is still simple: the route is an ordered list of delivery
 IDs, not a copied list of delivery structs.
 
@@ -483,7 +477,7 @@ delivery positions before scoring.
 2. collect delivery coordinates, demand, time windows, and service durations
 3. build delivery-to-delivery travel data
 4. build per-vehicle depot-to-delivery and delivery-to-depot legs
-5. attach `ProblemData` for SolverForge CVRP hooks
+5. attach `ProblemData` for the SolverForge CVRP profile
 6. attach `PreparedVehicleRouting` for app route shadows and previews
 
 In `road_network` mode, preparation uses `solverforge-maps` to load or fetch a
@@ -778,7 +772,7 @@ make test-live-road
 | Planning solution                | `src/domain/plan.rs`                |
 | Delivery fact                    | `src/domain/delivery.rs`            |
 | Vehicle entity and list variable | `src/domain/vehicle.rs`             |
-| Route preparation and CVRP hooks | `src/domain/route_metrics/`         |
+| Route preparation and CVRP profile data | `src/domain/route_metrics/`         |
 | Constraint assembly              | `src/constraints/mod.rs`            |
 | City demo IDs                    | `src/data/data_seed/entrypoints.rs` |
 | API routes                       | `src/api/routes.rs`                 |

@@ -25,10 +25,10 @@ This guide covers the verified integration path:
 ```toml
 [dependencies]
 axum = "0.8.9"
-solverforge-ui = { version = "0.6.5" }
+solverforge-ui = { version = "0.7.0" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.6.5" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.7.0" }
 ```
 
 Use the Git tag form when you need exact source-tag reproducibility instead of

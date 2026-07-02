@@ -80,34 +80,54 @@ pub visits: Vec<usize>,
 Use `solution_trait` only when stock list-variable helpers must see an explicit
 extra trait on the solution type.
 
-## Route Construction Hooks
+## CVRP Route Profile
 
-Routing-style list variables can expose one shared route hook set for
-Clarke-Wright construction and k-opt improvement:
+Stock CVRP route lists can use the built-in domain profile:
 
 ```rust
 #[planning_list_variable(
     element_collection = "visits",
-    solution_trait = "solverforge::cvrp::VrpSolution",
-    distance_meter = "solverforge::cvrp::MatrixDistanceMeter",
-    intra_distance_meter = "solverforge::cvrp::MatrixIntraDistanceMeter",
-    route_get_fn = "solverforge::cvrp::get_route",
-    route_set_fn = "solverforge::cvrp::replace_route",
-    route_depot_fn = "solverforge::cvrp::depot_for_entity",
-    route_metric_class_fn = "solverforge::cvrp::route_metric_class",
-    route_distance_fn = "solverforge::cvrp::route_distance",
-    route_feasible_fn = "solverforge::cvrp::route_feasible"
+    domain = "cvrp"
 )]
 pub visits: Vec<usize>,
 ```
 
-The hooks receive the route owner, so heterogeneous fleets can score and check
-routes against the correct depot, distance matrix, capacity, and time-window
-context. Avoid the older split between Clarke-Wright-only and k-opt-only hook
-names; the current public contract is the owner-aware `route_*` hook family.
-Use `route_metric_class_fn` when several owners share the same depot and
-distance behavior. Clarke-Wright computes savings once per metric class, then
-still asks `route_feasible_fn` for each candidate owner before assigning routes.
+The profile expands to `solverforge::cvrp::VrpSolution`, the stock
+`MatrixDistanceMeter` and `MatrixIntraDistanceMeter`, `route_hooks`,
+`savings_hooks`, and `savings_metric_class`. Route-local phases such as k-opt
+use strict stock CVRP feasibility: structural validity, capacity, and time
+windows. Clarke-Wright construction uses relaxed savings feasibility: malformed
+owners, data, or visit IDs are rejected, but scoreable capacity and time-window
+violations can still be assigned and compared against unassigned work.
+Unreachable travel-time legs remain strict route-local infeasibilities, and
+unreachable or malformed distance entries become large finite costs so
+construction and local search stay panic-free.
+
+## Custom Route Construction Hooks
+
+For non-CVRP route domains, or for a custom pruning policy, omit
+`domain = "cvrp"` and wire explicit route-local and savings hooks:
+
+```rust
+#[planning_list_variable(
+    element_collection = "visits",
+    solution_trait = "crate::routing::RouteContext",
+    route_hooks = "crate::routing::route_hooks",
+    savings_hooks = "crate::routing::savings_hooks",
+    savings_metric_class_fn = "crate::routing::savings_metric_class"
+)]
+pub visits: Vec<usize>,
+```
+
+`route_hooks` must export `get`, `set`, `depot`, `distance`, and `feasible`.
+`savings_hooks` must export `depot`, `distance`, and `feasible`. The hooks
+receive the route owner, so heterogeneous fleets can score and check routes
+against the correct depot, distance matrix, capacity, and time-window context.
+Use `savings_metric_class_fn` when several owners share the same construction
+depot and distance behavior. Clarke-Wright computes savings once per savings
+metric class, then still asks the savings `feasible` hook for each candidate
+owner before assigning routes. Route-local feasibility remains available to
+k-opt and route assignment through `route_hooks`.
 
 ## Ownership and Precedence Hooks
 

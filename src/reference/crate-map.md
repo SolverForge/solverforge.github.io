@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.15.2` crate and current
+This map is aligned with the `solverforge 0.17.2` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -29,9 +29,14 @@ complements, score weight helpers such as `fixed_weight` and `hard_weight`,
 collector helpers such as `count`, `sum`, `load_balance`, `consecutive_runs`,
 `collect_vec`, and `indexed_presence`, plus advanced grouped-scalar assignment,
 conflict-repair extension types, move-label telemetry, bounded applied-move
-traces, and owner-aware CVRP route helpers such as
-`route_metric_class`, `route_distance`, and `route_feasible`. That keeps app
-code on `solverforge` unless it needs to implement lower-level solver internals
+traces, and CVRP profile helpers such as `domain = "cvrp"`, `route_hooks`,
+`savings_hooks`, `savings_metric_class`, `route_distance`, `route_feasible`, and
+`savings_feasible`. The lower-level solver crate also exposes dynamic
+construction names such as `GroupedScalarCursor`, `GroupedScalarSelector`,
+`ScalarAssignmentMoveCursor`, `ScalarAssignmentMoveOptions`, and
+`ScalarAssignmentRequiredStreamingCursor` for integrations that intentionally
+assemble construction streams outside the facade. That keeps app code on
+`solverforge` unless it needs to implement lower-level solver internals
 directly.
 
 ## Workspace crates

@@ -9,11 +9,11 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui 0.6.5` contract is job-oriented and
-lifecycle-typed. New integrations should expose retained jobs, explicit
-`eventType` payloads, exact paused or terminal snapshots, normalized create-job
-identifiers, and the shipped optional map module when they need Leaflet route
-views.
+The current `solverforge-ui 0.7.0` contract is job-oriented,
+lifecycle-typed, and framework-neutral at the asset boundary. New integrations
+should expose retained jobs, explicit `eventType` payloads, exact paused or
+terminal snapshots, normalized create-job identifiers, and the shipped optional
+map module when they need Leaflet route views.
 <% end %>
 
 This page summarizes how `solverforge-ui` connects frontend code to backend APIs
@@ -197,8 +197,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
-- `/sf/sf.0.6.5.css`
-- `/sf/sf.0.6.5.js`
+- `/sf/sf.0.7.0.css`
+- `/sf/sf.0.7.0.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 
@@ -217,6 +217,24 @@ The crate emits both stable and versioned bundle filenames:
 
 A practical strategy is to use stable URLs during development and versioned
 bundles in production or CDN environments.
+
+For non-Axum Rust hosts, disable the default feature and serve the same
+embedded assets through the framework-neutral API:
+
+```toml
+solverforge-ui = { version = "0.7.0", default-features = false }
+```
+
+```rust
+let asset = solverforge_ui::assets::get("sf.js").expect("embedded sf.js");
+let content_type = asset.content_type();
+let cache_control = asset.cache_control();
+let bytes = asset.bytes();
+```
+
+`solverforge_ui::assets::paths()` lists the embedded asset paths, and
+`solverforge_ui::assets::version()` returns the crate version that produced the
+asset set.
 
 ## Optional Modules
 

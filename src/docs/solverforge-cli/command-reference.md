@@ -61,21 +61,21 @@ solverforge generate variable --help
 crate targets used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 2.2.1
-CLI version: 2.2.1
-Scaffold runtime target: SolverForge crate target 0.15.1
+solverforge solverforge-cli 2.2.2
+CLI version: 2.2.2
+Scaffold runtime target: SolverForge crate target 0.15.2
 Scaffold UI target: solverforge-ui 0.6.5
 Scaffold maps target: solverforge-maps 2.1.4
-Runtime source: crates.io: solverforge 0.15.1
+Runtime source: crates.io: solverforge 0.15.2
 UI source: crates.io: solverforge-ui 0.6.5
 Maps source: crates.io: solverforge-maps 2.1.4
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 2.2.1` scaffold starts on the published `solverforge 0.15.1`,
-`solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` crate line.
-The crates.io package remains `solverforge-cli 2.2.0` until 2.2.1 is published,
-so registry installs should always be checked with `solverforge --version`.
+`solverforge-cli 2.2.2` package starts new scaffolds on the published
+`solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`
+crate line. The core runtime can move ahead of the scaffold target, so registry
+installs should always be checked with `solverforge --version`.
 
 Keep generated-app dependency manifests aligned with the installed CLI. Use the
 version output as the source of truth for the scaffold targets carried by that

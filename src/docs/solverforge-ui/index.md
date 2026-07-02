@@ -11,10 +11,11 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks `solverforge-ui 0.6.5`: retained jobs,
+This section tracks the published `solverforge-ui 0.7.0` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
-exact dense scheduling geometry, normalized create-job identifiers, and
-optional map helpers.
+exact dense scheduling geometry, normalized create-job identifiers, optional
+map helpers, and framework-neutral embedded asset access. Current
+`solverforge-cli` scaffolds still pin `solverforge-ui 0.6.5`.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -41,16 +42,16 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.6.5" }
+solverforge-ui = { version = "0.7.0" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.6.5" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.7.0" }
 ```
 
 Use the Git tag form when you need exact source-tag reproducibility instead of
 the crates.io package.
 
-`solverforge-ui 0.6.5` declares `rust-version = "1.95"`.
+`solverforge-ui 0.7.0` declares `rust-version = "1.95"`.
 
 ## Minimal Workflow
 

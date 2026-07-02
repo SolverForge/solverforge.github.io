@@ -123,14 +123,19 @@ variable_name = "visits"
 k = 3
 ```
 
-Clarke-Wright construction and k-opt improvement use the same owner-aware
-route hook family on `#[planning_list_variable]`: `route_get_fn`,
-`route_set_fn`, `route_depot_fn`, optional `route_metric_class_fn`,
-`route_distance_fn`, and `route_feasible_fn`. The owner argument is part of the
-contract; distance and feasibility should be evaluated in the vehicle, route,
-or machine context that will own the candidate route. A metric-class hook lets
-Clarke-Wright reuse savings rows for owners with identical depot and distance
-behavior without merging their owner-specific feasibility rules.
+K-opt improvement uses the route-local hook bundle declared on
+`#[planning_list_variable]`. Stock CVRP lists can use `domain = "cvrp"`; that
+profile wires strict `solverforge::cvrp::route_hooks` so k-opt rejects candidate
+routes that violate stock capacity, time-window feasibility, or reachable-leg
+requirements. Stock distance hooks clamp unreachable or extreme route distances
+into the solver's scoring domain instead of panicking or overflowing. Custom
+route domains can wire `route_hooks` explicitly. That module exports `get`,
+`set`, `depot`, `distance`, and `feasible`, and the owner argument is part of
+the contract: distance and feasibility should be evaluated in the vehicle,
+route, or machine context that will own the candidate route. Clarke-Wright
+construction stays on the separate `savings_hooks` module plus optional
+`savings_metric_class_fn`, so construction savings can share a metric class
+without collapsing route-local assignment semantics.
 
 ## List Ruin
 

@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the checked-in SolverForge 0.15.0 use-case dependency shape
+- keep the checked-in SolverForge 0.17.1 use-case dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -119,16 +119,16 @@ surface, Docker build, and validation commands.
 ### Keep the Published Dependency Shape
 
 The current checked-in Lessons use-case source targets the published
-SolverForge 0.15.0 line:
+SolverForge 0.17.1 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.15.0", features = [
+solverforge = { version = "0.17.1", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.6.5"
+solverforge-ui = { version = "0.6.5" }
 
 # Web server
 axum = "0.8.9"
@@ -148,19 +148,19 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 2.2.0` scaffolds `solverforge 0.15.0`, so the generated
-baseline already matches the current tutorial runtime:
+`solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`; the finished Lessons
+app records its deliberate `solverforge 0.17.1` runtime target separately:
 
 ```toml
 [app]
 name = "solverforge-lessons"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "2.2.0"
+cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.15.0"
-runtime_source = "crates.io: solverforge 0.15.0"
+target = "solverforge 0.17.1"
+runtime_source = "crates.io: solverforge 0.17.1"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]

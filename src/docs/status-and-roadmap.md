@@ -10,24 +10,27 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the published `solverforge 0.15.2` crate and calls out
-published crates.io, docs.rs, CLI scaffold targets, and Python bindings
-separately. The public `solverforge 0.15.2` package is available on crates.io;
-docs.rs can briefly lag while it builds the newest Rustdoc pages. The published
-`solverforge-cli 2.2.0` package scaffolds generated apps on the
-`solverforge 0.15.0` runtime target; the CI-green GitHub source line is
-`solverforge-cli 2.2.1` and scaffolds `solverforge 0.15.1`. The published
-Python package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
+documentation tracks the `solverforge 0.17.2` crate and calls out
+published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
+bindings separately. The `solverforge 0.17.2` tag and workspace are the current
+core runtime line, and the public crate is available on crates.io. docs.rs can
+briefly lag while it builds the newest Rustdoc pages.
+The published `solverforge-cli 2.2.2` package scaffolds generated apps on
+`solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
+The published UI crate is `solverforge-ui 0.7.0`; generated app scaffolds and
+the worked use cases still pin the 0.6.5 UI asset line. The worked use-case
+bundle currently targets `solverforge 0.17.1`. The published Python
+package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
 <% end %>
 
 ## Current Status
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.15.2` |
-| **CLI Scaffold** | Source current; package pending | GitHub main `solverforge-cli 2.2.1` scaffolds `solverforge 0.15.1`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`; crates.io still serves `solverforge-cli 2.2.0` |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.17.2` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
 | **Python** | Published | PyPI `solverforge 0.4.0` provides dynamic CPython 3.14 bindings backed by the Rust SolverForge engine |
-| **UI** | Published | `solverforge-ui 0.6.5` is the current UI patch line |
+| **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -41,10 +44,10 @@ Python package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
   [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
-  [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides stay
-  aligned to the checked-in use-case bundle on `solverforge 0.15.0`; they are
-  intentionally not part of the 0.15.2 runtime or 2.2.1 CLI scaffold refresh
-  yet.
+  [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
+  document reference-app dependencies on `solverforge 0.17.1` while keeping
+  their recorded scaffold provenance separate from the published
+  `solverforge-cli 2.2.2` scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -102,11 +105,37 @@ Python package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
 
 ## Runtime Notes
 
-- **0.15.2 published baseline**: the core crate version is `0.15.2` and the
-  Rust toolchain floor remains `1.95`. The CI-green `solverforge-cli 2.2.1`
-  source line targets `solverforge 0.15.1`; the published
-  `solverforge-cli 2.2.0` package and checked-in use-case bundle still target
-  `solverforge 0.15.0` until their next publish or runtime-target refresh.
+- **0.17.2 runtime line**: the core crate version is `0.17.2` and the
+  Rust toolchain floor remains `1.95`. The published `solverforge-cli 2.2.2`
+  package targets `solverforge 0.15.2`; generated app manifests should be moved
+  to a newer `solverforge 0.17.x` runtime only when that app is deliberately upgraded and
+  validated.
+- **0.17.2 construction surface**: advanced solver integrations can import
+  dynamic construction primitives such as `GroupedScalarCursor`,
+  `GroupedScalarSelector`, `ScalarAssignmentMoveCursor`,
+  `ScalarAssignmentMoveOptions`, and
+  `ScalarAssignmentRequiredStreamingCursor`. Required assignment construction
+  now streams state instead of relying only on a closed internal batch path.
+- **0.17.1 route safety fixes**: stock CVRP helpers reject unreachable
+  travel-time legs during strict feasibility checks, convert unreachable or
+  malformed distance entries into a large finite cost for construction/search,
+  and clamp route-distance arithmetic used by Clarke-Wright and k-opt.
+- **CVRP list profile**: stock CVRP list variables can declare
+  `domain = "cvrp"`. The profile supplies the CVRP solution trait, distance
+  meters, strict route-local hooks, relaxed Clarke-Wright savings hooks, and
+  savings metric class.
+- **Route and savings hooks**: custom routing list variables can still split
+  route-local behavior from Clarke-Wright construction explicitly.
+  `route_hooks` exports `get`, `set`, `depot`, `distance`, and `feasible`;
+  `savings_hooks` exports `depot`, `distance`, and `feasible`;
+  `savings_metric_class_fn` is the optional construction sharing hook.
+- **Strict K-opt route feasibility**: stock CVRP route hooks reject capacity and
+  time-window violations before k-opt commits a route. The stock savings hooks
+  stay relaxed enough for Clarke-Wright construction to assign scoreable
+  capacity or time-window violations when that is better than leaving work
+  unassigned.
+- **Clarke-Wright completion**: `ListClarkeWright` completes unmatched
+  route elements instead of dropping work when no saving merge can place them.
 - **Dynamic bridge crate**: `solverforge-bridge` carries host-language binding
   contracts for logical entity/fact/variable IDs, dynamic score families, and
   descriptor-resolved scalar/list slots. Python remains the first published
@@ -164,16 +193,17 @@ Python package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
   line.
 - **Joined filter indexes**: low-level joined filters receive semantic source
   indexes for direct, grouped, projected, flattened, and higher-arity joins.
-- **Owner-aware route hooks**: list construction uses shared route hooks
-  `route_get_fn`, `route_set_fn`, `route_depot_fn`,
-  `route_metric_class_fn`, `route_distance_fn`, and `route_feasible_fn` for
-  Clarke-Wright and k-opt. Clarke-Wright can compute savings once per shared
-  route metric class while keeping final feasibility checks owner-specific.
+- **CVRP profile and custom hook split**: stock CVRP routes should use
+  `domain = "cvrp"`; custom route domains can wire `route_hooks`,
+  `savings_hooks`, and optional `savings_metric_class_fn` explicitly.
+  Construction savings can share a metric class without collapsing route-local
+  assignment semantics.
 - **Assignment value-pattern neighborhoods**: assignment-backed grouped scalar
   local search includes bounded value-window swaps, longer value-window swaps,
   same-sequence run-gap swaps, block reassignments, optional run releases, and
   three-value rotations. Required assignment construction still has a hard-first
-  batched fill path for required slots.
+  fill path for required slots, with public streaming state available for
+  advanced construction integrations.
 - **Borrowed constraint identity**: scoring metadata preserves full
   `ConstraintRef` identity borrowed from the owning constraint.
 - **Model-owned scalar hooks**: `candidate_values`,

@@ -32,14 +32,18 @@ Generic `FirstFit` and `CheapestInsertion` use the canonical construction
 engine when matching list work is present. Pure scalar targets use the
 descriptor-scalar construction path.
 
-List-specific construction such as Clarke-Wright consumes the owner-aware route
-hooks declared on the list variable: `route_get_fn`, `route_set_fn`,
-`route_depot_fn`, optional `route_metric_class_fn`, `route_distance_fn`, and
-`route_feasible_fn`. These hooks are shared with k-opt route improvement, so
-route distance and feasibility stay bound to the owner whose depot, matrix,
-capacity, and time-window context scored the route. When a metric-class hook is
-present, Clarke-Wright computes savings once per class of owners with identical
-depot and route-distance behavior, then keeps feasibility owner-specific.
+List-specific construction such as Clarke-Wright consumes savings hooks from
+the list variable. Stock CVRP lists can declare `domain = "cvrp"` to get the
+standard `solverforge::cvrp::savings_hooks` and `savings_metric_class` without
+repeating hook paths. Custom route domains can omit the profile and wire
+`savings_hooks` explicitly; the module must export `depot`, `distance`, and
+`feasible`, while optional `savings_metric_class_fn` lets owners with the same
+construction depot and distance behavior share savings rows. Route-local
+behavior stays separate in `route_hooks`, which exports `get`, `set`, `depot`,
+`distance`, and `feasible` for route assignment and k-opt improvement. Stock
+CVRP distance hooks turn unreachable or malformed matrix entries into large
+finite construction costs, and strict route hooks reject unreachable
+travel-time legs before route-local improvements commit them.
 
 ## Nullable Construction Obligation
 
@@ -181,6 +185,20 @@ cancel, and parent-yield control. Required assignments may displace optional
 occupants or move required blockers through bounded augmenting paths. Optional
 assignments remain score-improving only unless the model marks them required
 and configuration uses `assign_when_candidate_exists`.
+
+## Dynamic Construction Primitives
+
+Normal app models should keep construction on `ScalarGroup::assignment(...)`,
+`group_name`, and solver config. Advanced integrations that assemble
+construction streams directly can import the public lower-level construction
+surface from `solverforge-solver`, including `GroupedScalarCursor`,
+`GroupedScalarSelector`, `ScalarAssignmentMoveCursor`,
+`ScalarAssignmentMoveOptions`, and
+`ScalarAssignmentRequiredStreamingCursor`.
+
+That surface is the public form of the grouped-scalar construction machinery.
+It lets required assignment construction stream state while the stock runtime
+still owns the ordinary hard-first required-slot fill policy.
 
 ## Grouped Scalar Construction
 

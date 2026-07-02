@@ -60,6 +60,7 @@ construction heuristics already understand mixed scalar-plus-list problems.
 | bounded scalar neighborhoods       | declare `candidate_values`, `nearby_value_candidates`, or `nearby_entity_candidates` on the variable |
 | scalar construction ordering       | declare `construction_entity_order_key` or `construction_value_order_key` on the variable            |
 | required nullable-slot coverage    | declare an assignment-backed `ScalarGroup` and select it from `solver.toml`                          |
+| stock CVRP route ownership         | declare `domain = "cvrp"` on the list variable instead of repeating stock hook paths                 |
 | richer scoring context             | add immutable facts or derived helper methods instead of shoving logic into constraints              |
 | validation or import normalization | add app-side builders or conversion layers before solving                                            |
 
@@ -92,6 +93,10 @@ no longer tiny.
   assignment would do.
 - Treat nearby scalar hooks, scalar candidate hooks, and construction-order keys
   as model capabilities. Solver config consumes them; it does not infer them.
+- Use `#[planning_list_variable(element_collection = "...", domain = "cvrp")]`
+  for stock CVRP route lists. Omit the profile and wire `route_hooks` /
+  `savings_hooks` explicitly only when the route domain or construction pruning
+  policy is genuinely custom.
 - Keep solver config targets on canonical descriptor names even if the Rust
   manifest uses public aliases.
 
