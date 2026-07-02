@@ -16,6 +16,13 @@ published by GitHub Actions on 2026-06-10, and available as
 docs.rs can briefly remain on the prior Rustdoc build while it processes the
 new package.
 
+<%= render Ui::Callout.new(title: "Update, July 2, 2026") do %>
+This is a historical 0.15.x release note. The live documentation now tracks
+`solverforge 0.17.2`; the published `solverforge-cli 2.2.2` package scaffolds
+`solverforge 0.15.2`; and the worked use-case bundle currently targets
+`solverforge 0.17.1`.
+<% end %>
+
 The runtime release line is separate from CLI scaffold publishing. The
 CI-green `solverforge-cli 2.2.1` source line targets `solverforge 0.15.1`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`. The latest crates.io

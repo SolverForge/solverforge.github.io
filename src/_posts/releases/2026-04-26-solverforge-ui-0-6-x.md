@@ -11,6 +11,12 @@ description: >
 **solverforge-ui 0.6.x** is the current UI line for SolverForge generated apps.
 The latest patch is [0.6.5](https://crates.io/crates/solverforge-ui/0.6.5).
 
+<%= render Ui::Callout.new(title: "Update, July 2, 2026") do %>
+This is a historical 0.6.x release note. `solverforge-ui 0.7.0` is now
+published for direct UI integrations, while the published
+`solverforge-cli 2.2.2` package still scaffolds `solverforge-ui 0.6.5`.
+<% end %>
+
 Patch releases are folded into this line note instead of published as separate
 release-note pages.
 

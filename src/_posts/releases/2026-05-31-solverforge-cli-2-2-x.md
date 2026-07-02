@@ -17,6 +17,12 @@ The latest crates.io package is still `solverforge-cli 2.2.0` until the
 `v2.2.1` tag and package publish are cut. If you install from crates.io today,
 confirm the exact scaffold target with `solverforge --version`.
 
+<%= render Ui::Callout.new(title: "Update, July 2, 2026") do %>
+This is a historical 2.2.x release-line note. `solverforge-cli 2.2.2` is now
+published on crates.io and scaffolds `solverforge 0.15.2`,
+`solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
+<% end %>
+
 ```bash
 cargo install solverforge-cli --force
 solverforge --version
