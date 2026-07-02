@@ -3,9 +3,9 @@
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_RUNTIME_VERSION = "0.15.0"
+EXPECTED_RUNTIME_VERSION = "0.17.1"
 EXPECTED_UI_VERSION = "0.6.5"
-EXPECTED_CLI_VERSION = "2.2.0"
+EXPECTED_CLI_VERSION = "2.2.2"
 
 def log(message)
   puts "[verify-lessons-tutorial] #{message}"
@@ -68,7 +68,7 @@ assert_file_contains(doc_page, "SolverForge Lessons Use Case")
 assert_file_contains(doc_page, "https://huggingface.co/spaces/SolverForge/solverforge-lessons")
 assert_file_contains(doc_page, "solverforge #{EXPECTED_RUNTIME_VERSION}")
 assert_file_contains(doc_page, "solverforge-ui #{EXPECTED_UI_VERSION}")
-assert_file_contains(doc_page, "solverforge-cli #{EXPECTED_CLI_VERSION}")
+assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
 assert_file_contains(doc_page, "tokio = { version = \"1.52.1\", features = [\"full\"] }")
 assert_file_contains(doc_page, "tower-http = { version = \"0.6.8\", features = [\"fs\", \"cors\"] }")
 assert_file_contains(doc_page, "HardMediumSoftScore")

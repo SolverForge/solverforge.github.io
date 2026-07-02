@@ -12,13 +12,13 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.2.0"
-EXPECTED_CLI_RUNTIME_VERSION = "0.15.0"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.15.0"
+EXPECTED_CLI_VERSION = "2.2.2"
+EXPECTED_CLI_RUNTIME_VERSION = "0.15.2"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.17.1"
 EXPECTED_CLI_UI_VERSION = "0.6.5"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
-EXPECTED_HOSPITAL_APP_CLI_VERSION = "2.2.0"
+EXPECTED_HOSPITAL_APP_CLI_VERSION = "2.2.2"
 
 def log(message)
   puts "[verify-hospital-tutorial] #{message}"
@@ -292,11 +292,9 @@ begin
   assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_HOSPITAL_APP_CLI_VERSION}\"")
-  assert_file_contains(doc_page, "target = \"SolverForge crates.io target\"")
-  assert_file_contains(doc_page, "runtime_crate = \"solverforge\"")
-  assert_file_contains(doc_page, "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
-  assert_file_contains(doc_page, "ui_crate = \"solverforge-ui\"")
-  assert_file_contains(doc_page, "ui_version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+  assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+  assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
   assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
   assert_file_contains(doc_page, "HardSoftDecimalScore")
@@ -322,7 +320,7 @@ begin
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
-    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "score = \"HardSoftDecimalScore\"")
     assert_file_contains(File.join(hospital_bundle, "solver.toml"), "construction_heuristic_type = \"cheapest_insertion\"")
     assert_file_contains(File.join(hospital_bundle, "src/domain/plan.rs"), "pub employee_idx: Option<usize>")
@@ -451,11 +449,9 @@ begin
     assert_file_contains(File.join(hospital_repo, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_HOSPITAL_APP_CLI_VERSION}\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "target = \"SolverForge crates.io target\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "runtime_crate = \"solverforge\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "runtime_version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "ui_crate = \"solverforge-ui\"")
-    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "ui_version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_repo, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(hospital_repo, "src/domain/plan.rs"), "pub employee_idx: Option<usize>")
     assert_file_contains(File.join(hospital_repo, "src/domain/plan.rs"), "pub score: Option<HardSoftDecimalScore>")
     assert_file_contains(File.join(hospital_repo, "src/domain/employee.rs"), "pub struct Employee")

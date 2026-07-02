@@ -12,9 +12,10 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.2.0"
-EXPECTED_CLI_RUNTIME_VERSION = "0.15.0"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.15.0"
+EXPECTED_CLI_VERSION = "2.2.2"
+EXPECTED_CLI_RUNTIME_VERSION = "0.15.2"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.17.1"
+EXPECTED_DELIVERIES_APP_CLI_VERSION = "2.2.2"
 EXPECTED_CLI_UI_VERSION = "0.6.5"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
@@ -316,11 +317,10 @@ begin
   assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-maps = \"#{EXPECTED_MAPS_VERSION}\"")
-  assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
+  assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_DELIVERIES_APP_CLI_VERSION}\"")
   assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
-  assert_file_contains(doc_page, "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
   assert_file_contains(doc_page, "Vehicle.delivery_order")
   assert_file_contains(doc_page, "list_clarke_wright")
   assert_file_contains(doc_page, "/jobs/{id}/routes")
@@ -333,11 +333,8 @@ begin
   assert_file_contains(doc_page, "FIRENZE")
   assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
   assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
-  assert_file_contains(doc_page, "route_get_fn = \"solverforge::cvrp::get_route\"")
-  assert_file_contains(doc_page, "route_set_fn = \"solverforge::cvrp::replace_route\"")
-  assert_file_contains(doc_page, "route_depot_fn = \"solverforge::cvrp::depot_for_entity\"")
-  assert_file_contains(doc_page, "route_distance_fn = \"solverforge::cvrp::route_distance\"")
-  assert_file_contains(doc_page, "route_feasible_fn = \"crate::domain::delivery_route_feasible\"")
+  assert_file_contains(doc_page, "domain = \"cvrp\"")
+  assert_file_contains(doc_page, "The CVRP domain profile is stock SolverForge 0.17.1")
 
   assert_file_not_contains(doc_page, "Local sibling checkouts")
   assert_file_not_contains(doc_page, "sibling local path dependencies")
@@ -361,8 +358,7 @@ begin
     assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
     assert_file_contains(File.join(deliveries_bundle, "solverforge.app.toml"), "default_size = \"PHILADELPHIA\"")
     assert_file_contains(File.join(deliveries_bundle, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(deliveries_bundle, "src/domain/vehicle.rs"), "route_get_fn = \"solverforge::cvrp::get_route\"")
-    assert_file_contains(File.join(deliveries_bundle, "src/domain/vehicle.rs"), "route_feasible_fn = \"crate::domain::delivery_route_feasible\"")
+    assert_file_contains(File.join(deliveries_bundle, "src/domain/vehicle.rs"), "domain = \"cvrp\"")
     assert_file_contains(File.join(deliveries_bundle, "solver.toml"), "construction_heuristic_type = \"list_clarke_wright\"")
     assert_file_contains(File.join(deliveries_bundle, "solver.toml"), "type = \"k_opt_move_selector\"")
   end
@@ -480,11 +476,10 @@ begin
     assert_file_not_contains(File.join(deliveries_repo, "Cargo.toml"), "path = \"../solverforge-ui")
     assert_file_not_contains(File.join(deliveries_repo, "Cargo.toml"), "path = \"../solverforge-maps")
 
-    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
+    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_DELIVERIES_APP_CLI_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
-    assert_file_contains(File.join(deliveries_repo, "solverforge.app.toml"), "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
     assert_file_not_contains(File.join(deliveries_repo, "solverforge.app.toml"), "path:")
 
     assert_file_contains(File.join(deliveries_repo, "README.md"), "published crates.io")
@@ -495,6 +490,7 @@ begin
     assert_file_contains(File.join(deliveries_repo, "src/domain/delivery.rs"), "pub struct Delivery")
     assert_file_contains(File.join(deliveries_repo, "src/domain/delivery.rs"), "pub id: usize")
     assert_file_contains(File.join(deliveries_repo, "src/domain/vehicle.rs"), "#[planning_list_variable(")
+    assert_file_contains(File.join(deliveries_repo, "src/domain/vehicle.rs"), "domain = \"cvrp\"")
     assert_file_contains(File.join(deliveries_repo, "src/domain/vehicle.rs"), "pub delivery_order: Vec<usize>")
     assert_file_contains(File.join(deliveries_repo, "src/data/data_seed/entrypoints.rs"), "\"PHILADELPHIA\"")
     assert_file_contains(File.join(deliveries_repo, "src/data/data_seed/entrypoints.rs"), "\"HARTFORD\"")

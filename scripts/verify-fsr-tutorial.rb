@@ -12,10 +12,10 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.2.0"
-EXPECTED_CLI_RUNTIME_VERSION = "0.15.0"
-EXPECTED_FSR_APP_CLI_VERSION = "2.2.0"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.15.0"
+EXPECTED_CLI_VERSION = "2.2.2"
+EXPECTED_CLI_RUNTIME_VERSION = "0.15.2"
+EXPECTED_FSR_APP_CLI_VERSION = "2.2.2"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.17.1"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
 
@@ -291,13 +291,12 @@ begin
   assert_file_contains(doc_page, "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "solverforge-core = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "[Runtime and Browser Behavior](#runtime-and-browser-behavior)")
-  assert_file_contains(doc_page, "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
-  assert_file_contains(doc_page, "solverforge-maps = \"#{EXPECTED_MAPS_VERSION}\"")
+  assert_file_contains(doc_page, "solverforge-ui = { version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
+  assert_file_contains(doc_page, "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\"")
   assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_FSR_APP_CLI_VERSION}\"")
   assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
-  assert_file_contains(doc_page, "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
   assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
   assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
   assert_file_contains(doc_page, "default_size = \"standard\"")
@@ -348,7 +347,7 @@ begin
   if usecases_repo
     fsr_bundle = File.join(usecases_repo, "uc-fsr")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-core = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-core = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
@@ -446,7 +445,7 @@ begin
     log "Checking concrete FSR source files"
     assert_file_contains(File.join(fsr_repo, "Cargo.toml"), "rust-version = \"1.95\"")
     assert_file_contains(File.join(fsr_repo, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(fsr_repo, "Cargo.toml"), "solverforge-core = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(fsr_repo, "Cargo.toml"), "solverforge-core = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_repo, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(fsr_repo, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\"")
     assert_file_not_contains(File.join(fsr_repo, "Cargo.toml"), "path = \"../solverforge-rs")
@@ -457,7 +456,6 @@ begin
     assert_file_contains(File.join(fsr_repo, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_repo, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_repo, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
-    assert_file_contains(File.join(fsr_repo, "solverforge.app.toml"), "maps_source = \"crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}\"")
     assert_file_not_contains(File.join(fsr_repo, "solverforge.app.toml"), "path:")
 
     assert_file_contains(File.join(fsr_repo, "README.md"), "solverforge-fsr")
