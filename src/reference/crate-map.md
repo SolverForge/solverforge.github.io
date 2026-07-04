@@ -58,7 +58,7 @@ directly.
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
-| `solverforge-py`   | the `solverforge` Python package and PyO3 binding | you want Python model authoring backed by the Rust solver engine |
+| `solverforge-py`   | the tagged `solverforge 0.5.0` Python source line, PyO3 binding, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
@@ -66,7 +66,9 @@ directly.
 
 - Start with `solverforge-cli` to scaffold the app shell.
 - Start with the PyPI `solverforge` package when the application surface is
-  Python and you do not need a generated Rust web/API/CLI shell.
+  Python and you do not need a generated Rust web/API/CLI shell. Until the
+  `0.5.0` publish gate clears, PyPI latest is `0.4.0`; use the `solverforge-py`
+  `v0.5.0` tag for the source-current Python surface.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
 - Keep scalar/list model declarations in the `planning_model!` manifest and
@@ -78,8 +80,8 @@ directly.
 - Add `solverforge-ui` only if the product needs retained-job UI flows.
 - Add `solverforge-maps` only if routing or map-backed costs are part of the
   planning model.
-- Use `solverforge-py` for Python classes, decorators, callbacks, and retained
-  jobs over the native Rust engine.
+- Use `solverforge-py` for Python classes, decorators, callbacks, route/list
+  hooks, retained jobs, and embedded UI assets over the native Rust engine.
 - Reach into `solverforge-solver` directly only when configuration and the
   public facade stop being enough.
 - Reach into `solverforge-scoring` module-scoped names such as
@@ -92,7 +94,7 @@ directly.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
-| Python-authored planner            | PyPI `solverforge` package from `solverforge-py`        |
+| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.5.0` source tag |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |

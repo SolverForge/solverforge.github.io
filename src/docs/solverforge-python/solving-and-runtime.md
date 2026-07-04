@@ -118,6 +118,12 @@ Treat snapshots as point-in-time Python objects.
 
 ## Dynamic Move Support
 
+Construction phases available to Python dynamic models include scalar
+first-fit and cheapest insertion, assignment-group first-fit and cheapest
+insertion, list cheapest insertion, list regret insertion, list Clarke-Wright,
+and list k-opt construction polish when the model supplies the hooks that the
+phase needs.
+
 Scalar selectors available to Python dynamic models:
 
 - `change_move_selector`
@@ -140,6 +146,8 @@ List selectors available to Python dynamic models:
 - `sublist_change_move_selector`
 - `sublist_swap_move_selector`
 - `list_reverse_move_selector`
+- `list_permute_move_selector`
+- `list_precedence_move_selector`
 - `k_opt_move_selector`
 - `list_ruin_move_selector`
 
@@ -151,6 +159,25 @@ Selector combinators available to Python dynamic models:
 
 Grouped scalar and conflict-repair selectors require Python callbacks declared
 on the solution with `@scalar_group(...)` and `@conflict_repair(...)`.
+Assignment-aware grouped scalar construction and grouped local search consume
+`scalar_assignment_group(...)` metadata from the solution.
+
+## Embedded UI Assets
+
+The wheel embeds shared `solverforge-ui` assets through the native bridge.
+Python HTTP hosts can serve those files without copying the UI bundle into each
+example:
+
+```python
+from solverforge import ui
+
+asset = ui.asset("sf.js")
+for path in ui.asset_paths():
+    print(path)
+```
+
+The hospital and deliveries examples use this bridge for `/sf/*` assets and
+keep only app-specific browser modules under their own `static/` directories.
 
 ## Callback Threading
 

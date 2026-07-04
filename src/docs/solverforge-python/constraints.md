@@ -33,6 +33,8 @@ loading, validation, and reporting outside the constraint provider.
 | Binary join | `for_each(A).join(B, joiner).filter(...).penalize/reward(...).named(...)` |
 | Grouped count | `for_each(Entity).group_by(key).filter(...).penalize/reward(...).named(...)` |
 | Balance | `for_each(Entity).balance(key).filter(...).penalize/reward(...).named(...)` |
+| Unassigned list elements | `for_each_unassigned_element(Owner, "list_variable").filter(...).penalize/reward(...).named(...)` |
+| List precedence makespan | `list_precedence_makespan(Owner, "list_variable").named(...)` |
 
 The supported terminal operations are `penalize(...)`, `reward(...)`, and
 `named(...)`.
@@ -108,6 +110,25 @@ stream receives the grouped key and the count for that key.
 
 Use grouped counts for simple capacity, frequency, or load rules.
 
+`indexed_presence(...)` is available as a grouped collector when the grouped
+stream needs run or range presence scoring by ordinal index:
+
+```python
+from solverforge import indexed_presence
+
+(
+    factory.for_each(Shift)
+    .group_by(lambda shift: shift.employee_idx, indexed_presence(lambda shift: shift.day))
+    .penalize(
+        lambda employee_idx, presence: HardSoftScore.of_soft(
+            presence.complement_runs(0, 7).len()
+            + (1 if presence.any_in(5, 7) else 0)
+        )
+    )
+    .named("missing coverage days")
+)
+```
+
 ## Balance
 
 `balance(...)` scores imbalance across keys returned by the callback.
@@ -124,6 +145,28 @@ Use grouped counts for simple capacity, frequency, or load rules.
 
 Balance scoring is useful for spreading assignments across employees, machines,
 vehicles, or other owner keys.
+
+## List Constraints
+
+Use `for_each_unassigned_element(...)` when a planning-list model must score
+elements that are not currently assigned to any owner list.
+
+```python
+(
+    factory.for_each_unassigned_element(Vehicle, "delivery_order")
+    .penalize(HardSoftScore.ONE_HARD)
+    .named("all deliveries assigned")
+)
+```
+
+Use `list_precedence_makespan(...)` for list variables that declare
+`element_owner`, `precedence_duration`, and `precedence_successors` callbacks.
+The native scorer computes makespan from those callbacks and keeps ordinary
+Python constraints available for additional hard or soft penalties.
+
+```python
+factory.list_precedence_makespan(Machine, "operations").named("job shop makespan")
+```
 
 ## Weights
 

@@ -16,7 +16,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 | `solverforge` runtime | domain modeling, constraints, solving, retained lifecycle | project scaffolding, web components, routing datasets |
 | `solverforge-bridge` | dynamic binding contracts, logical model IDs, dynamic score and slot surfaces | Python UX, scaffold templates, solver policy |
 | `solverforge-cli` | app bootstrap and code generation | runtime truth, UI state, solver lifecycle semantics |
-| `solverforge-py` | Python decorators, callback binding, PyO3 bridge, Python package distribution | Rust crate docs, scaffold generation, web UI, route data |
+| `solverforge-py` | Python decorators, callback binding, route/list hooks, PyO3 bridge, Python package distribution, embedded UI asset access | Rust crate docs, scaffold generation, generic web UI design, route data ownership |
 | `solverforge-ui` | retained-job UI controls and frontend components | solver search logic, scoring rules, route-cost computation |
 | `solverforge-maps` | routing, map tiles, matrices, and road-network helpers | generic solver lifecycle, scaffold generation |
 | your app | business rules, imports, APIs, persistence, product behavior | generic runtime internals that belong upstream |
@@ -36,8 +36,9 @@ it, not infer it.
 ### Python as a binding
 
 Use `solverforge-py` when the product needs Python model authoring. Python
-classes, decorators, and callbacks describe the problem; Rust still owns the
-working state, solving, score evaluation, snapshots, and retained jobs.
+classes, decorators, route/list hooks, and callbacks describe the problem; Rust
+still owns the working state, solving, score evaluation, snapshots, retained
+jobs, and embedded shared UI asset bytes.
 
 ### UI as presentation and orchestration
 
@@ -55,7 +56,7 @@ network structure are real business inputs, not as a default dependency.
 | Product shape | Typical composition |
 |---|---|
 | backend planner service | `solverforge-cli` scaffold + `solverforge` |
-| Python planner service or notebook-backed prototype | PyPI `solverforge` package |
+| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.5.0` source tag |
 | browser-based planning app | `solverforge-cli` + `solverforge` + `solverforge-ui` |
 | fleet or dispatch optimizer | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | custom research harness | direct `solverforge` plus selected lower-level crates |

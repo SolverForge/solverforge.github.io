@@ -21,6 +21,7 @@ data you pass in.
 | `@constraint_provider` | a function that returns constraint plans |
 | `@scalar_group(name)` | grouped scalar repair candidates used by config |
 | `@conflict_repair(*constraint_names)` | conflict-repair candidates for named hard constraints |
+| `shadow_variable_updates(...)` | post-update listeners for refreshed list-derived fields |
 
 `@planning_solution(...)` accepts:
 
@@ -30,13 +31,18 @@ data you pass in.
     constraints=constraints,
     scalar_groups=[repair_employee_assignments],
     conflict_repairs=[repair_missing_skill],
+    shadow_updates=shadow_variable_updates(
+        list_owner="vehicles",
+        post_update_listener=refresh_vehicle_route_shadows,
+    ),
 )
 class Schedule:
     ...
 ```
 
-`constraints`, `scalar_groups`, and `conflict_repairs` are optional unless your
-solver config selects features that require them.
+`constraints`, `scalar_groups`, `conflict_repairs`, and `shadow_updates` are
+optional unless your solver config or list-variable model selects features that
+require them.
 
 ## Planning Fields
 
@@ -65,6 +71,32 @@ class Shift:
 
 The `value_range_provider` name must match a collection on the solution object.
 In this example, `Schedule.employees` provides candidate values.
+
+Scalar variables can also declare bounded candidate and nearby callbacks:
+`candidate_values`, `nearby_value_candidates`, `nearby_entity_candidates`,
+`nearby_value_distance_meter`, and `nearby_entity_distance_meter`. Dynamic
+scalar construction and nearby scalar local search consume those callbacks when
+the selected phase needs them.
+
+Assignment-aware grouped scalar construction and local search use
+`scalar_assignment_group(...)` metadata passed to the solution decorator:
+
+```python
+from solverforge import ScalarGroupLimits, scalar_assignment_group
+
+assignment_group = scalar_assignment_group(
+    "employee_assignments",
+    entity_class="Shift",
+    variable_name="employee_idx",
+    required_entity=lambda solution, entity_index: solution.shifts[entity_index].required,
+    capacity_key=lambda solution, entity_index, employee_index: solution.team_by_employee[employee_index],
+    limits=ScalarGroupLimits(value_candidate_limit=8),
+)
+
+@planning_solution(score=HardSoftScore, constraints=constraints, scalar_groups=[assignment_group])
+class Schedule:
+    ...
+```
 
 ## Collections And Type Hints
 
@@ -133,11 +165,53 @@ class DispatchPlan:
 List construction and list local-search selectors work with the same
 `Solver.solve(...)` and `SolverManager` entry points as scalar models.
 
+List variables can expose owner, precedence, route, and field-backed route data
+to the native solver:
+
+```python
+@planning_entity
+class Vehicle:
+    delivery_order = planning_list_variable(
+        element_collection="delivery_indices",
+        route_depot=route_depot,
+        route_metric_class=route_metric_class,
+        route_distance=route_distance,
+        route_feasible=route_feasible,
+    )
+```
+
+Use `element_owner`, `construction_element_order_key`,
+`precedence_duration`, and `precedence_successors` for owner-aware queues and
+precedence-list scoring. Use `route_depot`, `route_metric_class`,
+`route_distance`, and `route_feasible` for solution/entity-index route
+callbacks, or the `*_entity` variants when the callback should receive the
+route-owning entity object. Immutable route data can avoid per-query Python
+callbacks with `route_depot_field`, `route_metric_class_field`,
+`route_distance_matrix_field`, `route_capacity_field`, and
+`route_demand_field`.
+
+Shadow updates refresh fields derived from an ordered list after solve/analyze
+changes:
+
+```python
+@planning_solution(
+    constraints=constraints,
+    shadow_updates=shadow_variable_updates(
+        list_owner="vehicles",
+        post_update_listener=refresh_vehicle_route_shadows,
+    ),
+)
+class DeliveryPlan:
+    ...
+```
+
 ## Before Solving
 
 - Match each scalar variable's `value_range_provider` to a collection on the
   solution object.
 - Match each list variable's `element_collection` to a collection on the
   solution object.
+- Match route, precedence, shadow-update, and scalar-group callback names to
+  real functions that are deterministic for the same solution state.
 - Initialize `score` to `None`.
 - Validate and normalize input data before calling the solver.

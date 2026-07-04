@@ -22,6 +22,7 @@ Clone the repository when you want to run the full demo app.
 - Snapshot and analysis endpoints
 - Pause, resume, cancel, and delete controls
 - Schedule views by location and by employee
+- Shared `/sf/*` frontend assets served from the native `solverforge-ui` bridge
 
 ## Dataset Shape
 

@@ -19,8 +19,11 @@ The published `solverforge-cli 2.2.2` package scaffolds generated apps on
 `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
 The published UI crate is `solverforge-ui 0.7.0`; generated app scaffolds and
 the worked use cases still pin the 0.6.5 UI asset line. The worked use-case
-bundle currently targets `solverforge 0.17.1`. The published Python
-package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
+bundle currently targets `solverforge 0.17.1`. SolverForge Python has a tagged
+`solverforge-py 0.5.0` source line for CPython 3.14, backed by the
+`solverforge 0.17.2` runtime and embedded `solverforge-ui 0.7.0` assets; the
+public PyPI package remains `solverforge 0.4.0` until the reviewed 0.5.0
+publish gate completes.
 <% end %>
 
 ## Current Status
@@ -29,7 +32,7 @@ package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.17.2` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
-| **Python** | Published | PyPI `solverforge 0.4.0` provides dynamic CPython 3.14 bindings backed by the Rust SolverForge engine |
+| **Python** | Tagged, publish pending | `solverforge-py 0.5.0` provides dynamic CPython 3.14 bindings backed by the `solverforge 0.17.2` Rust engine; PyPI latest is still `solverforge 0.4.0` |
 | **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -91,17 +94,24 @@ package is `solverforge 0.4.0` on PyPI and targets CPython 3.14.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install solverforge`.
+- **Install**: `python3.14 -m pip install "solverforge==0.4.0"` for the
+  current public PyPI package; use the `solverforge-py` `v0.5.0` tag for the
+  source-current 0.5.0 APIs until PyPI approval completes.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   and callback constraints.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
   `SolverManager(config=None)`.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
   joins, grouped counts, balance scoring, fixed or callback-computed weights,
-  and `joiner.equal(...)` / `joiner.equal_bi(...)`.
+  unassigned-list scoring, list precedence/makespan scoring, indexed-presence
+  grouped collectors, and `joiner.equal(...)` / `joiner.equal_bi(...)`.
 - **Dynamic move parity**: supported scalar and list local-search selectors,
   including grouped scalar, conflict repair, compound conflict repair, k-opt,
-  list ruin, union, limited neighborhood, and two-child cartesian composition.
+  list precedence, list permute, list ruin, union, limited neighborhood, and
+  two-child cartesian composition.
+- **Examples**: hospital scheduling and deliveries routing FastAPI examples
+  with retained jobs, exact snapshots, analysis, and shared `solverforge-ui`
+  assets served from the native bridge.
 
 ## Runtime Notes
 
@@ -233,9 +243,12 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge 0.4.0` is available on PyPI for CPython 3.14. Current work focuses
-on examples, compatibility hardening, and exposing more Python APIs where the
-runtime supports them.
+`solverforge-py 0.5.0` is the current tagged SolverForge Python source line for
+CPython 3.14. It carries the Rust dependency base forward to
+`solverforge 0.17.2`, adds the deliveries routing example, embeds shared
+`solverforge-ui 0.7.0` assets, and expands Python dynamic scalar/list modeling
+over the native runtime. Public PyPI publishing is still gated; PyPI latest is
+`solverforge 0.4.0` until that approval completes.
 
 ### Additional Language Bindings
 

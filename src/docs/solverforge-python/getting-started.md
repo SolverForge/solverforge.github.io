@@ -15,20 +15,35 @@ solves it, and shows the equivalent config forms.
 - CPython 3.14
 - Rust 1.95.0 only if pip needs to build from source
 
-Create an isolated environment:
+The current public PyPI package is `solverforge 0.4.0`. The 0.5.0 APIs in this
+guide are available from the tagged source line until the reviewed PyPI publish
+gate completes.
+
+Install the documented 0.5.0 line from source:
 
 ```bash
-python3.14 -m venv .venv
+git clone https://github.com/SolverForge/solverforge-py.git
+cd solverforge-py
+git checkout v0.5.0
+make develop
 . .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install solverforge
 python - <<'PY'
 import solverforge
 print(solverforge.__version__)
 PY
 ```
 
-The version printed for the current package should be `0.4.0`.
+The version printed for the current release line should be `0.5.0`.
+
+After the 0.5.0 PyPI publish approval completes, the equivalent package install
+is:
+
+```bash
+python3.14 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install "solverforge==0.5.0"
+```
 
 ## A Minimal Model
 
@@ -146,3 +161,5 @@ load `solver.toml` from the current directory if it exists.
   retained jobs and dynamic selector configuration.
 - Use [Hospital Example](/docs/solverforge-python/hospital-example/) for the
   larger FastAPI demo.
+- Use [Deliveries Example](/docs/solverforge-python/deliveries-example/) for a
+  route-owning planning-list demo with CVRP route hooks and recommendations.

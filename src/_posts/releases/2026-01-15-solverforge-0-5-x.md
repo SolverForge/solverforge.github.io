@@ -335,13 +335,16 @@ The quickstarts repository will continue to grow with more examples covering dif
 
 ## Python Bindings Update
 
-SolverForge Python is now published as `solverforge 0.4.0` on PyPI. See the
-current [SolverForge Python docs](/docs/solverforge-python/) for installation,
-modeling, constraints, and retained runtime details.
+2026-07-03 update: SolverForge Python now has a tagged `solverforge-py 0.5.0`
+source line backed by the `solverforge 0.17.2` Rust runtime. Public PyPI still
+serves `solverforge 0.4.0` until the reviewed 0.5.0 publish gate completes. See
+the current [SolverForge Python docs](/docs/solverforge-python/) for
+installation, modeling, constraints, retained runtime details, and examples.
 
 At the time of this release, Python bindings were still in development at
 [github.com/solverforge/solverforge-py](https://github.com/solverforge/solverforge-py).
-The published package now provides dynamic Python bindings backed by the native
+The Python package later became publicly available as `solverforge 0.4.0`, and
+the current 0.5.0 source line extends those dynamic bindings over the native
 SolverForge engine.
 
 The architectural shift to native Rust was a major undertaking, and we chose to focus on getting the core solver right before building language bridges. The Python bindings will provide idiomatic Python APIs backed by SolverForge's zero-erasure engine, giving Python developers native constraint solving performance with familiar syntax.

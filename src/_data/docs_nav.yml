@@ -112,6 +112,8 @@ docs:
         href: /docs/solverforge-python/solving-and-runtime/
       - title: Hospital Example
         href: /docs/solverforge-python/hospital-example/
+      - title: Deliveries Example
+        href: /docs/solverforge-python/deliveries-example/
   - title: SolverForge
     href: /docs/solverforge/
     children:
