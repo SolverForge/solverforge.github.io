@@ -24,7 +24,7 @@ runtime.
 
 The runtime release remains separate from scaffold and binding publication.
 The published `solverforge-cli 2.2.2` package still scaffolds
-`solverforge 0.15.2`; the published `solverforge-py 0.6.0` package compiles
+`solverforge 0.15.2`; the published `solverforge-py 0.6.1` package compiles
 Python models into this `solverforge 0.18.0` runtime and embeds
 `solverforge-ui 0.7.0`. See the
 [SolverForge Python 0.6.x release post](/blog/releases/2026/07/13/solverforge-python-0-6-x/).

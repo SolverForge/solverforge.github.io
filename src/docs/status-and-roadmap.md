@@ -24,11 +24,10 @@ bundle now ships `solverforge-hospital@2.0.4`,
 `solverforge-lessons@2.0.4`, `solverforge-deliveries@2.0.4`, and
 `solverforge-fsr@2.0.5`, all on `solverforge 0.18.0`; bundle CI and the four
 Space sync workflows pass at the tagged commit. SolverForge Python has a tagged
-`solverforge-py 0.6.0` source line for CPython 3.14, compiled onto the
+`solverforge-py 0.6.1` source line for CPython 3.14, compiled onto the
 `solverforge 0.18.0` runtime with embedded `solverforge-ui 0.7.0` assets. The
-automatic release workflow completed and PyPI now serves `solverforge 0.6.0`;
-the source-bearing release commit passed GitHub CI. The final tag's follow-up CI
-run was manually cancelled during its local gate after release-only changes.
+automatic release workflow completed and PyPI now serves `solverforge 0.6.1`;
+GitHub CI and the final-tag release workflow both pass.
 <% end %>
 
 ## Current Status
@@ -37,7 +36,7 @@ run was manually cancelled during its local gate after release-only changes.
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.18.0` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
-| **Python** | Published; release passed | `solverforge-py 0.6.0` compiles dynamic CPython 3.14 models into the `solverforge 0.18.0` runtime; PyPI publishes `solverforge 0.6.0`, and the source-bearing release commit passed CI |
+| **Python** | Published; CI and release passed | `solverforge-py 0.6.1` compiles dynamic CPython 3.14 models into the `solverforge 0.18.0` runtime; PyPI publishes `solverforge 0.6.1` |
 | **Worked Use Cases** | Released, CI passed | `solverforge-hospital@2.0.4`, `solverforge-lessons@2.0.4`, `solverforge-deliveries@2.0.4`, and `solverforge-fsr@2.0.5`; all target `solverforge 0.18.0` and `solverforge-ui 0.6.5` |
 | **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
@@ -106,8 +105,8 @@ run was manually cancelled during its local gate after release-only changes.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.6.0"`; use the
-  matching `solverforge-py` `v0.6.0` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.6.1"`; use the
+  matching `solverforge-py` `v0.6.1` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
   metrics, and callback constraints.
@@ -294,12 +293,14 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.6.0` is the current tagged SolverForge Python source line for
+`solverforge-py 0.6.1` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
 `solverforge 0.18.0` runtime, removes the wrapper-owned search path, specializes
 safe native constraint plans, adds qualified retained candidate diagnostics,
 and keeps shared `solverforge-ui 0.7.0` assets. The automatic release workflow
-published the 0.6.0 source distribution and CPython 3.14 wheels to PyPI.
+published the 0.6.1 source distribution and CPython 3.14 wheels to PyPI. The
+source archive contains only the package metadata and Python/Rust build inputs;
+repository tests, examples, guidance, and tooling remain source-checkout assets.
 
 ### Additional Language Bindings
 

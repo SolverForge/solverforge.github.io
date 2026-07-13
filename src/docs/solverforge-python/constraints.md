@@ -215,9 +215,9 @@ solution score family:
 
 ## Compiled Evaluation Boundary
 
-Python callbacks remain the constraint authoring surface, but 0.6.0 compiles a
-native evaluator when schema evidence proves it has identical semantics. Safe
-specializations include:
+Python callbacks remain the constraint authoring surface, but the 0.6 line
+compiles a native evaluator when schema evidence proves it has identical
+semantics. Safe specializations include:
 
 - simple fixed-weight unary constraints
 - unassigned-list scoring

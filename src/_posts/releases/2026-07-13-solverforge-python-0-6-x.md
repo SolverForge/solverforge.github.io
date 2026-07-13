@@ -9,14 +9,12 @@ description: >
 ---
 
 **SolverForge Python 0.6.x** started with the
-[v0.6.0 source tag](https://github.com/SolverForge/solverforge-py/tree/v0.6.0)
+[v0.6.1 source tag](https://github.com/SolverForge/solverforge-py/tree/v0.6.1)
 on 2026-07-13. The tag plus the GitHub and Forgejo `main` branches point to the
-same `0.6.0` source. The automatic release workflow built, verified, and
-published the source distribution plus Linux, macOS, and Windows wheels; PyPI
-now resolves `solverforge` to `0.6.0`. The source-bearing release commit passed
-GitHub CI. The final tag adds release-workflow and release-documentation commits;
-its follow-up CI run was manually cancelled during the local CI gate, while the
-independent release workflow completed successfully.
+same `0.6.1` source. GitHub CI and the automatic release workflow completed
+successfully; the workflow built, verified, and published the source
+distribution plus Linux, macOS, and Windows wheels. PyPI now resolves
+`solverforge` to `0.6.1`.
 
 The 0.6 line targets CPython 3.14, consumes the published
 `solverforge 0.18.0` Rust crates, and embeds `solverforge-ui 0.7.0`. It replaces
@@ -139,8 +137,14 @@ implicit route callback conventions.
 Install the published package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.6.0"
+python3.14 -m pip install "solverforge==0.6.1"
 ```
+
+The 0.6.1 source distribution is limited to package metadata and the Python and
+Rust inputs needed to build the binding. Repository tests, examples, guidance,
+and tooling remain in the tagged source checkout. The wheel contains the public
+Python package, native extension, and embedded shared UI assets rather than the
+FastAPI example applications.
 
 Use the tagged source checkout when developing the repository examples or
 inspecting the complete source:
@@ -148,28 +152,28 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.0
+git checkout v0.6.1
 make develop
 . .venv/bin/activate
 python -c 'import solverforge; print(solverforge.__version__)'
 ```
 
-The command prints `0.6.0`.
+The command prints `0.6.1`.
 
 Do not infer the Python package version from the Rust crate, CLI, or UI release
 line. Their current boundaries are:
 
 | Surface | Current line |
 | ------- | ------------ |
-| SolverForge Python source | tagged `solverforge-py 0.6.0` |
-| Public PyPI package | published `solverforge 0.6.0` |
+| SolverForge Python source | tagged `solverforge-py 0.6.1` |
+| Public PyPI package | published `solverforge 0.6.1` |
 | Rust runtime base | published `solverforge 0.18.0` |
 | Embedded UI base | published `solverforge-ui 0.7.0` |
 | CLI scaffold runtime | published `solverforge-cli 2.2.2` still scaffolds `solverforge 0.15.2` |
 
 ## Upgrade Checklist
 
-- Check out `v0.6.0`, rebuild the native extension, and run model, lifecycle,
+- Check out `v0.6.1`, rebuild the native extension, and run model, lifecycle,
   snapshot, and example tests against the compiled 0.18 runtime.
 - Replace legacy flat list route arguments with `ListRouteHooks` and
   `ListSavingsHooks`, using explicit row, solution, or callback source wrappers.
@@ -188,12 +192,12 @@ line. Their current boundaries are:
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
-| `0.6.0` | 2026-07-13 | Moves dynamic Python search onto SolverForge 0.18.0's compiled runtime, adds explicit model metadata and safe native scoring plans, retains qualified candidate diagnostics, and updates the hospital and deliveries examples to exercise those contracts. |
+| `0.6.1` | 2026-07-13 | Establishes the 0.6 line on SolverForge 0.18.0's compiled runtime, adds explicit model metadata, safe native scoring plans, qualified candidate diagnostics, and refreshed examples, and restricts source archives to the inputs needed to build the package. |
 
 ## Documentation Changes
 
 - [SolverForge Python](/docs/solverforge-python/) now records the published
-  0.6.0 package, Rust 0.18.0 base, and UI 0.7.0 base.
+  0.6.1 package, Rust 0.18.0 base, and UI 0.7.0 base.
 - [Python Modeling](/docs/solverforge-python/modeling/) documents candidate
   metrics, assignment metadata, scoped list sources, and nested route/savings
   bundles.
@@ -204,6 +208,6 @@ line. Their current boundaries are:
   qualified provenance.
 - The [Hospital](/docs/solverforge-python/hospital-example/) and
   [Deliveries](/docs/solverforge-python/deliveries-example/) pages now match the
-  tagged 0.6.0 examples.
+  tagged 0.6.1 examples.
 - [Status & Roadmap](/docs/status-and-roadmap/) keeps tagged source, PyPI,
   runtime, UI, CLI, and worked-use-case release lines separate.

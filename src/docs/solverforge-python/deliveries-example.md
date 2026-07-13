@@ -87,7 +87,7 @@ The FastAPI app exposes:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.0
+git checkout v0.6.1
 make develop
 make deliveries-run PORT=7861
 ```

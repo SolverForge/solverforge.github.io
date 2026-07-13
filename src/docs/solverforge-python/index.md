@@ -11,12 +11,12 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-This section documents the tagged `solverforge-py 0.6.0` source line for
+This section documents the tagged `solverforge-py 0.6.1` source line for
 CPython 3.14. The automatic release workflow completed and the public PyPI
-package is `solverforge 0.6.0`. The source compiles Python models into the
+package is `solverforge 0.6.1`. The source compiles Python models into the
 `solverforge 0.18.0` Rust runtime and embeds `solverforge-ui 0.7.0` assets for
-Python-hosted examples. The source-bearing release commit passed GitHub CI, and
-the independent final-tag release workflow completed successfully.
+Python-hosted examples. GitHub CI and the final-tag release workflow completed
+successfully.
 <% end %>
 
 SolverForge Python lets Python users define planning models with ordinary
@@ -31,7 +31,7 @@ selector or move engine.
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.6.0"
+python3.14 -m pip install "solverforge==0.6.1"
 ```
 
 Use the tagged source checkout when developing the repository examples or
@@ -40,7 +40,7 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.0
+git checkout v0.6.1
 make develop
 . .venv/bin/activate
 ```
@@ -75,8 +75,8 @@ make develop
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.6.0` |
-| Published PyPI version | `0.6.0` |
+| Documented source line | `0.6.1` |
+| Published PyPI version | `0.6.1` |
 | Python requirement | `>=3.14` |
 | Runtime base | `solverforge 0.18.0` |
 | Embedded UI base | `solverforge-ui 0.7.0` |

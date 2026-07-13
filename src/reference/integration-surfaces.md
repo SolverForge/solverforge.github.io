@@ -64,7 +64,7 @@ network structure are real business inputs, not as a default dependency.
 | Product shape | Typical composition |
 |---|---|
 | backend planner service | `solverforge-cli` scaffold + `solverforge` |
-| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.6.0` source tag |
+| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.6.1` source tag |
 | browser-based planning app | `solverforge-cli` + `solverforge` + `solverforge-ui` |
 | fleet or dispatch optimizer | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | custom research harness | direct `solverforge` plus selected lower-level crates |

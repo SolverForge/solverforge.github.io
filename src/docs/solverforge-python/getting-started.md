@@ -15,13 +15,13 @@ solves it, and shows the equivalent config forms.
 - CPython 3.14
 - Rust 1.95.0 only if pip needs to build from source
 
-Install the published `solverforge 0.6.0` package:
+Install the published `solverforge 0.6.1` package:
 
 ```bash
 python3.14 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install "solverforge==0.6.0"
+python -m pip install "solverforge==0.6.1"
 ```
 
 Use the matching tagged source checkout when developing the repository examples
@@ -30,7 +30,7 @@ or inspecting the binding implementation:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.0
+git checkout v0.6.1
 make develop
 . .venv/bin/activate
 python - <<'PY'
@@ -39,7 +39,7 @@ print(solverforge.__version__)
 PY
 ```
 
-The version printed for either installation path should be `0.6.0`.
+The version printed for either installation path should be `0.6.1`.
 
 ## A Minimal Model
 
