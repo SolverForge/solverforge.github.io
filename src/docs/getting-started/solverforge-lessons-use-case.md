@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the checked-in SolverForge 0.17.1 use-case dependency shape
+- keep the checked-in SolverForge 0.18.0 use-case dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -118,12 +118,12 @@ surface, Docker build, and validation commands.
 
 ### Keep the Published Dependency Shape
 
-The current checked-in Lessons use-case source targets the published
-SolverForge 0.17.1 line:
+The tagged `solverforge-lessons@2.0.4` use-case source targets the published
+SolverForge 0.18.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.17.1", features = [
+solverforge = { version = "0.18.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -149,7 +149,7 @@ chrono = { version = "0.4.44", features = ["serde"] }
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
 `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`; the finished Lessons
-app records its deliberate `solverforge 0.17.1` runtime target separately:
+app records its deliberate `solverforge 0.18.0` runtime target separately:
 
 ```toml
 [app]
@@ -159,8 +159,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.17.1"
-runtime_source = "crates.io: solverforge 0.17.1"
+target = "solverforge 0.18.0"
+runtime_source = "crates.io: solverforge 0.18.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
@@ -249,9 +249,11 @@ Open:
 http://localhost:7860
 ```
 
-The browser loads the `LARGE` plan and renders retained solve controls, score
-status, cohort timetables, room views, teacher views, raw data, and the visible
-REST API guide.
+The browser first reads `/demo-data`, verifies that its default id is present in
+the advertised catalog, and then loads `/demo-data/LARGE`. It renders retained
+solve controls, score status, cohort timetables, room views, teacher views, raw
+data, and the visible REST API guide. A catalog mismatch is shown as a bootstrap
+error and leaves Solve disabled instead of guessing a dataset.
 
 ### Inspect Demo Data
 
@@ -586,6 +588,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
+| Tagged app release | `solverforge-lessons@2.0.4` |
 | Local run | `make run-release` |
 | Standard validation | `make test` |
 | Full local validation | `make ci-local` |

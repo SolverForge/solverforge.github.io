@@ -20,11 +20,15 @@ The published `solverforge-cli 2.2.2` package scaffolds generated apps on
 `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
 The published UI crate is `solverforge-ui 0.7.0`; generated app scaffolds and
 the worked use cases still pin the 0.6.5 UI asset line. The worked use-case
-bundle currently targets `solverforge 0.17.1`. SolverForge Python has a tagged
-`solverforge-py 0.5.0` source line for CPython 3.14, backed by the
-`solverforge 0.17.2` runtime and embedded `solverforge-ui 0.7.0` assets; the
-public PyPI package remains `solverforge 0.4.0` until the reviewed 0.5.0
-publish gate completes.
+bundle now ships `solverforge-hospital@2.0.4`,
+`solverforge-lessons@2.0.4`, `solverforge-deliveries@2.0.4`, and
+`solverforge-fsr@2.0.5`, all on `solverforge 0.18.0`; bundle CI and the four
+Space sync workflows pass at the tagged commit. SolverForge Python has a tagged
+`solverforge-py 0.6.0` source line for CPython 3.14, compiled onto the
+`solverforge 0.18.0` runtime with embedded `solverforge-ui 0.7.0` assets. The
+automatic release workflow completed and PyPI now serves `solverforge 0.6.0`;
+the source-bearing release commit passed GitHub CI. The final tag's follow-up CI
+run was manually cancelled during its local gate after release-only changes.
 <% end %>
 
 ## Current Status
@@ -33,7 +37,8 @@ publish gate completes.
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.18.0` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
-| **Python** | Tagged, publish pending | `solverforge-py 0.5.0` provides dynamic CPython 3.14 bindings backed by the `solverforge 0.17.2` Rust engine; PyPI latest is still `solverforge 0.4.0` |
+| **Python** | Published; release passed | `solverforge-py 0.6.0` compiles dynamic CPython 3.14 models into the `solverforge 0.18.0` runtime; PyPI publishes `solverforge 0.6.0`, and the source-bearing release commit passed CI |
+| **Worked Use Cases** | Released, CI passed | `solverforge-hospital@2.0.4`, `solverforge-lessons@2.0.4`, `solverforge-deliveries@2.0.4`, and `solverforge-fsr@2.0.5`; all target `solverforge 0.18.0` and `solverforge-ui 0.6.5` |
 | **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -49,9 +54,10 @@ publish gate completes.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document reference-app dependencies on `solverforge 0.17.1` while keeping
-  their recorded scaffold provenance separate from the published
-  `solverforge-cli 2.2.2` scaffold target.
+  document the released Hospital, Lessons, and Deliveries 2.0.4 and FSR 2.0.5
+  contracts on `solverforge 0.18.0`, while keeping their recorded
+  scaffold provenance separate from the published `solverforge-cli 2.2.2`
+  scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -100,13 +106,13 @@ publish gate completes.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.4.0"` for the
-  current public PyPI package; use the `solverforge-py` `v0.5.0` tag for the
-  source-current 0.5.0 APIs until PyPI approval completes.
+- **Install**: `python3.14 -m pip install "solverforge==0.6.0"`; use the
+  matching `solverforge-py` `v0.6.0` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
-  and callback constraints.
+  explicit assignment metadata, scoped route/savings bundles, named candidate
+  metrics, and callback constraints.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
-  `SolverManager(config=None)`.
+  `SolverManager(config=None)` over one compiled SolverForge 0.18 runtime graph.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
   joins, grouped counts, balance scoring, fixed or callback-computed weights,
   unassigned-list scoring, list precedence/makespan scoring, indexed-presence
@@ -115,9 +121,17 @@ publish gate completes.
   including grouped scalar, conflict repair, compound conflict repair, k-opt,
   list precedence, list permute, list ruin, union, limited neighborhood, and
   two-child cartesian composition.
-- **Examples**: hospital scheduling and deliveries routing FastAPI examples
-  with retained jobs, exact snapshots, analysis, and shared `solverforge-ui`
-  assets served from the native bridge.
+- **Retained diagnostics**: phase telemetry, bounded format-3 candidate traces,
+  atomic `telemetry_detail(...)`, and optional immutable
+  `QualifiedCandidateTraceProvenance` supplied per managed job.
+- **Compiled scoring boundary**: proven fixed-weight unary, unassigned-list,
+  precedence, and stable string-key equality plans can evaluate natively while
+  callback-dependent shapes preserve the Python path.
+- **Examples**: hospital scheduling with row-filtered scalar candidates and
+  nearby metadata, plus deliveries routing with unassigned seed routes and
+  explicit route/savings bundles; both expose retained jobs, exact snapshots,
+  phase telemetry, analysis, and shared `solverforge-ui` assets from the native
+  bridge.
 
 ## Runtime Notes
 
@@ -280,12 +294,12 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.5.0` is the current tagged SolverForge Python source line for
-CPython 3.14. It carries the Rust dependency base forward to
-`solverforge 0.17.2`, adds the deliveries routing example, embeds shared
-`solverforge-ui 0.7.0` assets, and expands Python dynamic scalar/list modeling
-over the native runtime. Public PyPI publishing is still gated; PyPI latest is
-`solverforge 0.4.0` until that approval completes.
+`solverforge-py 0.6.0` is the current tagged SolverForge Python source line for
+CPython 3.14. It compiles explicit Python model metadata into the
+`solverforge 0.18.0` runtime, removes the wrapper-owned search path, specializes
+safe native constraint plans, adds qualified retained candidate diagnostics,
+and keeps shared `solverforge-ui 0.7.0` assets. The automatic release workflow
+published the 0.6.0 source distribution and CPython 3.14 wheels to PyPI.
 
 ### Additional Language Bindings
 

@@ -24,9 +24,19 @@ runtime.
 
 The runtime release remains separate from scaffold and binding publication.
 The published `solverforge-cli 2.2.2` package still scaffolds
-`solverforge 0.15.2`. The tagged `solverforge-py 0.5.0` source line remains
-backed by `solverforge 0.17.2`, while PyPI latest remains `solverforge 0.4.0`.
-Those targets do not change merely because the Rust core published 0.18.0.
+`solverforge 0.15.2`; the published `solverforge-py 0.6.0` package compiles
+Python models into this `solverforge 0.18.0` runtime and embeds
+`solverforge-ui 0.7.0`. See the
+[SolverForge Python 0.6.x release post](/blog/releases/2026/07/13/solverforge-python-0-6-x/).
+
+The worked applications moved with this runtime line. The tagged
+`solverforge-usecases` bundle ships `solverforge-hospital@2.0.4`,
+`solverforge-lessons@2.0.4`, `solverforge-deliveries@2.0.4`, and
+`solverforge-fsr@2.0.5`; all four target SolverForge 0.18.0, retain the
+`solverforge-ui 0.6.5` web-shell line, and passed the bundle CI and Space sync
+workflows. Their long-form guides record the app-specific metadata, datasets,
+solver policies, and runtime behavior rather than treating the core version
+bump as the whole upgrade.
 
 ## What Changed
 
@@ -237,5 +247,10 @@ the CLI package version.
   describe cursor ownership and the resolved default policy.
 - [SolverManager](/docs/solverforge/solver/solver-manager/) documents phase
   telemetry, trace detail retrieval, and phase-boundary lifecycle settlement.
+- The [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
+  [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
+  [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), and
+  [FSR](/docs/getting-started/solverforge-fsr-use-case/) guides match the
+  tagged 2.0.4/2.0.5 applications on SolverForge 0.18.0.
 - [Status & Roadmap](/docs/status-and-roadmap/) keeps the core, CLI scaffold,
   Python, UI, maps, and worked-example release lines separate.

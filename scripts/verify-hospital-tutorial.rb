@@ -14,11 +14,12 @@ SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
 EXPECTED_CLI_VERSION = "2.2.2"
 EXPECTED_CLI_RUNTIME_VERSION = "0.15.2"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.17.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.18.0"
 EXPECTED_CLI_UI_VERSION = "0.6.5"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
 EXPECTED_HOSPITAL_APP_CLI_VERSION = "2.2.2"
+EXPECTED_HOSPITAL_APP_VERSION = "2.0.4"
 
 def log(message)
   puts "[verify-hospital-tutorial] #{message}"
@@ -295,6 +296,11 @@ begin
   assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
+  assert_file_contains(doc_page, "solverforge-hospital@#{EXPECTED_HOSPITAL_APP_VERSION}")
+  assert_file_contains(doc_page, "default_size = \"LARGE\"")
+  assert_file_contains(doc_page, "available_sizes = [\"LARGE\"]")
+  assert_file_contains(doc_page, "only then fetches")
+  assert_file_contains(doc_page, "only when the user requests it")
   assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
   assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
   assert_file_contains(doc_page, "HardSoftDecimalScore")
@@ -313,14 +319,18 @@ begin
   assert_file_not_contains(doc_page, "cd ~/")
   assert_file_not_contains(doc_page, "/srv/lab/dev/")
   assert_file_not_contains(doc_page, "solverforge generate solution plan")
+  assert_file_not_contains(doc_page, "default_size = \"large\"")
 
   if usecases_repo
     hospital_bundle = File.join(usecases_repo, "uc-hospital")
+    assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "version = \"#{EXPECTED_HOSPITAL_APP_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
     assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
+    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "default_size = \"LARGE\"")
+    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "available_sizes = [\"LARGE\"]")
     assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "score = \"HardSoftDecimalScore\"")
     assert_file_contains(File.join(hospital_bundle, "solver.toml"), "construction_heuristic_type = \"cheapest_insertion\"")
     assert_file_contains(File.join(hospital_bundle, "src/domain/plan.rs"), "pub employee_idx: Option<usize>")

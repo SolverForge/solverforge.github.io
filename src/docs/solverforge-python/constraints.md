@@ -2,7 +2,8 @@
 title: "Python Constraints"
 description: >
   Write callback-authored SolverForge Python constraints with supported stream
-  shapes, joins, grouping, balance scoring, and score weights.
+  shapes, joins, grouping, balance scoring, score weights, and safe compiled
+  evaluators.
 ---
 
 # Python Constraints
@@ -57,8 +58,8 @@ The filter callback must return `bool`.
 ## Joins
 
 Use stream-level `join(...)` for pair constraints. `joiner.equal(...)` compares
-one key on both sides. `joiner.equal_bi(...)` compares a left-key callback to a
-right-key callback.
+one key on both sides. `joiner.equal_bi(...)` compares separate left and right
+keys. A key may be a Python callback or an attribute-name string.
 
 ```python
 from solverforge import joiner
@@ -91,6 +92,23 @@ active_employees = factory.for_each(Employee).filter(lambda employee: employee.a
 ```
 
 Joiners preserve Python equality semantics.
+
+Use attribute strings when the equality key is a stable imported row field:
+
+```python
+(
+    factory.for_each(Shift)
+    .join(Employee, joiner.equal_bi("employee_idx", "index"))
+    .filter(lambda shift, employee: shift.required_skill not in employee.skills)
+    .penalize(HardSoftScore.ONE_HARD)
+    .named("missing required skill")
+)
+```
+
+SolverForge specializes string equality natively only for planning scalar slots
+and stable fields stored directly on every imported row. Properties,
+shadow-derived values, containers, unsupported scalar values, and callback keys
+retain live Python attribute access and equality.
 
 ## Grouped Counts
 
@@ -160,9 +178,11 @@ elements that are not currently assigned to any owner list.
 ```
 
 Use `list_precedence_makespan(...)` for list variables that declare
-`element_owner`, `precedence_duration`, and `precedence_successors` callbacks.
-The native scorer computes makespan from those callbacks and keeps ordinary
-Python constraints available for additional hard or soft penalties.
+`element_owner`, `precedence_duration`, and `precedence_successors` metadata.
+Each source can be a callback or a solution-level sequence field indexed by
+element ID. The native scorer computes makespan from that declared metadata and
+keeps ordinary Python constraints available for additional hard or soft
+penalties.
 
 ```python
 factory.list_precedence_makespan(Machine, "operations").named("job shop makespan")
@@ -192,6 +212,27 @@ solution score family:
     .named("priority weighted unassigned shift")
 )
 ```
+
+## Compiled Evaluation Boundary
+
+Python callbacks remain the constraint authoring surface, but 0.6.0 compiles a
+native evaluator when schema evidence proves it has identical semantics. Safe
+specializations include:
+
+- simple fixed-weight unary constraints
+- unassigned-list scoring
+- list precedence/makespan metadata
+- proven stable string-key equality joins
+
+Callback filters, callback-computed weights, computed properties, unsupported
+key values, and stateful callables remain on the Python callback path. Closures,
+bound defaults, partials, methods, callable instances, and other stateful
+callbacks compile per invocation rather than being retained across solves.
+
+Only capture-free functions with canonical module provenance and no defaults or
+function-owned metadata can share a schema/runtime plan. Mutable values in that
+module namespace remain live, and callbacks from different module namespaces do
+not share a plan merely because their code objects match.
 
 ## Python Stream API
 

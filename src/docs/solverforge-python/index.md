@@ -11,41 +11,38 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-This section documents the tagged `solverforge-py 0.5.0` source line for
-CPython 3.14. The public PyPI package remains `solverforge 0.4.0` until the
-`v0.5.0` release workflow clears the reviewed PyPI publish environment. The
-0.5.0 line is backed by the `solverforge 0.17.2` Rust runtime and embeds
-`solverforge-ui 0.7.0` assets for Python-hosted examples.
+This section documents the tagged `solverforge-py 0.6.0` source line for
+CPython 3.14. The automatic release workflow completed and the public PyPI
+package is `solverforge 0.6.0`. The source compiles Python models into the
+`solverforge 0.18.0` Rust runtime and embeds `solverforge-ui 0.7.0` assets for
+Python-hosted examples. The source-bearing release commit passed GitHub CI, and
+the independent final-tag release workflow completed successfully.
 <% end %>
 
 SolverForge Python lets Python users define planning models with ordinary
 classes, decorators, functions, and lambdas. Decorators mark planning entities,
 variables, and solutions. Constraint providers return Python callback-based
-rules. The solve still runs through the native SolverForge engine.
+rules. The binding compiles that authored schema into the same immutable runtime
+graph used by native SolverForge models; it does not maintain a second Python
+selector or move engine.
 
 ## Installation
 
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.4.0"
+python3.14 -m pip install "solverforge==0.6.0"
 ```
 
-Use the tagged source line for the 0.5.0 APIs documented here until PyPI
-publishing completes:
+Use the tagged source checkout when developing the repository examples or
+inspecting the complete source:
 
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.5.0
+git checkout v0.6.0
 make develop
 . .venv/bin/activate
-```
-
-After the 0.5.0 PyPI publish approval completes, install the same line with:
-
-```bash
-python3.14 -m pip install "solverforge==0.5.0"
 ```
 
 ## Basic Workflow
@@ -65,10 +62,11 @@ python3.14 -m pip install "solverforge==0.5.0"
 | Planning fields | `planning_id`, `planning_variable`, `planning_list_variable` |
 | Constraints | `@constraint_provider`, `ConstraintFactory`, `joiner` |
 | Grouped scalar repair | `scalar_assignment_group`, `ScalarGroupLimits`, `@scalar_group`, `@conflict_repair` |
-| List route hooks | `element_owner`, precedence hooks, route callbacks, route data fields, `shadow_variable_updates(...)` |
+| Candidate ordering | `@candidate_metric`, `selection_order`, `selection_metric` |
+| List metadata | `ListRouteHooks`, `ListSavingsHooks`, `RowField`, `SolutionField`, `EntityCallback`, `SolutionCallback` |
 | Scores | `SoftScore`, `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore` |
 | Direct solve | `Solver.solve(...)`, `Solver.analyze(...)` |
-| Retained jobs | `SolverManager` |
+| Retained jobs | `SolverManager`, `telemetry_detail(...)`, `QualifiedCandidateTraceProvenance` |
 | Runtime config | `SolverConfig`, dictionaries, or `solver.toml` |
 | Embedded UI assets | `solverforge.ui.asset(...)`, `solverforge.ui.asset_paths()` |
 
@@ -77,10 +75,10 @@ python3.14 -m pip install "solverforge==0.5.0"
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.5.0` |
-| Published PyPI version | `0.4.0` until the `v0.5.0` publish gate completes |
+| Documented source line | `0.6.0` |
+| Published PyPI version | `0.6.0` |
 | Python requirement | `>=3.14` |
-| Runtime base | `solverforge 0.17.2` |
+| Runtime base | `solverforge 0.18.0` |
 | Embedded UI base | `solverforge-ui 0.7.0` |
 | Repository | [SolverForge/solverforge-py](https://github.com/SolverForge/solverforge-py) |
 
@@ -89,19 +87,21 @@ python3.14 -m pip install "solverforge==0.5.0"
 - **[Getting Started](/docs/solverforge-python/getting-started/)** - install
   the package, write a minimal model, solve it, and pass config
 - **[Modeling](/docs/solverforge-python/modeling/)** - classes, decorators,
-  scalar variables, list variables, score families, and schema inference
+  scalar variables, assignment groups, scoped list metadata, candidate metrics,
+  score families, and schema compilation
 - **[Constraints](/docs/solverforge-python/constraints/)** - callback stream
   shapes, joins, grouping, balance scoring, and unsupported top-level methods
 - **[Solving & Runtime](/docs/solverforge-python/solving-and-runtime/)** -
-  synchronous solves, score analysis, solver config, retained jobs, and dynamic
-  move support
+  synchronous solves, score analysis, compiled runtime config, retained jobs,
+  candidate traces, qualified provenance, and dynamic move support
 - **[Hospital Example](/docs/solverforge-python/hospital-example/)** - the
   FastAPI example, retained lifecycle endpoints, and public dataset shape
 - **[Deliveries Example](/docs/solverforge-python/deliveries-example/)** -
-  the route-owning list-variable example, CVRP hooks, route snapshots, and
-  insertion recommendations
+  the route-owning list-variable example, explicit CVRP route/savings metadata,
+  route snapshots, and insertion recommendations
 
 ## Links
 
+- [SolverForge Python 0.6.x release notes](/blog/releases/2026/07/13/solverforge-python-0-6-x/)
 - [PyPI package](https://pypi.org/project/solverforge/)
 - [Python repository](https://github.com/SolverForge/solverforge-py)

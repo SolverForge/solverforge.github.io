@@ -168,6 +168,6 @@ Crate responsibilities, zero-erasure design, SERIO scoring, and retained runtime
 Start from the CLI scaffold and follow concrete hospital, lessons, delivery, or field-service examples.
   <% end %>
   <%= render Ui::Card.new(title: "Python", href: relative_url('/docs/solverforge-python/'), icon: "fa-solid fa-code") do %>
-Install the PyPI package and author SolverForge models with Python classes, decorators, and callbacks.
+Author SolverForge models with Python classes, explicit metadata, and callbacks, then compile them into the native runtime.
   <% end %>
 </div>

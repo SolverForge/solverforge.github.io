@@ -15,16 +15,22 @@ solves it, and shows the equivalent config forms.
 - CPython 3.14
 - Rust 1.95.0 only if pip needs to build from source
 
-The current public PyPI package is `solverforge 0.4.0`. The 0.5.0 APIs in this
-guide are available from the tagged source line until the reviewed PyPI publish
-gate completes.
+Install the published `solverforge 0.6.0` package:
 
-Install the documented 0.5.0 line from source:
+```bash
+python3.14 -m venv .venv
+. .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install "solverforge==0.6.0"
+```
+
+Use the matching tagged source checkout when developing the repository examples
+or inspecting the binding implementation:
 
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.5.0
+git checkout v0.6.0
 make develop
 . .venv/bin/activate
 python - <<'PY'
@@ -33,17 +39,7 @@ print(solverforge.__version__)
 PY
 ```
 
-The version printed for the current release line should be `0.5.0`.
-
-After the 0.5.0 PyPI publish approval completes, the equivalent package install
-is:
-
-```bash
-python3.14 -m venv .venv
-. .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install "solverforge==0.5.0"
-```
+The version printed for either installation path should be `0.6.0`.
 
 ## A Minimal Model
 
@@ -102,7 +98,9 @@ print([shift.nurse for shift in solved.shifts])
 ```
 
 `Solver.solve(...)` reads the Python object graph, runs SolverForge, then writes
-the solved variables and score back to a Python solution object.
+the solved variables and score back to a Python solution object. The schema is
+compiled into the SolverForge 0.18 runtime graph; Python-authored models do not
+use a separate search engine.
 
 ## Analyze A Solution
 
@@ -162,4 +160,5 @@ load `solver.toml` from the current directory if it exists.
 - Use [Hospital Example](/docs/solverforge-python/hospital-example/) for the
   larger FastAPI demo.
 - Use [Deliveries Example](/docs/solverforge-python/deliveries-example/) for a
-  route-owning planning-list demo with CVRP route hooks and recommendations.
+  route-owning planning-list demo with explicit CVRP route/savings metadata and
+  recommendations.

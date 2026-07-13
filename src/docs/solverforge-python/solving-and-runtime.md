@@ -1,8 +1,8 @@
 ---
 title: "Python Solving & Runtime"
 description: >
-  Run synchronous solves, score analysis, solver.toml config, retained jobs,
-  snapshots, and dynamic move selectors from SolverForge Python.
+  Run synchronous solves, score analysis, compiled solver.toml config, retained
+  jobs, candidate diagnostics, snapshots, and dynamic move selectors.
 ---
 
 # Python Solving & Runtime
@@ -13,7 +13,11 @@ SolverForge Python has two runtime entry points:
 - `SolverManager` for retained jobs, lifecycle events, snapshots, pause,
   resume, cancel, and delete
 
-Both paths run the native SolverForge engine.
+Both paths compile the authored Python schema into one immutable SolverForge
+0.18 runtime graph. The binding supplies dynamic state, callbacks, slot
+capabilities, assignment groups, providers, and candidate metrics; the core owns
+phase construction, cursor execution, foraging, lifecycle control, and
+telemetry. There is no wrapper-owned fallback runner.
 
 ## Synchronous Solve
 
@@ -106,6 +110,7 @@ The manager exposes:
 | ------ | ------- |
 | `solve(solution)` | start a retained job and return a `JobHandle` |
 | `get_status(job_id)` | read lifecycle state and current job metadata |
+| `telemetry_detail(job_id)` | atomically read detailed telemetry and an optional candidate trace |
 | `events(job_id)` | drain retained lifecycle events |
 | `wait(job_id, timeout_seconds=...)` | block until completed, cancelled, or failed |
 | `snapshot(job_id, snapshot_revision=None)` | export a deep-copied Python solution snapshot |
@@ -114,15 +119,81 @@ The manager exposes:
 | `cancel(job_id)` | request cancellation |
 | `delete(job_id)` | remove retained job state |
 
-Treat snapshots as point-in-time Python objects.
+Treat snapshots as point-in-time Python objects. Status telemetry includes the
+active phase type, phase index, phase-local counters, and generation/evaluation
+time when a phase is active.
+
+## Candidate Tracing
+
+Candidate tracing is opt-in, bounded, and available only for retained manager
+jobs:
+
+```python
+manager = SolverManager(
+    {
+        "termination": {"seconds_spent_limit": 10},
+        "candidate_trace": {"max_entries": 256},
+    }
+)
+handle = manager.solve(schedule)
+manager.wait(handle.job_id, timeout_seconds=15)
+
+detail = manager.telemetry_detail(handle.job_id)
+trace = detail["candidate_trace"]
+```
+
+`max_entries` must be greater than zero. The format-3 trace reports canonical
+configured input, execution policy, resolved phase-plan provenance, candidate
+identities and dispositions, prefix digests, explicit completeness state, and
+truncation. The total pull count continues after the bounded identity prefix is
+full.
+
+Ordinary `get_status(...)`, `events(...)`, and `snapshot(...)` payloads do not
+clone the trace. `Solver.solve(...)` rejects `candidate_trace` because the
+synchronous API has no retained detail channel.
+
+Use `QualifiedCandidateTraceProvenance` when an external harness has already
+attested the schema, instance, initial state, core tree, and loaded build:
+
+```python
+from solverforge import QualifiedCandidateTraceProvenance
+
+provenance = QualifiedCandidateTraceProvenance(
+    schema_sha256="01" * 32,
+    instance_sha256="02" * 32,
+    initial_state_sha256="03" * 32,
+    core_tree_sha256="04" * 32,
+    build_sha256="05" * 32,
+    producer="solverforge-bench",
+)
+
+handle = manager.solve(
+    schedule,
+    qualified_candidate_trace_provenance=provenance,
+)
+```
+
+The digests are keyword-only lowercase SHA-256 strings and `producer` must be
+non-blank. Qualified provenance is accepted per job only when the manager has
+candidate tracing enabled. It is never inferred from a solution or accepted as
+ordinary serializable solver config.
 
 ## Dynamic Move Support
 
-Construction phases available to Python dynamic models include scalar
-first-fit and cheapest insertion, assignment-group first-fit and cheapest
-insertion, list cheapest insertion, list regret insertion, list Clarke-Wright,
-and list k-opt construction polish when the model supplies the hooks that the
-phase needs.
+Construction phases available to Python dynamic models include ordinary scalar
+first-fit and cheapest insertion. Assignment groups additionally support
+first-fit decreasing, weakest-fit, weakest-fit decreasing, strongest-fit, and
+strongest-fit decreasing; decreasing variants require entity order and
+weakest/strongest variants require value order. Dynamic list construction
+supports list round robin, cheapest insertion, regret insertion,
+Clarke-Wright, and k-opt polish when the model supplies the metadata bundle each
+phase requires.
+
+An explicit assignment `group_name` obeys its configured obligation and
+termination. Required-only completion belongs to upstream omitted defaults.
+Default local search is assembled only when the top-level termination has an
+effective finite limit, so an empty or invalid termination cannot create an
+unbounded solve.
 
 Scalar selectors available to Python dynamic models:
 
@@ -162,6 +233,40 @@ on the solution with `@scalar_group(...)` and `@conflict_repair(...)`.
 Assignment-aware grouped scalar construction and grouped local search consume
 `scalar_assignment_group(...)` metadata from the solution.
 
+Assignment-owned variables are excluded from raw scalar, nearby, ruin, and
+conflict-repair selectors. Their declared group is the only construction and
+local-search ownership path. Multiple declarative assignment groups can still
+compose through selector combinators.
+
+Dynamic neighborhoods are resumable cursor trees. Union children, limits,
+Cartesian branches, pillar windows, and k-opt reconnections advance only when
+the solver requests another candidate. Nearby Python callbacks may return any
+iterable; the binding consumes it once into an exact bounded top-k. Losing
+candidates are released when the forager no longer needs them, and only the
+winner crosses the ownership boundary.
+
+## Candidate Ordering
+
+Leaf selectors can use `original`, seeded `random`, `shuffled`, `sorted`, or
+`probabilistic` order. Sorted and probabilistic leaves name a candidate metric
+registered through `@candidate_metric` and
+`@planning_solution(candidate_metrics=[...])`:
+
+```toml
+[[phases]]
+type = "local_search"
+
+[phases.move_selector]
+type = "change_move_selector"
+entity_class = "Shift"
+variable_name = "employee_idx"
+selection_order = "sorted"
+selection_metric = "dispatch_cost"
+```
+
+Sorted metrics are ascending. Metric results must be finite; probabilistic
+weights must also be non-negative, and zero-weight candidates are omitted.
+
 ## Embedded UI Assets
 
 The wheel embeds shared `solverforge-ui` assets through the native bridge.
@@ -185,6 +290,12 @@ Python callbacks must be deterministic for the same solution state. The native
 extension may invoke callbacks repeatedly during scoring and search. On
 free-threaded CPython 3.14, callback code and third-party extension modules used
 inside callbacks need to be safe for the concurrency they participate in.
+
+The native working solution stores scalar, list, and candidate values by
+compiled descriptor index and shares immutable metadata across clones. Callback
+views project entity and fact collections from that Rust-owned state, so working,
+preview, and best-solution clones do not share mutable Python row objects. After
+the first full callback-view sync, only changed rows are synchronized.
 
 Callback exceptions surface as SolverForge Python exceptions with Python
 traceback context.

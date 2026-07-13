@@ -124,13 +124,13 @@ CLI scaffold plus manual hospital scheduling code.
 
 Start from the CLI's current published scaffold line, then treat the finished
 hospital app as an app-owned runtime upgrade. `solverforge-cli 2.2.2` scaffolds
-`solverforge 0.15.2`; the current hospital reference app targets the published
-`solverforge 0.17.1` runtime while keeping `solverforge-ui 0.6.5` for the
-shipped web-shell assets:
+`solverforge 0.15.2`; the tagged `solverforge-hospital@2.0.4` reference app
+targets the published `solverforge 0.18.0` runtime while keeping
+`solverforge-ui 0.6.5` for the shipped web-shell assets:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.17.1", features = [
+solverforge = { version = "0.18.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -165,13 +165,13 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.17.1"
-runtime_source = "crates.io: solverforge 0.17.1"
+target = "solverforge 0.18.0"
+runtime_source = "crates.io: solverforge 0.18.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
-default_size = "large"
-available_sizes = ["large"]
+default_size = "LARGE"
+available_sizes = ["LARGE"]
 
 [solution]
 name = "Plan"
@@ -628,10 +628,12 @@ and translates runtime events into the JSON payloads consumed by the browser.
 domain `Plan` from flattened JSON and calls normalization before the solver sees
 the schedule.
 
-`static/app/main.mjs` is the browser entrypoint. It loads `sf-config.json`,
-loads `static/generated/ui-model.json`, creates the shared `solverforge-ui`
-shell, fetches `/demo-data/LARGE`, and renders the current schedule in both
-views.
+`static/app/main.mjs` is the browser entrypoint. Its config loader reads
+`sf-config.json` and `static/generated/ui-model.json`, confirms that the
+configured `LARGE` id is present in `/demo-data`, and only then fetches
+`/demo-data/LARGE`. The entrypoint creates the shared `solverforge-ui` shell and
+renders the current schedule in both views. Snapshot analysis is fetched from
+`/jobs/{id}/analysis` only when the user requests it.
 
 The neutral scaffold has `static/app.js`; the current hospital app uses focused
 modules under `static/app/`.
@@ -707,6 +709,7 @@ make test-slow
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
+| Tagged app release               | `solverforge-hospital@2.0.4`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |
@@ -744,4 +747,5 @@ make test-slow
 - [solverforge-cli Modeling and Generation](/docs/solverforge-cli/modeling-and-generation/)
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/)
 - [Solver Phases](/docs/solverforge/solver/phases/)
+- [Python Hospital Example](/docs/solverforge-python/hospital-example/)
 - [Project Overview](/docs/overview/)

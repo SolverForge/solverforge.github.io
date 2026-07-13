@@ -15,9 +15,10 @@ SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
 EXPECTED_CLI_VERSION = "2.2.2"
 EXPECTED_CLI_RUNTIME_VERSION = "0.15.2"
 EXPECTED_FSR_APP_CLI_VERSION = "2.2.2"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.17.1"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.18.0"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
+EXPECTED_FSR_APP_VERSION = "2.0.5"
 
 def log(message)
   puts "[verify-fsr-tutorial] #{message}"
@@ -297,10 +298,11 @@ begin
   assert_file_contains(doc_page, "target = \"solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "runtime_source = \"crates.io: solverforge #{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
   assert_file_contains(doc_page, "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
+  assert_file_contains(doc_page, "solverforge-fsr@#{EXPECTED_FSR_APP_VERSION}")
   assert_file_contains(doc_page, "tokio = { version = \"1.52.3\", features = [\"full\"] }")
   assert_file_contains(doc_page, "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
-  assert_file_contains(doc_page, "default_size = \"standard\"")
-  assert_file_contains(doc_page, "available_sizes = [\"standard\"]")
+  assert_file_contains(doc_page, "default_size = \"STANDARD\"")
+  assert_file_contains(doc_page, "available_sizes = [")
   assert_file_contains(doc_page, "solverforge generate fact location")
   assert_file_contains(doc_page, "solverforge generate fact service_visit")
   assert_file_contains(doc_page, "solverforge generate fact travel_leg")
@@ -326,6 +328,9 @@ begin
   assert_file_contains(doc_page, "stock `ConstraintFactory` streams")
   assert_file_contains(doc_page, "refresh_technician_route_shadows")
   assert_file_contains(doc_page, "if_not_exists(...)")
+  assert_file_contains(doc_page, "small custom incremental constraint")
+  assert_file_contains(doc_page, "one match per duplicated visit id")
+  assert_file_contains(doc_page, "static fact catalogs")
   assert_file_contains(doc_page, "RouteStats")
   assert_file_contains(doc_page, "make ci-local")
 
@@ -346,13 +351,14 @@ begin
 
   if usecases_repo
     fsr_bundle = File.join(usecases_repo, "uc-fsr")
+    assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "version = \"#{EXPECTED_FSR_APP_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-core = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "tokio = { version = \"1.52.3\", features = [\"full\"] }")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "tower-http = { version = \"0.6.10\", features = [\"fs\", \"cors\"] }")
-    assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "default_size = \"standard\"")
+    assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "default_size = \"STANDARD\"")
     assert_file_contains(File.join(fsr_bundle, "solverforge.app.toml"), "score = \"HardSoftScore\"")
     assert_file_contains(File.join(fsr_bundle, "src/domain/technician_route.rs"), "#[planning_list_variable(element_collection = \"service_visits\")]")
     assert_file_contains(File.join(fsr_bundle, "src/domain/technician_route.rs"), "#[cascading_update_shadow_variable]")
@@ -363,6 +369,8 @@ begin
     assert_file_contains(File.join(fsr_bundle, "src/constraints/mod.rs"), "`ConstraintFactory` streams")
     assert_file_contains(File.join(fsr_bundle, "src/constraints/reachable_legs.rs"), ".technician_routes()")
     assert_file_contains(File.join(fsr_bundle, "src/constraints/assigned_visits.rs"), ".if_not_exists((")
+    assert_file_contains(File.join(fsr_bundle, "src/constraints/assigned_visits.rs"), "DuplicateAssignmentsConstraint")
+    assert_file_contains(File.join(fsr_bundle, "src/constraints/assigned_visits.rs"), "duplicate_groups")
     fail!("FSR bundle still has removed route_constraint.rs") if File.exist?(File.join(fsr_bundle, "src/constraints/route_constraint.rs"))
     fail!("FSR bundle still has removed constraints/route_metrics.rs") if File.exist?(File.join(fsr_bundle, "src/constraints/route_metrics.rs"))
     assert_file_contains(File.join(fsr_bundle, "solver.toml"), "type = \"sublist_change_move_selector\"")

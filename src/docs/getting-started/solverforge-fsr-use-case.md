@@ -51,14 +51,14 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the checked-in SolverForge 0.17.1 use-case dependency shape
+- keep the checked-in SolverForge 0.18.0 use-case dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
 - see where Bergamo OSM data becomes the travel-leg matrix used by constraints
 - see how route shadow values let stock SolverForge constraint streams score
   route-wide business rules
-- read the ten route constraints in their intended order
+- read the ten route-constraint modules in their intended order
 - use retained jobs, snapshots, analysis, SSE, and `/jobs/{id}/routes`
 - validate the app locally before publishing the Space
 
@@ -123,17 +123,17 @@ score analysis surface, route tables, Docker build, and tests.
 
 ### Keep the Published Dependency Shape
 
-The current checked-in FSR use-case source targets the published SolverForge
-0.17.1 line:
+The tagged `solverforge-fsr@2.0.5` use-case source targets the published
+SolverForge 0.18.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.17.1", features = [
+solverforge = { version = "0.18.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.17.1"
+solverforge-core = "0.18.0"
 solverforge-ui = { version = "0.6.5" }
 solverforge-maps = { version = "2.1.4" }
 
@@ -161,7 +161,7 @@ and route shadow values; most generated applications only need the top-level
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
 `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`; the finished FSR app
-records its deliberate `solverforge 0.17.1` runtime target separately:
+records its deliberate `solverforge 0.18.0` runtime target separately:
 
 ```toml
 [app]
@@ -171,13 +171,15 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.17.1"
-runtime_source = "crates.io: solverforge 0.17.1"
+target = "solverforge 0.18.0"
+runtime_source = "crates.io: solverforge 0.18.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
-default_size = "standard"
-available_sizes = ["standard"]
+default_size = "STANDARD"
+available_sizes = [
+    "STANDARD",
+]
 
 [solution]
 name = "FieldServicePlan"
@@ -390,7 +392,7 @@ travel it carries.
 ### Route Shadows Bridge Lists and Streams
 
 Several business rules need the same expensive route walk. Rather than keeping
-that walk inside a custom constraint adapter, the v0.17.1 use-case stores the
+that walk inside a custom constraint adapter, the v0.18.0 use-case stores the
 derived measurements on `TechnicianRoute` as cascading shadow variables:
 
 - invalid and valid visit counts
@@ -431,6 +433,10 @@ Open `src/data/`.
 | `bergamo_catalog.rs` | Skill, parts, location, technician, and visit-profile seed types |
 | `data_seed.rs` | Demo catalog, plan generation, road-network loading, matrix computation, and `TravelLeg` construction |
 
+The `bergamo_*.rs` modules own the static fact catalogs. `data_seed.rs` owns
+`STANDARD` plan assembly and routing preparation, so catalog data does not
+drift into the mutable planning model.
+
 `DemoData::Standard` builds 48 service visits by cycling the visit profiles
 across the Bergamo service locations. `prepare_routing()` then:
 
@@ -463,7 +469,7 @@ Soft score records route quality and dispatcher preference:
 - lower road travel time and distance
 - balanced workload
 - familiar territory
-- slack for high-priority visits
+- deadline slack weighted by visit priority
 
 A plan with `0hard/-420soft` is feasible on the hard rules and better than
 `0hard/-600soft`, because both satisfy hard constraints and the first loses
@@ -475,10 +481,13 @@ less soft score.
 
 Open `src/constraints/`.
 
-`create_constraints()` assembles ten rules:
+`create_constraints()` assembles ten business-rule modules. The
+`assigned_visits` module expands into separate missing, duplicate, and invalid
+assignment constraints so each failure mode keeps its own score-analysis
+identity:
 
-| Constraint | Type | Purpose |
-| ---------- | ---- | ------- |
+| Constraint module | Type | Purpose |
+| ----------------- | ---- | ------- |
 | `assigned_visits` | Hard | Penalizes unassigned, duplicate, or invalid visit indexes |
 | `reachable_legs` | Hard | Penalizes depot-to-visit, visit-to-visit, and visit-to-depot legs that cannot be routed |
 | `required_skills` | Hard | Penalizes visits assigned to technicians without the required skill mask |
@@ -490,17 +499,20 @@ Open `src/constraints/`.
 | `territory_affinity` | Soft | Rewards visits inside the technician's territory |
 | `priority_slack` | Soft | Rewards high-priority visits served with slack before the deadline |
 
-`assigned_visits` is the cross-route coverage rule. It streams
-`service_visits()`, flattens `TechnicianRoute.visits`, and uses
-`if_not_exists(...)` to penalize service visits that do not appear in any route.
+`assigned_visits` is a three-part cross-route coverage contract. Missing visits
+use a stock `service_visits()` stream, flattened `TechnicianRoute.visits`, and
+`if_not_exists(...)`. Invalid indexes use a stock route-shadow stream. Exact
+duplicate counts use a small custom incremental constraint because a grouped
+stream would count singleton groups as analysis matches. One extra occurrence
+costs one hard point, while analysis reports one match per duplicated visit id.
 
-The other nine rules stream `technician_routes()` and score the route shadow
+The other nine modules stream `technician_routes()` and score the route shadow
 values refreshed by `FieldServicePlan`. For example, `reachable_legs` reads
 `route.reachability_violations()`, `required_skills` reads
 `route_missing_skill_visits`, `minimize_travel` reads `travel_penalty()`, and
 `priority_slack` rewards `route_priority_slack`.
 
-That is the v0.17.1 teaching point: whole-route business measurements can live
+That is the v0.18.0 teaching point: whole-route business measurements can live
 as domain shadow values, while the scoring rules remain stock SolverForge
 constraint streams with normal score-analysis metadata.
 
@@ -686,6 +698,7 @@ curl http://localhost:7860/demo-data
 
 | Topic | File |
 | ----- | ---- |
+| Tagged app release | `solverforge-fsr@2.0.5` |
 | App contract | `solverforge.app.toml` |
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |

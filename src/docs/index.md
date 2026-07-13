@@ -24,7 +24,7 @@ Current release, published package status, runtime surface, and roadmap.
 Start with the CLI shell, then continue into a complete hospital, lessons, deliveries, or field-service use case.
   <% end %>
   <%= render Ui::Card.new(title: "Python", href: relative_url('/docs/solverforge-python/'), icon: "fa-solid fa-code") do %>
-Write Python models with decorators and callbacks, then run the native SolverForge engine from PyPI or the tagged source line.
+Write Python models with explicit decorators, metadata, and callbacks, then compile them into the native SolverForge runtime from PyPI or the tagged source line.
   <% end %>
 </div>
 
