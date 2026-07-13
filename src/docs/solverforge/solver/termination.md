@@ -74,6 +74,12 @@ late_acceptance_size = 400
 unimproved_step_count_limit = 10000
 ```
 
+An explicit phase's termination counters start at that top-level phase boundary
+and are removed before the next phase begins. Score and unimproved limits observe
+committed step scores at the same boundary. Mandatory omitted construction does
+not install a phase-local overlay, so required completion remains governed by
+the retained lifecycle rather than an accidental internal cutoff.
+
 ## Programmatic Termination
 
 Use `SolverManager::cancel(job_id)` to stop a retained job from code:
@@ -90,6 +96,11 @@ MANAGER.cancel(job_id).expect("cancel should be accepted");
 Configured limits still terminate through the normal solver path. In that case
 the terminal event is `SolverEvent::Completed` and the terminal reason is
 `SolverTerminalReason::TerminatedByConfig`.
+
+Pause, cancellation, and config termination are polled inside large candidate
+work and around phase and terminal hooks. Paused time is removed from the active
+solve and phase timers, so resuming continues the remaining configured budget
+instead of charging the paused interval.
 
 ## See Also
 

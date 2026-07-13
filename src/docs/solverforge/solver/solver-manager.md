@@ -47,6 +47,11 @@ moves, score delta, and hard feasibility before and after the move. Any
 displayed `moves/s` value is derived at the edge rather than stored as the
 canonical runtime metric.
 
+`PhaseTelemetry` identifies the active phase and its local elapsed, step, move,
+score-calculation, generation-time, and evaluation-time counters. A generated
+count means a candidate was actually yielded to the engine; it does not include
+an unrequested logical tail after a cursor or forager short-circuits.
+
 Consume them in a loop:
 
 ```rust
@@ -115,6 +120,29 @@ The event variants are:
 - `Cancelled` — the job was explicitly cancelled
 - `Failed` — the runtime aborted with an error
 
+## Candidate Trace Diagnostics
+
+Set `[candidate_trace].max_entries` in `solver.toml` to retain a bounded ordered
+prefix of candidates pulled by the engine. A trace records the canonical config,
+resolved phase plan and execution policy, source/phase/step coordinates, logical
+operation identity, and ordered disposition changes such as interruption,
+evaluation, rejection, selection, and application. Truncation, incomplete
+identity, and provenance status are explicit; a digest alone is not proof of a
+complete or qualified run.
+
+Routine `SolverEvent` metadata, `get_status(...)`, and snapshots intentionally
+leave `telemetry.candidate_trace` empty. Candidate traces can be much larger than
+aggregate counters, so request one atomically with
+`get_telemetry_detail(job_id)`. The returned `SolverTelemetryDetail` pairs its
+optional trace with a `SolverStatus` from the same publication instant,
+including the exact score and latest snapshot revision. This prevents a caller
+from combining a trace from one progress publication with counters from another.
+
+Advanced benchmark or bridge callers can submit externally validated trace
+provenance through `solve_with_qualified_candidate_trace_provenance(...)`.
+Qualification changes only the diagnostic header; it does not select a
+different runner or lifecycle.
+
 ## Solver Status
 
 Check the current state of a job:
@@ -164,9 +192,11 @@ retains a checkpoint-backed snapshot, emits `Paused`, and only then allows
 `resume()`.
 
 The built-in construction, local-search, and retained phase flow poll control
-state during large neighborhood work aggressively enough that `pause()`,
-`cancel()`, and config termination unwind promptly without extra watchdog code
-in the application.
+state inside large candidate work and again around phase and terminal hooks.
+Pending pause or cancellation cannot be overwritten by ordinary default
+completion. Long-running work emits metadata-only phase pulses, paused time is
+excluded from active phase elapsed telemetry, and `pause()`, `cancel()`, or
+config termination unwind without app-side watchdog code.
 
 ## Snapshots and Analysis
 

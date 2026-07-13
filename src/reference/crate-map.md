@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the `solverforge 0.17.2` crate and current
+This map is aligned with the published `solverforge 0.18.0` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -28,14 +28,16 @@ complements, symmetric and directed projected self-joins, projected grouped
 complements, score weight helpers such as `fixed_weight` and `hard_weight`,
 collector helpers such as `count`, `sum`, `load_balance`, `consecutive_runs`,
 `collect_vec`, and `indexed_presence`, plus advanced grouped-scalar assignment,
-conflict-repair extension types, move-label telemetry, bounded applied-move
-traces, and CVRP profile helpers such as `domain = "cvrp"`, `route_hooks`,
+conflict-repair extension types, phase and move-label telemetry, bounded
+applied-move and candidate-pull traces, candidate-trace provenance types, and
+CVRP profile helpers such as `domain = "cvrp"`, `route_hooks`,
 `savings_hooks`, `savings_metric_class`, `route_distance`, `route_feasible`, and
 `savings_feasible`. The lower-level solver crate also exposes dynamic
 construction names such as `GroupedScalarCursor`, `GroupedScalarSelector`,
 `ScalarAssignmentMoveCursor`, `ScalarAssignmentMoveOptions`, and
-`ScalarAssignmentRequiredStreamingCursor` for integrations that intentionally
-assemble construction streams outside the facade. That keeps app code on
+`ScalarAssignmentRequiredStreamingCursor`, plus immutable runtime model,
+provider, and candidate-metric registries for integrations that intentionally
+assemble runtime declarations outside the facade. That keeps app code on
 `solverforge` unless it needs to implement lower-level solver internals
 directly.
 
@@ -44,12 +46,12 @@ directly.
 | Crate                 | Owns                                                                     | Reach for it when...                                                           |
 | --------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
 | `solverforge`         | the public facade and re-exports                                         | you are building an app and want the normal public API                         |
-| `solverforge-core`    | score types, descriptors, domain traits                                  | you are extending lower-level abstractions or implementing core-facing helpers |
+| `solverforge-core`    | score types, descriptors, domain traits, and dynamic capability contracts | you are extending lower-level abstractions or implementing core-facing helpers |
 | `solverforge-macros`  | `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]`, `#[solverforge_constraints]` | you need derive behavior, model glue, or constraint-function compilation |
 | `solverforge-scoring` | constraint streams, incremental scoring, and shared grouped node state    | you are working directly on scoring internals or advanced scoring extensions   |
-| `solverforge-config`  | TOML/YAML config parsing, selector config, acceptor config, and builders | you need direct config construction or parsing outside the stock solve path    |
-| `solverforge-solver`  | phases, move selectors, acceptors, retained lifecycle, and telemetry     | you are building custom runtime behavior beyond facade-level use               |
-| `solverforge-bridge`  | dynamic host-language binding contracts, logical IDs, dynamic scores, and dynamic slots | you are implementing or maintaining a binding layer |
+| `solverforge-config`  | TOML/YAML parsing, resolved selector policy, candidate-trace config, acceptors, and builders | you need direct config construction or parsing outside the stock solve path    |
+| `solverforge-solver`  | runtime compiler, phases, cursor selectors, retained lifecycle, and telemetry | you are building custom runtime behavior beyond facade-level use               |
+| `solverforge-bridge`  | dynamic binding contracts, logical IDs, scores, explicit slot capabilities, and the compiled runner | you are implementing or maintaining a binding layer |
 | `solverforge-console` | tracing-driven console output                                            | you want the standard terminal UX or progress formatting                       |
 | `solverforge-cvrp`    | CVRP-specific helpers and distance utilities                             | your problem is route-centric and the domain benefits from these helpers       |
 

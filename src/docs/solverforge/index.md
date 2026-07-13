@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.17.2` crate and current release
+These pages track the `solverforge 0.18.0` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the published `solverforge-cli 2.2.2` package scaffolds
 `solverforge 0.15.2`, so check `solverforge --version` when starting from a
@@ -33,24 +33,54 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.17.2` crate declares Rust `1.95`.
+The `0.18.0` workspace declares Rust `1.95`.
 
-The generated runtime now builds one `RuntimeModel` for each planning model.
-Scalar metadata is resolved by descriptor index and variable name, not by Rust
-module declaration order. Generic `FirstFit` and `CheapestInsertion` use the
-canonical construction engine whenever matching list work is present, while pure
-scalar matches reuse the descriptor boundary. Assignment-backed grouped scalar
-construction can cover required nullable scalar slots through
+The generated runtime resolves one value-owned `RuntimeModel` for each planning
+model, then compiles construction stages, selector trees, providers, stable
+list-source identities, and defaults into one immutable search graph. Native
+Rust models and dynamic bridge models use that same compile-and-execute
+lifecycle. Scalar metadata is resolved by descriptor index and variable name,
+not Rust module declaration order; invalid declarations fail before candidate
+work rather than falling through to a parallel builder path.
+
+Generic `FirstFit` and `CheapestInsertion` use the compiled graph's
+descriptor-placement schedule for scalar-only targets and its declaration-order
+global scan for matching mixed/list work. Assignment-backed grouped scalar
+construction covers required nullable scalar slots through
 `ScalarGroup::assignment(...)`, and optional scalar variables keep `None` when
 it is the best legal baseline unless configuration asks construction to assign
 whenever a candidate exists.
 
-Startup telemetry is shape-aware in the current release: scalar solves report
-average `candidates`, list solves report element counts, and console output
-labels those solve shapes as `candidates` or `elements`.
+Startup telemetry is shape-aware: scalar solves report average `candidates`,
+list solves report element counts, and console output labels those solve shapes
+as `candidates` or `elements`. Retained telemetry also identifies the active
+phase and keeps its local elapsed/work counters separate from whole-solve totals.
 
 The current release tightens several public contracts:
 
+- macro-generated and dynamic solves both enter the same runtime compiler;
+  public build failures distinguish declaration, compilation, phase
+  preparation, and phase execution without exposing private graph types
+- runtime variable slots, list element sources, native/host compound providers,
+  and optional candidate metrics are resolved once and frozen for the solve.
+  Specialized list construction uses stable source keys rather than payload
+  equality or hash recovery
+- local-search config now models leaf `selection_order`, registered
+  `selection_metric` values for sorted/probabilistic ordering, weighted union
+  scheduling, and seeded score tie-breaking. Omitted multi-family unions use
+  `stratified_random`; omitted leaf order uses seeded `random`
+- dynamic bridges declare scalar-assignment metadata plus list mutation and
+  metadata capabilities explicitly. Missing required operations, descriptor
+  bindings, legal values, or route/precedence bundles fail during binding or
+  graph compilation
+- `[candidate_trace]` enables a bounded ordered prefix of candidates actually
+  pulled by the engine, including the canonical config, resolved phase plan,
+  execution policy, logical operation identity, and disposition transitions.
+  Detailed traces are fetched explicitly with
+  `SolverManager::get_telemetry_detail(...)`
+- pause and cancellation settle at phase and terminal-hook boundaries as well
+  as inside long-running work; paused time does not consume active phase timing,
+  and pending control cannot be overwritten by default completion
 - `#[solverforge_constraints]` is the canonical constraint-function attribute
   when a function reuses grouped streams. Reused same-binding grouped streams
   and syntax-proved identical grouped chains share one retained node while each
@@ -80,8 +110,9 @@ The current release tightens several public contracts:
   `SolverConfigOverride`, and related enums are available directly from
   `solverforge`
 - `solverforge::bridge` re-exports host-language binding contracts for logical
-  entity/fact/variable IDs, dynamic score families, and descriptor-resolved
-  dynamic scalar/list slots
+  entity/fact/variable IDs, dynamic score families, descriptor-resolved dynamic
+  scalar/list slots, explicit list access/metadata capabilities, and dynamic
+  scalar-assignment metadata
 - projected scoring rows use `Projection` / `ProjectionSink` for bounded
   single-source rows, and cross joins can either group joined pairs directly
   with `.group_by(|left, right| key, collector)` or retain one scoring row per
@@ -106,11 +137,13 @@ The current release tightens several public contracts:
 - nearby scalar neighborhoods are bounded model capabilities through
   `nearby_value_candidates` and `nearby_entity_candidates`; distance meters rank
   or filter those candidates, but do not discover them
-- default local-search neighborhoods are explicit streaming defaults: nearby
-  scalar selectors when hooks exist, scalar change/swap fallbacks for
-  non-assignment-owned slots, list nearby-change, nearby-swap, sublist,
-  reverse, optional k-opt/list-ruin when hooks exist, and grouped-scalar or
-  conflict-repair selectors only when the model declares them
+- default local-search neighborhoods are capability-matched streaming defaults:
+  nearby scalar selectors before plain change/swap fallbacks for
+  non-assignment-owned slots; precedence plus permutation for fully capable list
+  slots; nearby list change/swap when a cross-position metric exists and plain
+  change/swap otherwise; capability-gated sublist, reverse, and k-opt; list ruin
+  for bound list slots; and grouped-scalar or conflict-repair selectors only
+  when the model declares them
 - assignment-backed grouped scalar search includes bounded value-window swaps,
   longer window swaps, same-sequence run-gap swaps, block reassignments,
   optional run releases, and value rotations without weakening the assignment
@@ -145,8 +178,10 @@ The current release tightens several public contracts:
   instead of loading arbitrary runtime classes
 - retained telemetry preserves exact generated, evaluated, accepted,
   not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-  construction-slot, move-label, and bounded applied-move trace counters plus
-  generation and evaluation durations; `moves/s` is only a display metric
+  construction-slot, active-phase, move-label, and bounded applied-move counters
+  plus generation and evaluation durations. `moves_generated` counts candidates
+  actually yielded, not an unrequested logical tail; `moves/s` is only a display
+  metric
 
 ## Minimal Example
 
@@ -235,8 +270,8 @@ fn main() {
 
 Full published API documentation is available on
 [docs.rs/solverforge](https://docs.rs/solverforge). docs.rs can briefly lag the
-crate registry after a release; the `0.17.2` crate is the source of truth once
-crates.io has accepted the package. Source-line API maps for the local
+crate registry after a release; the `0.18.0` crate is the package source of
+truth now that crates.io has accepted it. Source-line API maps for the local
 workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections

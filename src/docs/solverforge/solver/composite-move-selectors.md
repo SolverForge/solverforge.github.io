@@ -3,19 +3,20 @@ title: "Composite Move Selectors"
 linkTitle: "Composite Selectors"
 weight: 36
 description: >
-  Move storage, selector composition, limits, and lower-level building blocks.
+  Candidate ownership, selector composition, limits, and lower-level building blocks.
 ---
 
 Composite selectors combine or constrain other selectors. Use them when one
 selector family is not enough, or when a broad selector needs an explicit cap.
 
-## Move Storage
+## Candidate Ownership
 
-SolverForge stores generated moves in a `MoveArena` during a selector step.
-Selectors expose cursor-scoped candidates so search phases can evaluate borrowed
-candidates and materialize ownership only for the selected winner. This is what
-keeps cartesian and composite neighborhoods preview-safe without cloning large
-move payloads.
+Selectors expose cursor-scoped candidates with stable candidate IDs. Search
+phases evaluate borrowed candidates, release losers promptly, and transfer only
+the selected winner by value. `MoveArena` remains a reusable-capacity owner for
+the concrete APIs and composite storage that need it; it is not the universal
+runtime owner for every selector step. This keeps cartesian and union execution
+preview-safe without cloning large move payloads.
 
 ## `union_move_selector`
 
@@ -25,7 +26,8 @@ each child selector according to `selection_order`.
 ```toml
 [phases.move_selector]
 type = "union_move_selector"
-selection_order = "round_robin"
+selection_order = "stratified_random"
+weighting = "equal"
 
 [[phases.move_selector.selectors]]
 type = "change_move_selector"
@@ -37,7 +39,15 @@ variable_name = "employee_idx"
 ```
 
 Use union when the solver should search several independent neighborhoods in
-one local-search phase.
+one local-search phase. Available union orders are `sequential`, `round_robin`,
+`rotating_round_robin`, `random`, and the default `stratified_random`. Child
+weights can be `equal`, `fixed` through a parallel `weights` vector, or derived
+from `candidate_count`.
+
+Union scheduling and leaf candidate ordering are separate policies. Each leaf
+can preserve `original` order, use seeded `random` or `shuffled` order, or use a
+registered `selection_metric` for `sorted` / `probabilistic` ordering. The
+runtime compiler resolves and freezes both layers before the phase starts.
 
 ## `cartesian_product_move_selector`
 
@@ -100,8 +110,10 @@ config.
 ### Descriptor Scalar Selectors
 
 Descriptor scalar selectors target variables through model descriptors rather
-than hand-written field access. They are the explicit descriptor engine used by
-generated scalar runtime paths.
+than hand-written field access. They remain a standalone opt-in selector API.
+Generated and dynamic configured solves use the immutable runtime compiler;
+descriptor selectors do not create a second construction or configured-search
+engine.
 
 ### Selector Decorators
 

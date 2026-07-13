@@ -10,6 +10,16 @@ List selectors operate on ordered list planning variables. They are the normal
 surface for vehicle routing, machine sequences, visit ordering, task queues,
 and other domains where position matters.
 
+The runtime compiler validates the required list operations and metadata before
+the phase starts. Dynamic lists declare set, whole-row replace, reverse, and
+atomic sublist capabilities explicitly; an absent operation rejects a selector
+that needs it instead of being emulated from weaker mutations. Route,
+precedence, distance, ownership, and savings bundles are validated the same way.
+
+Every concrete leaf can also choose `original`, seeded `random`, `shuffled`,
+`sorted`, or `probabilistic` order. Sorted and probabilistic leaves require a
+registered named candidate metric; omitted stock leaves use seeded random order.
+
 ## Baseline Route Selectors
 
 For most route or sequence models, start with nearby relocation, nearby swap,

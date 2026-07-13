@@ -42,13 +42,18 @@ The stock generated solve path loads `solver.toml` automatically from the
 current working directory. `solverforge-config` also exposes parsing APIs when
 you want to inspect or construct configs directly.
 
-The current release uses one `RuntimeModel` per planning model. Generic
-construction heuristics share that model for mixed/list-bearing work, while
-pure scalar construction uses the descriptor boundary. Local search uses
-explicit streaming defaults when `move_selector` is omitted, and scalar
-candidate limits, assignment-backed grouped scalar selectors, conflict repair
-selectors, list permutation, precedence-list selectors, and score-level
-simulated annealing are expressed in `solver.toml`.
+The current release resolves one `RuntimeModel` per planning model and compiles
+it into one immutable graph before solving. Native, dynamic, scalar-only,
+list-only, and mixed models share that graph compiler. Generic construction,
+configured selector trees, provider registries, stable list sources, and
+model-aware defaults are validated once; there is no parallel descriptor phase
+builder or fallback runtime path.
+
+Local search uses capability-matched streaming defaults when `move_selector` is
+omitted. Scalar candidate limits, assignment-backed grouped scalar selectors,
+conflict repair, list permutation and precedence repair, per-leaf ordering,
+weighted unions, seeded score ties, candidate tracing, and score-level simulated
+annealing are expressed in `solver.toml`.
 
 The facade exports the configuration surface directly from
 `solverforge`, including `SolverConfig`, `PhaseConfig`, `MoveSelectorConfig`,
@@ -70,18 +75,20 @@ inspect `SolverStatus`, and fetch or analyze retained snapshots by
 `snapshot_revision`.
 
 Retained telemetry carries exact generated, evaluated, accepted, not-doable,
-acceptor-rejected, forager-ignored, hard-delta, conflict-repair, and
-construction-slot counters plus generation and evaluation durations. The
-current runtime also carries per-move-label telemetry and a bounded applied-move trace
-with selected candidate index, per-step candidate counts, score delta, and
-hard-feasibility before/after. User-facing rates such as `moves/s` are
+acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
+construction-slot, and active-phase counters plus generation and evaluation
+durations. The runtime also carries per-move-label telemetry and a bounded
+applied-move trace with selected candidate index, per-step candidate counts,
+score delta, and hard-feasibility before/after. Opt-in candidate-pull traces add
+canonical plan, policy, input, identity, and disposition provenance and are read
+through `get_telemetry_detail(...)`. User-facing rates such as `moves/s` remain
 display-only derived values.
 
 ## Sections
 
-- **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, `solver.toml`, and YAML parsing
-- **[Construction](/docs/solverforge/solver/construction/)** — construction heuristics, nullable obligations, and grouped scalar construction
-- **[Local Search](/docs/solverforge/solver/local-search/)** — acceptors, foragers, selectors, and score-level annealing
+- **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, selector policy, candidate tracing, `solver.toml`, and YAML parsing
+- **[Construction](/docs/solverforge/solver/construction/)** — construction heuristics, nullable obligations, grouped scalar construction, and stable list sources
+- **[Local Search](/docs/solverforge/solver/local-search/)** — acceptors, foragers, selector ordering, union weighting, and score-level annealing
 - **[Phases](/docs/solverforge/solver/phases/)** — Construction heuristic, local search, VND, typed exact search, and partitioned search
 - **[Moves](/docs/solverforge/solver/moves/)** — selector-family guide with scalar, list, and composite subsections
 - **[Termination](/docs/solverforge/solver/termination/)** — When to stop solving

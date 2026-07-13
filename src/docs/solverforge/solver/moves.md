@@ -30,6 +30,11 @@ All selector `entity_class` and `variable_name` fields are optional target
 filters. When omitted, the selector uses every compatible variable. When set,
 they match canonical model descriptor names, not local Rust aliases.
 
+SolverForge compiles the complete selector tree before solving. Leaf order,
+candidate metrics, union scheduling and weighting, cartesian preview order,
+target capabilities, and score tie policy are resolved once; invalid
+combinations fail at their config path instead of during a candidate loop.
+
 ## Selector Families
 
 <div class="card-grid">
@@ -40,7 +45,7 @@ Assignment, swap, nearby, pillar, ruin/recreate, grouped scalar assignment, and 
 Route and sequence selectors: list change, list swap, permute, precedence, sublist, reverse, K-opt, and list ruin.
   <% end %>
   <%= render Ui::Card.new(title: "Composite Selectors", href: relative_url('/docs/solverforge/solver/composite-move-selectors/'), icon: "fa-solid fa-layer-group") do %>
-Move storage, union, cartesian, limited neighborhoods, and lower-level building blocks.
+Candidate ownership, union scheduling, cartesian composition, limited neighborhoods, and lower-level building blocks.
   <% end %>
 </div>
 

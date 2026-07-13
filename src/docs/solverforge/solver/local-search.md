@@ -86,7 +86,8 @@ Move selection lives under `[phases.move_selector]`.
 ```toml
 [phases.move_selector]
 type = "union_move_selector"
-selection_order = "round_robin"
+selection_order = "stratified_random"
+weighting = "equal"
 
 [[phases.move_selector.selectors]]
 type = "change_move_selector"
@@ -99,9 +100,17 @@ type = "swap_move_selector"
 For selector details, start with [Moves](/docs/solverforge/solver/moves/).
 
 Union selectors can use `sequential`, `round_robin`,
-`rotating_round_robin`, or `stratified_random` selection order. The current
-stock defaults use fair ordering for broad unions so no child neighborhood owns
-the prefix indefinitely.
+`rotating_round_robin`, `random`, or `stratified_random` selection order.
+`stratified_random` is the default. Union scheduling can weight children
+equally, by an explicit fixed vector, or by declared candidate count.
+
+Leaf selectors separately support `original`, seeded `random`, `shuffled`,
+`sorted`, and `probabilistic` ordering. Sorted and probabilistic leaves require
+a registered named candidate metric. Omitted stock local search uses randomized
+leaves; a multi-family default uses a stratified-random union, while a single
+family uses sequential union order. The phase's seeded `score_tie_break`
+defaults to `random`; choose `first` only when first-equal behavior is part of
+the intended policy.
 
 Assignment-backed grouped scalar selectors are regular local-search selectors.
 Use them when a model-owned `ScalarGroup::assignment(...)` should repair
@@ -121,7 +130,9 @@ require_hard_improvement = true
 
 Retained status and events preserve exact generated, evaluated, accepted,
 not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-and construction-slot counters plus generation and evaluation durations.
+construction-slot, and active-phase counters plus generation and evaluation
+durations. `moves_generated` counts candidates actually yielded to the engine;
+it does not claim the unrequested tail of a short-circuited cursor.
 Per-move-label telemetry reports generated, evaluated, accepted, applied,
 not-doable, acceptor-rejected, forager-ignored, score-improving, score-equal,
 score-worse, rejected-improving, and applied score-improvement totals. The
@@ -129,6 +140,12 @@ bounded applied-move trace records the selected candidate index, per-step
 generated/evaluated/accepted/ignored counts, score delta, and hard feasibility
 before and after the applied move. Displayed `moves/s` is a human-facing
 derived value.
+
+When `[candidate_trace]` is enabled, SolverForge also retains a bounded ordered
+prefix of actual pulls with canonical plan/policy/input headers, logical
+operation identities, and disposition transitions. Fetch that large diagnostic
+payload explicitly with `SolverManager::get_telemetry_detail(...)`; routine
+progress events and snapshots intentionally omit it.
 
 ## Variable Neighborhood Descent
 

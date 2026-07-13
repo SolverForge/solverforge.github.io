@@ -35,14 +35,17 @@ well-tested retained runtime path.
 
 If `move_selector` is omitted, the stock runtime stays intentionally narrow:
 
-- scalar-only models default to `ChangeMoveSelector`
-  plus `SwapMoveSelector`
-- list-only models default to `NearbyListChangeMoveSelector(20)`,
-  `NearbyListSwapMoveSelector(20)`, `SublistChangeMoveSelector`,
-  `SublistSwapMoveSelector`, and `ListReverseMoveSelector`, with k-opt, list
-  ruin, list permutation, and precedence-list support enabled only when their
-  hooks or model metadata make them applicable
-- mixed models use the list defaults first, then scalar defaults
+- scalar slots with nearby value/entity sources receive targeted nearby
+  change/swap first; every non-assignment-owned slot still receives targeted
+  plain change/swap fallbacks
+- list slots with a cross-position metric receive nearby change and, when set
+  access exists, nearby swap; slots without that metric receive the plain
+  variants. Sublist, reverse, k-opt, permutation, and precedence repair are
+  capability-gated, while every bound list slot receives list ruin
+- mixed models declare list families first, then nearby scalar, grouped scalar,
+  compound conflict repair, and ordinary scalar families
+- omitted leaves use seeded random order; multiple families use a
+  stratified-random union and a single family uses sequential union order
 
 Assignment-owned scalar variables stay on their grouped scalar selector path.
 Plain scalar defaults and conflict-repair defaults exclude slots owned by an
@@ -59,6 +62,9 @@ search policy you are expressing.
 | construction phase choice             | initial feasibility and seed quality                          |
 | local search acceptor                 | exploration vs greediness                                     |
 | move selector choice                  | neighborhood breadth and cost                                 |
+| leaf order / candidate metric         | original, random, shuffled, sorted, or probabilistic pulls     |
+| union order / weighting               | how independent child neighborhoods share candidate pulls     |
+| score tie-break                       | seeded random or first-equal best-candidate choice             |
 | accepted-count `limit`                | finite accepted-candidate horizon for one selector step |
 | `value_candidate_limit`               | bounded scalar value generation for selectors that support it |
 | termination limits                    | wall time, unimproved steps, or best-score goals              |
@@ -98,9 +104,14 @@ That means:
   and construction-slot counters belong there too
 - selector telemetry carries stable selector indexes and labels for
   local-search and VND diagnosis
+- active-phase telemetry carries its own elapsed, step, move, score-calculation,
+  generation, and evaluation counters
 - generation and evaluation durations stay exact in the event stream
 - move-label telemetry and the bounded applied-move trace belong to runtime
   diagnostics, not benchmark-only instrumentation
+- optional candidate-pull traces carry canonical execution plan/policy/input
+  identity and dispositions; retrieve them through `get_telemetry_detail(...)`
+  instead of bloating ordinary events and snapshots
 - `moves/s` is a display-only derived metric at the UI edge
 - pause, resume, snapshot fetch, and analysis should use the retained
   `SolverManager` contract rather than ad-hoc channels

@@ -64,6 +64,13 @@ Scalar runtime metadata is descriptor-addressed. The generated compact
 hook attachment and ordering use the descriptor index plus variable name. That
 means Rust module declaration order is not a modeling contract.
 
+At solve time, the generated model becomes one value-owned `RuntimeModel` plus
+a typed search declaration. SolverForge resolves descriptor targets, stable list
+sources, scalar/list capabilities, groups, providers, and config into an
+immutable graph before the first phase runs. The macro path therefore uses the
+same compiled lifecycle as dynamic bridge models without moving schema discovery
+into candidate loops.
+
 ## Sections
 
 - **[Planning Solutions](/docs/solverforge/modeling/planning-solutions/)** — The top-level container struct

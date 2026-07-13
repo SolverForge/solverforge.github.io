@@ -156,6 +156,20 @@ hooks expose element durations and fixed successor arcs to the stock
 `ListPrecedenceMakespanConstraint` and `list_precedence_move_selector`; they do
 not introduce a benchmark-specific adapter or a new public selector trait.
 
+## Stable Element Source Identity
+
+Generated `usize` list models bind declared elements by a stable source key.
+Construction uses that identity for declaration order, ownership, precedence,
+candidate tracing, and static/dynamic parity; it does not fall back to payload
+equality or hashing. Duplicate declarations, unknown or duplicate assigned
+values, and inconsistent precedence successors fail when the reached
+construction node binds its source.
+
+If you build specialized list phases through lower-level APIs, supply the
+required `element_source_key` explicitly. Multiple phases targeting the same
+slot reuse the frozen declaration binding but refresh current assignments before
+each phase, so later construction cannot reinsert work committed earlier.
+
 ## Shadow Updates
 
 Advanced predecessor, successor, inverse, and aggregate updates are configured
@@ -174,6 +188,12 @@ Generated public list mutation helpers such as `list_len_static()`,
 model API in the current release. Keep application code on the public modeling,
 constraint-stream, descriptor, solver, and configuration APIs instead of
 calling hidden runtime operations directly.
+
+The generated model publishes typed slot declarations to the runtime compiler.
+The compiler validates access operations, distance/route/precedence bundles,
+stable sources, and configured selector requirements once, then freezes the
+result for the solve. Dynamic binding models declare the corresponding list
+access and metadata capability bundles explicitly and enter the same graph.
 
 For constraints over list-owner entities, start from the generated solution
 source method and let the stream API preserve source ownership. The vehicle

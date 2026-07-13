@@ -30,10 +30,12 @@ right SolverForge annotation or structure.
 | list variable   | order or insertion position matters | a vehicle route or task sequence       |
 | model with both | both assignment and ordering matter | route planning with assigned operators |
 
-The current runtime builds one `RuntimeModel` per planning model, so mixed
-models are first-class. Generic `FirstFit` and `CheapestInsertion` already
-handle matching list work, while specialized list heuristics stay explicit
-opt-in phases.
+The current runtime resolves one `RuntimeModel` per planning model, then
+validates and freezes construction, selector, provider, and source bindings into
+one immutable search graph before solving. Scalar-only, list-only, mixed, and
+dynamic models therefore use the same compiled lifecycle. Generic `FirstFit`
+and `CheapestInsertion` handle matching list work, while specialized list
+heuristics remain explicit opt-in phases.
 
 ## Fast rules of thumb
 

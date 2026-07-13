@@ -13,7 +13,7 @@ public dependency when it needs to inspect or build configs directly.
 
 ```rust
 use solverforge::{
-    AcceptorConfig, ForagerConfig, MoveSelectorConfig, PhaseConfig,
+    AcceptorConfig, CandidateTraceConfig, ForagerConfig, MoveSelectorConfig, PhaseConfig,
     SolverConfig, SolverConfigOverride,
 };
 ```
@@ -22,15 +22,20 @@ Configuration has three levels:
 
 | Level | Scope | Typical owner |
 | ----- | ----- | ------------- |
-| Global config | environment mode, random seed, thread count, top-level termination | app/operator |
-| Phase config | construction, local search, VND via `local_search_type`, partitioned search, custom phase names, phase-specific termination | app/operator |
-| Model hooks | candidate providers, nearby hooks, construction order keys, scalar groups | Rust domain model |
+| Global config | environment mode, random seed, thread count, top-level termination, candidate tracing | app/operator |
+| Phase config | construction, local search, score ties, VND via `local_search_type`, partitioned search, custom phase names, phase-specific termination | app/operator |
+| Model capabilities | candidate providers and metrics, nearby hooks, list operations/metadata, construction order keys, scalar groups | Rust model or binding |
 
 The important rule is that config selects declared capabilities. It does not
 invent model hooks. If a selector asks for nearby scalar candidates, grouped
 scalar candidates, assignment-backed scalar groups, or conflict repair
 providers, the model must expose those capabilities through the generated model
 support layer.
+
+SolverForge 0.18.0 compiles the complete resolved policy before solving. A bad
+target, missing operation bundle, unknown provider or metric, invalid selector
+composition, or inconsistent construction source is a build error at its config
+path; the runtime does not defer schema discovery until a hot candidate loop.
 
 ## Loading Configuration
 
@@ -149,6 +154,27 @@ Set a fixed seed when you want reproducible runs:
 random_seed = 42
 ```
 
+### Candidate Trace
+
+Candidate tracing is an opt-in diagnostic surface. It records a bounded ordered
+prefix at the engine candidate-pull boundary:
+
+```toml
+[candidate_trace]
+max_entries = 4096
+```
+
+Each retained pull can carry its phase and step, selector/source index, logical
+operation identity, construction target, and ordered disposition transitions
+such as evaluated, rejected, selected, and applied. The header owns canonical
+config, execution policy, resolved phase plan, and optional externally attested
+input/qualification provenance. `max_entries` must be nonzero; truncation is
+reported explicitly.
+
+Ordinary events, status, and snapshots stay compact. Read the trace together
+with the exact aggregate publication using
+`SolverManager::get_telemetry_detail(job_id)`.
+
 ### Phases
 
 Phases run in sequence. A typical configuration uses a construction heuristic
@@ -161,6 +187,7 @@ construction_heuristic_type = "first_fit"
 
 [[phases]]
 type = "local_search"
+score_tie_break = "random"
 [phases.acceptor]
 type = "tabu_search"
 entity_tabu_size = 7
@@ -192,11 +219,13 @@ limit = 4
 
 [phases.move_selector]
 type = "union_move_selector"
-selection_order = "round_robin"
+selection_order = "stratified_random"
+weighting = "equal"
 
 [[phases.move_selector.selectors]]
 type = "change_move_selector"
 value_candidate_limit = 32
+selection_order = "random"
 
 [[phases.move_selector.selectors]]
 type = "swap_move_selector"
@@ -208,7 +237,9 @@ step_count_limit = 100000
 Construction creates the first workable solution. Local search improves it.
 The acceptor decides whether a scored candidate can be accepted. The forager
 decides which accepted candidate is committed. The move selector decides which
-candidate moves are generated.
+candidate moves are pulled. `score_tie_break = "random"` is the seeded default
+for equally scored best candidates; use `first` to retain the first equal best
+candidate instead.
 
 ### Move Selectors
 
@@ -224,6 +255,50 @@ variable_name = "visits"
 
 Nearby selection is configured by choosing a nearby selector variant, not by
 top-level `nearby_selection = true` flags.
+
+Every non-composite leaf selector accepts an optional `selection_order`:
+
+| Value | Behavior |
+| ----- | -------- |
+| `original` | preserve the canonical cursor order |
+| `random` | seeded random pull order; used by omitted local-search defaults |
+| `shuffled` | seeded full shuffle |
+| `sorted` | sort a complete stream by a registered `selection_metric` |
+| `probabilistic` | sample a complete stream by non-negative weights from a registered `selection_metric` |
+
+```toml
+[phases.move_selector]
+type = "change_move_selector"
+variable_name = "employee_id"
+selection_order = "sorted"
+selection_metric = "assignment_priority"
+```
+
+`sorted` and `probabilistic` require a named runtime candidate metric;
+`selection_metric` is rejected for the other orders. Advanced native or binding
+runtimes register immutable metrics on
+`RuntimeModel::with_candidate_metrics(...)`. Unknown names, non-finite results,
+and negative probabilistic weights fail explicitly.
+
+Union selectors have their own scheduling policy. `selection_order` can be
+`sequential`, `round_robin`, `rotating_round_robin`, `random`, or the default
+`stratified_random`. `weighting` is `equal` by default, `fixed` with a `weights`
+vector, or `candidate_count` to derive child weights from declared candidate
+counts:
+
+```toml
+[phases.move_selector]
+type = "union_move_selector"
+selection_order = "stratified_random"
+weighting = "fixed"
+weights = [3, 1]
+
+[[phases.move_selector.selectors]]
+type = "change_move_selector"
+
+[[phases.move_selector.selectors]]
+type = "swap_move_selector"
+```
 
 Nearby scalar selectors require model-declared candidate hooks on the matching
 `#[planning_variable]`: `nearby_value_candidates` for

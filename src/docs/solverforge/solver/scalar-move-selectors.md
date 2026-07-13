@@ -10,6 +10,15 @@ Scalar selectors operate on non-list planning variables. They are the right
 starting point for assignment, bin packing, staffing, matching, and other
 models where an entity owns one or more scalar decision fields.
 
+The runtime compiler resolves each configured target to an immutable static or
+dynamic scalar slot before local search. Dynamic slots declare legal-value and
+lazy nearby-source behavior explicitly; a nearby visitor receives a consumption
+limit and is not drained past the engine's requested prefix.
+
+Every concrete leaf can preserve `original` order, use seeded `random` or
+`shuffled` order, or use a registered named candidate metric for `sorted` /
+`probabilistic` order. Omitted stock leaves use seeded random order.
+
 ## Baseline Selectors
 
 ### `change_move_selector`

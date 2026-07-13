@@ -28,9 +28,11 @@ value_candidate_limit = 32
 | grouped scalar with `group_name` | cover required nullable scalar slots or apply atomic multi-scalar candidates from a named `ScalarGroup` |
 | list-specific constructors | route and sequence initialization where list work is present |
 
-Generic `FirstFit` and `CheapestInsertion` use the canonical construction
-engine when matching list work is present. Pure scalar targets use the
-descriptor-scalar construction path.
+Generic `FirstFit` and `CheapestInsertion` are compiled before the phase starts.
+Scalar-only targets use the graph's descriptor-placement schedule; mixed or
+list-bearing targets use its declaration-order global scan. Specialized scalar
+and list heuristics become compiled nodes that call the same public kernels,
+rather than entering a parallel phase-builder lifecycle.
 
 List-specific construction such as Clarke-Wright consumes savings hooks from
 the list variable. Stock CVRP lists can declare `domain = "cvrp"` to get the
@@ -44,6 +46,21 @@ behavior stays separate in `route_hooks`, which exports `get`, `set`, `depot`,
 CVRP distance hooks turn unreachable or malformed matrix entries into large
 finite construction costs, and strict route hooks reject unreachable
 travel-time legs before route-local improvements commit them.
+
+### Stable list-source identity
+
+Generated `usize` list models supply a stable element-source key automatically.
+Lower-level `ListConstructionPhaseBuilder`, `ListCheapestInsertionPhase`,
+`ListRegretInsertionPhase`, and `ListClarkeWrightPhase` callers must provide an
+`element_source_key` that maps declared elements, current assignments, and
+precedence successors to the same unique `usize` identity.
+
+SolverForge freezes that declaration binding before a reached construction node
+does candidate work. Duplicate declarations, unknown assigned keys, duplicate
+assigned keys, or inconsistent successor keys are binding errors; the runtime
+does not recover identity through payload equality or hashing. Later phases
+reuse the frozen declaration but refresh current assignments, so they cannot
+reinsert work accepted by an earlier phase or reread the declaration callback.
 
 ## Nullable Construction Obligation
 
@@ -177,14 +194,16 @@ value_candidate_limit = 8
 group_candidate_limit = 64
 ```
 
-Required entities are handled before optional entities. Required assignment
-construction uses a hard-first batched fill path for dense required coverage,
-so required slots with doable candidates are completed even when an ordinary
-time or move budget has already expired. It still respects external pause,
-cancel, and parent-yield control. Required assignments may displace optional
-occupants or move required blockers through bounded augmenting paths. Optional
-assignments remain score-improving only unless the model marks them required
-and configuration uses `assign_when_candidate_exists`.
+Required entities are handled before optional entities. One live placer cursor
+owns the required pass: dense coverage can produce one hard-first allocation
+candidate, while single-slot required work remains a bounded stream so
+`cheapest_insertion` and weakest/strongest ordering keep their normal semantics.
+Mandatory required slots may finish after ordinary construction limits expire,
+but still respect pause, cancel, and parent-yield control. Accepted work commits
+immediately. Required assignments may displace optional occupants or move
+required blockers through bounded augmenting paths. Optional assignments remain
+score-improving only unless the model marks them required and configuration uses
+`assign_when_candidate_exists`.
 
 ## Dynamic Construction Primitives
 

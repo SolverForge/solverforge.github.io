@@ -79,8 +79,15 @@ When `constraints = "..."` is present, `#[planning_solution]` also generates:
 - Collection source methods such as `Schedule::shifts()` and
   `Schedule::employees()`, so constraints can start from
   `factory.for_each(Schedule::shifts())` without ad hoc slice closures
-- `Solvable` for retained-job solving through `SolverManager::solve()`
+- `Solvable` for retained-job solving through `SolverManager::solve()`, including
+  the typed search declaration consumed by the runtime compiler
 - `Analyzable` for score breakdowns via `analyze()`
+
+Before candidate work begins, generated solving resolves that declaration and
+the model's descriptor/runtime slots into one immutable graph. Missing targets,
+capabilities, providers, stable list sources, or invalid selector composition
+surface as runtime-build errors instead of being discovered halfway through a
+phase.
 
 Generated source methods are the default way to start constraints
 over planning entity and problem fact collections. See

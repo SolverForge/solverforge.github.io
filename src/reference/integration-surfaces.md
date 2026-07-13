@@ -13,8 +13,8 @@ behavior in your app, and optional helpers limited to the problems they solve.
 
 | Component | Owns | Should not own |
 |---|---|---|
-| `solverforge` runtime | domain modeling, constraints, solving, retained lifecycle | project scaffolding, web components, routing datasets |
-| `solverforge-bridge` | dynamic binding contracts, logical model IDs, dynamic score and slot surfaces | Python UX, scaffold templates, solver policy |
+| `solverforge` runtime | domain modeling, constraints, compiled search policy, solving, retained lifecycle | project scaffolding, web components, routing datasets |
+| `solverforge-bridge` | dynamic binding contracts, logical model IDs, explicit scalar/list capabilities, dynamic score and slot surfaces | Python UX, scaffold templates, a second solver path |
 | `solverforge-cli` | app bootstrap and code generation | runtime truth, UI state, solver lifecycle semantics |
 | `solverforge-py` | Python decorators, callback binding, route/list hooks, PyO3 bridge, Python package distribution, embedded UI asset access | Rust crate docs, scaffold generation, generic web UI design, route data ownership |
 | `solverforge-ui` | retained-job UI controls and frontend components | solver search logic, scoring rules, route-cost computation |
@@ -32,6 +32,13 @@ application modules and `solverforge` runtime code.
 
 Treat retained lifecycle state as runtime-owned. UI and HTTP layers should read
 it, not infer it.
+
+Native and dynamic models both enter the same validated runtime compiler. A
+binding declares slot access, list metadata, assignment metadata, providers,
+and optional candidate metrics; the core freezes those capabilities into one
+search graph before candidate work starts. Binding layers should surface a
+declaration, compilation, preparation, or execution error rather than install a
+parallel phase builder or fallback runner.
 
 ### Python as a binding
 

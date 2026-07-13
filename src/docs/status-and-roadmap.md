@@ -10,11 +10,12 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.17.2` crate and calls out
+documentation tracks the `solverforge 0.18.0` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `solverforge 0.17.2` tag and workspace are the current
-core runtime line, and the public crate is available on crates.io. docs.rs can
-briefly lag while it builds the newest Rustdoc pages.
+bindings separately. The `v0.18.0` tag, workspace, and crates.io package are the
+current core runtime line. GitHub CI, the GitHub Release, and the crates.io
+publish workflow completed successfully on 2026-07-13; docs.rs can briefly lag
+while it builds the new Rustdoc pages.
 The published `solverforge-cli 2.2.2` package scaffolds generated apps on
 `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
 The published UI crate is `solverforge-ui 0.7.0`; generated app scaffolds and
@@ -30,7 +31,7 @@ publish gate completes.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.17.2` |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.18.0` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
 | **Python** | Tagged, publish pending | `solverforge-py 0.5.0` provides dynamic CPython 3.14 bindings backed by the `solverforge 0.17.2` Rust engine; PyPI latest is still `solverforge 0.4.0` |
 | **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
@@ -85,12 +86,17 @@ publish gate completes.
   search extensions
 - **Move System**: scalar, list, grouped scalar, assignment repair,
   conflict repair, cartesian, and composite move families
+- **Runtime Compiler**: one immutable resolved graph for native and dynamic
+  construction, selector trees, providers, stable list sources, defaults, and
+  execution errors
 - **SolverManager API**: retained job lifecycle with progress, best-solution,
   pause/resume, completion, cancellation, failure, snapshots, and
-  snapshot-bound analysis
+  snapshot-bound analysis, active-phase telemetry, and explicit candidate-trace
+  detail retrieval
 - **Configuration**: stock `solver.toml`, TOML/YAML parsing helpers, bounded
-  scalar candidates, grouped scalar selectors, level-aware simulated annealing,
-  and per-solution config overlays
+  scalar candidates, grouped scalar selectors, per-leaf ordering and metrics,
+  weighted unions, seeded score ties, candidate tracing, level-aware simulated
+  annealing, and per-solution config overlays
 
 ## Python Package
 
@@ -115,11 +121,40 @@ publish gate completes.
 
 ## Runtime Notes
 
-- **0.17.2 runtime line**: the core crate version is `0.17.2` and the
-  Rust toolchain floor remains `1.95`. The published `solverforge-cli 2.2.2`
-  package targets `solverforge 0.15.2`; generated app manifests should be moved
-  to a newer `solverforge 0.17.x` runtime only when that app is deliberately upgraded and
-  validated.
+- **0.18.0 runtime line**: `v0.18.0` and the crates.io `solverforge 0.18.0`
+  package are current, and the Rust toolchain floor remains `1.95`. The
+  published `solverforge-cli 2.2.2` package targets `solverforge 0.15.2`;
+  generated app manifests should move to `solverforge 0.18.0` only when that app
+  is deliberately upgraded and validated.
+- **One compiled runtime graph**: native Rust and dynamic bridge models resolve
+  construction stages, recursive selector trees, providers, stable list-source
+  identities, defaults, and termination into one immutable graph before
+  solving. Declaration, compilation, preparation, and execution errors are
+  explicit; there is no parallel configured-search fallback.
+- **Resolved selector policy**: leaf selectors can use original, seeded random,
+  shuffled, sorted, or probabilistic order; sorted/probabilistic leaves require
+  a registered candidate metric. Unions support sequential, round-robin,
+  rotating-round-robin, random, and default stratified-random scheduling with
+  equal, fixed, or candidate-count weighting. Equal best scores use seeded
+  random tie-breaking by default.
+- **Cursor-owned candidate execution**: shared scalar/list kernels expose stable
+  candidate IDs, let foragers short-circuit without draining a neighborhood,
+  and transfer only the selected winner by value. Generated counts represent
+  actual cursor yields rather than an unrequested logical tail.
+- **Qualified candidate traces**: `[candidate_trace]` retains a bounded ordered
+  prefix with canonical config, resolved plan, execution policy, input,
+  operation identity, and disposition provenance. Detailed traces are fetched
+  atomically through `SolverManager::get_telemetry_detail(...)`; routine events
+  and snapshots keep only compact telemetry.
+- **Dynamic capability contracts**: bridge models declare scalar legality and
+  nearby sources, list mutation operations, immutable list metadata bundles,
+  and scalar-assignment metadata explicitly. Host compound providers and
+  optional candidate metrics are frozen per solve instead of discovered through
+  mutable schema or thread-local state in cursor execution.
+- **Lifecycle settlement**: pause and cancellation are polled around phases and
+  terminal hooks as well as inside long candidate work. Paused time is excluded
+  from active phase telemetry, and pending control cannot be overwritten by
+  ordinary completion.
 - **0.17.2 construction surface**: advanced solver integrations can import
   dynamic construction primitives such as `GroupedScalarCursor`,
   `GroupedScalarSelector`, `ScalarAssignmentMoveCursor`,
@@ -221,12 +256,14 @@ publish gate completes.
   `construction_entity_order_key`, and `construction_value_order_key` declare
   bounded scalar neighborhoods and construction ordering on the model.
 - **Model-aware defaults**: omitted runtime config builds construction plus one
-  streaming local-search phase; omitted `move_selector` values use typed
-  scalar/list/grouped defaults rather than prebuilding broad neighborhoods.
+  streaming local-search phase. Capability-matched leaves use seeded random
+  order, multi-family unions use stratified-random scheduling, and
+  assignment-owned scalar slots remain exclusively on their grouped path.
 - **Exact retained telemetry**: generated, evaluated, accepted, not-doable,
   acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-  construction-slot, move-label, and bounded applied-move trace counters are
-  retained as authoritative counters.
+  construction-slot, active-phase, move-label, and bounded applied-move counters
+  are retained as authoritative counters; bounded candidate-pull detail is
+  retained separately on explicit request.
 
 ## Roadmap
 

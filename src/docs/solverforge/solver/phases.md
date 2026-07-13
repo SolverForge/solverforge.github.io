@@ -16,13 +16,13 @@ Builds an initial solution by assigning values to all planning variables. Runs f
 
 | Type                           | Description                                                                                                                                                            |
 | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `first_fit`                    | Default generic first-fit construction. Mixed or list-bearing models use the shared runtime construction engine; pure scalar matches reuse the descriptor-scalar path. |
+| `first_fit`                    | Default generic first-fit construction. Scalar-only targets use the compiled descriptor-placement schedule; mixed/list-bearing targets use the compiled global scan. |
 | `first_fit_decreasing`         | Specialized scalar-only first fit, processing entities by difficulty.                                                                                                  |
 | `weakest_fit`                  | Assigns the value that leaves the most room for future assignments.                                                                                                    |
 | `weakest_fit_decreasing`       | Weakest fit, processing entities by difficulty.                                                                                                                        |
 | `strongest_fit`                | Assigns the value that uses resources most aggressively.                                                                                                               |
 | `strongest_fit_decreasing`     | Strongest fit, processing entities by difficulty.                                                                                                                      |
-| `cheapest_insertion`           | Generic best-score construction over mixed or list-bearing models; pure scalar matches reuse the descriptor-scalar path.                                               |
+| `cheapest_insertion`           | Generic best-score construction. Scalar-only targets use the compiled descriptor-placement schedule; mixed/list-bearing targets use the compiled global scan.          |
 | `allocate_entity_from_queue`   | Queue-driven entity allocation.                                                                                                                                        |
 | `allocate_to_value_from_queue` | Queue-driven value allocation.                                                                                                                                         |
 | `list_round_robin`             | Distributes elements evenly across entities (list variables).                                                                                                          |
@@ -37,9 +37,17 @@ type = "construction_heuristic"
 construction_heuristic_type = "first_fit"
 ```
 
-The stock runtime now builds one `RuntimeModel` per planning model. Generic
-construction heuristics work over that shared runtime context instead of
-splitting scalar-variable and list-variable solve paths.
+The stock runtime resolves one `RuntimeModel` per planning model and compiles
+the full phase sequence before execution. Construction stages, local-search
+selector trees, providers, defaults, and stable source bindings are immutable
+for that solve. Scalar-only, list-only, mixed, native, and dynamic models do not
+split into parallel phase-builder lifecycles.
+
+Reached construction nodes prepare their current solve-owned sources lazily;
+already-terminated or unreached nodes do not bind unused sources. Phase-local
+termination overlays begin and end at their top-level phase boundary. Mandatory
+omitted construction remains governed by retained lifecycle control so required
+completion is not silently cut off by an internal overlay.
 
 Scalar-only construction heuristics validate their model-owned hooks before
 phase build. `first_fit_decreasing` and `allocate_entity_from_queue` require
@@ -67,6 +75,12 @@ Current local-search telemetry emits `phase_start` after the starting score is
 known. With console output enabled, the phase-start line includes that score,
 making it clear what construction handed to local search before the first move
 is evaluated.
+
+`PhaseTelemetry` carries the active phase's local elapsed time, steps, generated,
+evaluated, accepted, applied, improving, score-calculation, generation-time, and
+evaluation-time counters. Long phases publish metadata-only pulses. Pause and
+cancel settle both inside large candidate work and around phase/terminal hooks;
+paused time is excluded from active phase elapsed time.
 
 ### Acceptors
 

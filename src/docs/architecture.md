@@ -9,7 +9,8 @@ weight: 3
 # Architecture
 
 SolverForge is a native Rust constraint solver. It keeps the public facade
-small while preserving concrete types through the solver pipeline.
+small, compiles one immutable search graph before execution, and preserves
+concrete types through the native solver pipeline.
 
 ## Workspace Shape
 
@@ -30,21 +31,34 @@ For most app code, depend on `solverforge` and stay on the facade. Reach for
 lower-level crates only when extending SolverForge itself or building a custom
 runtime path.
 
-## Zero-Erasure Runtime
+## Compiled Zero-Erasure Runtime
 
-SolverForge preserves concrete types through scoring, moves, phases, and
-runtime assembly:
+Every macro-generated Rust model and dynamic bridge model enters the same
+runtime compiler. SolverForge resolves scalar/list slots, stable list-source
+identities, construction stages, recursive selector trees, native or host
+providers, candidate metrics, defaults, and termination policy before the first
+phase runs. The resulting graph is immutable for that solve; declaration,
+compilation, preparation, and execution failures are reported explicitly
+instead of falling through to a second phase-builder path.
 
-- no `Box<dyn Iterator>` in hot move selectors
-- no hidden allocation for ordinary moves
-- move payloads stored inline or in arena-owned candidate storage
-- score directors and stream constraints monomorphized by solution and score
-  type
-- deterministic selector order for reproducible local search
+The native hot path keeps concrete types through scoring, moves, selectors, and
+phases:
 
-The descriptor boundary remains explicit for generated scalar/list model
-metadata, but app code should not need to construct descriptor-level runtime
-pieces directly.
+- GAT-based cursors expose stable candidate IDs without `Box<dyn Iterator>` in
+  selector hot loops
+- cursor-owned candidate storage releases losing moves and transfers the chosen
+  move by value exactly once
+- score directors, move carriers, selector carriers, and stream constraints are
+  monomorphized by solution and score type
+- deterministic canonical enumeration plus seeded ordering keeps reproducible
+  search reproducible
+- object-safe dispatch is confined to documented dynamic/host integration,
+  descriptor access, scorer-agnostic callbacks, real-time problem changes,
+  analysis, and cold panic-preservation boundaries
+
+Descriptor scalar selectors remain an explicit standalone API. They do not
+form an alternate construction or configured-search engine for generated
+models.
 
 ## SERIO Scoring
 
@@ -63,11 +77,13 @@ their left/right semantics.
 ## Dynamic Bridge
 
 `solverforge-bridge` owns the Rust contracts used by host-language bindings:
-stable logical entity, fact, and variable IDs; dynamic score-family values; and
-descriptor-resolved scalar/list slots. Binding layers can build dynamic models
-without depending on Rust `TypeId` as their public identity model, while the
-solver still resolves those logical IDs to descriptor indexes before
-construction, local search, and score-director notifications.
+stable logical entity, fact, and variable IDs; dynamic score-family values;
+descriptor-resolved scalar/list slots; dynamic scalar-assignment metadata; and
+explicit list access and metadata capability bundles. Binding layers can build
+dynamic models without depending on Rust `TypeId` as their public identity
+model. The runtime resolves those logical IDs, validates legal-value and
+operation capabilities, freezes host providers and optional candidate metrics,
+and then executes the same compiled graph as native models.
 
 ## Constraint Compiler
 
@@ -97,17 +113,28 @@ solves. A running job can emit:
 - `Failed`
 
 Snapshots are retained by revision, and score analysis can target a retained
-snapshot while the job is active or terminal.
+snapshot while the job is active or terminal. Pause and cancel requests are
+settled at phase and terminal-hook boundaries as well as inside long-running
+candidate work. Paused time is excluded from active phase telemetry, and a
+pending control command cannot be overwritten by ordinary completion.
+
+Compact events and status carry aggregate and active-phase telemetry. Opt-in
+bounded candidate-pull traces are retained separately and fetched through
+`SolverManager::get_telemetry_detail(...)`, so control-plane events do not clone
+large diagnostic prefixes.
 
 ## Configuration Boundary
 
 `solver.toml` selects declared capabilities; it does not invent model hooks.
 Nearby scalar selectors require nearby candidate hooks on the model. Grouped
 scalar selectors require named scalar groups. Conflict repair selectors require
-constraint-aware repair providers.
+constraint-aware repair providers. Sorted or probabilistic leaf ordering
+requires a registered named candidate metric.
 
 That boundary keeps the runtime honest: the model declares what it can produce,
-and config chooses which declared search paths to run.
+and config chooses which declared search paths to run. The compiler freezes the
+resolved selection order, union weighting, score tie policy, construction
+obligations, and candidate-trace plan before solving.
 
 ## See Also
 
