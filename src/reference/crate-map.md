@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.18.0` crate and current
+This map is aligned with the published `solverforge 0.19.0` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -60,7 +60,7 @@ directly.
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
-| `solverforge-py`   | the tagged `v0.6.1` Python source line, compiled-model PyO3 binding, retained diagnostics, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
+| `solverforge-py`   | the tagged `v0.6.2` Python source line, compiled-model PyO3 binding, retained diagnostics, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
@@ -69,13 +69,15 @@ directly.
 - Start with `solverforge-cli` to scaffold the app shell.
 - Start with the PyPI `solverforge` package when the application surface is
   Python and you do not need a generated Rust web/API/CLI shell. PyPI publishes
-  `solverforge 0.6.1`; use the matching `solverforge-py v0.6.1` tag for source
-  and example development on SolverForge 0.18.0.
+  `solverforge 0.6.2`; use the matching `solverforge-py v0.6.2` tag for source
+  and example development on SolverForge 0.19.0.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
 - Keep scalar/list model declarations in the `planning_model!` manifest and
   variable attributes; solver config consumes declared hooks rather than
   inferring nearby or construction-order behavior.
+- Use scalar variables for direct assignments and list variables for ordered
+  membership; SolverForge 0.19 has no separate chained-scalar sequence model.
 - Keep reusable grouped constraint work inside a
   `#[solverforge_constraints]` function; do not add app-level caches or public
   sharing helpers.
@@ -97,7 +99,7 @@ directly.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
-| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.1` source tag |
+| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.2` source tag |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |
