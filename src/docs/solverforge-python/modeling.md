@@ -48,7 +48,7 @@ feature that requires them.
 
 The decorator data is not late-bound search behavior. SolverForge Python
 validates it into one immutable runtime plan containing the schema, solution
-descriptor, and SolverForge 0.18 runtime model. Direct solves, retained jobs,
+descriptor, and SolverForge 0.19.0 runtime model. Direct solves, retained jobs,
 snapshots, and resumes reuse that plan; instance rows, callback views, seeds,
 and moves remain specific to each solve.
 

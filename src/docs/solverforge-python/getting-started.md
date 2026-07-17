@@ -15,13 +15,13 @@ solves it, and shows the equivalent config forms.
 - CPython 3.14
 - Rust 1.95.0 only if pip needs to build from source
 
-Install the published `solverforge 0.6.1` package:
+Install the published `solverforge 0.6.2` package:
 
 ```bash
 python3.14 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install "solverforge==0.6.1"
+python -m pip install "solverforge==0.6.2"
 ```
 
 Use the matching tagged source checkout when developing the repository examples
@@ -30,7 +30,7 @@ or inspecting the binding implementation:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.1
+git checkout v0.6.2
 make develop
 . .venv/bin/activate
 python - <<'PY'
@@ -39,7 +39,7 @@ print(solverforge.__version__)
 PY
 ```
 
-The version printed for either installation path should be `0.6.1`.
+The version printed for either installation path should be `0.6.2`.
 
 ## A Minimal Model
 
@@ -99,7 +99,7 @@ print([shift.nurse for shift in solved.shifts])
 
 `Solver.solve(...)` reads the Python object graph, runs SolverForge, then writes
 the solved variables and score back to a Python solution object. The schema is
-compiled into the SolverForge 0.18 runtime graph; Python-authored models do not
+compiled into the SolverForge 0.19.0 runtime graph; Python-authored models do not
 use a separate search engine.
 
 ## Analyze A Solution

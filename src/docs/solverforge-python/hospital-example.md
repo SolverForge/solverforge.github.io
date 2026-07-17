@@ -80,7 +80,7 @@ after 30 seconds or 5 seconds without improvement.
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.1
+git checkout v0.6.2
 make develop
 make hospital-run
 ```

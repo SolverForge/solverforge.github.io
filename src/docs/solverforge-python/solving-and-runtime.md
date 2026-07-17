@@ -14,7 +14,7 @@ SolverForge Python has two runtime entry points:
   resume, cancel, and delete
 
 Both paths compile the authored Python schema into one immutable SolverForge
-0.18 runtime graph. The binding supplies dynamic state, callbacks, slot
+0.19.0 runtime graph. The binding supplies dynamic state, callbacks, slot
 capabilities, assignment groups, providers, and candidate metrics; the core owns
 phase construction, cursor execution, foraging, lifecycle control, and
 telemetry. There is no wrapper-owned fallback runner.
