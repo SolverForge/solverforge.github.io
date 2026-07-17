@@ -21,7 +21,8 @@ Planning Solution
 └── planning_score           → Option<ScoreType>   (current quality)
 
 Planning Entity
-└── planning_variable(value_range_provider = "facts")       (decision field)
+├── planning_variable(value_range_provider = "facts")       (single assignment)
+└── planning_list_variable(element_collection = "elements") (assignment + order)
 ```
 
 ## How It Works

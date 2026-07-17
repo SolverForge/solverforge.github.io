@@ -60,6 +60,12 @@ Descriptor scalar selectors remain an explicit standalone API. They do not
 form an alternate construction or configured-search engine for generated
 models.
 
+The 0.19 model boundary is equally explicit: scalar slots are direct
+single-value assignments, while list slots own ordered membership. Inverse,
+index, previous, next, custom, cascading, and piggyback shadows are derived
+views of that list; there is no second predecessor-chain topology in the
+runtime.
+
 ## SERIO Scoring
 
 SERIO, the Scoring Engine for Real-time Incremental Optimization, evaluates

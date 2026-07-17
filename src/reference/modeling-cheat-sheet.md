@@ -17,6 +17,7 @@ right SolverForge annotation or structure.
 | `#[problem_fact]`               | immutable input data               | workers, depots, skills, rooms                                        |
 | `#[planning_id]`                | stable identity                    | put on facts and entities that need identity                          |
 | `#[planning_variable(...)]`     | scalar assignment decision         | references a value range by solution-field name                       |
+| `#[planning_list_variable(...)]` | ordered assignment decision       | owner stores element indexes in canonical sequence order              |
 | `#[problem_fact_collection]`    | fact collections on the solution   | usually `Vec<T>`                                                      |
 | `#[planning_entity_collection]` | entity collections on the solution | the main search space                                                 |
 | `#[planning_score]`             | current score field                | typically `Option<ScoreType>`                                         |
@@ -29,6 +30,9 @@ right SolverForge annotation or structure.
 | scalar variable | one entity picks one value          | a shift picks an employee              |
 | list variable   | order or insertion position matters | a vehicle route or task sequence       |
 | model with both | both assignment and ordering matter | route planning with assigned operators |
+
+In SolverForge 0.19, an ordered sequence is always a list variable. Scalar
+variables are direct one-slot assignments and do not have a chained mode.
 
 The current runtime resolves one `RuntimeModel` per planning model, then
 validates and freezes construction, selector, provider, and source bindings into
@@ -52,6 +56,8 @@ heuristics remain explicit opt-in phases.
   for construction-phase ordering
 - use `ScalarGroup::assignment(...)` when nullable scalar construction must
   cover required slots and respect capacity keys
+- derive inverse, index, previous, and next views from a list variable instead
+  of storing a second sequence topology
 - keep domain-specific helper methods in ordinary Rust impl blocks
 
 ## Optional assignment

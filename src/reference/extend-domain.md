@@ -38,6 +38,8 @@ derived helpers that describe the planning problem you actually need to solve.
 Use mixed models when the problem really has both assignment and sequencing.
 The current runtime builds one `RuntimeModel` per planning model, and the stock
 construction heuristics already understand mixed scalar-plus-list problems.
+Since SolverForge 0.19, list variables are the only planning primitive for an
+owned sequence; do not encode ordered work as a chained scalar predecessor.
 
 ## A practical growth path
 
@@ -91,6 +93,8 @@ no longer tiny.
 - Treat the scaffold as disposable starter code once the app has a real shape.
 - Reach for list variables when order is the point, not when a single scalar
   assignment would do.
+- Derive owner, index, previous, and next lookup fields from the owner list;
+  do not store a second route topology.
 - Treat nearby scalar hooks, scalar candidate hooks, and construction-order keys
   as model capabilities. Solver config consumes them; it does not infer them.
 - Use `#[planning_list_variable(element_collection = "...", domain = "cvrp")]`

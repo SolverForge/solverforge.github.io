@@ -74,10 +74,15 @@ Construction order keys are construction-only. Local-search scalar selectors
 keep canonical bounded candidate order even when the same variable declares
 construction keys.
 
+In SolverForge 0.19, scalar variables remain direct one-slot assignments.
+The former `chained = true` scalar mode is removed; when planning owns
+membership or order as well as assignment, use a list variable instead.
+
 ### `#[planning_list_variable]`
 
-Declares a stock list variable for routing or sequencing. In the current runtime
-this is represented as `Vec<usize>` plus an `element_collection` name.
+Declares the canonical ordered-sequence variable for routing or sequencing. In
+the current runtime this is represented as `Vec<usize>` plus an
+`element_collection` name.
 
 ```rust
 #[planning_list_variable(element_collection = "visits")]
@@ -119,6 +124,13 @@ Tracks an inverse relationship from a source variable.
 #[inverse_relation_shadow_variable(source_variable_name = "visits")]
 pub vehicle: Option<usize>,
 ```
+
+### `#[index_shadow_variable]`
+
+For list variables, tracks the element's current zero-based position. Declare
+`#[index_shadow_variable(source_variable_name = "visits")]` on an
+`Option<usize>` field and name that field with `index_field` on the solution's
+`#[shadow_variable_updates(...)]` configuration.
 
 ### `#[previous_element_shadow_variable]`
 

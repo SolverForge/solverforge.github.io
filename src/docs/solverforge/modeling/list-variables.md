@@ -8,6 +8,10 @@ description: >
 
 **List variables** model problems where the solver must determine the **order** of elements in a sequence — not just which value is assigned, but what comes before and after. This is essential for vehicle routing (stop ordering), job shop scheduling (operation sequencing), and similar problems.
 
+SolverForge 0.19 uses this owner-held list as the sole planning representation
+for ordered assignments. Scalar variables still model one direct assignment;
+they no longer have a chained predecessor mode.
+
 ## When to Use List Variables
 
 Use list variables when:
@@ -23,9 +27,9 @@ Use scalar planning variables when:
 
 ## Stock Representation
 
-In the current stock runtime, a list variable is represented as `Vec<usize>` on
-the owner entity. The indices refer to a named collection on the planning
-solution.
+In the current stock runtime, the canonical sequence is represented as
+`Vec<usize>` on the owner entity. The indices refer to a named collection on
+the planning solution.
 
 ```rust
 use solverforge::prelude::*;
@@ -172,13 +176,19 @@ each phase, so later construction cannot reinsert work committed earlier.
 
 ## Shadow Updates
 
-Advanced predecessor, successor, inverse, and aggregate updates are configured
-on the planning solution with `#[shadow_variable_updates(...)]` plus matching
-shadow fields on the relevant entity types.
+Previous, next, index, inverse, and aggregate views are derived from the owner
+list. Configure them on the planning solution with
+`#[shadow_variable_updates(...)]` plus matching shadow fields on the relevant
+entity types. For example, an element field declared as
+`#[index_shadow_variable(source_variable_name = "visits")]` with type
+`Option<usize>` is maintained by
+`#[shadow_variable_updates(list_owner = "routes", index_field = "index")]` on
+the planning solution.
 
 Stock list solving does **not** require shadow updates. Add them only when your
-domain model needs derived state such as previous/next pointers or per-route
-aggregates. When you do configure them, the canonical `ScoreDirector` invokes
+domain model needs derived state such as owner/index lookup, previous/next
+pointers, or per-route aggregates. When you do configure them, the canonical
+`ScoreDirector` invokes
 those solution hooks automatically.
 
 ## Generated Runtime Surface

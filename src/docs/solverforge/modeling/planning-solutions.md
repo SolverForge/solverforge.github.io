@@ -98,7 +98,10 @@ For advanced list-shadow workflows, the struct can also carry
 `#[shadow_variable_updates(...)]`. When present, the macro generates
 `PlanningSolution::update_entity_shadows(...)` and `update_all_shadows()`
 overrides directly on the solution type, and the stock `ScoreDirector` calls
-those hooks automatically during solving and score analysis.
+those hooks automatically during solving and score analysis. The update
+configuration can maintain `inverse_field`, `index_field`, `previous_field`,
+and `next_field` views of the canonical owner list before cascading,
+aggregate, compute, and post-update listeners run.
 
 ## Requirements
 

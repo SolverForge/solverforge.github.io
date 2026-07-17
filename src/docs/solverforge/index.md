@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.18.0` crate and current release
+These pages track the `solverforge 0.19.0` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the published `solverforge-cli 2.2.2` package scaffolds
 `solverforge 0.15.2`, so check `solverforge --version` when starting from a
@@ -33,7 +33,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.18.0` workspace declares Rust `1.95`.
+The `0.19.0` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -58,6 +58,11 @@ phase and keeps its local elapsed/work counters separate from whole-solve totals
 
 The current release tightens several public contracts:
 
+- ordered assignments and routes use planning list variables as their single
+  canonical representation. List owners store the sequence directly, and
+  inverse, index, previous, next, custom, cascading, and piggyback shadows stay
+  derived from that list. Scalar variables retain direct single-slot mutation;
+  they no longer carry predecessor-chain semantics
 - macro-generated and dynamic solves both enter the same runtime compiler;
   public build failures distinguish declaration, compilation, phase
   preparation, and phase execution without exposing private graph types
@@ -269,10 +274,9 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge](https://docs.rs/solverforge). docs.rs can briefly lag the
-crate registry after a release; the `0.18.0` crate is the package source of
-truth now that crates.io has accepted it. Source-line API maps for the local
-workspace live in the repository `crates/*/WIREFRAME.md` files.
+[docs.rs/solverforge 0.19.0](https://docs.rs/solverforge/0.19.0/solverforge/).
+The `0.19.0` crate is the registry source of truth. Source-line API maps for
+the local workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections
 

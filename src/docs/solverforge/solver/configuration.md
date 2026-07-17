@@ -32,7 +32,7 @@ scalar candidates, assignment-backed scalar groups, or conflict repair
 providers, the model must expose those capabilities through the generated model
 support layer.
 
-SolverForge 0.18.0 compiles the complete resolved policy before solving. A bad
+SolverForge 0.19.0 compiles the complete resolved policy before solving. A bad
 target, missing operation bundle, unknown provider or metric, invalid selector
 composition, or inconsistent construction source is a build error at its config
 path; the runtime does not defer schema discovery until a hot candidate loop.
