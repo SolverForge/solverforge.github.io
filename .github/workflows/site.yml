@@ -42,6 +42,15 @@ jobs:
           repository: SolverForge/solverforge-ui
           path: .ci/solverforge-ui
 
+      - name: Checkout released SolverForge use-case bundle
+        uses: actions/checkout@v4
+        with:
+          repository: SolverForge/solverforge-usecases
+          # The coordinated releases were cut sequentially; the final tag
+          # contains all four published app versions.
+          ref: "solverforge-lessons@2.0.5"
+          path: .ci/solverforge-usecases
+
       - name: Install Rust 1.95
         run: |
           rustup toolchain install 1.95.0 --profile minimal
@@ -65,6 +74,7 @@ jobs:
           SOLVERFORGE_RS_REPO: ${{ github.workspace }}/.ci/solverforge-rs
           SOLVERFORGE_MAPS_REPO: ${{ github.workspace }}/.ci/solverforge-maps
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
+          SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
         run: make ci-local
 
       - name: Configure Pages
