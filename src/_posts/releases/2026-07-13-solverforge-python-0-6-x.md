@@ -5,26 +5,28 @@ draft: false
 description: >
   SolverForge Python 0.6.x moves dynamic Python models onto the SolverForge
   compiled runtime, makes model metadata explicit, adds qualified retained
-  candidate diagnostics, and aligns 0.6.2 with SolverForge 0.19.0.
+  candidate diagnostics, and aligns 0.6.3 with SolverForge 0.19.1 mandatory
+  completion semantics.
 ---
 
 **SolverForge Python 0.6.x** started with the
 [v0.6.1 source tag](https://github.com/SolverForge/solverforge-py/tree/v0.6.1)
 on 2026-07-13. Its current patch is
-[v0.6.2](https://github.com/SolverForge/solverforge-py/tree/v0.6.2), published
-on 2026-07-17. The current tag plus the GitHub and Forgejo `main` branches point
-to the same `0.6.2` source. GitHub CI and the automatic release workflow
+[v0.6.3](https://github.com/SolverForge/solverforge-py/tree/v0.6.3), published
+on 2026-07-18. The current tag plus the GitHub and Forgejo `main` branches point
+to the same `0.6.3` source. GitHub CI and the automatic release workflow
 completed successfully; the workflow built, verified, and published the source
 distribution plus Linux, macOS, and Windows wheels. PyPI now resolves
-`solverforge` to `0.6.2`.
+`solverforge` to `0.6.3`.
 
 The 0.6 line targets CPython 3.14, consumes the published
-`solverforge 0.19.0` Rust crates, and embeds `solverforge-ui 0.7.0`. Version
-0.6.2 is a compatibility release that moves the exact Rust crate set from
-SolverForge 0.18.0 to 0.19.0 without changing the public Python API. The line
-replaces the wrapper-owned search path with one compiled SolverForge runtime
-and makes the Python-to-Rust contract explicit enough to validate, reuse, and
-diagnose.
+`solverforge 0.19.1` Rust crates, and embeds `solverforge-ui 0.7.0`. Version
+0.6.3 is a runtime-correctness patch that carries the 0.19.1
+mandatory-completion contract through the Python binding. The preceding 0.6.2
+patch moved the exact Rust crate set from SolverForge 0.18.0 to 0.19.0 without
+changing the public Python API. The line replaces the wrapper-owned search path
+with one compiled SolverForge runtime and makes the Python-to-Rust contract
+explicit enough to validate, reuse, and diagnose.
 
 ## What Changed
 
@@ -39,6 +41,18 @@ parallel Python phase tree, assignment placer, TLS slot state, synthetic
 candidate metric, or fallback solver path. Direct solves and retained jobs both
 reuse one immutable compiled runtime plan containing the schema, descriptor,
 and runtime model; solution rows, callbacks, seeds, and moves remain per solve.
+
+### Mandatory work completes before publication
+
+Solver and phase limits stay binding during construction. SolverForge publishes
+a best or completed solution only after every planning-list element, required
+assignment row, and non-optional scalar variable is assigned. There is no
+post-limit fallback that silently finishes required work.
+
+If a configured limit is reached first, `Solver.solve(...)` raises a runtime
+error. A retained `SolverManager` job enters `FAILED` without publishing a
+latest snapshot. A pause before mandatory construction completes remains
+resumable internal state, but it does not expose a partial solution snapshot.
 
 ### Model metadata is explicit and scoped
 
@@ -142,10 +156,10 @@ implicit route callback conventions.
 Install the published package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.6.2"
+python3.14 -m pip install "solverforge==0.6.3"
 ```
 
-The 0.6.2 source distribution is limited to package metadata and the Python and
+The 0.6.3 source distribution is limited to package metadata and the Python and
 Rust inputs needed to build the binding. Repository tests, examples, guidance,
 and tooling remain in the tagged source checkout. The wheel contains the public
 Python package, native extension, and embedded shared UI assets rather than the
@@ -157,31 +171,32 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.2
+git checkout v0.6.3
 make develop
 . .venv/bin/activate
 python -c 'import solverforge; print(solverforge.__version__)'
 ```
 
-The command prints `0.6.2`.
+The command prints `0.6.3`.
 
 Do not infer the Python package version from the Rust crate, CLI, or UI release
 line. Their current boundaries are:
 
 | Surface | Current line |
 | ------- | ------------ |
-| SolverForge Python source | tagged `solverforge-py 0.6.2` |
-| Public PyPI package | published `solverforge 0.6.2` |
-| Rust runtime base | published `solverforge 0.19.0` |
+| SolverForge Python source | tagged `solverforge-py 0.6.3` |
+| Public PyPI package | published `solverforge 0.6.3` |
+| Rust runtime base | published `solverforge 0.19.1` |
 | Embedded UI base | published `solverforge-ui 0.7.0` |
 | CLI scaffold runtime | published `solverforge-cli 2.2.2` still scaffolds `solverforge 0.15.2` |
 
 ## Upgrade Checklist
 
-- When upgrading from 0.6.1, update the package pin to 0.6.2 and rebuild the
-  native extension; the public Python API is unchanged.
-- Check out `v0.6.2` and run model, lifecycle, snapshot, and example tests
-  against the compiled 0.19.0 runtime.
+- When upgrading from 0.6.2, update the package pin to 0.6.3. The public Python
+  API is unchanged, but a limit reached before mandatory completion now raises
+  or fails instead of returning an incomplete solution.
+- Check out `v0.6.3` and run model, lifecycle, snapshot, and example tests
+  against the compiled 0.19.1 runtime.
 - Replace legacy flat list route arguments with `ListRouteHooks` and
   `ListSavingsHooks`, using explicit row, solution, or callback source wrappers.
 - Declare assignment-owned scalar variables through
@@ -199,23 +214,24 @@ line. Their current boundaries are:
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.6.3` | 2026-07-18 | Aligns the exact SolverForge Rust crate set with 0.19.1, keeps configured limits binding during mandatory construction, and withholds incomplete best/completed snapshots. |
 | `0.6.2` | 2026-07-17 | Aligns the exact SolverForge Rust crate set with 0.19.0 while keeping the 0.6 Python API and embedded `solverforge-ui 0.7.0` assets unchanged. |
 | `0.6.1` | 2026-07-13 | Establishes the 0.6 line on SolverForge 0.18.0's compiled runtime, adds explicit model metadata, safe native scoring plans, qualified candidate diagnostics, and refreshed examples, and restricts source archives to the inputs needed to build the package. |
 
 ## Documentation Changes
 
 - [SolverForge Python](/docs/solverforge-python/) now records the published
-  0.6.2 package, Rust 0.19.0 base, and UI 0.7.0 base.
+  0.6.3 package, Rust 0.19.1 base, and UI 0.7.0 base.
 - [Python Modeling](/docs/solverforge-python/modeling/) documents candidate
   metrics, assignment metadata, scoped list sources, and nested route/savings
   bundles.
 - [Python Constraints](/docs/solverforge-python/constraints/) explains the
   native specialization boundary and string-key join behavior.
 - [Python Solving & Runtime](/docs/solverforge-python/solving-and-runtime/)
-  covers the single compiled runtime, phase telemetry, candidate traces, and
-  qualified provenance.
+  covers the single compiled runtime, mandatory-completion boundary, phase
+  telemetry, candidate traces, and qualified provenance.
 - The [Hospital](/docs/solverforge-python/hospital-example/) and
   [Deliveries](/docs/solverforge-python/deliveries-example/) pages now match the
-  tagged 0.6.2 examples.
+  tagged 0.6.3 examples.
 - [Status & Roadmap](/docs/status-and-roadmap/) keeps tagged source, PyPI,
   runtime, UI, CLI, and worked-use-case release lines separate.

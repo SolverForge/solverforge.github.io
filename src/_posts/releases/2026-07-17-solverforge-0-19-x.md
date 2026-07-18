@@ -21,6 +21,11 @@ same version line.
 > returning an incomplete plan. A pre-completion pause remains resumable
 > in-process without exposing a partial solution snapshot.
 
+> **Python update, 2026-07-18:** SolverForge Python 0.6.3 is published with the
+> exact SolverForge 0.19.1 crate set and the same mandatory-completion boundary.
+> PyPI provides its source distribution plus Linux, macOS, and Windows CPython
+> 3.14 wheels.
+
 > **Update, 2026-07-17:** SolverForge Python 0.6.2, Hospital 2.0.5,
 > Lessons 2.0.5, Deliveries 2.0.5, and FSR 2.0.6 are now published with the
 > exact SolverForge 0.19.0 crate set. The version table below preserves the
@@ -188,15 +193,22 @@ python3.14 -m pip install "solverforge==0.6.1"
 That package embeds the exact SolverForge 0.18.0 crate set; publishing the Rust
 0.19.0 workspace does not silently change an existing Python wheel.
 
-SolverForge Python 0.6.2 was published later on 2026-07-17 and is now the
-current package:
+SolverForge Python 0.6.2 was published later on 2026-07-17:
 
 ```bash
 python3.14 -m pip install "solverforge==0.6.2"
 ```
 
 Version 0.6.2 embeds the exact SolverForge 0.19.0 crate set without changing
-the public Python API.
+the public Python API. SolverForge Python 0.6.3 is the current package:
+
+```bash
+python3.14 -m pip install "solverforge==0.6.3"
+```
+
+Version 0.6.3 embeds the exact SolverForge 0.19.1 crate set. Configured limits
+remain binding during mandatory construction; reaching one first raises from a
+direct solve or fails a retained job without publishing an incomplete snapshot.
 
 The worked use cases were also republished later on 2026-07-17:
 
@@ -238,5 +250,7 @@ datasets, or solver policies.
   published 2.2.2 scaffold targets separately from the 0.19.1 core.
 - [Crate & Runtime Map](/reference/crate-map/) aligns Rust, CLI, Python, and
   companion repositories on the new release line.
+- [SolverForge Python](/docs/solverforge-python/) records the published 0.6.3
+  package and its exact SolverForge 0.19.1 runtime base.
 - [Status & Roadmap](/docs/status-and-roadmap/) tracks each independently
   published package and use-case version.
