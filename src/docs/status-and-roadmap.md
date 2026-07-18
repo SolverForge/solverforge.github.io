@@ -22,9 +22,9 @@ generated apps on `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and
 `solverforge-deliveries@2.0.5`, and `solverforge-fsr@2.0.6`, all on
 `solverforge 0.19.0`; bundle CI and all four tag-triggered Space sync workflows
 pass. SolverForge Python has a tagged
-`solverforge-py 0.6.2` source line for CPython 3.14, compiled onto the
-`solverforge 0.19.0` runtime with embedded `solverforge-ui 0.7.0` assets. The
-automatic release workflow completed and PyPI serves `solverforge 0.6.2`;
+`solverforge-py 0.6.3` source line for CPython 3.14, compiled onto the
+`solverforge 0.19.1` runtime with embedded `solverforge-ui 0.7.0` assets. The
+automatic release workflow completed and PyPI serves `solverforge 0.6.3`;
 GitHub CI and the final-tag release workflow both pass.
 <% end %>
 
@@ -34,7 +34,7 @@ GitHub CI and the final-tag release workflow both pass.
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.19.1` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.6.2` compiles dynamic CPython 3.14 models into the `solverforge 0.19.0` runtime; PyPI publishes `solverforge 0.6.2` |
+| **Python** | Published; CI and release passed | `solverforge-py 0.6.3` compiles dynamic CPython 3.14 models into the `solverforge 0.19.1` runtime; PyPI publishes `solverforge 0.6.3` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.5`, `solverforge-lessons@2.0.5`, `solverforge-deliveries@2.0.5`, and `solverforge-fsr@2.0.6`; all target `solverforge 0.19.0` and `solverforge-ui 0.6.5` |
 | **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
@@ -103,13 +103,13 @@ GitHub CI and the final-tag release workflow both pass.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.6.2"`; use the
-  matching `solverforge-py` `v0.6.2` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.6.3"`; use the
+  matching `solverforge-py` `v0.6.3` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
   metrics, and callback constraints.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
-  `SolverManager(config=None)` over one compiled SolverForge 0.19.0 runtime graph.
+  `SolverManager(config=None)` over one compiled SolverForge 0.19.1 runtime graph.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
   joins, grouped counts, balance scoring, fixed or callback-computed weights,
   unassigned-list scoring, list precedence/makespan scoring, indexed-presence
@@ -300,15 +300,17 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.6.2` is the current tagged SolverForge Python source line for
+`solverforge-py 0.6.3` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
-`solverforge 0.19.0` runtime, removes the wrapper-owned search path, specializes
+`solverforge 0.19.1` runtime, removes the wrapper-owned search path, specializes
 safe native constraint plans, adds qualified retained candidate diagnostics,
 and keeps shared `solverforge-ui 0.7.0` assets. The automatic release workflow
-published the 0.6.2 source distribution and CPython 3.14 wheels to PyPI. This
-patch aligns the exact Rust crate set with SolverForge 0.19.0 without changing
-the public Python API. Its source archive contains only the package metadata
-and Python/Rust build inputs; repository tests, examples, guidance, and tooling
+published the 0.6.3 source distribution and CPython 3.14 wheels to PyPI. This
+patch aligns the exact Rust crate set with SolverForge 0.19.1 and enforces its
+mandatory-completion contract: configured limits stay binding, direct solves
+raise if mandatory work remains, and retained jobs fail without publishing an
+incomplete snapshot. Its source archive contains only the package metadata and
+Python/Rust build inputs; repository tests, examples, guidance, and tooling
 remain source-checkout assets.
 
 ### Additional Language Bindings
