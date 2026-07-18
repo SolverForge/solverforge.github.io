@@ -93,9 +93,18 @@ let (job_id, rx) = MANAGER.solve(problem).expect("solver job should start");
 MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
 
-Configured limits still terminate through the normal solver path. In that case
-the terminal event is `SolverEvent::Completed` and the terminal reason is
-`SolverTerminalReason::TerminatedByConfig`.
+Configured limits remain binding during mandatory scalar and list construction.
+Their terminal result depends on whether the solution is structurally complete:
+
+- after every mandatory list element, required assignment row, and non-optional
+  scalar slot is assigned, the terminal event is `SolverEvent::Completed` and
+  the terminal reason is `SolverTerminalReason::TerminatedByConfig`
+- if a limit fires first, the terminal event is `SolverEvent::Failed`; no
+  `BestSolution`, completed snapshot, or partial construction state is published
+
+Local search cannot start until the mandatory completion gate passes. The gate
+is checked again before final publication, so a later phase cannot expose a
+solution that has become structurally incomplete.
 
 Pause, cancellation, and config termination are polled inside large candidate
 work and around phase and terminal hooks. Paused time is removed from the active

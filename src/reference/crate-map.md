@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.0` crate and current
+This map is aligned with the published `solverforge 0.19.1` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,

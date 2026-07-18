@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.0` crate and current release
+These pages track the `solverforge 0.19.1` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the published `solverforge-cli 2.2.2` package scaffolds
 `solverforge 0.15.2`, so check `solverforge --version` when starting from a
@@ -33,7 +33,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.0` workspace declares Rust `1.95`.
+The `0.19.1` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -66,6 +66,11 @@ The current release tightens several public contracts:
 - macro-generated and dynamic solves both enter the same runtime compiler;
   public build failures distinguish declaration, compilation, phase
   preparation, and phase execution without exposing private graph types
+- configured solver and phase limits remain binding during mandatory
+  construction. Best-solution publication opens only after every list element,
+  required assignment row, and non-optional scalar slot is assigned; reaching
+  a limit first ends the retained job as `Failed` without exposing an
+  incomplete solution or snapshot
 - runtime variable slots, list element sources, native/host compound providers,
   and optional candidate metrics are resolved once and frozen for the solve.
   Specialized list construction uses stable source keys rather than payload
@@ -85,7 +90,9 @@ The current release tightens several public contracts:
   `SolverManager::get_telemetry_detail(...)`
 - pause and cancellation settle at phase and terminal-hook boundaries as well
   as inside long-running work; paused time does not consume active phase timing,
-  and pending control cannot be overwritten by default completion
+  and pending control cannot be overwritten by default completion. A pause
+  before mandatory construction completes remains resumable in-process but has
+  no public solution snapshot
 - `#[solverforge_constraints]` is the canonical constraint-function attribute
   when a function reuses grouped streams. Reused same-binding grouped streams
   and syntax-proved identical grouped chains share one retained node while each
@@ -262,10 +269,9 @@ fn main() {
         }
     }
 
-    let snapshot = MANAGER
-        .get_snapshot(job_id, None)
-        .expect("latest snapshot should exist");
-    println!("latest snapshot revision {}", snapshot.snapshot_revision);
+    if let Ok(snapshot) = MANAGER.get_snapshot(job_id, None) {
+        println!("latest snapshot revision {}", snapshot.snapshot_revision);
+    }
 
     MANAGER.delete(job_id).expect("delete retained job");
 }
@@ -274,8 +280,8 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.0](https://docs.rs/solverforge/0.19.0/solverforge/).
-The `0.19.0` crate is the registry source of truth. Source-line API maps for
+[docs.rs/solverforge 0.19.1](https://docs.rs/solverforge/0.19.1/solverforge/).
+The `0.19.1` crate is the registry source of truth. Source-line API maps for
 the local workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections

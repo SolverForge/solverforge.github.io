@@ -10,18 +10,18 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.0` tag and calls out
+documentation tracks the `solverforge 0.19.1` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.0` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.1` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and all nine workspace crates
-were published on 2026-07-17, and docs.rs serves the 0.19.0 API.
+were published on 2026-07-18, and docs.rs serves the 0.19.1 API.
 The independently published `solverforge-cli 2.2.2` package still scaffolds
 generated apps on `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and
-`solverforge-maps 2.1.4`. The worked-use-case bundle still ships
-`solverforge-hospital@2.0.4`, `solverforge-lessons@2.0.4`,
-`solverforge-deliveries@2.0.4`, and `solverforge-fsr@2.0.5`, all on
-`solverforge 0.18.0`; bundle CI and the four
-Space sync workflows pass at the tagged commit. SolverForge Python has a tagged
+`solverforge-maps 2.1.4`. The worked-use-case bundle now ships
+`solverforge-hospital@2.0.5`, `solverforge-lessons@2.0.5`,
+`solverforge-deliveries@2.0.5`, and `solverforge-fsr@2.0.6`, all on
+`solverforge 0.19.0`; bundle CI and all four tag-triggered Space sync workflows
+pass. SolverForge Python has a tagged
 `solverforge-py 0.6.2` source line for CPython 3.14, compiled onto the
 `solverforge 0.19.0` runtime with embedded `solverforge-ui 0.7.0` assets. The
 automatic release workflow completed and PyPI serves `solverforge 0.6.2`;
@@ -32,10 +32,10 @@ GitHub CI and the final-tag release workflow both pass.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.19.0` |
+| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.19.1` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.2` compiles dynamic CPython 3.14 models into the `solverforge 0.19.0` runtime; PyPI publishes `solverforge 0.6.2` |
-| **Worked Use Cases** | Released, CI passed | `solverforge-hospital@2.0.4`, `solverforge-lessons@2.0.4`, `solverforge-deliveries@2.0.4`, and `solverforge-fsr@2.0.5`; all target `solverforge 0.18.0` and `solverforge-ui 0.6.5` |
+| **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.5`, `solverforge-lessons@2.0.5`, `solverforge-deliveries@2.0.5`, and `solverforge-fsr@2.0.6`; all target `solverforge 0.19.0` and `solverforge-ui 0.6.5` |
 | **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
@@ -51,8 +51,8 @@ GitHub CI and the final-tag release workflow both pass.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital, Lessons, and Deliveries 2.0.4 and FSR 2.0.5
-  contracts on `solverforge 0.18.0`, while keeping their recorded
+  document the released Hospital, Lessons, and Deliveries 2.0.5 and FSR 2.0.6
+  contracts on `solverforge 0.19.0`, while keeping their recorded
   scaffold provenance separate from the published `solverforge-cli 2.2.2`
   scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
@@ -92,10 +92,10 @@ GitHub CI and the final-tag release workflow both pass.
 - **Runtime Compiler**: one immutable resolved graph for native and dynamic
   construction, selector trees, providers, stable list sources, defaults, and
   execution errors
-- **SolverManager API**: retained job lifecycle with progress, best-solution,
-  pause/resume, completion, cancellation, failure, snapshots, and
-  snapshot-bound analysis, active-phase telemetry, and explicit candidate-trace
-  detail retrieval
+- **SolverManager API**: retained job lifecycle with progress, structurally
+  complete best-solution publication, pause/resume, completion, cancellation,
+  failure, snapshots, snapshot-bound analysis, active-phase telemetry, and
+  explicit candidate-trace detail retrieval
 - **Configuration**: stock `solver.toml`, TOML/YAML parsing helpers, bounded
   scalar candidates, grouped scalar selectors, per-leaf ordering and metrics,
   weighted unions, seeded score ties, candidate tracing, level-aware simulated
@@ -132,10 +132,10 @@ GitHub CI and the final-tag release workflow both pass.
 
 ## Runtime Notes
 
-- **0.19.0 runtime line**: `v0.19.0` and the crates.io `solverforge 0.19.0`
+- **0.19.1 runtime line**: `v0.19.1` and the crates.io `solverforge 0.19.1`
   package are current, and the Rust toolchain floor remains `1.95`. The
   published `solverforge-cli 2.2.2` package targets `solverforge 0.15.2`;
-  generated app manifests should move to `solverforge 0.19.0` only when that app
+  generated app manifests should move to `solverforge 0.19.1` only when that app
   is deliberately upgraded and validated.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
@@ -171,7 +171,10 @@ GitHub CI and the final-tag release workflow both pass.
 - **Lifecycle settlement**: pause and cancellation are polled around phases and
   terminal hooks as well as inside long candidate work. Paused time is excluded
   from active phase telemetry, and pending control cannot be overwritten by
-  ordinary completion.
+  ordinary completion. Configured limits remain binding during mandatory
+  construction; incomplete work fails without publishing an incomplete
+  best/completed snapshot, and a pre-completion pause remains resumable without
+  publishing a partial snapshot.
 - **0.17.2 construction surface**: advanced solver integrations can import
   dynamic construction primitives such as `GroupedScalarCursor`,
   `GroupedScalarSelector`, `ScalarAssignmentMoveCursor`,

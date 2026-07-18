@@ -112,11 +112,13 @@ while let Some(event) = rx.blocking_recv() {
 The event variants are:
 
 - `Progress` — telemetry plus lifecycle metadata
-- `BestSolution` — an owned improving solution plus a retained snapshot
+- `BestSolution` — an owned structurally complete improving solution plus a
+  retained snapshot
 - `PauseRequested` — pause has been requested but not yet settled
-- `Paused` — the runtime reached a safe checkpoint and retained a resumable snapshot
-- `Resumed` — a paused job continued from its retained checkpoint
-- `Completed` — the final owned best solution
+- `Paused` — the runtime reached a safe resumable boundary; snapshot metadata is
+  present only after mandatory construction is complete
+- `Resumed` — a paused job continued from its exact retained in-process state
+- `Completed` — the final owned structurally complete best solution
 - `Cancelled` — the job was explicitly cancelled
 - `Failed` — the runtime aborted with an error
 
@@ -174,8 +176,10 @@ Terminal jobs also expose a separate `terminal_reason`:
 - `Cancelled`
 - `Failed`
 
-This distinction matters because a job can be `Completed` for a normal solve end
-or for a configured termination condition.
+This distinction matters because a structurally complete job can be `Completed`
+for a normal solve end or for a configured termination condition. If a
+configured limit fires before mandatory construction completes, the job is
+`Failed` instead and exposes no partial solution.
 
 ## Pause, Resume, and Cancel
 
@@ -188,8 +192,11 @@ MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
 
 `pause()` is not a best-effort hint. The runtime settles it at a safe boundary,
-retains a checkpoint-backed snapshot, emits `Paused`, and only then allows
-`resume()`.
+emits `Paused`, and only then allows `resume()`. Once mandatory construction is
+complete, the pause also retains a checkpoint-backed solution snapshot. Before
+that gate opens, the in-process state remains resumable but the `Paused` event
+has no `snapshot_revision`, `checkpoint_available` remains false, and
+`get_snapshot(...)` returns no partial construction state.
 
 The built-in construction, local-search, and retained phase flow poll control
 state inside large candidate work and again around phase and terminal hooks.
@@ -209,6 +216,10 @@ let exact = MANAGER
     .get_snapshot(job_id, Some(latest.snapshot_revision))
     .expect("requested snapshot");
 ```
+
+Snapshot availability begins only after mandatory construction is complete.
+Callers must treat `snapshot_revision` as optional on lifecycle metadata and
+must not assume that a paused job already has a renderable solution.
 
 If your planning solution is `Analyzable`, you can request score analysis for a
 specific snapshot revision:

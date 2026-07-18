@@ -198,12 +198,14 @@ Required entities are handled before optional entities. One live placer cursor
 owns the required pass: dense coverage can produce one hard-first allocation
 candidate, while single-slot required work remains a bounded stream so
 `cheapest_insertion` and weakest/strongest ordering keep their normal semantics.
-Mandatory required slots may finish after ordinary construction limits expire,
-but still respect pause, cancel, and parent-yield control. Accepted work commits
+Configured solver and phase limits remain binding during this required pass.
+If a limit fires before every required slot is assigned, the solve ends as
+`Failed` without publishing an incomplete best solution or snapshot. Pause,
+cancel, and parent-yield control remain cooperative, and accepted work commits
 immediately. Required assignments may displace optional occupants or move
-required blockers through bounded augmenting paths. Optional assignments remain
-score-improving only unless the model marks them required and configuration uses
-`assign_when_candidate_exists`.
+required blockers through bounded augmenting paths. Optional assignments
+remain score-improving only unless the model marks them required and
+configuration uses `assign_when_candidate_exists`.
 
 ## Dynamic Construction Primitives
 

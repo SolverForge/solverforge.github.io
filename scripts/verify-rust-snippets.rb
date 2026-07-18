@@ -9,7 +9,7 @@ require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
 DEFAULT_SOLVERFORGE_RS_REPO = "/srv/lab/dev/solverforge/solverforge"
-DEFAULT_SOLVERFORGE_RS_REF = "v0.19.0"
+DEFAULT_SOLVERFORGE_RS_REF = "v0.19.1"
 DEFAULT_SOLVERFORGE_MAPS_REPO = "/srv/lab/dev/solverforge/solverforge-maps"
 DEFAULT_SOLVERFORGE_UI_REPO = "/srv/lab/dev/solverforge/solverforge-ui"
 

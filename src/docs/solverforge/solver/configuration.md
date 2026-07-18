@@ -32,7 +32,7 @@ scalar candidates, assignment-backed scalar groups, or conflict repair
 providers, the model must expose those capabilities through the generated model
 support layer.
 
-SolverForge 0.19.0 compiles the complete resolved policy before solving. A bad
+SolverForge 0.19.1 compiles the complete resolved policy before solving. A bad
 target, missing operation bundle, unknown provider or metric, invalid selector
 composition, or inconsistent construction source is a build error at its config
 path; the runtime does not defer schema discovery until a hot candidate loop.
@@ -490,6 +490,12 @@ Controls when the solver stops. See [Termination](/docs/solverforge/solver/termi
 [termination]
 seconds_spent_limit = 300
 ```
+
+Configured solver and phase limits remain binding during required scalar and
+list construction. SolverForge publishes a best solution only after every
+mandatory list element, required assignment row, and non-optional scalar slot
+is assigned. If a limit fires first, the retained job ends as `Failed` without
+publishing an incomplete solution or snapshot.
 
 ### Programmatic Builders
 

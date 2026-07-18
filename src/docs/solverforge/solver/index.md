@@ -49,6 +49,12 @@ configured selector trees, provider registries, stable list sources, and
 model-aware defaults are validated once; there is no parallel descriptor phase
 builder or fallback runtime path.
 
+Best-solution publication is gated on structural completion. Every mandatory
+list element, required assignment row, and non-optional scalar slot must be
+assigned before `BestSolution`, a completed snapshot, or local search can begin.
+Configured limits still apply during construction; reaching one first ends the
+job as `Failed` instead of returning a partial plan.
+
 Local search uses capability-matched streaming defaults when `move_selector` is
 omitted. Scalar candidate limits, assignment-backed grouped scalar selectors,
 conflict repair, list permutation and precedence repair, per-leaf ordering,
@@ -72,7 +78,8 @@ occupant releases, block reassignments, or value rotations from the same group.
 channel. In addition to `Progress` and `BestSolution`, you can observe
 `PauseRequested`, `Paused`, `Resumed`, `Completed`, `Cancelled`, and `Failed`,
 inspect `SolverStatus`, and fetch or analyze retained snapshots by
-`snapshot_revision`.
+`snapshot_revision`. A pause before mandatory construction completes remains
+resumable in-process but intentionally exposes no partial solution snapshot.
 
 Retained telemetry carries exact generated, evaluated, accepted, not-doable,
 acceptor-rejected, forager-ignored, hard-delta, conflict-repair,

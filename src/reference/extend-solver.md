@@ -113,6 +113,11 @@ That means:
   identity and dispositions; retrieve them through `get_telemetry_detail(...)`
   instead of bloating ordinary events and snapshots
 - `moves/s` is a display-only derived metric at the UI edge
+- configured limits remain binding during mandatory construction; incomplete
+  list, required-assignment, or non-optional scalar work is a failed solve, not
+  a best solution
+- a pre-completion pause is resumable in-process but has no public solution
+  snapshot; check optional snapshot metadata before fetching or analyzing it
 - pause, resume, snapshot fetch, and analysis should use the retained
   `SolverManager` contract rather than ad-hoc channels
 

@@ -11,10 +11,18 @@ description: >
 **SolverForge 0.19.x** starts with
 [v0.19.0](https://github.com/SolverForge/solverforge/releases/tag/v0.19.0)
 on 2026-07-17. The current core release is
-[0.19.0](https://crates.io/crates/solverforge/0.19.0). The workspace keeps its
-Rust `1.95` floor and publishes all nine crates on the same version line.
+[0.19.1](https://crates.io/crates/solverforge/0.19.1), published on 2026-07-18.
+The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
+same version line.
 
-> **Update, 2026-07-17:** SolverForge Python 0.6.2 is now published with the
+> **Update, 2026-07-18:** SolverForge 0.19.1 keeps configured solver and phase
+> limits binding during mandatory construction. Best-solution publication now
+> waits for structural completion; reaching a limit first fails instead of
+> returning an incomplete plan. A pre-completion pause remains resumable
+> in-process without exposing a partial solution snapshot.
+
+> **Update, 2026-07-17:** SolverForge Python 0.6.2, Hospital 2.0.5,
+> Lessons 2.0.5, Deliveries 2.0.5, and FSR 2.0.6 are now published with the
 > exact SolverForge 0.19.0 crate set. The version table below preserves the
 > package boundaries when the core release completed.
 
@@ -30,7 +38,7 @@ on chained variables. Those independently released surfaces therefore did not
 need a domain-model rewrite. At the time of the core release, they remained on
 their published 0.18-based lines until their own releases moved. The published
 CLI remains 2.2.2 and still scaffolds SolverForge 0.15.2; generated apps can
-upgrade their runtime manifest to 0.19.0 deliberately.
+upgrade their runtime manifest to the current 0.19.1 patch deliberately.
 
 ## Why One Sequence Model
 
@@ -154,20 +162,20 @@ For direct Rust applications:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.0", features = ["serde", "console"] }
+solverforge = { version = "0.19.1", features = ["serde", "console"] }
 ```
 
-The companion workspace crates are all published at `0.19.0`:
+The companion workspace crates are all published at `0.19.1`:
 
 ```toml
-solverforge-core = "0.19.0"
-solverforge-macros = "0.19.0"
-solverforge-scoring = "0.19.0"
-solverforge-config = "0.19.0"
-solverforge-solver = "0.19.0"
-solverforge-bridge = "0.19.0"
-solverforge-cvrp = "0.19.0"
-solverforge-console = "0.19.0"
+solverforge-core = "0.19.1"
+solverforge-macros = "0.19.1"
+solverforge-scoring = "0.19.1"
+solverforge-config = "0.19.1"
+solverforge-solver = "0.19.1"
+solverforge-bridge = "0.19.1"
+solverforge-cvrp = "0.19.1"
+solverforge-console = "0.19.1"
 ```
 
 When the core release completed, the Python package was still on the previous
@@ -190,9 +198,21 @@ python3.14 -m pip install "solverforge==0.6.2"
 Version 0.6.2 embeds the exact SolverForge 0.19.0 crate set without changing
 the public Python API.
 
+The worked use cases were also republished later on 2026-07-17:
+
+- `solverforge-hospital@2.0.5`
+- `solverforge-lessons@2.0.5`
+- `solverforge-deliveries@2.0.5`
+- `solverforge-fsr@2.0.6`
+
+All four target `solverforge 0.19.0` and retain `solverforge-ui 0.6.5`.
+Deliveries and FSR also retain `solverforge-maps 2.1.4`. These patches align
+dependency and release metadata without changing the application behavior,
+datasets, or solver policies.
+
 ## Upgrade Checklist
 
-- Bump SolverForge dependencies to `0.19.0` and regenerate `Cargo.lock` from
+- Bump SolverForge dependencies to `0.19.1` and regenerate `Cargo.lock` from
   the registry.
 - Replace predecessor-chain entities with an owner-side planning list variable.
 - Replace anchor lookup with the list owner or an inverse-relation shadow.
@@ -207,14 +227,15 @@ the public Python API.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.1` | 2026-07-18 | Keeps configured limits binding during mandatory construction, gates best-solution and snapshot publication on structural completion, and fails rather than returning an incomplete plan. |
 | `0.19.0` | 2026-07-17 | Makes list variables the sole sequence model, removes chained-only metadata and anchor shadows, preserves list-derived shadows, and keeps ordinary scalar paths on direct mutation. |
 
 ## Documentation Changes
 
 - [SolverForge runtime docs](/docs/solverforge/) describe the scalar/list
-  boundary and current 0.19.0 runtime.
+  boundary and current 0.19.1 runtime.
 - [CLI command reference](/docs/solverforge-cli/command-reference/) records the
-  published 2.2.2 scaffold targets separately from the 0.19.0 core.
+  published 2.2.2 scaffold targets separately from the 0.19.1 core.
 - [Crate & Runtime Map](/reference/crate-map/) aligns Rust, CLI, Python, and
   companion repositories on the new release line.
 - [Status & Roadmap](/docs/status-and-roadmap/) tracks each independently

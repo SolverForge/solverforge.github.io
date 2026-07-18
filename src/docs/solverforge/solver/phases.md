@@ -46,8 +46,10 @@ split into parallel phase-builder lifecycles.
 Reached construction nodes prepare their current solve-owned sources lazily;
 already-terminated or unreached nodes do not bind unused sources. Phase-local
 termination overlays begin and end at their top-level phase boundary. Mandatory
-omitted construction remains governed by retained lifecycle control so required
-completion is not silently cut off by an internal overlay.
+omitted construction does not install a phase-local overlay; it remains governed
+by the retained job's top-level limits. If one of those limits fires before
+structural completion, the job fails without publishing a partial best solution
+or snapshot.
 
 Scalar-only construction heuristics validate their model-owned hooks before
 phase build. `first_fit_decreasing` and `allocate_entity_from_queue` require
