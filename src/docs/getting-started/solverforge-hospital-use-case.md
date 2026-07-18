@@ -124,13 +124,13 @@ CLI scaffold plus manual hospital scheduling code.
 
 Start from the CLI's current published scaffold line, then treat the finished
 hospital app as an app-owned runtime upgrade. `solverforge-cli 2.2.2` scaffolds
-`solverforge 0.15.2`; the tagged `solverforge-hospital@2.0.4` reference app
-targets the published `solverforge 0.18.0` runtime while keeping
+`solverforge 0.15.2`; the tagged `solverforge-hospital@2.0.5` reference app
+targets the published `solverforge 0.19.0` runtime while keeping
 `solverforge-ui 0.6.5` for the shipped web-shell assets:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.18.0", features = [
+solverforge = { version = "0.19.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -165,8 +165,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.18.0"
-runtime_source = "crates.io: solverforge 0.18.0"
+target = "solverforge 0.19.0"
+runtime_source = "crates.io: solverforge 0.19.0"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
@@ -709,7 +709,7 @@ make test-slow
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
-| Tagged app release               | `solverforge-hospital@2.0.4`               |
+| Tagged app release               | `solverforge-hospital@2.0.5`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |

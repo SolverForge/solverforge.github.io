@@ -3,10 +3,10 @@
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_RUNTIME_VERSION = "0.18.0"
+EXPECTED_RUNTIME_VERSION = "0.19.0"
 EXPECTED_UI_VERSION = "0.6.5"
 EXPECTED_CLI_VERSION = "2.2.2"
-EXPECTED_APP_VERSION = "2.0.4"
+EXPECTED_APP_VERSION = "2.0.5"
 
 def log(message)
   puts "[verify-lessons-tutorial] #{message}"
