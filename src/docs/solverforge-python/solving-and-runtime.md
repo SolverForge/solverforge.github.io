@@ -14,7 +14,7 @@ SolverForge Python has two runtime entry points:
   resume, cancel, and delete
 
 Both paths compile the authored Python schema into one immutable SolverForge
-0.19.0 runtime graph. The binding supplies dynamic state, callbacks, slot
+0.19.1 runtime graph. The binding supplies dynamic state, callbacks, slot
 capabilities, assignment groups, providers, and candidate metrics; the core owns
 phase construction, cursor execution, foraging, lifecycle control, and
 telemetry. There is no wrapper-owned fallback runner.
@@ -123,6 +123,18 @@ Treat snapshots as point-in-time Python objects. Status telemetry includes the
 active phase type, phase index, phase-local counters, and generation/evaluation
 time when a phase is active.
 
+## Mandatory Completion And Limits
+
+Configured solver and phase limits remain binding during construction. A best
+or completed solution is published only after every planning-list element,
+required assignment row, and non-optional scalar variable is assigned.
+
+If a limit is reached first, `Solver.solve(...)` raises a runtime error. A
+retained job enters `FAILED` without a latest snapshot revision, and
+`snapshot(...)` remains unavailable instead of returning an incomplete plan. A
+pause requested before mandatory construction completes preserves resumable
+internal state, but it does not expose a partial snapshot.
+
 ## Candidate Tracing
 
 Candidate tracing is opt-in, bounded, and available only for retained manager
@@ -190,10 +202,10 @@ Clarke-Wright, and k-opt polish when the model supplies the metadata bundle each
 phase requires.
 
 An explicit assignment `group_name` obeys its configured obligation and
-termination. Required-only completion belongs to upstream omitted defaults.
-Default local search is assembled only when the top-level termination has an
-effective finite limit, so an empty or invalid termination cannot create an
-unbounded solve.
+termination. Omitted construction resolves required and optional stages in the
+core, but mandatory work never bypasses a configured limit. Default local
+search is assembled only when the top-level termination has an effective finite
+limit, so an empty or invalid termination cannot create an unbounded solve.
 
 Scalar selectors available to Python dynamic models:
 
