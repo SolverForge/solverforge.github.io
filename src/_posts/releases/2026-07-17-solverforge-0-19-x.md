@@ -5,15 +5,33 @@ draft: false
 description: >
   SolverForge 0.19.x makes planning list variables the sole model for routes
   and ordered assignments, keeps the full list-shadow system, and leaves
-  ordinary scalar search on direct single-slot mutation.
+  ordinary scalar search on direct single-slot mutation. Patch releases through
+  0.19.4 tighten mandatory construction, control, telemetry, and assignment
+  batching.
 ---
 
 **SolverForge 0.19.x** starts with
 [v0.19.0](https://github.com/SolverForge/solverforge/releases/tag/v0.19.0)
 on 2026-07-17. The current core release is
-[0.19.1](https://crates.io/crates/solverforge/0.19.1), published on 2026-07-18.
+[0.19.4](https://crates.io/crates/solverforge/0.19.4), published on 2026-08-11.
 The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
 same version line.
+
+> **Update, 2026-08-11:** SolverForge 0.19.4 commits the dense hard-first
+> required-assignment batch from independent direct assignments, then leaves
+> bounded augmenting rematches to a following cursor that can retain their
+> multi-entity edits. Generic and specialized construction share the same
+> engine-owned lifecycle and progress telemetry, including prompt first work
+> and roughly one-second verbose progress during long phases.
+
+> **Update, 2026-07-29:** SolverForge 0.19.3 restores shared assignment
+> rotation. The independently released CLI 2.2.3 and Hospital, Lessons,
+> Deliveries, and FSR 2.0.x patches target this 0.19.3 registry line.
+
+> **Update, 2026-07-19:** SolverForge 0.19.2 unifies generic and specialized
+> construction lifecycle handling, keeps buffered route telemetry atomic,
+> publishes first and periodic phase progress, polls expensive construction
+> work by control deadline, and preserves mandatory-completion semantics.
 
 > **Update, 2026-07-18:** SolverForge 0.19.1 keeps configured solver and phase
 > limits binding during mandatory construction. Best-solution publication now
@@ -41,9 +59,10 @@ the list runtime.
 No released SolverForge use case, Python model, or benchmark workload depended
 on chained variables. Those independently released surfaces therefore did not
 need a domain-model rewrite. At the time of the core release, they remained on
-their published 0.18-based lines until their own releases moved. The published
-CLI remains 2.2.2 and still scaffolds SolverForge 0.15.2; generated apps can
-upgrade their runtime manifest to the current 0.19.1 patch deliberately.
+their published 0.18-based lines until their own releases moved. The current
+published CLI is 2.2.3 and scaffolds SolverForge 0.19.3. Existing generated
+applications still own their dependency manifests and should move to 0.19.4
+only after app-level validation.
 
 ## Why One Sequence Model
 
@@ -136,8 +155,8 @@ sublist, reverse, k-opt, ruin/recreate, nearby, precedence, and CVRP-specific
 selectors then operate on the same sequence representation. Configure only the
 shadows that constraints or application code actually need.
 
-The published SolverForge CLI 2.2.2 already exposes the same scalar/list
-modeling boundary, even though its fresh-project runtime target remains 0.15.2:
+The published SolverForge CLI 2.2.3 exposes the same scalar/list modeling
+boundary and scaffolds the SolverForge 0.19.3 runtime:
 
 ```bash
 solverforge generate variable visit_order \
@@ -167,20 +186,20 @@ For direct Rust applications:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.1", features = ["serde", "console"] }
+solverforge = { version = "0.19.4", features = ["serde", "console"] }
 ```
 
-The companion workspace crates are all published at `0.19.1`:
+The companion workspace crates are all published at `0.19.4`:
 
 ```toml
-solverforge-core = "0.19.1"
-solverforge-macros = "0.19.1"
-solverforge-scoring = "0.19.1"
-solverforge-config = "0.19.1"
-solverforge-solver = "0.19.1"
-solverforge-bridge = "0.19.1"
-solverforge-cvrp = "0.19.1"
-solverforge-console = "0.19.1"
+solverforge-core = "0.19.4"
+solverforge-macros = "0.19.4"
+solverforge-scoring = "0.19.4"
+solverforge-config = "0.19.4"
+solverforge-solver = "0.19.4"
+solverforge-bridge = "0.19.4"
+solverforge-cvrp = "0.19.4"
+solverforge-console = "0.19.4"
 ```
 
 When the core release completed, the Python package was still on the previous
@@ -200,7 +219,7 @@ python3.14 -m pip install "solverforge==0.6.2"
 ```
 
 Version 0.6.2 embeds the exact SolverForge 0.19.0 crate set without changing
-the public Python API. SolverForge Python 0.6.3 is the current package:
+the public Python API. SolverForge Python 0.6.3 followed on 2026-07-18:
 
 ```bash
 python3.14 -m pip install "solverforge==0.6.3"
@@ -210,21 +229,32 @@ Version 0.6.3 embeds the exact SolverForge 0.19.1 crate set. Configured limits
 remain binding during mandatory construction; reaching one first raises from a
 direct solve or fails a retained job without publishing an incomplete snapshot.
 
-The worked use cases were also republished later on 2026-07-17:
+Python 0.6.4 and 0.6.5 then consumed the 0.19.2 construction repair and 0.19.3
+assignment-rotation repair. The current Python package is 0.6.6:
 
-- `solverforge-hospital@2.0.5`
-- `solverforge-lessons@2.0.5`
-- `solverforge-deliveries@2.0.5`
-- `solverforge-fsr@2.0.6`
+```bash
+python3.14 -m pip install "solverforge==0.6.6"
+```
 
-All four target `solverforge 0.19.0` and retain `solverforge-ui 0.6.5`.
+Version 0.6.6 embeds the exact SolverForge 0.19.4 crate set, treats each row's
+imported scalar candidate set as a hard native domain, and adds
+`same_value_conflict_field` for callback-free static assignment conflict graphs.
+
+The worked use cases were republished again on the SolverForge 0.19.3 line:
+
+- `solverforge-hospital@2.0.6`
+- `solverforge-lessons@2.0.6`
+- `solverforge-deliveries@2.0.6`
+- `solverforge-fsr@2.0.7`
+
+All four target `solverforge 0.19.3` and retain `solverforge-ui 0.6.5`.
 Deliveries and FSR also retain `solverforge-maps 2.1.4`. These patches align
 dependency and release metadata without changing the application behavior,
 datasets, or solver policies.
 
 ## Upgrade Checklist
 
-- Bump SolverForge dependencies to `0.19.1` and regenerate `Cargo.lock` from
+- Bump SolverForge dependencies to `0.19.4` and regenerate `Cargo.lock` from
   the registry.
 - Replace predecessor-chain entities with an owner-side planning list variable.
 - Replace anchor lookup with the list owner or an inverse-relation shadow.
@@ -239,18 +269,21 @@ datasets, or solver policies.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.4` | 2026-08-11 | Commits direct required assignments in the dense hard-first batch, defers augmenting rematches to a retaining cursor, and exposes the unified construction progress contract. |
+| `0.19.3` | 2026-07-29 | Restores shared assignment rotation. |
+| `0.19.2` | 2026-07-19 | Repairs required construction completion and interruption, unifies construction lifecycle and progress, preserves committed scores, and commits route telemetry atomically. |
 | `0.19.1` | 2026-07-18 | Keeps configured limits binding during mandatory construction, gates best-solution and snapshot publication on structural completion, and fails rather than returning an incomplete plan. |
 | `0.19.0` | 2026-07-17 | Makes list variables the sole sequence model, removes chained-only metadata and anchor shadows, preserves list-derived shadows, and keeps ordinary scalar paths on direct mutation. |
 
 ## Documentation Changes
 
 - [SolverForge runtime docs](/docs/solverforge/) describe the scalar/list
-  boundary and current 0.19.1 runtime.
+  boundary and current 0.19.4 runtime.
 - [CLI command reference](/docs/solverforge-cli/command-reference/) records the
-  published 2.2.2 scaffold targets separately from the 0.19.1 core.
+  published 2.2.3 scaffold targets separately from the 0.19.4 core.
 - [Crate & Runtime Map](/reference/crate-map/) aligns Rust, CLI, Python, and
   companion repositories on the new release line.
-- [SolverForge Python](/docs/solverforge-python/) records the published 0.6.3
-  package and its exact SolverForge 0.19.1 runtime base.
+- [SolverForge Python](/docs/solverforge-python/) records the published 0.6.6
+  package and its exact SolverForge 0.19.4 runtime base.
 - [Status & Roadmap](/docs/status-and-roadmap/) tracks each independently
   published package and use-case version.

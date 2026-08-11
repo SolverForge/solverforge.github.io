@@ -51,6 +51,10 @@ canonical runtime metric.
 score-calculation, generation-time, and evaluation-time counters. A generated
 count means a candidate was actually yielded to the engine; it does not include
 an unrequested logical tail after a cursor or forager short-circuits.
+Construction and local search publish that same phase telemetry. With verbose
+logging, the engine reports the first observed construction work promptly and
+then emits progress at roughly one-second intervals during long-running phases;
+bindings and console consumers receive the same structured events.
 
 Consume them in a loop:
 

@@ -17,10 +17,10 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.1` crate and current release
+These pages track the `solverforge 0.19.4` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
-runtime; the published `solverforge-cli 2.2.2` package scaffolds
-`solverforge 0.15.2`, so check `solverforge --version` when starting from a
+runtime; the published `solverforge-cli 2.2.3` package scaffolds
+`solverforge 0.19.3`, so check `solverforge --version` when starting from a
 scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
@@ -33,7 +33,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.1` workspace declares Rust `1.95`.
+The `0.19.4` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -47,14 +47,21 @@ Generic `FirstFit` and `CheapestInsertion` use the compiled graph's
 descriptor-placement schedule for scalar-only targets and its declaration-order
 global scan for matching mixed/list work. Assignment-backed grouped scalar
 construction covers required nullable scalar slots through
-`ScalarGroup::assignment(...)`, and optional scalar variables keep `None` when
-it is the best legal baseline unless configuration asks construction to assign
-whenever a candidate exists.
+`ScalarGroup::assignment(...)`. Its default required pass commits the dense
+hard-first batch with direct independent assignments, then leaves bounded
+augmenting rematches to the following required cursor where multi-entity edits
+can be retained. Optional scalar variables keep `None` when it is the best legal
+baseline unless configuration asks construction to assign whenever a candidate
+exists.
 
 Startup telemetry is shape-aware: scalar solves report average `candidates`,
 list solves report element counts, and console output labels those solve shapes
 as `candidates` or `elements`. Retained telemetry also identifies the active
 phase and keeps its local elapsed/work counters separate from whole-solve totals.
+Generic and specialized construction now publish the same engine-owned
+lifecycle and progress events as local search: the first observed work is
+reported promptly and long-running phases continue at roughly one-second
+intervals when verbose logging is enabled.
 
 The current release tightens several public contracts:
 
@@ -71,6 +78,10 @@ The current release tightens several public contracts:
   required assignment row, and non-optional scalar slot is assigned; reaching
   a limit first ends the retained job as `Failed` without exposing an
   incomplete solution or snapshot
+- generic and specialized construction share one phase lifecycle, telemetry,
+  and control-polling contract. Candidate counters and route telemetry commit
+  atomically, expensive cursor generation can observe pause/cancel/deadline
+  control, and consumers do not synthesize construction progress
 - runtime variable slots, list element sources, native/host compound providers,
   and optional candidate metrics are resolved once and frozen for the solve.
   Specialized list construction uses stable source keys rather than payload
@@ -280,8 +291,8 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.1](https://docs.rs/solverforge/0.19.1/solverforge/).
-The `0.19.1` crate is the registry source of truth. Source-line API maps for
+[docs.rs/solverforge 0.19.4](https://docs.rs/solverforge/0.19.4/solverforge/).
+The `0.19.4` crate is the registry source of truth. Source-line API maps for
 the local workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections

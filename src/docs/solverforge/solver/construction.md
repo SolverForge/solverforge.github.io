@@ -34,6 +34,13 @@ list-bearing targets use its declaration-order global scan. Specialized scalar
 and list heuristics become compiled nodes that call the same public kernels,
 rather than entering a parallel phase-builder lifecycle.
 
+Generic and specialized constructors emit one engine-owned phase lifecycle.
+With verbose logging, the first observed construction work is published
+promptly and long-running work continues at roughly one-second intervals.
+Candidate, score-calculation, generation-time, and evaluation-time counters are
+the runtime's authoritative values; Rust apps and bindings do not reconstruct
+construction progress from callbacks or terminal output.
+
 List-specific construction such as Clarke-Wright consumes savings hooks from
 the list variable. Stock CVRP lists can declare `domain = "cvrp"` to get the
 standard `solverforge::cvrp::savings_hooks` and `savings_metric_class` without
@@ -195,15 +202,20 @@ group_candidate_limit = 64
 ```
 
 Required entities are handled before optional entities. One live placer cursor
-owns the required pass: dense coverage can produce one hard-first allocation
-candidate, while single-slot required work remains a bounded stream so
-`cheapest_insertion` and weakest/strongest ordering keep their normal semantics.
+owns the required pass. The dense hard-first batch commits independent direct
+assignments immediately; it does not explore augmenting rematches that cannot
+be retained as part of that batch. Bounded rematches remain available to the
+following required cursor, where their multi-entity edits can be retained.
+Single-slot required work remains a bounded stream so `cheapest_insertion` and
+weakest/strongest ordering keep their normal semantics.
+
 Configured solver and phase limits remain binding during this required pass.
 If a limit fires before every required slot is assigned, the solve ends as
 `Failed` without publishing an incomplete best solution or snapshot. Pause,
-cancel, and parent-yield control remain cooperative, and accepted work commits
-immediately. Required assignments may displace optional occupants or move
-required blockers through bounded augmenting paths. Optional assignments
+cancel, deadline, and parent-yield control are polled during preprocessing and
+expensive candidate pulls as well as at phase boundaries, and accepted work
+commits immediately. Required assignments may displace optional occupants or
+move required blockers through bounded augmenting paths. Optional assignments
 remain score-improving only unless the model marks them required and
 configuration uses `assign_when_candidate_exists`.
 
