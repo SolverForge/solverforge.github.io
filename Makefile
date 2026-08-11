@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint ci-local pre-release verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial start clean version
+.PHONY: help doctor install frontend frontend-watch build test lint ci-local pre-release verify-release-surface verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial start clean version
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -33,6 +33,7 @@ help:
 	@printf '\nQuality gates\n'
 	@printf '  make test                       Build in test mode and verify worked examples\n'
 	@printf '  make lint                       Run Ruby and JavaScript syntax checks\n'
+	@printf '  make verify-release-surface     Verify current package and app version contracts\n'
 	@printf '  make verify-cli-release         Install the published CLI and verify scaffold targets\n'
 	@printf '  make verify-rust-snippets       Compile-check Rust snippets in docs\n'
 	@printf '  make verify-hospital-tutorial   Run portable tutorial contract checks\n'
@@ -78,6 +79,8 @@ build: frontend
 test: frontend
 	$(call status,Building Bridgetown site in test mode)
 	@BRIDGETOWN_ENV=test bundle exec rake test
+	$(call status,Verifying current release documentation contracts)
+	@ruby scripts/verify-release-surface.rb
 	$(call status,Verifying hospital tutorial contract)
 	@ruby scripts/verify-hospital-tutorial.rb
 	$(call status,Verifying lessons tutorial contract)
@@ -95,7 +98,7 @@ lint:
 	$(call status,Checking JavaScript syntax)
 	@find . \( -path './.git' -o -path './.bridgetown-cache' -o -path './node_modules' -o -path './output' -o -path './vendor' \) -prune -o \( -name '*.js' -o -name '*.mjs' \) -print0 | xargs -0 -n 1 node --check
 
-ci-local: doctor lint verify-rust-snippets build verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
+ci-local: doctor lint verify-release-surface verify-rust-snippets build verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -103,6 +106,10 @@ pre-release: verify-cli-release ci-local
 verify-cli-release:
 	$(call status,Verifying published solverforge-cli release)
 	@ruby scripts/verify-cli-release.rb
+
+verify-release-surface:
+	$(call status,Verifying current release documentation contracts)
+	@ruby scripts/verify-release-surface.rb
 
 verify-rust-snippets:
 	$(call status,Verifying Rust documentation snippets)
