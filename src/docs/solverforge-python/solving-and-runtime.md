@@ -14,7 +14,7 @@ SolverForge Python has two runtime entry points:
   resume, cancel, and delete
 
 Both paths compile the authored Python schema into one immutable SolverForge
-0.19.1 runtime graph. The binding supplies dynamic state, callbacks, slot
+0.19.4 runtime graph. The binding supplies dynamic state, callbacks, slot
 capabilities, assignment groups, providers, and candidate metrics; the core owns
 phase construction, cursor execution, foraging, lifecycle control, and
 telemetry. There is no wrapper-owned fallback runner.
@@ -122,6 +122,11 @@ The manager exposes:
 Treat snapshots as point-in-time Python objects. Status telemetry includes the
 active phase type, phase index, phase-local counters, and generation/evaluation
 time when a phase is active.
+
+Construction and local search publish the same engine-owned phase lifecycle and
+progress telemetry. The first observed construction work is reported promptly,
+and long-running phases continue at roughly one-second intervals when verbose
+logging is enabled. The Python layer does not synthesize construction counters.
 
 ## Mandatory Completion And Limits
 
@@ -249,6 +254,11 @@ Assignment-owned variables are excluded from raw scalar, nearby, ruin, and
 conflict-repair selectors. Their declared group is the only construction and
 local-search ownership path. Multiple declarative assignment groups can still
 compose through selector combinators.
+
+Every scalar selector also respects the entity row's imported
+`candidate_values` set as a hard domain. Change, swap, grouped-scalar, and
+construction moves cannot assign a solution-level value that the row candidate
+source excluded.
 
 Dynamic neighborhoods are resumable cursor trees. Union children, limits,
 Cartesian branches, pillar windows, and k-opt reconnections advance only when

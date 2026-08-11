@@ -48,7 +48,7 @@ feature that requires them.
 
 The decorator data is not late-bound search behavior. SolverForge Python
 validates it into one immutable runtime plan containing the schema, solution
-descriptor, and SolverForge 0.19.1 runtime model. Direct solves, retained jobs,
+descriptor, and SolverForge 0.19.4 runtime model. Direct solves, retained jobs,
 snapshots, and resumes reuse that plan; instance rows, callback views, seeds,
 and moves remain specific to each solve.
 
@@ -88,6 +88,12 @@ the selected phase needs them. Nearby candidate and distance metadata accepts
 either a callback or a row field name. Each property has exactly one source;
 declaring both is rejected during schema compilation.
 
+`candidate_values` is also the native hard domain for that entity row. Every
+scalar mutation path, including swaps and assignment-group moves, checks the
+imported row candidate set before applying a value. A selector therefore cannot
+move a value into a row merely because it exists in the solution-level value
+range when that row's candidate callback excluded it.
+
 Assignment-aware grouped scalar construction and local search use
 `scalar_assignment_group(...)` metadata passed to the solution decorator:
 
@@ -113,6 +119,27 @@ class Schedule:
 Required metadata is a row boolean, position and sequence metadata are row
 integers, and capacity metadata is a row list indexed by candidate value. A
 field source and callback source for the same property are mutually exclusive.
+
+For a static conflict graph, `same_value_conflict_field` is the native
+alternative to `assignment_rule`. The named row field contains a list of other
+entity indexes that cannot hold the same assigned value:
+
+```python
+assignment_group = scalar_assignment_group(
+    "employee_assignments",
+    entity_class="Shift",
+    variable_name="employee_idx",
+    required_entity_field="required",
+    same_value_conflict_field="conflicts",
+    sequence_key_field="sequence",
+)
+```
+
+The conflict field must contain only in-range entity indexes. Conflict lookup
+is symmetric across the two rows, sequence metadata is required, and
+`same_value_conflict_field` cannot be combined with an `assignment_rule`
+callback. The field-backed graph stays in Rust-owned row state and avoids a
+Python transition for each legality check.
 
 An assignment-owned variable has one mutation path: its declared group handles
 grouped construction and `grouped_scalar_move_selector`. Raw scalar, nearby,
