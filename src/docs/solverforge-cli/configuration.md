@@ -87,12 +87,12 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "2.2.2"
+cli_version = "2.2.3"
 
 [runtime]
-target = "solverforge 0.15.2"
-runtime_source = "crates.io: solverforge 0.15.2"
-ui_source = "crates.io: solverforge-ui 0.6.5"
+target = "solverforge 0.19.3"
+runtime_source = "crates.io: solverforge 0.19.3"
+ui_source = "crates.io: solverforge-ui 0.7.0"
 
 [demo]
 default_size = "standard"
@@ -103,9 +103,9 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the published `solverforge-cli 2.2.2` web scaffold
-target. Fresh web generated apps start on the published `solverforge 0.15.2`
-runtime and the CLI's `solverforge-ui 0.6.5` scaffold target.
+This example reflects the published `solverforge-cli 2.2.3` web scaffold
+target. Fresh web generated apps start on the published `solverforge 0.19.3`
+runtime and the CLI's `solverforge-ui 0.7.0` scaffold target.
 
 Record any later app-owned target changes explicitly in that app's dependency
 manifest and `solverforge.app.toml`.

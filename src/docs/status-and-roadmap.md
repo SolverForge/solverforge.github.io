@@ -10,21 +10,21 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.1` tag and calls out
+documentation tracks the `solverforge 0.19.4` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.1` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.4` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and all nine workspace crates
-were published on 2026-07-18, and docs.rs serves the 0.19.1 API.
-The independently published `solverforge-cli 2.2.2` package still scaffolds
-generated apps on `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and
+were published on 2026-08-11, and docs.rs serves the 0.19.4 API.
+The independently published `solverforge-cli 2.2.3` package scaffolds
+generated apps on `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and
 `solverforge-maps 2.1.4`. The worked-use-case bundle now ships
-`solverforge-hospital@2.0.5`, `solverforge-lessons@2.0.5`,
-`solverforge-deliveries@2.0.5`, and `solverforge-fsr@2.0.6`, all on
-`solverforge 0.19.0`; bundle CI and all four tag-triggered Space sync workflows
+`solverforge-hospital@2.0.6`, `solverforge-lessons@2.0.6`,
+`solverforge-deliveries@2.0.6`, and `solverforge-fsr@2.0.7`, all on
+`solverforge 0.19.3`; bundle CI and all four tag-triggered Space sync workflows
 pass. SolverForge Python has a tagged
-`solverforge-py 0.6.3` source line for CPython 3.14, compiled onto the
-`solverforge 0.19.1` runtime with embedded `solverforge-ui 0.7.0` assets. The
-automatic release workflow completed and PyPI serves `solverforge 0.6.3`;
+`solverforge-py 0.6.6` source line for CPython 3.14, compiled onto the
+`solverforge 0.19.4` runtime with embedded `solverforge-ui 0.7.0` assets. The
+automatic release workflow completed and PyPI serves `solverforge 0.6.6`;
 GitHub CI and the final-tag release workflow both pass.
 <% end %>
 
@@ -32,11 +32,11 @@ GitHub CI and the final-tag release workflow both pass.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published | Native Rust constraint solver published as `solverforge 0.19.1` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.6.3` compiles dynamic CPython 3.14 models into the `solverforge 0.19.1` runtime; PyPI publishes `solverforge 0.6.3` |
-| **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.5`, `solverforge-lessons@2.0.5`, `solverforge-deliveries@2.0.5`, and `solverforge-fsr@2.0.6`; all target `solverforge 0.19.0` and `solverforge-ui 0.6.5` |
-| **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets; CLI scaffolds still pin `solverforge-ui 0.6.5` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.4` |
+| **CLI Scaffold** | Published | `solverforge-cli 2.2.3` scaffolds `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4` |
+| **Python** | Published; CI and release passed | `solverforge-py 0.6.6` compiles dynamic CPython 3.14 models into the `solverforge 0.19.4` runtime; PyPI publishes `solverforge 0.6.6` |
+| **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.6`, `solverforge-lessons@2.0.6`, `solverforge-deliveries@2.0.6`, and `solverforge-fsr@2.0.7`; all target `solverforge 0.19.3` and `solverforge-ui 0.6.5` |
+| **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets and is the current CLI scaffold target |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -51,9 +51,10 @@ GitHub CI and the final-tag release workflow both pass.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital, Lessons, and Deliveries 2.0.5 and FSR 2.0.6
-  contracts on `solverforge 0.19.0`, while keeping their recorded
-  scaffold provenance separate from the published `solverforge-cli 2.2.2`
+  document the released Hospital, Lessons, and Deliveries 2.0.6 and FSR 2.0.7
+  contracts on `solverforge 0.19.3`, while keeping their recorded
+  `solverforge-cli 2.2.2` scaffold provenance separate from the published
+  `solverforge-cli 2.2.3`
   scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
@@ -103,13 +104,14 @@ GitHub CI and the final-tag release workflow both pass.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.6.3"`; use the
-  matching `solverforge-py` `v0.6.3` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.6.6"`; use the
+  matching `solverforge-py` `v0.6.6` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
-  metrics, and callback constraints.
+  metrics, hard per-row scalar candidate domains, native static same-value
+  conflict fields, and callback constraints.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
-  `SolverManager(config=None)` over one compiled SolverForge 0.19.1 runtime graph.
+  `SolverManager(config=None)` over one compiled SolverForge 0.19.4 runtime graph.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
   joins, grouped counts, balance scoring, fixed or callback-computed weights,
   unassigned-list scoring, list precedence/makespan scoring, indexed-presence
@@ -132,10 +134,10 @@ GitHub CI and the final-tag release workflow both pass.
 
 ## Runtime Notes
 
-- **0.19.1 runtime line**: `v0.19.1` and the crates.io `solverforge 0.19.1`
+- **0.19.4 runtime line**: `v0.19.4` and the crates.io `solverforge 0.19.4`
   package are current, and the Rust toolchain floor remains `1.95`. The
-  published `solverforge-cli 2.2.2` package targets `solverforge 0.15.2`;
-  generated app manifests should move to `solverforge 0.19.1` only when that app
+  published `solverforge-cli 2.2.3` package targets `solverforge 0.19.3`;
+  generated app manifests should move to `solverforge 0.19.4` only when that app
   is deliberately upgraded and validated.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
@@ -158,6 +160,13 @@ GitHub CI and the final-tag release workflow both pass.
   candidate IDs, let foragers short-circuit without draining a neighborhood,
   and transfer only the selected winner by value. Generated counts represent
   actual cursor yields rather than an unrequested logical tail.
+- **Construction control and progress**: generic and specialized construction
+  share one lifecycle and phase-telemetry path, publish first work promptly,
+  continue roughly once per second under verbose logging, poll control during
+  expensive generation, and commit route counters atomically.
+- **Required assignment batches**: the default hard-first required pass commits
+  dense independent assignments directly, then leaves bounded augmenting
+  rematches to a following cursor that can retain their multi-entity edits.
 - **Qualified candidate traces**: `[candidate_trace]` retains a bounded ordered
   prefix with canonical config, resolved plan, execution policy, input,
   operation identity, and disposition provenance. Detailed traces are fetched
@@ -300,18 +309,18 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.6.3` is the current tagged SolverForge Python source line for
+`solverforge-py 0.6.6` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
-`solverforge 0.19.1` runtime, removes the wrapper-owned search path, specializes
+`solverforge 0.19.4` runtime, removes the wrapper-owned search path, specializes
 safe native constraint plans, adds qualified retained candidate diagnostics,
 and keeps shared `solverforge-ui 0.7.0` assets. The automatic release workflow
-published the 0.6.3 source distribution and CPython 3.14 wheels to PyPI. This
-patch aligns the exact Rust crate set with SolverForge 0.19.1 and enforces its
-mandatory-completion contract: configured limits stay binding, direct solves
-raise if mandatory work remains, and retained jobs fail without publishing an
-incomplete snapshot. Its source archive contains only the package metadata and
-Python/Rust build inputs; repository tests, examples, guidance, and tooling
-remain source-checkout assets.
+published the 0.6.6 source distribution and CPython 3.14 wheels to PyPI. This
+patch enforces each row's imported candidate set as the hard domain for every
+native scalar mutation and adds `same_value_conflict_field` for static
+assignment conflict graphs without callback transitions. It also carries the
+exact SolverForge 0.19.4 construction and telemetry behavior. Its source archive
+contains only the package metadata and Python/Rust build inputs; repository
+tests, examples, guidance, and tooling remain source-checkout assets.
 
 ### Additional Language Bindings
 

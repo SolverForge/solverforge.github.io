@@ -5,9 +5,9 @@ require "fileutils"
 require "open3"
 require "tmpdir"
 
-EXPECTED_CLI_VERSION = "2.2.2"
-EXPECTED_RUNTIME_VERSION = "0.15.2"
-EXPECTED_UI_VERSION = "0.6.5"
+EXPECTED_CLI_VERSION = "2.2.3"
+EXPECTED_RUNTIME_VERSION = "0.19.3"
+EXPECTED_UI_VERSION = "0.7.0"
 EXPECTED_MAPS_VERSION = "2.1.4"
 
 def fail!(message)

@@ -15,7 +15,7 @@ This section tracks the published `solverforge-ui 0.7.0` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
 exact dense scheduling geometry, normalized create-job identifiers, optional
 map helpers, and framework-neutral embedded asset access. Current
-`solverforge-cli` scaffolds still pin `solverforge-ui 0.6.5`.
+`solverforge-cli 2.2.3` scaffolds pin `solverforge-ui 0.7.0`.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for

@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the checked-in SolverForge 0.19.0 use-case dependency shape
+- keep the checked-in SolverForge 0.19.3 use-case dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -123,17 +123,17 @@ score analysis surface, route tables, Docker build, and tests.
 
 ### Keep the Published Dependency Shape
 
-The tagged `solverforge-fsr@2.0.6` use-case source targets the published
-SolverForge 0.19.0 line:
+The tagged `solverforge-fsr@2.0.7` use-case source targets the published
+SolverForge 0.19.3 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.0", features = [
+solverforge = { version = "0.19.3", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.19.0"
+solverforge-core = "0.19.3"
 solverforge-ui = { version = "0.6.5" }
 solverforge-maps = { version = "2.1.4" }
 
@@ -160,8 +160,9 @@ and route shadow values; most generated applications only need the top-level
 `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 2.2.2` scaffolds `solverforge 0.15.2`; the finished FSR app
-records its deliberate `solverforge 0.19.0` runtime target separately:
+`solverforge-cli 2.2.3` now scaffolds `solverforge 0.19.3`; the finished FSR app
+records the same runtime target while retaining its original `2.2.2` scaffold
+provenance:
 
 ```toml
 [app]
@@ -171,8 +172,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.19.0"
-runtime_source = "crates.io: solverforge 0.19.0"
+target = "solverforge 0.19.3"
+runtime_source = "crates.io: solverforge 0.19.3"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
@@ -392,7 +393,7 @@ travel it carries.
 ### Route Shadows Bridge Lists and Streams
 
 Several business rules need the same expensive route walk. Rather than keeping
-that walk inside a custom constraint adapter, the v0.19.0 use-case stores the
+that walk inside a custom constraint adapter, the v0.19.3 use-case stores the
 derived measurements on `TechnicianRoute` as cascading shadow variables:
 
 - invalid and valid visit counts
@@ -512,7 +513,7 @@ values refreshed by `FieldServicePlan`. For example, `reachable_legs` reads
 `route_missing_skill_visits`, `minimize_travel` reads `travel_penalty()`, and
 `priority_slack` rewards `route_priority_slack`.
 
-That is the v0.19.0 teaching point: whole-route business measurements can live
+That is the v0.19.3 teaching point: whole-route business measurements can live
 as domain shadow values, while the scoring rules remain stock SolverForge
 constraint streams with normal score-analysis metadata.
 
@@ -698,7 +699,7 @@ curl http://localhost:7860/demo-data
 
 | Topic | File |
 | ----- | ---- |
-| Tagged app release | `solverforge-fsr@2.0.6` |
+| Tagged app release | `solverforge-fsr@2.0.7` |
 | App contract | `solverforge.app.toml` |
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |

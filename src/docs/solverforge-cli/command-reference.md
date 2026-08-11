@@ -61,19 +61,19 @@ solverforge generate variable --help
 crate targets used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 2.2.2
-CLI version: 2.2.2
-Scaffold runtime target: SolverForge crate target 0.15.2
-Scaffold UI target: solverforge-ui 0.6.5
+solverforge solverforge-cli 2.2.3
+CLI version: 2.2.3
+Scaffold runtime target: SolverForge crate target 0.19.3
+Scaffold UI target: solverforge-ui 0.7.0
 Scaffold maps target: solverforge-maps 2.1.4
-Runtime source: crates.io: solverforge 0.15.2
-UI source: crates.io: solverforge-ui 0.6.5
+Runtime source: crates.io: solverforge 0.19.3
+UI source: crates.io: solverforge-ui 0.7.0
 Maps source: crates.io: solverforge-maps 2.1.4
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 2.2.2` package starts new scaffolds on the published
-`solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`
+`solverforge-cli 2.2.3` package starts new scaffolds on the published
+`solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`
 crate line. The core runtime can move ahead of the scaffold target, so registry
 installs should always be checked with `solverforge --version`.
 

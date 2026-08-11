@@ -18,9 +18,12 @@ Direct UI integrations can install the new line:
 solverforge-ui = { version = "0.7.0" }
 ```
 
-The current `solverforge-cli 2.2.2` scaffold target still uses
-`solverforge-ui 0.6.5`. That is a scaffold dependency choice, not a statement
-that the published UI crate is still on 0.6.x.
+At publication, `solverforge-cli 2.2.2` still targeted `solverforge-ui 0.6.5`.
+That was a scaffold dependency choice, not a statement that the published UI
+crate was still on 0.6.x.
+
+> **Update, 2026-08-11:** The current `solverforge-cli 2.2.3` scaffold target
+> now uses `solverforge-ui 0.7.0`.
 
 ## What Changed
 

@@ -12,13 +12,14 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "2.2.2"
-EXPECTED_CLI_RUNTIME_VERSION = "0.15.2"
+EXPECTED_CLI_VERSION = "2.2.3"
+EXPECTED_CLI_RUNTIME_VERSION = "0.19.3"
+EXPECTED_CLI_UI_VERSION = "0.7.0"
 EXPECTED_FSR_APP_CLI_VERSION = "2.2.2"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.19.0"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.19.3"
 EXPECTED_TUTORIAL_UI_VERSION = "0.6.5"
 EXPECTED_MAPS_VERSION = "2.1.4"
-EXPECTED_FSR_APP_VERSION = "2.0.6"
+EXPECTED_FSR_APP_VERSION = "2.0.7"
 
 def log(message)
   puts "[verify-fsr-tutorial] #{message}"
@@ -390,7 +391,7 @@ begin
     version_output = run_command(cli_bin, "--version")
     assert_text_contains(version_output, "CLI version: #{EXPECTED_CLI_VERSION}", "solverforge --version output")
     assert_text_contains(version_output, "Scaffold runtime target: SolverForge crate target #{EXPECTED_CLI_RUNTIME_VERSION}", "solverforge --version output")
-    assert_text_contains(version_output, "Scaffold UI target: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}", "solverforge --version output")
+    assert_text_contains(version_output, "Scaffold UI target: solverforge-ui #{EXPECTED_CLI_UI_VERSION}", "solverforge --version output")
     assert_text_contains(version_output, "Scaffold maps target: solverforge-maps #{EXPECTED_MAPS_VERSION}", "solverforge --version output")
 
     log "Scaffolding a fresh FSR app through the real CLI"
@@ -404,10 +405,10 @@ begin
     assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
     assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_CLI_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_CLI_RUNTIME_VERSION}\"")
-    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_TUTORIAL_UI_VERSION}\"")
+    assert_file_contains(File.join(generated_app, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_CLI_UI_VERSION}\"")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "rust-version = \"1.95\"")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_CLI_RUNTIME_VERSION}\", features = [\"serde\", \"console\", \"verbose-logging\"] }")
-    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_TUTORIAL_UI_VERSION}\" }")
+    assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_CLI_UI_VERSION}\" }")
     assert_file_contains(File.join(generated_app, "Cargo.toml"), "solverforge-maps = { version = \"#{EXPECTED_MAPS_VERSION}\" }")
     fail!("fresh scaffold is missing static/app.js") unless File.file?(File.join(generated_app, "static/app.js"))
 
