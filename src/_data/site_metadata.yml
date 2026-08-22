@@ -3,7 +3,7 @@ tagline: Write constraints like you write code
 email: maintainers@solverforge.org
 description: >-
   Inspectable Rust planning software for scheduling, routing, allocation, and dispatch.
-url: https://solverforge.github.io
+url: https://solverforge.org
 github: https://github.com/SolverForge/solverforge
 github_org: https://github.com/SolverForge
 docs_rs: https://docs.rs/solverforge
