@@ -80,7 +80,6 @@ them instead of relying only on syntax checks.
 
 ## Publishing
 
-This repo is meant to be served as `solverforge.org`. The legacy
-`solverforge.ai` hostname may point here by CNAME, but it is not a separate
-commercial destination. GitHub Actions installs dependencies with `make install`,
-runs `make ci-local`, and deploys `output/` to Pages.
+This repo is meant to be served as `solverforge.org`. GitHub Actions installs
+dependencies with `make install`, runs `make ci-local`, and deploys `output/` to
+Pages.
