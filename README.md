@@ -61,7 +61,8 @@ snippets, then adds source-level and live app checks when
 `SOLVERFORGE_DELIVERIES_REPO` points to the app checkout.
 
 `make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
-linting, a full Bridgetown build, and the portable tutorial verifiers.
+linting, a full Bridgetown build, the public-page copy/link/nav/layout checks,
+and the portable tutorial verifiers.
 `make pre-release` first installs the published `solverforge-cli` release into
 `/tmp`, verifies the scaffold targets, and then delegates to the local CI gate.
 
