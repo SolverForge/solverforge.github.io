@@ -236,10 +236,15 @@ you want to write:
 | Flag | Pattern | Typical use |
 | ---- | ------- | ----------- |
 | `--unary` | `for_each + filter + penalize` | single-entity violations |
-| `--pair` | pairwise comparison | collisions and overlap checks |
+| `--pair` | `for_each_unique_pair` | collisions and overlap checks |
 | `--join` | entity-fact comparison | requirement matching |
 | `--balance` | balance stream | distribution fairness |
 | `--reward` | `for_each + filter + reward` | preferred states |
+| `--runs` | grouped consecutive-runs collector | streaks and run lengths |
+| `--presence` | grouped indexed-presence collector | ordinal presence checks |
+| `--collect-vec` | grouped `collect_vec` collector | owned grouped payloads |
+| `--group-complement` | grouped complement | missing-key rows |
+| `--projected-group` | projected join plus grouped collector | joined grouped rules |
 | `--hard` | hard score impact | must-hold rules |
 | `--soft` | soft score impact | optimization preferences |
 

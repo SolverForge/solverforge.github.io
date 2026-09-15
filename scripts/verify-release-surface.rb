@@ -30,6 +30,12 @@ REQUIRED_TEXT = {
     "Scaffold MCP target: rmcp 3.3.0",
     "solverforge connect"
   ],
+  "src/docs/solverforge-cli/generator-commands.md" => [
+    "`--countable-range <FROM..TO>`",
+    "`--runs`",
+    "`--projected-group`",
+    "`SimpleScore` is not accepted"
+  ],
   "src/docs/solverforge-cli/scaffold-commands.md" => [
     "`web`, `api`, `cli`, and `mcp`",
     "rmcp",

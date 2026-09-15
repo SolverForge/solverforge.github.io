@@ -148,10 +148,15 @@ Pattern options:
 | Option      | Meaning |
 | ----------- | ------- |
 | `--unary`   | Penalize matching entities with `for_each + filter + penalize` |
-| `--pair`    | Penalize conflicting pairs with pairwise comparison |
+| `--pair`    | Penalize conflicting pairs with `for_each_unique_pair` |
 | `--join`    | Penalize entity-fact mismatch with `for_each + join` |
 | `--balance` | Generate a load-balance style soft constraint |
 | `--reward`  | Reward matching entities with `for_each + filter + reward` |
+| `--runs`    | Generate a grouped consecutive-runs collector skeleton |
+| `--presence` | Generate a grouped indexed-presence collector skeleton |
+| `--collect-vec` | Generate a grouped `collect_vec` collector skeleton |
+| `--group-complement` | Generate a grouped complement skeleton |
+| `--projected-group` | Generate a projected join plus grouped collector skeleton |
 
 Write options:
 

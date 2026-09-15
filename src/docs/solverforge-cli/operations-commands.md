@@ -146,7 +146,10 @@ Arguments:
 
 For example, `termination.seconds_spent_limit` addresses the solver termination
 limit. Values are parsed as integer, float, boolean, then string. Intermediate
-TOML tables are created when needed.
+TOML tables are created when needed. `config set` writes non-phase settings;
+ordered `phases` edits are manual, and generated model-resource references in
+`solver.toml` are exact-ID graph references that `destroy` re-renders rather
+than aliases.
 
 ## `solverforge completions`
 
