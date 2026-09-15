@@ -219,10 +219,10 @@ The solver uses specialized moves for list variables:
 | `ListSwapMove`      | Swap two elements between or within lists                          |
 | `ListPermuteMove`   | Permute a contiguous window inside one list                        |
 | `ListReverseMove`   | Reverse a subsequence within a list                                |
-| `SubListChangeMove` | Move a contiguous subsequence to another position                  |
-| `SubListSwapMove`   | Swap two contiguous subsequences                                   |
+| `SublistChangeMove` | Move a contiguous subsequence to another position                  |
+| `SublistSwapMove`   | Swap two contiguous subsequences                                   |
 | `KOptMove`          | K-opt style moves for routing problems                             |
-| `RuinMove`          | Remove elements and reinsert them (ruin-and-recreate)              |
+| `ListRuinMove`      | Remove list elements and reinsert them (list ruin-and-recreate)    |
 | precedence support  | Critical-path precedence repairs for list variables with precedence hooks |
 
 ## Example: Vehicle Routing Constraint

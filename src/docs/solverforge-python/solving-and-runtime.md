@@ -79,10 +79,10 @@ random_seed = 7
 seconds_spent_limit = 5
 
 [[phases]]
-phase_type = "construction_heuristic"
+type = "construction_heuristic"
 
 [[phases]]
-phase_type = "local_search"
+type = "local_search"
 move_selector = { type = "change_move_selector" }
 ```
 

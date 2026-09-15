@@ -203,7 +203,7 @@ For a generated app, inspect the installed CLI before changing its manifest:
 solverforge --version
 ```
 
-The current published CLI reports `2.2.2` and scaffolds
+At this release, the published CLI reported `2.2.2` and scaffolded
 `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and
 `solverforge-maps 2.1.4`. Upgrade a generated app to 0.18.0 deliberately and
 run its model, config, and lifecycle tests; do not infer the runtime target from

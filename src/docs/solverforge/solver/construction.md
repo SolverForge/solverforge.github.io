@@ -221,17 +221,12 @@ configuration uses `assign_when_candidate_exists`.
 
 ## Dynamic Construction Primitives
 
-Normal app models should keep construction on `ScalarGroup::assignment(...)`,
-`group_name`, and solver config. Advanced integrations that assemble
-construction streams directly can import the public lower-level construction
-surface from `solverforge-solver`, including `GroupedScalarCursor`,
-`GroupedScalarSelector`, `ScalarAssignmentMoveCursor`,
-`ScalarAssignmentMoveOptions`, and
-`ScalarAssignmentRequiredStreamingCursor`.
-
-That surface is the public form of the grouped-scalar construction machinery.
-It lets required assignment construction stream state while the stock runtime
-still owns the ordinary hard-first required-slot fill policy.
+Normal app models keep construction on `ScalarGroup::assignment(...)`,
+`group_name`, and solver config. The grouped-scalar construction cursors and
+assignment-stream types are runtime-internal; they are assembled through the
+`pub(crate)` solver builder and are not importable from the public crate
+surface. Required assignment construction streams state internally while the
+stock runtime still owns the ordinary hard-first required-slot fill policy.
 
 ## Grouped Scalar Construction
 

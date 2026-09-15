@@ -32,14 +32,12 @@ conflict-repair extension types, phase and move-label telemetry, bounded
 applied-move and candidate-pull traces, candidate-trace provenance types, and
 CVRP profile helpers such as `domain = "cvrp"`, `route_hooks`,
 `savings_hooks`, `savings_metric_class`, `route_distance`, `route_feasible`, and
-`savings_feasible`. The lower-level solver crate also exposes dynamic
-construction names such as `GroupedScalarCursor`, `GroupedScalarSelector`,
-`ScalarAssignmentMoveCursor`, `ScalarAssignmentMoveOptions`, and
-`ScalarAssignmentRequiredStreamingCursor`, plus immutable runtime model,
-provider, and candidate-metric registries for integrations that intentionally
-assemble runtime declarations outside the facade. That keeps app code on
-`solverforge` unless it needs to implement lower-level solver internals
-directly.
+`savings_feasible`. The grouped-scalar construction cursors, runtime model,
+provider, and candidate-metric registries are solver-internal; applications
+reach grouped construction through `ScalarGroup::assignment(...)`,
+`group_name`, and `grouped_scalar_move_selector` rather than by importing those
+types. That keeps app code on `solverforge` unless it needs to implement
+lower-level solver internals directly.
 
 ## Workspace crates
 

@@ -100,7 +100,8 @@ improves.
 [phases.move_selector]
 type = "ruin_recreate_move_selector"
 variable_name = "employee_idx"
-ruin_size = 8
+min_ruin_count = 2
+max_ruin_count = 8
 value_candidate_limit = 32
 ```
 
@@ -188,7 +189,7 @@ name for package-less constraints.
 | `SwapMove` | `swap_move_selector`, `nearby_swap_move_selector` |
 | `PillarChangeMove` | `pillar_change_move_selector` |
 | `PillarSwapMove` | `pillar_swap_move_selector` |
-| `RuinMove` / `RuinRecreateMove` | `ruin_recreate_move_selector` |
+| `RuinRecreateMove` | `ruin_recreate_move_selector` |
 | `CompoundScalarMove` | grouped scalar assignment and compound conflict repair |
 | `ConflictRepairMove` | conflict-repair selectors |
 

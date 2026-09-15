@@ -148,9 +148,9 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 2.2.3` scaffolds `solverforge 0.19.3`; the finished Lessons app
-records its app-owned `solverforge 0.19.4` runtime target while retaining its
-original `2.2.2` scaffold provenance:
+`solverforge-cli 3.0.0` scaffolds `solverforge 0.19.4`; the finished Lessons app
+records the same app-owned `solverforge 0.19.4` runtime target while retaining
+its original `2.2.2` scaffold provenance:
 
 ```toml
 [app]
@@ -210,8 +210,8 @@ solverforge generate variable room_idx \
   --kind scalar \
   --range rooms
 
-solverforge generate constraint assign_timeslot --unary --medium
-solverforge generate constraint assign_room --unary --medium
+solverforge generate constraint assign_timeslot --unary --soft
+solverforge generate constraint assign_room --unary --soft
 solverforge generate constraint teacher_availability --join --hard
 solverforge generate constraint group_availability --join --hard
 solverforge generate constraint room_kind --join --soft
@@ -223,6 +223,11 @@ solverforge generate constraint late_lesson --join --soft
 solverforge generate constraint repeated_subject_day --pair --soft
 solverforge generate data --mode stub
 ```
+
+The constraint generator only emits `--hard` and `--soft` skeletons, so
+`assign_timeslot` and `assign_room` are generated as soft and then hand-edited
+to score at the medium level (`.penalize(|_: &Lesson| HardMediumSoftScore::of_medium(1))`),
+matching the finished app.
 
 Those commands are the learning skeleton, not the full finished app. The
 Lessons repository then supplies the timetable-specific work:

@@ -66,5 +66,6 @@ Good first questions are:
 - Use `Coord::try_new` and `BoundingBox::try_new` on external input.
 - Keep a stable cache location for repeated workloads.
 - Warm commonly used service areas ahead of large optimization jobs.
-- Treat cache hit/miss counters as coarse indicators, not exact layer-specific metrics.
+- Read `memory_hits`, `disk_hits`, `network_fetches`, and `in_flight_waits`
+  separately; there is no combined hit/miss counter to reason from.
 - Use connectivity diagnostics when a region produces many unreachable pairs.

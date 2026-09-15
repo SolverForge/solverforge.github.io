@@ -16,11 +16,11 @@ floor, publishes the workspace crates on one version line, makes stock CVRP
 route lists much easier to declare, and exposes more construction internals for
 advanced integrations.
 
-The runtime release line is separate from CLI scaffold publishing. The current
-published `solverforge-cli 2.2.2` package scaffolds generated apps on
-`solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
-Direct Cargo projects and deliberately upgraded generated apps can depend on
-the current `solverforge 0.17.2` runtime.
+The runtime release line is separate from CLI scaffold publishing. At this
+release, the published `solverforge-cli 2.2.2` package scaffolded generated apps
+on `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and
+`solverforge-maps 2.1.4`. Direct Cargo projects and deliberately upgraded
+generated apps can depend on the current `solverforge 0.17.2` runtime.
 
 ## What Changed
 
@@ -117,7 +117,7 @@ For generated apps, confirm the installed CLI target:
 solverforge --version
 ```
 
-The current published CLI reports:
+The published CLI at this release reported:
 
 ```text
 CLI version: 2.2.2

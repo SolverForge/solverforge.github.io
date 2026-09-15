@@ -160,9 +160,9 @@ and route shadow values; most generated applications only need the top-level
 `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 2.2.3` scaffolds `solverforge 0.19.3`; the finished FSR app
-records its app-owned `solverforge 0.19.4` runtime target while retaining its
-original `2.2.2` scaffold provenance:
+`solverforge-cli 3.0.0` scaffolds `solverforge 0.19.4`; the finished FSR app
+records the same app-owned `solverforge 0.19.4` runtime target while retaining
+its original `2.2.2` scaffold provenance:
 
 ```toml
 [app]
@@ -509,7 +509,7 @@ costs one hard point, while analysis reports one match per duplicated visit id.
 
 The other nine modules stream `technician_routes()` and score the route shadow
 values refreshed by `FieldServicePlan`. For example, `reachable_legs` reads
-`route.reachability_violations()`, `required_skills` reads
+the route shadow `route.route_unreachable_legs`, `required_skills` reads
 `route_missing_skill_visits`, `minimize_travel` reads `travel_penalty()`, and
 `priority_slack` rewards `route_priority_slack`.
 

@@ -46,7 +46,7 @@ Marks a field as a planning variable — the solver assigns values to this field
 pub employee_id: Option<usize>,
 
 #[planning_variable(countable_range = "0..10")]
-pub priority_bucket: i32,
+pub priority_bucket: Option<usize>,
 ```
 
 Common parameters:
@@ -54,7 +54,9 @@ Common parameters:
 - `value_range_provider = "employees"`: references a field on the planning
   solution that supplies possible values
 - `allows_unassigned = true`: permits `None` for `Option<T>` variables
-- `countable_range = "0..10"`: declares an integer range directly on the field
+- `countable_range = "0..10"`: declares a half-open integer range of candidate
+  values directly on the field. The field remains `Option<usize>` and stores the
+  chosen candidate index, like every other scalar planning variable
 - `candidate_values = "fn_name"`: supplies an ordered bounded scalar value
   neighborhood for construction, change, pillar-change, and ruin-recreate
 - `nearby_value_candidates = "fn_name"` and
@@ -138,7 +140,7 @@ For list variables — automatically tracks the previous element in the list.
 
 ```rust
 #[previous_element_shadow_variable(source_variable_name = "visits")]
-pub previous_stop: Option<Stop>,
+pub previous_stop: Option<usize>,
 ```
 
 ### `#[next_element_shadow_variable]`
@@ -147,7 +149,7 @@ For list variables — automatically tracks the next element in the list.
 
 ```rust
 #[next_element_shadow_variable(source_variable_name = "visits")]
-pub next_stop: Option<Stop>,
+pub next_stop: Option<usize>,
 ```
 
 ## Requirements

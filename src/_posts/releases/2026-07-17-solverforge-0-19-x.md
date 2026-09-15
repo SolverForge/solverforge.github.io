@@ -255,7 +255,7 @@ datasets, or solver policies.
 > **Update, 2026-09-13:** The use-case bundle was republished on the SolverForge
 > 0.19.4 line: `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`,
 > `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`. All four target
-> `solverforge 0.19.4` and retain `solverforge-ui 0.6.5`; deliverables and FSR
+> `solverforge 0.19.4` and retain `solverforge-ui 0.6.5`; deliveries and FSR
 > retain `solverforge-maps 2.1.4`. Bundle CI and the tag-triggered Space sync
 > workflows passed.
 >

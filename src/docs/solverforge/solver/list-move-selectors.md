@@ -157,7 +157,8 @@ not enough.
 [phases.move_selector]
 type = "list_ruin_move_selector"
 variable_name = "visits"
-ruin_size = 8
+min_ruin_count = 2
+max_ruin_count = 8
 ```
 
 The current runtime skips empty owners during list-ruin sampling, so empty

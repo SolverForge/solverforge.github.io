@@ -120,9 +120,10 @@ engine.
 | Decorator | Purpose |
 | --------- | ------- |
 | `FilteringMoveSelector` | filter borrowable candidates without reopening cartesian children |
-| `ShufflingMoveSelector` | randomize selector order |
-| `SortingMoveSelector` | sort borrowable candidates |
-| `ProbabilityMoveSelector` | probabilistically keep candidates by weight |
+
+Leaf ordering is not a public decorator type. Configure random, shuffled, sorted,
+or probabilistic order through `selection_order` on a leaf selector, and register
+a metric with `selection_metric` for the sorted and probabilistic modes.
 
 ## Move Unions
 
@@ -130,7 +131,7 @@ engine.
 | ---------- | ------- |
 | `ScalarMoveUnion` | change, swap, pillar, ruin, and related scalar moves |
 | `ListMoveUnion` | list change, list swap, reverse, K-opt, and list ruin moves |
-| `DescriptorScalarMoveUnion` | descriptor-targeted scalar moves |
+| `DescriptorMoveUnion` | descriptor-targeted moves |
 
 ## See Also
 

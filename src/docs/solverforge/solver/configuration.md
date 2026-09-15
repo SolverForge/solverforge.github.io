@@ -54,7 +54,7 @@ use solverforge::SolverConfig;
 
 let config = SolverConfig::from_toml_str(r#"
     environment_mode = "reproducible"
-    move_thread_count = 4
+    move_thread_count = { count = 4 }
 
     [termination]
     seconds_spent_limit = 120
@@ -141,9 +141,9 @@ environment_mode = "non_reproducible"
 Controls multi-threaded move evaluation.
 
 ```toml
-move_thread_count = 4        # Fixed thread count
-move_thread_count = "auto"   # Use available cores (default)
-move_thread_count = "none"   # Single-threaded
+move_thread_count = { count = 4 }  # Fixed thread count
+move_thread_count = "auto"         # Use available cores (default)
+move_thread_count = "none"         # Single-threaded
 ```
 
 ### Random Seed

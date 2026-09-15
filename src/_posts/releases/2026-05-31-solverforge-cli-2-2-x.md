@@ -18,7 +18,7 @@ At that time, the latest crates.io package was still `solverforge-cli 2.2.0` unt
 `v2.2.1` tag and package publish are cut. If you install from crates.io today,
 confirm the exact scaffold target with `solverforge --version`.
 
-<%= render Ui::Callout.new(title: "Update, July 2, 2026") do %>
+<%= render Ui::Callout.new(title: "Update, June 12, 2026") do %>
 `solverforge-cli 2.2.2` was published on crates.io and scaffolded `solverforge 0.15.2`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
 <% end %>
@@ -28,6 +28,15 @@ The current package is `solverforge-cli 2.2.3`. Its released binary scaffolds
 `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`.
 The original 2.2.1 narrative and version output below remain as the dated
 release record; use the current command reference for live output.
+<% end %>
+
+<%= render Ui::Callout.new(title: "Update, September 15, 2026") do %>
+`solverforge-cli 3.0.0` is published on crates.io and released on GitHub,
+adding the `mcp` shell, `solverforge connect`, countable scalar ranges, the full
+list-metadata flags, and the `solverforge-modeling` agent skill. The 3.0.0 line
+targets `solverforge 0.19.4`, `solverforge-ui 0.7.0`, `solverforge-maps 2.1.4`,
+and `rmcp 3.3.0`. See the
+[3.0.0 release note](/blog/releases/2026/09/15/solverforge-cli-3-0-x/).
 <% end %>
 
 ```bash
@@ -155,8 +164,8 @@ lines.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
-| `2.2.3` | 2026-07-14 | Publishes the neutral scalar/list/mixed scaffold line and currently targets `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`. |
-| `2.2.2` | 2026-07-02 | Publishes the `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` scaffold contract recorded by the July update. |
+| `2.2.3` | 2026-07-30 | Publishes the neutral scalar/list/mixed scaffold line and currently targets `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`. |
+| `2.2.2` | 2026-06-12 | Publishes the `solverforge 0.15.2`, `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4` scaffold contract recorded by the June update. |
 | `2.2.1` | 2026-06-10 | Retargets fresh generated apps to `solverforge 0.15.1` on the CI-green GitHub source line, keeps `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4`, and aligns generated metadata with the current scaffold contract. |
 | `2.2.0` | 2026-05-31 | Retargets fresh generated apps to `solverforge 0.15.0`, keeps `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4`, exposes scalar-group and conflict-repair model resources, and preserves API/CLI shell boundaries. |
 

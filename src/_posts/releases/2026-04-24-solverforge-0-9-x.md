@@ -55,7 +55,7 @@ a stable model-owned place to validate entities, facts, planning solutions,
 scalar hooks, list-shadow wiring, and runtime metadata.
 
 For users starting from `solverforge-cli`, this is already the normal shape.
-Current CLI-generated projects target:
+At this release, CLI-generated projects targeted:
 
 - `solverforge-cli 2.0.0`
 - `solverforge 0.9.0`
@@ -63,7 +63,8 @@ Current CLI-generated projects target:
 - `solverforge-maps 2.1.3`
 
 Run `solverforge --version` to confirm the exact scaffold targets in your
-installed CLI.
+installed CLI. The current CLI line is documented in the
+[command reference](/docs/solverforge-cli/command-reference/).
 
 ## What changed
 
