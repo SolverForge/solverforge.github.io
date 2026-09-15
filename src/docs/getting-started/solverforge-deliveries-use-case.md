@@ -136,13 +136,13 @@ delivery-routing code.
 Start from the CLI's current published scaffold line, then keep the finished
 app's recorded release contract explicit. `solverforge-cli 2.2.3` scaffolds
 `solverforge 0.19.3` with `solverforge-ui 0.7.0`; the tagged
-`solverforge-deliveries@2.0.6` reference app also targets the published
-`solverforge 0.19.3` runtime while retaining the
+`solverforge-deliveries@2.0.7` reference app targets the published
+`solverforge 0.19.4` runtime while retaining the
 `solverforge-ui 0.6.5` and `solverforge-maps 2.1.4` companion lines:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.3", features = [
+solverforge = { version = "0.19.4", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -181,8 +181,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.19.3"
-runtime_source = "crates.io: solverforge 0.19.3"
+target = "solverforge 0.19.4"
+runtime_source = "crates.io: solverforge 0.19.4"
 ui_source = "crates.io: solverforge-ui 0.6.5"
 
 [demo]
@@ -410,7 +410,7 @@ pub struct Vehicle {
 }
 ```
 
-The CVRP domain profile is stock SolverForge 0.19.3. It expands to the
+The CVRP domain profile is stock SolverForge 0.19.4. It expands to the
 `VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
 assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
 metric class. The delivery app now keeps city-level routing preparation in the
@@ -590,7 +590,7 @@ Then local search combines list-aware route edits:
 The late-acceptance phase uses the
 `first_last_step_score_improving` forager. It keeps scanning through accepted
 ties and stops when a candidate improves on the score at the start of the
-step; that exact policy name is part of the shipped 2.0.6 configuration.
+step; that exact policy name is part of the shipped 2.0.7 configuration.
 
 For beginners, this is the difference between writing one greedy dispatcher and
 building a search space. The solver starts from a route plan and repeatedly asks
@@ -772,7 +772,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@2.0.6`      |
+| Tagged app release               | `solverforge-deliveries@2.0.7`      |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |

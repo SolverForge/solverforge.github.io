@@ -18,9 +18,9 @@ were published on 2026-08-11, and docs.rs serves the 0.19.4 API.
 The independently published `solverforge-cli 2.2.3` package scaffolds
 generated apps on `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and
 `solverforge-maps 2.1.4`. The worked-use-case bundle now ships
-`solverforge-hospital@2.0.6`, `solverforge-lessons@2.0.6`,
-`solverforge-deliveries@2.0.6`, and `solverforge-fsr@2.0.7`, all on
-`solverforge 0.19.3`; bundle CI and all four tag-triggered Space sync workflows
+`solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`,
+`solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`, all on
+`solverforge 0.19.4`; bundle CI and all four tag-triggered Space sync workflows
 pass. SolverForge Python has a tagged
 `solverforge-py 0.6.6` source line for CPython 3.14, compiled onto the
 `solverforge 0.19.4` runtime with embedded `solverforge-ui 0.7.0` assets. The
@@ -35,8 +35,8 @@ GitHub CI and the final-tag release workflow both pass.
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.4` |
 | **CLI Scaffold** | Published | `solverforge-cli 2.2.3` scaffolds `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.6` compiles dynamic CPython 3.14 models into the `solverforge 0.19.4` runtime; PyPI publishes `solverforge 0.6.6` |
-| **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.6`, `solverforge-lessons@2.0.6`, `solverforge-deliveries@2.0.6`, and `solverforge-fsr@2.0.7`; all target `solverforge 0.19.3` and `solverforge-ui 0.6.5` |
-| **UI** | Published | `solverforge-ui 0.7.0` exposes framework-neutral embedded assets and is the current CLI scaffold target |
+| **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`, `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`; all target `solverforge 0.19.4` and `solverforge-ui 0.6.5` |
+| **UI** | Published | `solverforge-ui 0.8.0` exposes framework-neutral embedded assets; the published `solverforge-cli 2.2.3` package still scaffolds `solverforge-ui 0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -51,8 +51,8 @@ GitHub CI and the final-tag release workflow both pass.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital, Lessons, and Deliveries 2.0.6 and FSR 2.0.7
-  contracts on `solverforge 0.19.3`, while keeping their recorded
+  document the released Hospital, Lessons, and Deliveries 2.0.7 and FSR 2.0.8
+  contracts on `solverforge 0.19.4`, while keeping their recorded
   `solverforge-cli 2.2.2` scaffold provenance separate from the published
   `solverforge-cli 2.2.3`
   scaffold target.

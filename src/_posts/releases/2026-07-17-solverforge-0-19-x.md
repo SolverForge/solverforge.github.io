@@ -240,7 +240,7 @@ Version 0.6.6 embeds the exact SolverForge 0.19.4 crate set, treats each row's
 imported scalar candidate set as a hard native domain, and adds
 `same_value_conflict_field` for callback-free static assignment conflict graphs.
 
-The worked use cases were republished again on the SolverForge 0.19.3 line:
+The worked use cases were first republished on the SolverForge 0.19.3 line:
 
 - `solverforge-hospital@2.0.6`
 - `solverforge-lessons@2.0.6`
@@ -251,6 +251,17 @@ All four target `solverforge 0.19.3` and retain `solverforge-ui 0.6.5`.
 Deliveries and FSR also retain `solverforge-maps 2.1.4`. These patches align
 dependency and release metadata without changing the application behavior,
 datasets, or solver policies.
+
+> **Update, 2026-09-13:** The use-case bundle was republished on the SolverForge
+> 0.19.4 line: `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`,
+> `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`. All four target
+> `solverforge 0.19.4` and retain `solverforge-ui 0.6.5`; deliverables and FSR
+> retain `solverforge-maps 2.1.4`. Bundle CI and the tag-triggered Space sync
+> workflows passed.
+>
+> **Update, 2026-09-15:** `solverforge-ui 0.8.0` is published; the published
+> `solverforge-cli 2.2.3` package still scaffolds the `solverforge-ui 0.7.0`
+> line.
 
 ## Upgrade Checklist
 
