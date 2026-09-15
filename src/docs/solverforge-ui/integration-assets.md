@@ -9,11 +9,11 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui 0.7.0` contract is job-oriented,
-lifecycle-typed, and framework-neutral at the asset boundary. New integrations
-should expose retained jobs, explicit `eventType` payloads, exact paused or
-terminal snapshots, normalized create-job identifiers, and the shipped optional
-map module when they need Leaflet route views.
+The current `solverforge-ui 0.8.0` contract is job-oriented, lifecycle-typed, and
+framework-neutral at the asset boundary. New integrations should expose retained
+jobs, explicit `eventType` payloads, exact paused or terminal snapshots,
+null-safe snapshot callbacks, normalized create-job identifiers, and the shipped
+optional map module when they need Leaflet route views.
 <% end %>
 
 This page summarizes how `solverforge-ui` connects frontend code to backend APIs
@@ -45,7 +45,12 @@ var backend = SF.createBackend({
 });
 ```
 
-Use this when solver traffic is bridged through Tauri IPC.
+Use this when solver traffic is bridged through Tauri IPC. The adapter uses
+`invoke` and `listen` instead of HTTP. Optional `commands` entries override the
+default command names (`create_job`, `get_job`, `get_snapshot`,
+`analyze_snapshot`, `pause_job`, `resume_job`, `cancel_job`, `delete_job`, and
+`demo_seed`). `listDemoData()` returns an empty list for this adapter because
+Tauri exposes demo loading through `getDemoData(name)`.
 
 ### Generic Fetch Adapter
 
@@ -53,12 +58,18 @@ Use this when solver traffic is bridged through Tauri IPC.
 var backend = SF.createBackend({
   type: "fetch",
   baseUrl: "/api/v1",
+  jobsPath: "/jobs",
+  demoDataPath: "/demo-data",
   headers: { "X-CSRF-Token": csrfToken },
 });
 ```
 
-Use this when your app needs extra headers or a non-default base path while
-still implementing the retained-job backend methods expected by
+The HTTP adapter accepts `type: "axum"` or `type: "fetch"` and supports
+`baseUrl`, `jobsPath` (default `/jobs`), `demoDataPath` (default `/demo-data`),
+and extra request `headers`. It sends JSON request bodies and parses JSON
+responses when their content type is JSON; other successful responses are
+returned as text. Use this when your app needs extra headers or a non-default
+base path while still implementing the retained-job backend methods expected by
 `SF.createSolver(...)`.
 
 ## Lifecycle Contract Expectations
@@ -160,6 +171,23 @@ Supported callbacks are `onProgress`, `onSolution`, `onPauseRequested`,
 `onPaused`, `onResumed`, `onCancelled`, `onComplete`, `onFailure`, `onAnalysis`,
 and `onError`.
 
+| Callback | Arguments | Delivery |
+|---|---|---|
+| `onProgress` | `(meta)` | Scored metadata-only progress updates |
+| `onSolution` | `(snapshot, meta)` | Live `best_solution` updates with a solution snapshot |
+| `onPauseRequested` | `(meta)` | Runtime acknowledgement that pause was requested |
+| `onPaused` | `(snapshot, meta)` | Authoritative paused state after snapshot synchronization |
+| `onResumed` | `(meta)` | Authoritative resumed state |
+| `onCancelled` | `(snapshot, meta)` | Authoritative cancellation; `snapshot` may be `null` |
+| `onComplete` | `(snapshot, meta)` | Authoritative completion after a usable snapshot is synchronized |
+| `onFailure` | `(message, meta, snapshot, analysis)` | Failed solve or synchronization; snapshot and analysis may be `null` |
+| `onAnalysis` | `(analysis, meta)` | Analysis obtained during paused or terminal synchronization |
+| `onError` | `(message)` | Transport or synchronization failure without inventing a lifecycle transition |
+
+A snapshot-bearing callback must render only when `snapshot && snapshot.solution`
+exists, and should synchronize application lifecycle markers in a `finally`
+block so cancellation, failure, or a failed snapshot sync still updates the UI.
+
 ### Startup Stream Contract
 
 Startup streams may begin with either a scored `progress` event or a scored
@@ -197,8 +225,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
-- `/sf/sf.0.7.0.css`
-- `/sf/sf.0.7.0.js`
+- `/sf/sf.0.8.0.css`
+- `/sf/sf.0.8.0.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 
@@ -222,7 +250,7 @@ For non-Axum Rust hosts, disable the default feature and serve the same
 embedded assets through the framework-neutral API:
 
 ```toml
-solverforge-ui = { version = "0.7.0", default-features = false }
+solverforge-ui = { version = "0.8.0", default-features = false }
 ```
 
 ```rust
@@ -234,7 +262,9 @@ let bytes = asset.bytes();
 
 `solverforge_ui::assets::paths()` lists the embedded asset paths, and
 `solverforge_ui::assets::version()` returns the crate version that produced the
-asset set.
+asset set. The browser bundle exposes the same value as `SF.version`, so a host
+can assert that the loaded `sf.js` matches the version its Rust dependency
+served.
 
 ## Optional Modules
 

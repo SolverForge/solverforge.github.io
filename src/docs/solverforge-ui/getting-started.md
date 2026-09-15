@@ -25,10 +25,10 @@ This guide covers the verified integration path:
 ```toml
 [dependencies]
 axum = "0.8.9"
-solverforge-ui = { version = "0.7.0" }
+solverforge-ui = { version = "0.8.0" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.7.0" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.8.0" }
 ```
 
 Use the Git tag form when you need exact source-tag reproducibility instead of
@@ -77,8 +77,8 @@ still owns its HTML pages and any job/solver API routes.
     <script>
       var tabs = SF.createTabs({
         tabs: [
-          { id: "plan", content: "<div>Plan view</div>", active: true },
-          { id: "gantt", content: "<div>Gantt view</div>" },
+          { id: "plan", content: { unsafeHtml: "<div>Plan view</div>" }, active: true },
+          { id: "gantt", content: { unsafeHtml: "<div>Gantt view</div>" } },
         ],
       });
       document.body.appendChild(tabs.el);
@@ -122,16 +122,45 @@ still owns its HTML pages and any job/solver API routes.
         onProgress: function (meta) {
           console.log("progress", meta.currentScore, meta.bestScore);
         },
-        onSolution: function (snapshot) {
-          console.log("best solution", snapshot.solution);
+        onSolution: function (snapshot, meta) {
+          renderAndSync(snapshot, meta);
         },
         onPaused: function (snapshot, meta) {
-          console.log("paused", meta.snapshotRevision, snapshot.solution);
+          renderAndSync(snapshot, meta);
         },
         onComplete: function (snapshot, meta) {
-          console.log("completed", meta.currentScore, snapshot.solution);
+          renderAndSync(snapshot, meta);
+        },
+        onCancelled: function (snapshot, meta) {
+          renderAndSync(snapshot, meta);
+        },
+        onFailure: function (message, meta, snapshot, analysis) {
+          console.error(message, analysis);
+          renderAndSync(snapshot, meta);
         },
       });
+
+      function renderAndSync(snapshot, meta) {
+        try {
+          if (snapshot && snapshot.solution) {
+            render(snapshot.solution);
+          }
+        } finally {
+          syncMarkers(meta);
+        }
+      }
+
+      function render(solution) {
+        // Replace this with the app's domain-specific renderer.
+        console.log("solution", solution);
+      }
+
+      function syncMarkers(meta) {
+        document.body.dataset.jobId = (meta && meta.jobId) || "";
+        document.body.dataset.snapshotRevision =
+          meta && meta.snapshotRevision != null ? String(meta.snapshotRevision) : "";
+        document.body.dataset.lifecycleState = (meta && meta.lifecycleState) || "IDLE";
+      }
     </script>
   </body>
 </html>
@@ -139,9 +168,12 @@ still owns its HTML pages and any job/solver API routes.
 
 `SF.createSolver(...)` now follows the retained-job lifecycle. Use
 `onProgress(...)` for score and telemetry updates, `onSolution(...)` for
-snapshot-bearing `best_solution` events, and `onPaused(...)` or
-`onComplete(...)` when you need the exact retained snapshot after the runtime
-reaches an authoritative lifecycle state.
+snapshot-bearing `best_solution` events, and `onPaused(...)`, `onCancelled(...)`,
+or `onComplete(...)` when you need the exact retained snapshot after the runtime
+reaches an authoritative lifecycle state. Snapshot-bearing callbacks are
+null-safe: cancellation, failure, or a failed snapshot synchronization can leave
+no solution snapshot, so render only when `snapshot && snapshot.solution` exists
+and synchronize lifecycle markers in a `finally` block.
 
 The header renders the cancel action as **Stop**. Keep using the `onCancel`
 configuration key and call `solver.cancel()`; `delete()` is reserved for

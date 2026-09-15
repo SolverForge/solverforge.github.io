@@ -30,13 +30,17 @@ The current public API documents these factories:
 | `SF.showError(title, detail)` | `void`                                                                                                                                     | Error toast shorthand                                                                            |
 | `SF.showTab(tabId, root?)`    | `void`                                                                                                                                     | Activate tab panels globally or within one root                                                  |
 
+Factories return detached DOM nodes or APIs containing detached nodes. Append
+them to the document only after the host layout exists; `SF.gantt.create()` in
+particular requires a laid-out, non-zero-size mount target.
+
 ## Composition Example
 
 ```js
 var tabs = SF.createTabs({
   tabs: [
-    { id: "plan", content: "<div>Plan view</div>", active: true },
-    { id: "gantt", content: "<div>Gantt view</div>" },
+    { id: "plan", content: { unsafeHtml: "<div>Plan view</div>" }, active: true },
+    { id: "gantt", content: { unsafeHtml: "<div>Gantt view</div>" } },
   ],
 });
 document.body.appendChild(tabs.el);

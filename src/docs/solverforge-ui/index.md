@@ -11,11 +11,13 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-ui 0.7.0` crate: retained jobs,
+This section tracks the published `solverforge-ui 0.8.0` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
-exact dense scheduling geometry, normalized create-job identifiers, optional
-map helpers, and framework-neutral embedded asset access. Current
-`solverforge-cli 2.2.3` scaffolds pin `solverforge-ui 0.7.0`.
+null-safe snapshot callbacks, exact dense scheduling geometry, normalized
+create-job identifiers, optional map helpers, framework-neutral embedded asset
+access, and the bundled agent skill. The published `solverforge-cli 2.2.3`
+scaffold still pins `solverforge-ui 0.7.0`, so generated apps move to `0.8.0`
+only when that app is deliberately upgraded.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -37,21 +39,28 @@ the runtime integration path.
   `.merge(solverforge_ui::routes())`
 - **Stable and versioned bundles** for compatibility and cache-friendly
   production deployments
+- **Bundled agent skill** that maps a planning model onto the shipped timeline,
+  Gantt, map, rail, and table surfaces
 
 ## Installation
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.7.0" }
+solverforge-ui = { version = "0.8.0" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.7.0" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.8.0" }
 ```
 
 Use the Git tag form when you need exact source-tag reproducibility instead of
 the crates.io package.
 
-`solverforge-ui 0.7.0` declares `rust-version = "1.95"`.
+`solverforge-ui 0.8.0` declares `rust-version = "1.95"`.
+
+Production cache pinning uses the versioned bundles for the installed crate
+version, `/sf/sf.0.8.0.css` and `/sf/sf.0.8.0.js`. `SF.version` in either
+bundle and `solverforge_ui::assets::version()` both report the crate version
+that produced the embedded asset set.
 
 ## Minimal Workflow
 
@@ -64,7 +73,7 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
 <script src="/sf/sf.js"></script>
 <script>
   var tabs = SF.createTabs({
-    tabs: [{ id: "plan", content: "<div>Plan view</div>", active: true }],
+    tabs: [{ id: "plan", content: { unsafeHtml: "<div>Plan view</div>" }, active: true }],
   });
   document.body.appendChild(tabs.el);
 
@@ -104,14 +113,26 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
     onProgress: function (meta) {
       console.log("progress", meta.currentScore);
     },
-    onSolution: function (snapshot) {
-      console.log("solution", snapshot.solution);
+    onSolution: function (snapshot, meta) {
+      if (snapshot && snapshot.solution) {
+        console.log("solution", snapshot.solution, meta.snapshotRevision);
+      }
     },
-    onPaused: function (snapshot) {
-      console.log("paused", snapshot.solution);
+    onPaused: function (snapshot, meta) {
+      if (snapshot && snapshot.solution) {
+        console.log("paused", snapshot.solution, meta.snapshotRevision);
+      }
     },
-    onComplete: function (snapshot) {
-      console.log("complete", snapshot.solution);
+    onComplete: function (snapshot, meta) {
+      if (snapshot && snapshot.solution) {
+        console.log("complete", snapshot.solution, meta.currentScore);
+      }
+    },
+    onCancelled: function (snapshot, meta) {
+      console.log("cancelled", meta.lifecycleState, snapshot && snapshot.solution);
+    },
+    onFailure: function (message, meta, snapshot, analysis) {
+      console.error(message, analysis);
     },
   });
 </script>

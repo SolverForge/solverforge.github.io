@@ -41,6 +41,11 @@ time coordinates are absolute minutes:
 - `model.lanes[].items[].startMinute` and `endMinute`
 - overlay `startMinute` and `endMinute` when an overlay is time-positioned
 
+Day entries may also carry `label`, `subLabel` or `meta`, and `isWeekend`. Tick
+entries may be numbers or `{ minute, label? }` objects. Timeline tones are
+`emerald`, `blue`, `amber`, `rose`, `violet`, `cyan`, `red`, and `slate`; a raw
+CSS colour or a `{ background, border, overlay, text }` object is also accepted.
+
 Use application code to convert dates, shifts, and route windows into these
 integer-minute coordinates before calling `createTimeline(...)`.
 
@@ -224,6 +229,14 @@ gantt.highlightTask("task-1");
 
 View modes include `Quarter Day`, `Half Day`, `Day`, `Week`, and `Month`.
 Sortable headers are opt-in per column.
+
+`mount(target)` accepts an element or element id, and the target must already
+have non-zero layout dimensions. Tasks may be supplied before or after mount;
+`setTasks()` rebuilds both panes. `refresh()` refreshes an existing Frappe
+chart, and `destroy()` removes the wrapper and releases Split.js and resize
+observers. The built-in popup escapes task strings. Use `unsafePopupHtml` only
+for trusted HTML; column renderers may return text, a DOM node, or the
+documented `{ unsafeHtml }` value.
 
 ## Choosing Timeline, Rail, or Gantt
 

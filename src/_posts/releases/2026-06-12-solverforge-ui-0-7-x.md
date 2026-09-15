@@ -25,6 +25,13 @@ crate was still on 0.6.x.
 > **Update, 2026-08-11:** The current `solverforge-cli 2.2.3` scaffold target
 > now uses `solverforge-ui 0.7.0`.
 
+<%= render Ui::Callout.new(title: "Update, September 15, 2026") do %>
+`solverforge-ui 0.8.0` is now published for direct UI integrations. The
+published `solverforge-cli 2.2.3` package still scaffolds `solverforge-ui
+0.7.0`, so generated apps stay on this line until they are deliberately
+upgraded. See [solverforge-ui 0.8.x](/blog/releases/2026/09/15/solverforge-ui-0-8-x/).
+<% end %>
+
 ## What Changed
 
 ### Embedded assets are framework-neutral
