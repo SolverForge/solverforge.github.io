@@ -8,8 +8,9 @@ weight: 8
 # Operations Commands
 
 Operations commands do not change the domain model structure. They inspect the
-generated app, validate the working tree, run tests, show web/API routes, edit
-runtime configuration, or emit shell integration files.
+generated app, validate the working tree, run tests, show web/API routes, print
+MCP client connection configs, edit runtime configuration, or emit shell
+integration files.
 
 ## `solverforge info`
 
@@ -49,6 +50,33 @@ solverforge routes [OPTIONS]
 Searches for `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs`, then
 parses Axum `.route("...", method(handler))` calls and prints a
 `METHOD / PATH / HANDLER` table. This applies to web and API shells.
+
+## `solverforge connect`
+
+```text
+solverforge connect [OPTIONS]
+```
+
+Prints ready-to-paste MCP client configuration for an MCP-shell project: the
+stdio command plus the Streamable HTTP URL for Claude Code, Claude Desktop,
+Cursor, VS Code, and other clients.
+
+Options:
+
+| Option             | Meaning |
+| ------------------ | ------- |
+| `--write <TARGET>` | Write the in-project client config for the target; only `vscode` is supported |
+| `-p, --port <PORT>` | Port used in the printed Streamable HTTP URL; when omitted, use `.solverforgerc` and then `7860` |
+
+`--write vscode` merges the project entry into `.vscode/mcp.json`; global client
+files are printed with their path instead of being modified. See the
+[MCP Shell](/docs/solverforge-cli/mcp-shell/) page.
+
+```bash
+solverforge connect
+solverforge connect --write vscode
+solverforge connect --port 8080
+```
 
 ## `solverforge test`
 

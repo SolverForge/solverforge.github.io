@@ -19,9 +19,9 @@ cargo add solverforge
 
 These pages track the `solverforge 0.19.4` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
-runtime; the published `solverforge-cli 2.2.3` package scaffolds
-`solverforge 0.19.3`, so check `solverforge --version` when starting from a
-scaffold.
+runtime; the `solverforge-cli 3.0.0` line scaffolds `solverforge 0.19.4`, while
+the previous package, `2.2.3`, scaffolded `solverforge 0.19.3`, so check
+`solverforge --version` when starting from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
@@ -115,10 +115,10 @@ The current release tightens several public contracts:
 - assignment-backed grouped scalar construction and repair are public runtime
   policy through `ScalarGroup::assignment(...)`, grouped construction
   `group_name`, and `grouped_scalar_move_selector`
-- solver construction internals that advanced integrations use directly now
-  expose `GroupedScalarCursor`, `GroupedScalarSelector`,
-  `ScalarAssignmentMoveCursor`, `ScalarAssignmentMoveOptions`, and
-  `ScalarAssignmentRequiredStreamingCursor` from the public solver surface
+- solver construction internals used by grouped-scalar assignment stay
+  runtime-internal. The public policy is `ScalarGroup::assignment(...)`,
+  grouped construction `group_name`, and `grouped_scalar_move_selector`; the
+  grouped construction cursors are not part of the public crate surface
 - `collect_vec(...)`, `consecutive_runs(...)`, `indexed_presence(...)`,
   `CollectedVec`, `IndexedPresence`, `Run`, and `Runs` are available from the
   prelude for grouped collection, streak, and ordinal-presence rules; their

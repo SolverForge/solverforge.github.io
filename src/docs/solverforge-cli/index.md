@@ -11,15 +11,15 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual documents the current `solverforge-cli` interface. Fresh projects
-use the scaffold targets baked into the binary you have installed; run
-`solverforge --version` to confirm the exact runtime, UI, and maps targets.
+This manual documents the `solverforge-cli 3.0.0` interface. Fresh projects use
+the scaffold targets baked into the binary you have installed; run
+`solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It
-creates a neutral `web`, `api`, or `cli` shell, then lets you grow that shell
-with scalar and list planning variables, or both in one app, using generator
-commands and ordinary Rust edits.
+creates a neutral `web`, `api`, `cli`, or `mcp` shell, then lets you grow that
+shell with scalar and list planning variables, or both in one app, using
+generator commands and ordinary Rust edits.
 
 The CLI owns project bootstrap and code generation. The generated application
 then uses:
@@ -27,6 +27,7 @@ then uses:
 - `solverforge` for domain modeling and solving
 - `solverforge-ui` for the shipped frontend in web-shell projects
 - `solverforge-maps` for map and routing integration in web-shell projects
+- `rmcp` for the Model Context Protocol server in MCP-shell projects
 
 ## Mental Model
 
@@ -48,16 +49,21 @@ variables as the domain earns them, and the app metadata follows the Rust model.
 
 - A neutral scaffold that starts runnable instead of forcing a tutorial-shaped
   problem-class choice
-- `web`, `api`, and `cli` generated shells selected by `solverforge new --shell`
+- `web`, `api`, `cli`, and `mcp` generated shells selected by `solverforge new --shell`
 - A generated Axum backend for web/API shells with retained jobs, typed SSE
   events, snapshots, analysis, pause, resume, cancel, and delete flows
+- An MCP shell that exposes the retained lifecycle as schema-typed tools for
+  agent harnesses, with `solverforge connect` client configs
 - Generator commands for facts, entities, variables, constraints, solution
   types, score types, scalar groups, conflict repairs, and demo data
 - A CLI-maintained app contract in `solverforge.app.toml`
 - A frontend that composes shipped `solverforge-ui` assets rather than
   vendoring a template-specific asset pipeline
 - A local development flow built around `solverforge server`, `solverforge
-  info`, `solverforge check`, `solverforge routes`, and `solverforge test`
+  info`, `solverforge check`, `solverforge routes`, `solverforge connect`, and
+  `solverforge test`
+- A portable `solverforge-modeling` agent skill with an installable solve smoke
+  test
 
 ## Daily Loop
 
@@ -166,6 +172,10 @@ model for you.
   `solverforge.app.toml`, UI metadata, and scaffold target versioning
 - **[Command Reference](/docs/solverforge-cli/command-reference/)** - command groups, version output,
   global options, and focused command-reference subsections
+- **[MCP Shell](/docs/solverforge-cli/mcp-shell/)** - the `mcp` shell, its tool surface, and
+  `solverforge connect`
+- **[Agent Skill](/docs/solverforge-cli/agent-skill/)** - the portable `solverforge-modeling`
+  skill and its solve smoke test
 
 ## External References
 

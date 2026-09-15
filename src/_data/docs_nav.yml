@@ -99,6 +99,10 @@ docs:
             href: /docs/solverforge-cli/generator-commands/
           - title: Operations Commands
             href: /docs/solverforge-cli/operations-commands/
+          - title: MCP Shell
+            href: /docs/solverforge-cli/mcp-shell/
+          - title: Agent Skill
+            href: /docs/solverforge-cli/agent-skill/
   - title: SolverForge Python
     href: /docs/solverforge-python/
     children:
@@ -193,5 +197,7 @@ docs:
         href: /docs/solverforge-ui/scheduling-views/
       - title: Integration & Assets
         href: /docs/solverforge-ui/integration-assets/
+      - title: Agent Skill
+        href: /docs/solverforge-ui/agent-skill/
   - title: solverforge-bench
     href: /docs/solverforge-bench/

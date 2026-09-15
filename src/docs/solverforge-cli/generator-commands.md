@@ -84,8 +84,20 @@ solverforge generate variable [OPTIONS] --entity <ENTITY_TYPE> --kind <KIND> <FI
 | ------------------------------ | ------- |
 | `--entity <ENTITY_TYPE>`       | Target entity struct name, such as `Shift` |
 | `--kind <KIND>`                | Variable kind; valid values are `scalar` and `list` |
-| `--range <FACT_COLLECTION>`    | Required for `--kind scalar`; source fact collection |
-| `--elements <FACT_COLLECTION>` | Required for `--kind list`; list element collection |
+| `--range <FACT_COLLECTION>`    | Scalar only; source fact collection; mutually exclusive with `--countable-range` |
+| `--countable-range <FROM..TO>` | Scalar only; half-open integer range, such as `0..24`; mutually exclusive with `--range` |
+| `--elements <FACT_COLLECTION>` | List only; list element collection |
+| `--domain <PROFILE>`           | List only; stock domain profile, currently `cvrp` |
+| `--distance-meter <RUST_PATH>` | List only; cross-entity distance meter type/path |
+| `--intra-distance-meter <RUST_PATH>` | List only; within-entity distance meter type/path |
+| `--route-hooks <MODULE_PATH>`  | List only; route-local get/set/depot/distance/feasible hooks module |
+| `--savings-hooks <MODULE_PATH>` | List only; Clarke-Wright depot/distance/feasible hooks module |
+| `--savings-metric-class-fn <FN_PATH>` | List only; per-owner savings metric class function |
+| `--element-owner-fn <FN_PATH>` | List only; fixed owner for each list element |
+| `--construction-element-order-key <FN_PATH>` | List only; construction element ordering |
+| `--precedence-duration-fn <FN_PATH>` | List only; precedence duration for a list element |
+| `--precedence-successors-fn <FN_PATH>` | List only; precedence successors for a list element |
+| `--solution-trait <TRAIT_PATH>` | List only; additional solution trait required by the list metadata |
 | `--allows-unassigned`          | Scalar only; generate an optional assignment |
 | `--candidate-values <FN_PATH>` | Scalar only; candidate value hook |
 | `--nearby-value-candidates <FN_PATH>` | Scalar only; nearby value hook |
@@ -95,14 +107,28 @@ solverforge generate variable [OPTIONS] --entity <ENTITY_TYPE> --kind <KIND> <FI
 | `--construction-entity-order-key <FN_PATH>` | Scalar only; construction entity ordering |
 | `--construction-value-order-key <FN_PATH>` | Scalar only; construction value ordering |
 
+Scalar variables are always `Option<usize>` candidate indexes. `--range` and
+`--countable-range` choose the candidate domain; `--countable-range` validates a
+non-negative `usize` range with `from < to` and projects it into
+`solverforge.app.toml` and, for web shells, the generated UI model. The stock
+`cvrp` profile owns its meters, route and savings hooks, metric class, and
+solution trait, so those entries cannot be overridden alongside `--domain cvrp`.
+
 `standard` is not a variable kind. It is only the default demo data size label
 used by `solverforge.app.toml`.
 
 ```bash
 solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --allows-unassigned
+solverforge generate variable hour --entity Shift --kind scalar --countable-range 0..24
 solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --candidate-values employee_candidates
 solverforge generate variable stops --entity Route --kind list --elements visits
+solverforge generate variable visit_order --entity Route --kind list --elements visits --domain cvrp
 ```
+
+Scalar-hook and list-metadata flags only write `#[planning_variable(...)]` or
+`#[planning_list_variable(...)]` metadata; they project it into
+`solverforge.app.toml` and the web-shell UI model, and they name user-owned Rust
+implementations that you still have to write.
 
 ### `generate constraint`
 
@@ -168,8 +194,8 @@ solverforge generate score [OPTIONS] <SCORE_TYPE>
 ```
 
 `<SCORE_TYPE>` can be `HardSoftScore`, `HardSoftDecimalScore`,
-`HardMediumSoftScore`, `SoftScore`, `SimpleScore`, or a concrete bendable score
-such as `BendableScore<2, 3>`.
+`HardMediumSoftScore`, `SoftScore`, or a concrete bendable score such as
+`BendableScore<2, 3>`. `SimpleScore` is not accepted.
 
 ```bash
 solverforge generate score HardSoftDecimalScore

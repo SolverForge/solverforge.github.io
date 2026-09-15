@@ -135,6 +135,7 @@ Useful flags:
 - `--entity <TYPE>` - target entity struct name
 - `--kind scalar` - scalar assignment variable
 - `--range <FACT_COLLECTION>` - value range collection name
+- `--countable-range <FROM..TO>` - half-open integer range instead of a fact collection, such as `0..24`
 - `--allows-unassigned` - allow `None`
 - `--candidate-values <FN_PATH>` - app-owned candidate-value hook
 - `--nearby-value-candidates <FN_PATH>` - app-owned nearby value hook
@@ -176,6 +177,12 @@ Useful flags:
 - `--entity <TYPE>` - target entity struct name
 - `--kind list` - list variable
 - `--elements <FACT_COLLECTION>` - element collection name
+- `--domain <PROFILE>` - stock list domain profile, currently `cvrp`
+- `--distance-meter` / `--intra-distance-meter` - cross-entity and within-entity distance meters
+- `--route-hooks` / `--savings-hooks` / `--savings-metric-class-fn` - route-local and Clarke-Wright hook modules
+- `--element-owner-fn` / `--construction-element-order-key` - fixed ownership and construction ordering
+- `--precedence-duration-fn` / `--precedence-successors-fn` - precedence hooks
+- `--solution-trait` - additional solution trait required by the list metadata
 
 ## Models With Both Variable Families
 
@@ -210,7 +217,10 @@ The current `generate score` command accepts score types such as:
 - `HardSoftScore`
 - `HardSoftDecimalScore`
 - `HardMediumSoftScore`
-- `SimpleScore`
+- `SoftScore`
+- `BendableScore<N, M>`
+
+`SimpleScore` is not accepted.
 
 ## Constraints
 

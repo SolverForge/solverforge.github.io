@@ -124,11 +124,26 @@ optional `commands` entries override the default command names.
 
 ### Bundled agent skill
 
-`skills/solverforge-ui/` is a portable agent skill that maps a planning model
-onto the shipped timeline, Gantt, map, rail, and table surfaces while
-preserving the generated model and the `/sf` + `/jobs` + `/demo-data` backend
-contract. Install it with `make install-skill` or
-`scripts/install-skill --list`.
+`skills/solverforge-ui/` is a portable, harness-agnostic agent skill that maps a
+planning model onto the shipped timeline, Gantt, map, rail, and table surfaces
+while preserving the generated model and the `/sf` + `/jobs` + `/demo-data`
+backend contract.
+
+```sh
+./scripts/install-skill                    # opencode + Claude Code + Agent Skills
+./scripts/install-skill --only claude      # one harness only
+./scripts/install-skill --project ../my-app  # per-harness project directories
+./scripts/install-skill --dir ~/skills     # any explicit skills directory
+./scripts/install-skill --list             # show install state
+```
+
+The installer copies the skill into each harness's own skills directory; there
+is no symlink and no shared location. User-scope defaults are opencode
+`~/.config/opencode/skills`, Claude Code `~/.claude/skills`, and Agent Skills
+`~/.agents/skills`, with `--project` using each harness's project directory.
+From the repository root, `make install-skill` runs the same script. See the
+[solverforge-ui agent skill page](/docs/solverforge-ui/agent-skill/) for the
+install matrix, the reference files, and the guardrails the skill enforces.
 
 ## Patch History
 

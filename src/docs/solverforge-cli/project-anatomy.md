@@ -62,7 +62,10 @@ my-scheduler/
 `solverforge new --shell api` keeps the Axum API and omits `static/`,
 `solverforge-ui`, and `solverforge-maps`. `solverforge new --shell cli` emits a
 command-line app without Axum, static frontend assets, UI, or maps
-dependencies.
+dependencies. `solverforge new --shell mcp` emits an MCP server without the
+frontend, UI, or maps dependencies. Only the web shell generates `static/`,
+`static/generated/ui-model.json`, and `ui_source`; the other shells keep that
+boundary intact through later `generate` and `destroy` commands.
 
 ## Ownership Boundaries
 
@@ -158,7 +161,7 @@ The scaffold frontend does not vendor a separate npm app. Instead, it:
 - mounts the shipped `solverforge-ui` assets
 
 This keeps the default generated project thin while still shipping a usable UI.
-API and CLI shells deliberately omit these frontend files.
+API, CLI, and MCP shells deliberately omit these frontend files.
 
 ## Advanced Customization
 

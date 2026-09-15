@@ -15,9 +15,9 @@ This section tracks the published `solverforge-ui 0.8.0` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
 null-safe snapshot callbacks, exact dense scheduling geometry, normalized
 create-job identifiers, optional map helpers, framework-neutral embedded asset
-access, and the bundled agent skill. The published `solverforge-cli 2.2.3`
-scaffold still pins `solverforge-ui 0.7.0`, so generated apps move to `0.8.0`
-only when that app is deliberately upgraded.
+access, and the bundled agent skill. The `solverforge-cli 3.0.0` scaffold still
+pins `solverforge-ui 0.7.0`, so generated apps move to `0.8.0` only when that
+app is deliberately upgraded.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -163,6 +163,8 @@ It is a strong fit for:
   primitives, and Gantt APIs with exact-geometry examples
 - **[Integration & Assets](/docs/solverforge-ui/integration-assets/)** — Backend adapters, asset
   serving, cache behavior, and example route contracts
+- **[Agent Skill](/docs/solverforge-ui/agent-skill/)** — Install and use the portable agent
+  skill that extends a generated shell into a domain-faithful UI
 
 ## External References
 

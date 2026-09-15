@@ -85,7 +85,7 @@ cd my-scheduler
 
 Useful options:
 
-- `--shell web|api|cli` - choose the generated shell; `web` is the default
+- `--shell web|api|cli|mcp` - choose the generated shell; `web` is the default
 - `--skip-git` - do not run `git init` or create the initial commit
 - `--skip-readme` - do not generate `README.md`
 
@@ -100,8 +100,10 @@ default web generated shell already contains:
 
 Use `--shell api` when you want the Axum API without static frontend assets.
 Use `--shell cli` when you want a command-line app rather than an HTTP server.
-The shell choice is recorded in `[app].shell`; it is not a scalar, list, or
-mixed model selector.
+Use `--shell mcp` when you want an MCP server that exposes the solver to an
+agent harness; see the [MCP Shell](/docs/solverforge-cli/mcp-shell/) page. The
+shell choice is recorded in `[app].shell`; it is not a scalar, list, or mixed
+model selector.
 
 ## Run the Local Server
 
@@ -127,6 +129,11 @@ The default web generated project serves:
 - retained job routes under `/jobs/*`
 - demo data endpoints under `/demo-data/*`
 
+For an `mcp` project, `solverforge server` boots the stateless Streamable HTTP
+transport; the default stdio transport starts with `cargo run`. A `cli` project
+does not use `solverforge server`; run it with `cargo run -- demo-data`. See the
+[MCP Shell](/docs/solverforge-cli/mcp-shell/) page.
+
 ## Inspect the Scaffold Before You Change It
 
 Right after scaffolding, these commands are useful:
@@ -135,6 +142,7 @@ Right after scaffolding, these commands are useful:
 solverforge info
 solverforge check
 solverforge routes
+solverforge connect
 ```
 
 `solverforge info` summarizes the current planning solution, facts, entities,
@@ -214,6 +222,18 @@ solverforge generate variable resource_idx \
   --range resources \
   --allows-unassigned
 ```
+
+A scalar variable can also draw from a half-open integer range instead of a fact
+collection; it is still an `Option<usize>` candidate index:
+
+```bash
+solverforge generate variable hour \
+  --entity Shift \
+  --kind scalar \
+  --countable-range 0..24
+```
+
+`--range` and `--countable-range` are mutually exclusive.
 
 List example:
 

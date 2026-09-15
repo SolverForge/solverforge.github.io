@@ -15,10 +15,15 @@ published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
 bindings separately. The `v0.19.4` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and all nine workspace crates
 were published on 2026-08-11, and docs.rs serves the 0.19.4 API.
-The independently published `solverforge-cli 2.2.3` package scaffolds
-generated apps on `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and
-`solverforge-maps 2.1.4`. The worked-use-case bundle now ships
-`solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`,
+The independently published CLI line moved to `solverforge-cli 3.0.0`, which
+adds the `mcp` shell, `solverforge connect`, and the `solverforge-modeling`
+agent skill. The 3.0.0 line targets `solverforge 0.19.4`, with
+`solverforge-ui 0.7.0` and `solverforge-maps 2.1.4` for the web shell and
+`rmcp 3.3.0` for the MCP shell. The GitHub release and crates.io package were
+published on 2026-09-15; the previous package, `solverforge-cli 2.2.3`,
+scaffolded `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and
+`solverforge-maps 2.1.4`. The worked-use-case bundle
+now ships `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`,
 `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`, all on
 `solverforge 0.19.4`; bundle CI and all four tag-triggered Space sync workflows
 pass. SolverForge Python has a tagged
@@ -33,10 +38,10 @@ GitHub CI and the final-tag release workflow both pass.
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.4` |
-| **CLI Scaffold** | Published | `solverforge-cli 2.2.3` scaffolds `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.0.0` adds the `mcp` shell and targets `solverforge 0.19.4`, web `solverforge-ui 0.7.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.3.0`; the previous package, `2.2.3`, scaffolded `solverforge 0.19.3` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.6` compiles dynamic CPython 3.14 models into the `solverforge 0.19.4` runtime; PyPI publishes `solverforge 0.6.6` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`, `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`; all target `solverforge 0.19.4` and `solverforge-ui 0.6.5` |
-| **UI** | Published | `solverforge-ui 0.8.0` exposes framework-neutral embedded assets; the published `solverforge-cli 2.2.3` package still scaffolds `solverforge-ui 0.7.0` |
+| **UI** | Published | `solverforge-ui 0.8.0` exposes framework-neutral embedded assets; every current CLI line, including `solverforge-cli 3.0.0`, still scaffolds `solverforge-ui 0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -53,8 +58,8 @@ GitHub CI and the final-tag release workflow both pass.
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
   document the released Hospital, Lessons, and Deliveries 2.0.7 and FSR 2.0.8
   contracts on `solverforge 0.19.4`, while keeping their recorded
-  `solverforge-cli 2.2.2` scaffold provenance separate from the published
-  `solverforge-cli 2.2.3`
+  `solverforge-cli 2.2.2` scaffold provenance separate from the current
+  `solverforge-cli 3.0.0`
   scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
@@ -136,9 +141,10 @@ GitHub CI and the final-tag release workflow both pass.
 
 - **0.19.4 runtime line**: `v0.19.4` and the crates.io `solverforge 0.19.4`
   package are current, and the Rust toolchain floor remains `1.95`. The
-  published `solverforge-cli 2.2.3` package targets `solverforge 0.19.3`;
-  generated app manifests should move to `solverforge 0.19.4` only when that app
-  is deliberately upgraded and validated.
+  `solverforge-cli 3.0.0` line targets `solverforge 0.19.4` for fresh scaffolds;
+  the previous package, `2.2.3`, targeted `solverforge 0.19.3`. Generated
+  app manifests should move to `solverforge 0.19.4` only when that app is
+  deliberately upgraded and validated.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
   inverse, index, previous, next, custom, cascading, and piggyback shadows.
@@ -184,12 +190,12 @@ GitHub CI and the final-tag release workflow both pass.
   construction; incomplete work fails without publishing an incomplete
   best/completed snapshot, and a pre-completion pause remains resumable without
   publishing a partial snapshot.
-- **0.17.2 construction surface**: advanced solver integrations can import
-  dynamic construction primitives such as `GroupedScalarCursor`,
-  `GroupedScalarSelector`, `ScalarAssignmentMoveCursor`,
-  `ScalarAssignmentMoveOptions`, and
-  `ScalarAssignmentRequiredStreamingCursor`. Required assignment construction
-  now streams state instead of relying only on a closed internal batch path.
+- **Grouped-scalar construction policy**: applications drive grouped
+  construction and repair through `ScalarGroup::assignment(...)`, grouped
+  construction `group_name`, and `grouped_scalar_move_selector`. The
+  grouped-scalar construction cursors remain solver-internal rather than a
+  public import surface. Required assignment construction streams state instead
+  of relying only on a closed internal batch path.
 - **0.17.1 route safety fixes**: stock CVRP helpers reject unreachable
   travel-time legs during strict feasibility checks, convert unreachable or
   malformed distance entries into a large finite cost for construction/search,

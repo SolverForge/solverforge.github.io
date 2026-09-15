@@ -87,11 +87,11 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "2.2.3"
+cli_version = "3.0.0"
 
 [runtime]
-target = "solverforge 0.19.3"
-runtime_source = "crates.io: solverforge 0.19.3"
+target = "solverforge 0.19.4"
+runtime_source = "crates.io: solverforge 0.19.4"
 ui_source = "crates.io: solverforge-ui 0.7.0"
 
 [demo]
@@ -103,9 +103,10 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the published `solverforge-cli 2.2.3` web scaffold
-target. Fresh web generated apps start on the published `solverforge 0.19.3`
-runtime and the CLI's `solverforge-ui 0.7.0` scaffold target.
+This example reflects the `solverforge-cli 3.0.0` web scaffold target. Fresh
+web generated apps target `solverforge 0.19.4`, take the CLI's
+`solverforge-ui 0.7.0` scaffold target, and omit `ui_source` entirely for the
+`api`, `cli`, and `mcp` shells.
 
 Record any later app-owned target changes explicitly in that app's dependency
 manifest and `solverforge.app.toml`.
@@ -126,7 +127,7 @@ conflict repairs, the CLI also keeps these structural arrays in sync:
 metadata used to:
 
 - record scaffold provenance and targets
-- record the selected generated shell as `web`, `api`, or `cli`
+- record the selected generated shell as `web`, `api`, `cli`, or `mcp`
 - store demo defaults
 - describe collections and solvable fields for web frontends
 - produce `static/generated/ui-model.json` for web-shell projects

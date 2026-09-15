@@ -5,10 +5,11 @@ require "fileutils"
 require "open3"
 require "tmpdir"
 
-EXPECTED_CLI_VERSION = "2.2.3"
-EXPECTED_RUNTIME_VERSION = "0.19.3"
+EXPECTED_CLI_VERSION = "3.0.0"
+EXPECTED_RUNTIME_VERSION = "0.19.4"
 EXPECTED_UI_VERSION = "0.7.0"
 EXPECTED_MAPS_VERSION = "2.1.4"
+EXPECTED_MCP_VERSION = "3.3.0"
 
 def fail!(message)
   warn "[verify-cli-release] ERROR: #{message}"
@@ -63,9 +64,11 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   assert_contains(version_output, "Scaffold runtime target: SolverForge crate target #{EXPECTED_RUNTIME_VERSION}", "solverforge --version")
   assert_contains(version_output, "Scaffold UI target: solverforge-ui #{EXPECTED_UI_VERSION}", "solverforge --version")
   assert_contains(version_output, "Scaffold maps target: solverforge-maps #{EXPECTED_MAPS_VERSION}", "solverforge --version")
+  assert_contains(version_output, "Scaffold MCP target: rmcp #{EXPECTED_MCP_VERSION}", "solverforge --version")
   assert_contains(version_output, "Runtime source: crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}", "solverforge --version")
   assert_contains(version_output, "UI source: crates.io: solverforge-ui #{EXPECTED_UI_VERSION}", "solverforge --version")
   assert_contains(version_output, "Maps source: crates.io: solverforge-maps #{EXPECTED_MAPS_VERSION}", "solverforge --version")
+  assert_contains(version_output, "MCP source: crates.io: rmcp #{EXPECTED_MCP_VERSION}", "solverforge --version")
 
   run_command(cli, "new", "release-gate", "--skip-git", "--skip-readme", "--quiet", chdir: scaffold_root)
 
@@ -77,6 +80,13 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   assert_file_contains(File.join(app_root, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
   assert_file_contains(File.join(app_root, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_RUNTIME_VERSION}\"")
   assert_file_contains(File.join(app_root, "solverforge.app.toml"), "ui_source = \"crates.io: solverforge-ui #{EXPECTED_UI_VERSION}\"")
+
+  mcp_root = File.join(scaffold_root, "release-gate-mcp")
+  run_command(cli, "new", "release-gate-mcp", "--shell", "mcp", "--skip-git", "--skip-readme", "--quiet", chdir: scaffold_root)
+  assert_file_contains(File.join(mcp_root, "Cargo.toml"), "rmcp = { version = \"#{EXPECTED_MCP_VERSION}\"")
+  assert_file_contains(File.join(mcp_root, "solverforge.app.toml"), "shell = \"mcp\"")
+  assert_file_contains(File.join(mcp_root, "solverforge.app.toml"), "target = \"solverforge #{EXPECTED_RUNTIME_VERSION}\"")
+  fail!("MCP scaffold should not pin solverforge-ui") if File.read(File.join(mcp_root, "Cargo.toml")).include?("solverforge-ui")
 
   log "Published CLI release matches the documented scaffold targets"
 end
