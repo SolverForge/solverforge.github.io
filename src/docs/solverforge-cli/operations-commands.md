@@ -58,22 +58,35 @@ solverforge connect [OPTIONS]
 ```
 
 Prints ready-to-paste MCP client configuration for an MCP-shell project: the
-stdio command plus the Streamable HTTP URL for Claude Code, Claude Desktop,
-Cursor, VS Code, and other clients.
+stdio command plus the Streamable HTTP URL for opencode, Claude Code,
+Claude Desktop, Cursor, VS Code, and other clients.
 
 Options:
 
 | Option             | Meaning |
 | ------------------ | ------- |
-| `--write <TARGET>` | Write the in-project client config for the target; only `vscode` is supported |
+| `--write <TARGET>` | Write the in-project client config for the target: `vscode`, `cursor`, `claude`, or `opencode` |
 | `-p, --port <PORT>` | Port used in the printed Streamable HTTP URL; when omitted, use `.solverforgerc` and then `7860` |
 
-`--write vscode` merges the project entry into `.vscode/mcp.json`; global client
-files are printed with their path instead of being modified. See the
-[MCP Shell](/docs/solverforge-cli/mcp-shell/) page.
+Write targets and their in-project files:
+
+| Target | Written file |
+| ------ | ------------ |
+| `vscode` | `.vscode/mcp.json` |
+| `cursor` | `.cursor/mcp.json` |
+| `claude` | `.mcp.json` |
+| `opencode` | `opencode.json` |
+
+`--write` updates only the project's MCP server entry and replaces the config
+atomically; JSONC comments in an existing file are preserved. Global client
+files (Claude Desktop) are printed with their path instead of being modified.
+See the [MCP Shell](/docs/solverforge-cli/mcp-shell/) page.
 
 ```bash
 solverforge connect
+solverforge connect --write opencode
+solverforge connect --write claude
+solverforge connect --write cursor
 solverforge connect --write vscode
 solverforge connect --port 8080
 ```

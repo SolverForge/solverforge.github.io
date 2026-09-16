@@ -24,14 +24,20 @@ solverforge generate variable resource_idx --entity Task --kind scalar --range r
 solverforge generate data
 cargo run --release              # stdio MCP server
 cargo run --release -- --http    # Streamable HTTP on http://127.0.0.1:7860/mcp
-solverforge connect              # client configs for Claude Code, Claude Desktop, Cursor, VS Code
+solverforge connect              # client configs for opencode, Claude Code, Claude Desktop, Cursor, VS Code
 ```
 
 The server speaks stdio by default. With `--http` it serves stateless
 Streamable HTTP at `/mcp`. HTTP binds the loopback interface unless `--host`
 selects a concrete IP address; wildcard binds (`0.0.0.0` and `::`) are rejected
-so `rmcp` Host validation remains active. One solver service and one task store
-are shared by every request, so jobs and tasks survive individual negotiations.
+so `rmcp` Host validation remains active. The HTTP transport is
+unauthenticated and has no per-caller isolation: every connection shares one
+solver and task store, so a non-loopback `--host` lets anyone who can reach the
+port start solves and inspect, cancel, or delete jobs. Host validation only
+rejects DNS-rebinding headers. Leave `--host` on loopback unless the network is
+trusted, or put an authenticating proxy in front; stdio has no such exposure.
+One solver service and one task store are shared by every request, so jobs and
+tasks survive individual negotiations.
 
 ## Tool Surface
 
@@ -66,19 +72,33 @@ solverforge connect [OPTIONS]
 ```
 
 Prints ready-to-paste MCP client configuration for an MCP-shell project: the
-stdio command plus the Streamable HTTP URL for Claude Code, Claude Desktop,
-Cursor, VS Code, and other clients.
+stdio command plus the Streamable HTTP URL for opencode, Claude Code,
+Claude Desktop, Cursor, VS Code, and other clients.
 
 | Option              | Meaning |
 | ------------------- | ------- |
-| `--write <TARGET>`  | Write the in-project client config for the target; only `vscode` is currently supported |
+| `--write <TARGET>`  | Write the in-project client config for the target: `vscode`, `cursor`, `claude`, or `opencode` |
 | `-p, --port <PORT>` | Port used in the printed Streamable HTTP URL; when omitted, use `.solverforgerc` and then `7860` |
 
-`--write vscode` merges the project entry into `.vscode/mcp.json`; global client
-files are printed with their path instead of being modified.
+Write targets and their in-project files:
+
+| Target | Written file |
+| ------ | ------------ |
+| `vscode` | `.vscode/mcp.json` |
+| `cursor` | `.cursor/mcp.json` |
+| `claude` | `.mcp.json` |
+| `opencode` | `opencode.json` |
+
+`--write` updates only the project's MCP server entry and replaces the config
+atomically; JSONC comments in an existing file are preserved. Global client
+files (Claude Desktop) are printed with their path instead of being modified.
+After writing a config, reload the harness so it rescans its MCP configuration.
 
 ```bash
 solverforge connect
+solverforge connect --write opencode
+solverforge connect --write claude
+solverforge connect --write cursor
 solverforge connect --write vscode
 solverforge connect --port 8080
 ```

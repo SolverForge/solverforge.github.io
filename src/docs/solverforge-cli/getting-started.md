@@ -72,6 +72,7 @@ The output includes:
 - scaffold runtime target
 - scaffold UI target
 - scaffold maps target
+- scaffold MCP target
 - explicit source labels for each dependency line used in new projects
 
 ## Create a New Project

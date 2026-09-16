@@ -11,7 +11,7 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual documents the `solverforge-cli 3.0.0` interface. Fresh projects use
+This manual documents the `solverforge-cli 3.1.0` interface. Fresh projects use
 the scaffold targets baked into the binary you have installed; run
 `solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
 <% end %>
@@ -53,7 +53,8 @@ variables as the domain earns them, and the app metadata follows the Rust model.
 - A generated Axum backend for web/API shells with retained jobs, typed SSE
   events, snapshots, analysis, pause, resume, cancel, and delete flows
 - An MCP shell that exposes the retained lifecycle as schema-typed tools for
-  agent harnesses, with `solverforge connect` client configs
+  agent harnesses, with `solverforge connect` client configs for opencode,
+  Claude Code, Cursor, and VS Code
 - Generator commands for facts, entities, variables, constraints, solution
   types, score types, scalar groups, conflict repairs, and demo data
 - A CLI-maintained app contract in `solverforge.app.toml`
@@ -62,8 +63,8 @@ variables as the domain earns them, and the app metadata follows the Rust model.
 - A local development flow built around `solverforge server`, `solverforge
   info`, `solverforge check`, `solverforge routes`, `solverforge connect`, and
   `solverforge test`
-- A portable `solverforge-modeling` agent skill with an installable solve smoke
-  test
+- The portable `solverforge-modeling` and `solverforge-ui` agent skills with an
+  agent-centric installer and an installable solve smoke test
 
 ## Daily Loop
 

@@ -64,10 +64,10 @@ delivery surface and dependencies:
 
 | Shell | Delivery surface | Key dependencies | Omitted |
 | ----- | ---------------- | ---------------- | ------- |
-| `web` (default) | Axum server plus the bundled `solverforge-ui` frontend under `static/` | `solverforge`, `solverforge-ui 0.7.0`, `solverforge-maps 2.1.4`, Axum, Tokio, `tokio-stream`, `tower-http`, serialization, `parking_lot` | - |
+| `web` (default) | Axum server plus the bundled `solverforge-ui` frontend under `static/` | `solverforge`, `solverforge-ui 0.9.0`, `solverforge-maps 2.1.4`, Axum, Tokio, `tokio-stream`, `tower-http`, serialization, `parking_lot` | - |
 | `api` | Axum HTTP API with retained-job routes and SSE, no frontend | `solverforge`, Axum, Tokio, SSE, `tower-http` CORS, serialization, `parking_lot` | `solverforge-ui`, `solverforge-maps`, `static/`, `ui_source` |
 | `cli` | Clap command-line app; no HTTP server | `solverforge`, Clap, Tokio, serialization, `parking_lot` | Axum, `tower-http`, `tokio-stream`, `solverforge-ui`, `solverforge-maps`, `static/`, `ui_source` |
-| `mcp` | MCP server exposing the solver as schema-typed tools | `solverforge`, `rmcp 3.3.0`, Axum, Tokio, `tracing`, `tracing-subscriber`, serialization, `parking_lot` | `solverforge-ui`, `solverforge-maps`, `static/`, `ui_source` |
+| `mcp` | MCP server exposing the solver as schema-typed tools | `solverforge`, `rmcp 3.4.0`, Axum, Tokio, `tracing`, `tracing-subscriber`, serialization, `parking_lot` | `solverforge-ui`, `solverforge-maps`, `static/`, `ui_source` |
 
 Every shell declares `rust-version = "1.95"` and `schemars` as an optional
 dependency behind a `schema` feature; only the MCP shell enables it, so it can
