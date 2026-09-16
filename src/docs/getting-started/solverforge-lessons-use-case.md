@@ -148,8 +148,8 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.0.0` scaffolds `solverforge 0.19.4`; the finished Lessons app
-records the same app-owned `solverforge 0.19.4` runtime target while retaining
+`solverforge-cli 3.1.0` scaffolds `solverforge 0.19.5`; the finished Lessons app
+records an app-owned `solverforge 0.19.4` runtime target while retaining
 its original `2.2.2` scaffold provenance:
 
 ```toml

@@ -8,7 +8,7 @@ description: "Historical maintainer note for retained-job lifecycle, snapshot id
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
 This is a historical maintainer note from April 6, 2026. The current public
 contract is documented in the `solverforge 0.19.5` runtime docs, the
-`solverforge-cli 3.0.0` CLI docs, and the `solverforge-ui 0.9.0` UI docs; use
+`solverforge-cli 3.1.0` CLI docs, and the `solverforge-ui 0.9.0` UI docs; use
 those pages for user-facing guidance.
 <% end %>
 

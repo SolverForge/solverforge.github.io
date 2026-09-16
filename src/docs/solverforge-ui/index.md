@@ -16,9 +16,10 @@ typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
 null-safe snapshot callbacks, exact dense scheduling geometry, normalized
 create-job identifiers, optional map helpers, and framework-neutral embedded
 asset access. The bundled agent skill moved to the `solverforge-cli` repository
-in 0.9.0. The `solverforge-cli 3.0.0` scaffold still pins
-`solverforge-ui 0.7.0`, so generated apps move to `0.9.0` only when that app is
-deliberately upgraded.
+in 0.9.0. The `solverforge-cli 3.1.0` scaffold pins `solverforge-ui 0.9.0`, so
+new projects get these assets directly; apps scaffolded by the earlier `3.0.0`
+line still pin `0.7.0` and move to `0.9.0` only when that app is deliberately
+upgraded.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for

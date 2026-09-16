@@ -9,7 +9,7 @@ description: >
 
 <%= render Ui::Callout.new do %>
 This section tracks the published `solverforge-maps 2.1.4` crate. The current
-`solverforge-cli 3.0.0` package also scaffolds
+`solverforge-cli 3.1.0` package also scaffolds
 `solverforge-maps 2.1.4` for the web shell.
 <% end %>
 

@@ -19,8 +19,9 @@ cargo add solverforge
 
 These pages track the `solverforge 0.19.5` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
-runtime; the `solverforge-cli 3.0.0` line scaffolds `solverforge 0.19.4`, so
-check `solverforge --version` when starting from a scaffold.
+runtime; the `solverforge-cli 3.1.0` line scaffolds `solverforge 0.19.5`, while
+apps scaffolded by the previous `3.0.0` line pin `solverforge 0.19.4`, so check
+`solverforge --version` when starting from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:

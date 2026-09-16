@@ -16,11 +16,13 @@ bindings separately. The `v0.19.5` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and all nine workspace crates
 were published on 2026-09-15, and docs.rs serves the 0.19.5 API.
 
-The independently published CLI line is `solverforge-cli 3.0.0`, which adds the
-`mcp` shell, `solverforge connect`, and the `solverforge-modeling` agent skill.
-The published 3.0.0 package targets `solverforge 0.19.4`, with
-`solverforge-ui 0.7.0` and `solverforge-maps 2.1.4` for the web shell and
-`rmcp 3.3.0` for the MCP shell.
+The independently published CLI line is `solverforge-cli 3.1.0`, which adds the
+`mcp` shell, `solverforge connect`, the `solverforge-modeling` and
+`solverforge-ui` agent skills with an agent-centric installer, and multi-client
+MCP config writing. The published 3.1.0 package targets `solverforge 0.19.5`,
+with `solverforge-ui 0.9.0` and `solverforge-maps 2.1.4` for the web shell and
+`rmcp 3.4.0` for the MCP shell. Apps scaffolded by the earlier `3.0.0` line pin
+`solverforge 0.19.4`, `solverforge-ui 0.7.0`, and `rmcp 3.3.0`.
 
 The worked-use-case bundle ships `solverforge-hospital@2.0.7`,
 `solverforge-lessons@2.0.7`, `solverforge-deliveries@2.0.7`, and
@@ -38,10 +40,10 @@ SolverForge skills now live.
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.5` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.0.0` adds the `mcp` shell and targets `solverforge 0.19.4`, web `solverforge-ui 0.7.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.3.0`; the previous package, `2.2.3`, scaffolded `solverforge 0.19.3` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.1.0` targets `solverforge 0.19.5`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.4.0`, and adds multi-client `connect --write` plus the agent-centric skill installer; the previous package, `3.0.0`, scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.6` compiles dynamic CPython 3.14 models into the `solverforge 0.19.4` runtime; PyPI publishes `solverforge 0.6.6` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`, `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`; all target `solverforge 0.19.4` and `solverforge-ui 0.6.5` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; every current CLI line, including `solverforge-cli 3.0.0`, still scaffolds `solverforge-ui 0.7.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.1.0` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -59,7 +61,7 @@ SolverForge skills now live.
   document the released Hospital, Lessons, and Deliveries 2.0.7 and FSR 2.0.8
   contracts on `solverforge 0.19.4`, while keeping their recorded
   `solverforge-cli 2.2.2` scaffold provenance separate from the current
-  `solverforge-cli 3.0.0`
+  `solverforge-cli 3.1.0`
   scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
@@ -141,9 +143,10 @@ SolverForge skills now live.
 
 - **0.19.5 runtime line**: `v0.19.5` and the crates.io `solverforge 0.19.5`
   package are current, and the Rust toolchain floor remains `1.95`. The
-  published `solverforge-cli 3.0.0` package targets `solverforge 0.19.4` for
-  fresh scaffolds. Generated app manifests should move to `solverforge 0.19.5`
-  only when that app is deliberately upgraded and validated.
+  published `solverforge-cli 3.1.0` package targets `solverforge 0.19.5` for
+  fresh scaffolds; apps scaffolded by `3.0.0` pin `0.19.4` and should move to
+  `solverforge 0.19.5` only when that app is deliberately upgraded and
+  validated.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
   inverse, index, previous, next, custom, cascading, and piggyback shadows.
