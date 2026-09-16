@@ -5,11 +5,11 @@ require "fileutils"
 require "open3"
 require "tmpdir"
 
-EXPECTED_CLI_VERSION = "3.0.0"
-EXPECTED_RUNTIME_VERSION = "0.19.4"
-EXPECTED_UI_VERSION = "0.7.0"
+EXPECTED_CLI_VERSION = "3.1.0"
+EXPECTED_RUNTIME_VERSION = "0.19.5"
+EXPECTED_UI_VERSION = "0.9.0"
 EXPECTED_MAPS_VERSION = "2.1.4"
-EXPECTED_MCP_VERSION = "3.3.0"
+EXPECTED_MCP_VERSION = "3.4.0"
 
 def fail!(message)
   warn "[verify-cli-release] ERROR: #{message}"

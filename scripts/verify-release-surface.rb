@@ -6,7 +6,7 @@ ROOT = File.expand_path("..", __dir__)
 REQUIRED_TEXT = {
   "src/docs/solverforge/index.md" => [
     "solverforge 0.19.5",
-    "solverforge-cli 3.0.0",
+    "solverforge-cli 3.1.0",
     "solverforge 0.19.4",
     "docs.rs/solverforge/0.19.5/solverforge/"
   ],
@@ -21,13 +21,13 @@ REQUIRED_TEXT = {
     "`same_value_conflict_field`"
   ],
   "src/docs/solverforge-cli/index.md" => [
-    "solverforge-cli 3.0.0",
+    "solverforge-cli 3.1.0",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 3.0.0",
-    "SolverForge crate target 0.19.4",
-    "Scaffold MCP target: rmcp 3.3.0",
+    "solverforge-cli 3.1.0",
+    "SolverForge crate target 0.19.5",
+    "Scaffold MCP target: rmcp 3.4.0",
     "solverforge connect"
   ],
   "src/docs/solverforge-cli/generator-commands.md" => [
@@ -45,17 +45,20 @@ REQUIRED_TEXT = {
     "get_candidate_trace",
     "Streamable HTTP",
     "solverforge connect",
-    "MCP 2026-07-28"
+    "MCP 2026-07-28",
+    "unauthenticated"
   ],
   "src/docs/solverforge-cli/agent-skill.md" => [
     "skills/solverforge-modeling/",
     "solve-smoke-test.sh",
-    "make install-skill"
+    "make install-skill",
+    "--agent opencode|claude|codex",
+    "--layout covering"
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.0.0",
-    "solverforge-ui 0.7.0",
+    "solverforge-cli 3.1.0",
+    "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
   ],
@@ -86,7 +89,15 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/agent-skill/"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge-ui 0.9.0"
+    "solverforge-ui 0.9.0",
+    "solverforge-cli 3.1.0"
+  ],
+  "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
+    "`3.1.0` | 2026-09-16",
+    "rmcp 3.4.0",
+    "--agent opencode|claude|codex",
+    "`solverforge 0.19.5`",
+    "`solverforge-ui 0.9.0`"
   ],
   "src/_posts/releases/2026-09-15-solverforge-ui-0-8-x.md" => [
     "`0.8.0` | 2026-09-15",
@@ -103,7 +114,7 @@ REQUIRED_TEXT = {
   "src/docs/status-and-roadmap.md" => [
     "solverforge 0.19.5",
     "solverforge-py 0.6.6",
-    "solverforge-cli 3.0.0",
+    "solverforge-cli 3.1.0",
     "solverforge-ui 0.9.0",
     "solverforge-hospital@2.0.7",
     "solverforge-lessons@2.0.7",
@@ -150,6 +161,33 @@ FORBIDDEN_TEXT = {
   "src/docs/solverforge-ui/index.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
   "src/docs/solverforge-ui/integration-assets.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
   "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.3", "solverforge==0.6.3"],
+  "src/docs/solverforge-cli/index.md" => [
+    "solverforge-cli 3.0.0",
+    "--only"
+  ],
+  "src/docs/solverforge-cli/command-reference.md" => [
+    "solverforge-cli 3.0.0",
+    "rmcp 3.3.0",
+    "SolverForge crate target 0.19.4"
+  ],
+  "src/docs/solverforge-cli/scaffold-commands.md" => [
+    "rmcp 3.3.0",
+    "solverforge-ui 0.7.0"
+  ],
+  "src/docs/solverforge-cli/operations-commands.md" => [
+    "only `vscode`"
+  ],
+  "src/docs/solverforge-cli/mcp-shell.md" => [
+    "only `vscode`"
+  ],
+  "src/docs/solverforge-cli/agent-skill.md" => [
+    "--only"
+  ],
+  "src/docs/solverforge-cli/configuration.md" => [
+    "cli_version = \"3.0.0\"",
+    "target = \"solverforge 0.19.4\"",
+    "solverforge-ui 0.7.0"
+  ],
   "src/docs/solverforge-cli/command-reference.md" => [
     "solverforge-cli 2.2.2",
     "crate target 0.15.2",
