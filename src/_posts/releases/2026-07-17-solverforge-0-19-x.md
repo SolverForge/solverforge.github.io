@@ -6,16 +6,20 @@ description: >
   SolverForge 0.19.x makes planning list variables the sole model for routes
   and ordered assignments, keeps the full list-shadow system, and leaves
   ordinary scalar search on direct single-slot mutation. Patch releases through
-  0.19.4 tighten mandatory construction, control, telemetry, and assignment
-  batching.
+  0.19.5 tighten mandatory construction, control, telemetry, cancellation, and
+  assignment batching.
 ---
 
 **SolverForge 0.19.x** starts with
 [v0.19.0](https://github.com/SolverForge/solverforge/releases/tag/v0.19.0)
 on 2026-07-17. The current core release is
-[0.19.4](https://crates.io/crates/solverforge/0.19.4), published on 2026-08-11.
+[0.19.5](https://crates.io/crates/solverforge/0.19.5), published on 2026-09-15.
 The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
 same version line.
+
+> **Update, 2026-09-15:** SolverForge 0.19.5 retains the complete solution when
+> a job is cancelled, initializes score history with a slice fill, and preserves
+> complete Clarke-Wright construction.
 
 > **Update, 2026-08-11:** SolverForge 0.19.4 commits the dense hard-first
 > required-assignment batch from independent direct assignments, then leaves
@@ -60,8 +64,8 @@ No released SolverForge use case, Python model, or benchmark workload depended
 on chained variables. Those independently released surfaces therefore did not
 need a domain-model rewrite. At the time of the core release, they remained on
 their published 0.18-based lines until their own releases moved. The current
-published CLI is 2.2.3 and scaffolds SolverForge 0.19.3. Existing generated
-applications still own their dependency manifests and should move to 0.19.4
+published CLI is 3.0.0 and scaffolds SolverForge 0.19.4. Existing generated
+applications still own their dependency manifests and should move to 0.19.5
 only after app-level validation.
 
 ## Why One Sequence Model
@@ -186,20 +190,20 @@ For direct Rust applications:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.4", features = ["serde", "console"] }
+solverforge = { version = "0.19.5", features = ["serde", "console"] }
 ```
 
-The companion workspace crates are all published at `0.19.4`:
+The companion workspace crates are all published at `0.19.5`:
 
 ```toml
-solverforge-core = "0.19.4"
-solverforge-macros = "0.19.4"
-solverforge-scoring = "0.19.4"
-solverforge-config = "0.19.4"
-solverforge-solver = "0.19.4"
-solverforge-bridge = "0.19.4"
-solverforge-cvrp = "0.19.4"
-solverforge-console = "0.19.4"
+solverforge-core = "0.19.5"
+solverforge-macros = "0.19.5"
+solverforge-scoring = "0.19.5"
+solverforge-config = "0.19.5"
+solverforge-solver = "0.19.5"
+solverforge-bridge = "0.19.5"
+solverforge-cvrp = "0.19.5"
+solverforge-console = "0.19.5"
 ```
 
 When the core release completed, the Python package was still on the previous
@@ -259,13 +263,13 @@ datasets, or solver policies.
 > retain `solverforge-maps 2.1.4`. Bundle CI and the tag-triggered Space sync
 > workflows passed.
 >
-> **Update, 2026-09-15:** `solverforge-ui 0.8.0` is published; the published
-> `solverforge-cli 2.2.3` package still scaffolds the `solverforge-ui 0.7.0`
-> line.
+> **Update, 2026-09-15:** `solverforge-ui 0.9.0` is published and moves the
+> bundled agent skill into the `solverforge-cli` repository. The published
+> `solverforge-cli 3.0.0` package scaffolds the `solverforge-ui 0.7.0` line.
 
 ## Upgrade Checklist
 
-- Bump SolverForge dependencies to `0.19.4` and regenerate `Cargo.lock` from
+- Bump SolverForge dependencies to `0.19.5` and regenerate `Cargo.lock` from
   the registry.
 - Replace predecessor-chain entities with an owner-side planning list variable.
 - Replace anchor lookup with the list owner or an inverse-relation shadow.
@@ -280,6 +284,7 @@ datasets, or solver policies.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.5` | 2026-09-15 | Retains the complete solution on cancellation, initializes score history with a slice fill, and preserves complete Clarke-Wright construction. |
 | `0.19.4` | 2026-08-11 | Commits direct required assignments in the dense hard-first batch, defers augmenting rematches to a retaining cursor, and exposes the unified construction progress contract. |
 | `0.19.3` | 2026-07-29 | Restores shared assignment rotation. |
 | `0.19.2` | 2026-07-19 | Repairs required construction completion and interruption, unifies construction lifecycle and progress, preserves committed scores, and commits route telemetry atomically. |
@@ -289,9 +294,9 @@ datasets, or solver policies.
 ## Documentation Changes
 
 - [SolverForge runtime docs](/docs/solverforge/) describe the scalar/list
-  boundary and current 0.19.4 runtime.
+  boundary and current 0.19.5 runtime.
 - [CLI command reference](/docs/solverforge-cli/command-reference/) records the
-  published 2.2.3 scaffold targets separately from the 0.19.4 core.
+  published 3.0.0 scaffold targets separately from the 0.19.5 core.
 - [Crate & Runtime Map](/reference/crate-map/) aligns Rust, CLI, Python, and
   companion repositories on the new release line.
 - [SolverForge Python](/docs/solverforge-python/) records the published 0.6.6

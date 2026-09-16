@@ -10,38 +10,38 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.4` tag and calls out
+documentation tracks the `solverforge 0.19.5` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.4` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.5` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and all nine workspace crates
-were published on 2026-08-11, and docs.rs serves the 0.19.4 API.
-The independently published CLI line moved to `solverforge-cli 3.0.0`, which
-adds the `mcp` shell, `solverforge connect`, and the `solverforge-modeling`
-agent skill. The 3.0.0 line targets `solverforge 0.19.4`, with
+were published on 2026-09-15, and docs.rs serves the 0.19.5 API.
+
+The independently published CLI line is `solverforge-cli 3.0.0`, which adds the
+`mcp` shell, `solverforge connect`, and the `solverforge-modeling` agent skill.
+The published 3.0.0 package targets `solverforge 0.19.4`, with
 `solverforge-ui 0.7.0` and `solverforge-maps 2.1.4` for the web shell and
-`rmcp 3.3.0` for the MCP shell. The GitHub release and crates.io package were
-published on 2026-09-15; the previous package, `solverforge-cli 2.2.3`,
-scaffolded `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and
-`solverforge-maps 2.1.4`. The worked-use-case bundle
-now ships `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`,
-`solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`, all on
-`solverforge 0.19.4`; bundle CI and all four tag-triggered Space sync workflows
-pass. SolverForge Python has a tagged
+`rmcp 3.3.0` for the MCP shell.
+
+The worked-use-case bundle ships `solverforge-hospital@2.0.7`,
+`solverforge-lessons@2.0.7`, `solverforge-deliveries@2.0.7`, and
+`solverforge-fsr@2.0.8`, all on `solverforge 0.19.4`; bundle CI and all four
+tag-triggered Space sync workflows pass. SolverForge Python has a tagged
 `solverforge-py 0.6.6` source line for CPython 3.14, compiled onto the
-`solverforge 0.19.4` runtime with embedded `solverforge-ui 0.7.0` assets. The
-automatic release workflow completed and PyPI serves `solverforge 0.6.6`;
-GitHub CI and the final-tag release workflow both pass.
+`solverforge 0.19.4` runtime with embedded `solverforge-ui 0.7.0` assets; PyPI
+serves `solverforge 0.6.6`. The current UI line is `solverforge-ui 0.9.0`, which
+moved the bundled agent skill into the `solverforge-cli` repository, where both
+SolverForge skills now live.
 <% end %>
 
 ## Current Status
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.4` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.5` |
 | **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.0.0` adds the `mcp` shell and targets `solverforge 0.19.4`, web `solverforge-ui 0.7.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.3.0`; the previous package, `2.2.3`, scaffolded `solverforge 0.19.3` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.6` compiles dynamic CPython 3.14 models into the `solverforge 0.19.4` runtime; PyPI publishes `solverforge 0.6.6` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.7`, `solverforge-lessons@2.0.7`, `solverforge-deliveries@2.0.7`, and `solverforge-fsr@2.0.8`; all target `solverforge 0.19.4` and `solverforge-ui 0.6.5` |
-| **UI** | Published | `solverforge-ui 0.8.0` exposes framework-neutral embedded assets; every current CLI line, including `solverforge-cli 3.0.0`, still scaffolds `solverforge-ui 0.7.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; every current CLI line, including `solverforge-cli 3.0.0`, still scaffolds `solverforge-ui 0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -139,12 +139,11 @@ GitHub CI and the final-tag release workflow both pass.
 
 ## Runtime Notes
 
-- **0.19.4 runtime line**: `v0.19.4` and the crates.io `solverforge 0.19.4`
+- **0.19.5 runtime line**: `v0.19.5` and the crates.io `solverforge 0.19.5`
   package are current, and the Rust toolchain floor remains `1.95`. The
-  `solverforge-cli 3.0.0` line targets `solverforge 0.19.4` for fresh scaffolds;
-  the previous package, `2.2.3`, targeted `solverforge 0.19.3`. Generated
-  app manifests should move to `solverforge 0.19.4` only when that app is
-  deliberately upgraded and validated.
+  published `solverforge-cli 3.0.0` package targets `solverforge 0.19.4` for
+  fresh scaffolds. Generated app manifests should move to `solverforge 0.19.5`
+  only when that app is deliberately upgraded and validated.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
   inverse, index, previous, next, custom, cascading, and piggyback shadows.

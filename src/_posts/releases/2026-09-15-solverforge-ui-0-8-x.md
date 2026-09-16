@@ -26,6 +26,13 @@ That is a scaffold dependency choice, not a statement that the published UI
 crate is still on 0.7.x. Generated apps move to `0.8.0` only when the app is
 deliberately upgraded and validated.
 
+<%= render Ui::Callout.new(title: "Update, September 15, 2026") do %>
+`solverforge-ui 0.9.0` is published. It moves the bundled agent skill into the
+[`solverforge-cli`](https://github.com/SolverForge/solverforge-cli) repository,
+where both SolverForge skills now live, and the crate no longer ships it. The
+published `solverforge-cli 3.0.0` package still scaffolds `solverforge-ui 0.7.0`.
+<% end %>
+
 ## What Changed
 
 ### Solver lifecycle callbacks are explicit and null-safe

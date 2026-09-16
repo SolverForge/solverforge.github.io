@@ -8,9 +8,10 @@ weight: 5
 
 # Agent Skill
 
-`solverforge-ui 0.8.0` ships a portable, harness-agnostic agent skill under
-`skills/solverforge-ui/` in the
-[solverforge-ui repository](https://github.com/SolverForge/solverforge-ui). The
+As of `solverforge-ui 0.9.0`, the `solverforge-ui` agent skill lives with the
+other SolverForge skills in the
+[solverforge-cli repository](https://github.com/SolverForge/solverforge-cli)
+(`skills/solverforge-ui/`); the `solverforge-ui` crate no longer bundles it. The
 skill teaches a coding agent to extend a thin `solverforge-cli` scaffold into a
 domain-faithful interface using only the shipped `SF.*` components, so the
 planning model stays the single source of truth and the generated backend stays
@@ -38,44 +39,10 @@ timeline, Gantt, map, rail, and table models.
 
 ## Install
 
-The installer copies the skill into each selected harness's **own** skills
-directory. There is no symlink and no shared central location, so every harness
-gets an independent, self-contained copy.
-
-```sh
-# Default: user scope for opencode, Claude Code, and the Agent Skills standard
-./scripts/install-skill
-
-# Explicitly choose harnesses
-./scripts/install-skill --only opencode
-./scripts/install-skill --only claude
-./scripts/install-skill --only agents
-
-# Into a specific scaffolded app; each harness gets its own project directory
-./scripts/install-skill --project ../my-scheduler
-
-# Any other skills directory you want
-./scripts/install-skill --dir ~/.config/some-harness/skills
-
-# Inspect or remove
-./scripts/install-skill --list
-./scripts/install-skill --uninstall
-```
-
-| Harness | User scope | Project scope (`--project <dir>`) |
-| --- | --- | --- |
-| opencode | `~/.config/opencode/skills` | `<dir>/.opencode/skills` |
-| Claude Code | `~/.claude/skills` | `<dir>/.claude/skills` |
-| Agent Skills | `~/.agents/skills` | `<dir>/.agents/skills` |
-
-From the repository root, `make install-skill` runs the same script. Restart the
-agent after installing so it rescans skill directories.
-
-Each installed copy includes an ownership receipt recording the copied payload.
-Updates and uninstalls proceed only when that receipt is valid and the installed
-files are unchanged. An unmanaged directory, an invalid receipt, or local
-customizations are reported and left untouched; resolve those conflicts
-manually before rerunning the command.
+Install the skill from a `solverforge-cli` checkout with that repository's
+installer; see its `skills/README.md`. The `solverforge-ui` crate no longer
+ships an installer of its own. Restart the agent after installing so it rescans
+skill directories.
 
 ## How The Skill Is Structured
 
@@ -91,9 +58,8 @@ It points to focused reference files for the task at hand:
 | "Which surface should I build for this problem?" | `references/problem-shapes.md` |
 | Proving the UI works end to end | `references/validation.md` |
 
-The skill metadata records the `solverforge-ui` version it was written against;
-check the version an app actually pins in `Cargo.lock` before relying on a
-detail.
+The skill targets the `solverforge-ui` version an app pins; check `Cargo.lock`
+and that version's `README.md` before relying on a detail.
 
 ## Guardrails The Skill Enforces
 
@@ -114,6 +80,7 @@ The skill is written to keep the generated model and the `/sf`, `/jobs`, and
 ## External References
 
 - [solverforge-ui repository](https://github.com/SolverForge/solverforge-ui)
+- [solverforge-cli repository (skill home)](https://github.com/SolverForge/solverforge-cli)
 - [solverforge-ui 0.8.x release notes](/blog/releases/2026/09/15/solverforge-ui-0-8-x/)
 - [Components](/docs/solverforge-ui/components/)
 - [Scheduling Views](/docs/solverforge-ui/scheduling-views/)

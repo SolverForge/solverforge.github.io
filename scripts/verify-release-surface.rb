@@ -5,10 +5,10 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/docs/solverforge/index.md" => [
-    "solverforge 0.19.4",
+    "solverforge 0.19.5",
     "solverforge-cli 3.0.0",
-    "solverforge 0.19.3",
-    "docs.rs/solverforge/0.19.4/solverforge/"
+    "solverforge 0.19.4",
+    "docs.rs/solverforge/0.19.5/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py 0.6.6",
@@ -53,14 +53,14 @@ REQUIRED_TEXT = {
     "make install-skill"
   ],
   "src/docs/solverforge-ui/index.md" => [
-    "solverforge-ui 0.8.0",
+    "solverforge-ui 0.9.0",
     "solverforge-cli 3.0.0",
     "solverforge-ui 0.7.0",
-    "/sf/sf.0.8.0.css",
+    "/sf/sf.0.9.0.css",
     "SF.version"
   ],
   "src/docs/solverforge-ui/integration-assets.md" => [
-    "solverforge-ui 0.8.0",
+    "solverforge-ui 0.9.0",
     "solverforge_ui::assets::version()",
     "SF.version",
     "onFailure",
@@ -76,11 +76,9 @@ REQUIRED_TEXT = {
     "unsafePopupHtml"
   ],
   "src/docs/solverforge-ui/agent-skill.md" => [
+    "solverforge-cli repository",
     "skills/solverforge-ui/",
-    "./scripts/install-skill",
-    "opencode",
-    "Claude Code",
-    "Agent Skills"
+    "solverforge-ui 0.9.0"
   ],
   "src/_data/docs_nav.yml" => [
     "/docs/solverforge-ui/agent-skill/",
@@ -88,7 +86,7 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/agent-skill/"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge-ui 0.8.0"
+    "solverforge-ui 0.9.0"
   ],
   "src/_posts/releases/2026-09-15-solverforge-ui-0-8-x.md" => [
     "`0.8.0` | 2026-09-15",
@@ -103,10 +101,10 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "solverforge 0.19.4",
+    "solverforge 0.19.5",
     "solverforge-py 0.6.6",
     "solverforge-cli 3.0.0",
-    "solverforge-ui 0.8.0",
+    "solverforge-ui 0.9.0",
     "solverforge-hospital@2.0.7",
     "solverforge-lessons@2.0.7",
     "solverforge-deliveries@2.0.7",
@@ -129,6 +127,7 @@ REQUIRED_TEXT = {
     "solverforge 0.19.4"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
+    "`0.19.5` | 2026-09-15",
     "`0.19.4` | 2026-08-11",
     "`0.19.3` | 2026-07-29",
     "`0.19.2` | 2026-07-19",
@@ -142,7 +141,14 @@ REQUIRED_TEXT = {
 }.freeze
 
 FORBIDDEN_TEXT = {
-  "src/docs/solverforge/index.md" => ["solverforge 0.19.1", "solverforge-cli 2.2.2"],
+  "src/docs/solverforge/index.md" => [
+    "solverforge 0.19.1",
+    "solverforge-cli 2.2.2",
+    "solverforge 0.19.3",
+    "docs.rs/solverforge/0.19.4/"
+  ],
+  "src/docs/solverforge-ui/index.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
+  "src/docs/solverforge-ui/integration-assets.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
   "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.3", "solverforge==0.6.3"],
   "src/docs/solverforge-cli/command-reference.md" => [
     "solverforge-cli 2.2.2",
@@ -154,6 +160,7 @@ FORBIDDEN_TEXT = {
     "solverforge-py 0.6.3",
     "solverforge 0.19.1",
     "solverforge-cli 2.2.2` package",
+    "solverforge-ui 0.8.0",
     "solverforge-hospital@2.0.6",
     "solverforge-lessons@2.0.6",
     "solverforge-deliveries@2.0.6",

@@ -9,7 +9,7 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui 0.8.0` contract is job-oriented, lifecycle-typed, and
+The current `solverforge-ui 0.9.0` contract is job-oriented, lifecycle-typed, and
 framework-neutral at the asset boundary. New integrations should expose retained
 jobs, explicit `eventType` payloads, exact paused or terminal snapshots,
 null-safe snapshot callbacks, normalized create-job identifiers, and the shipped
@@ -225,8 +225,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
-- `/sf/sf.0.8.0.css`
-- `/sf/sf.0.8.0.js`
+- `/sf/sf.0.9.0.css`
+- `/sf/sf.0.9.0.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 
@@ -250,7 +250,7 @@ For non-Axum Rust hosts, disable the default feature and serve the same
 embedded assets through the framework-neutral API:
 
 ```toml
-solverforge-ui = { version = "0.8.0", default-features = false }
+solverforge-ui = { version = "0.9.0", default-features = false }
 ```
 
 ```rust

@@ -11,13 +11,14 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-ui 0.8.0` crate: retained jobs,
+This section tracks the published `solverforge-ui 0.9.0` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
 null-safe snapshot callbacks, exact dense scheduling geometry, normalized
-create-job identifiers, optional map helpers, framework-neutral embedded asset
-access, and the bundled agent skill. The `solverforge-cli 3.0.0` scaffold still
-pins `solverforge-ui 0.7.0`, so generated apps move to `0.8.0` only when that
-app is deliberately upgraded.
+create-job identifiers, optional map helpers, and framework-neutral embedded
+asset access. The bundled agent skill moved to the `solverforge-cli` repository
+in 0.9.0. The `solverforge-cli 3.0.0` scaffold still pins
+`solverforge-ui 0.7.0`, so generated apps move to `0.9.0` only when that app is
+deliberately upgraded.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -39,26 +40,27 @@ the runtime integration path.
   `.merge(solverforge_ui::routes())`
 - **Stable and versioned bundles** for compatibility and cache-friendly
   production deployments
-- **Bundled agent skill** that maps a planning model onto the shipped timeline,
-  Gantt, map, rail, and table surfaces
+- **Agent skill** for mapping a planning model onto the shipped timeline, Gantt,
+  map, rail, and table surfaces; it lives with the other SolverForge skills in
+  the `solverforge-cli` repository as of 0.9.0
 
 ## Installation
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.8.0" }
+solverforge-ui = { version = "0.9.0" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.8.0" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.9.0" }
 ```
 
 Use the Git tag form when you need exact source-tag reproducibility instead of
 the crates.io package.
 
-`solverforge-ui 0.8.0` declares `rust-version = "1.95"`.
+`solverforge-ui 0.9.0` declares `rust-version = "1.95"`.
 
 Production cache pinning uses the versioned bundles for the installed crate
-version, `/sf/sf.0.8.0.css` and `/sf/sf.0.8.0.js`. `SF.version` in either
+version, `/sf/sf.0.9.0.css` and `/sf/sf.0.9.0.js`. `SF.version` in either
 bundle and `solverforge_ui::assets::version()` both report the crate version
 that produced the embedded asset set.
 

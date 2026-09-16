@@ -17,11 +17,10 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.4` crate and current release
+These pages track the `solverforge 0.19.5` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
-runtime; the `solverforge-cli 3.0.0` line scaffolds `solverforge 0.19.4`, while
-the previous package, `2.2.3`, scaffolded `solverforge 0.19.3`, so check
-`solverforge --version` when starting from a scaffold.
+runtime; the `solverforge-cli 3.0.0` line scaffolds `solverforge 0.19.4`, so
+check `solverforge --version` when starting from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow:
@@ -33,7 +32,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.4` workspace declares Rust `1.95`.
+The `0.19.5` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -291,8 +290,8 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.4](https://docs.rs/solverforge/0.19.4/solverforge/).
-The `0.19.4` crate is the registry source of truth. Source-line API maps for
+[docs.rs/solverforge 0.19.5](https://docs.rs/solverforge/0.19.5/solverforge/).
+The `0.19.5` crate is the registry source of truth. Source-line API maps for
 the local workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections
