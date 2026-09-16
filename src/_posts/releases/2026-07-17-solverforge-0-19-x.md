@@ -64,7 +64,7 @@ No released SolverForge use case, Python model, or benchmark workload depended
 on chained variables. Those independently released surfaces therefore did not
 need a domain-model rewrite. At the time of the core release, they remained on
 their published 0.18-based lines until their own releases moved. The current
-published CLI is 3.0.0 and scaffolds SolverForge 0.19.4. Existing generated
+published CLI is 3.1.0 and scaffolds SolverForge 0.19.5. Existing generated
 applications still own their dependency manifests and should move to 0.19.5
 only after app-level validation.
 
@@ -266,6 +266,11 @@ datasets, or solver policies.
 > **Update, 2026-09-15:** `solverforge-ui 0.9.0` is published and moves the
 > bundled agent skill into the `solverforge-cli` repository. The published
 > `solverforge-cli 3.0.0` package scaffolds the `solverforge-ui 0.7.0` line.
+>
+> **Update, 2026-09-16:** `solverforge-cli 3.1.0` is published and scaffolds
+> `solverforge 0.19.5` with `solverforge-ui 0.9.0` and `rmcp 3.4.0`, so fresh
+> scaffolds align with this core line. See the
+> [3.1.0 release note](/blog/releases/2026/09/16/solverforge-cli-3-1-x/).
 
 ## Upgrade Checklist
 
@@ -296,7 +301,7 @@ datasets, or solver policies.
 - [SolverForge runtime docs](/docs/solverforge/) describe the scalar/list
   boundary and current 0.19.5 runtime.
 - [CLI command reference](/docs/solverforge-cli/command-reference/) records the
-  published 3.0.0 scaffold targets separately from the 0.19.5 core.
+  published 3.1.0 scaffold targets, which align with the 0.19.5 core.
 - [Crate & Runtime Map](/reference/crate-map/) aligns Rust, CLI, Python, and
   companion repositories on the new release line.
 - [SolverForge Python](/docs/solverforge-python/) records the published 0.6.6

@@ -33,6 +33,13 @@ where both SolverForge skills now live, and the crate no longer ships it. The
 published `solverforge-cli 3.0.0` package still scaffolds `solverforge-ui 0.7.0`.
 <% end %>
 
+<%= render Ui::Callout.new(title: "Update, September 16, 2026") do %>
+`solverforge-cli 3.1.0` is published and scaffolds `solverforge-ui 0.9.0`
+directly, so new projects receive this UI line without a manual upgrade. Apps
+scaffolded by `3.0.0` still pin `0.7.0` and upgrade deliberately. See the
+[3.1.0 CLI release note](/blog/releases/2026/09/16/solverforge-cli-3-1-x/).
+<% end %>
+
 ## What Changed
 
 ### Solver lifecycle callbacks are explicit and null-safe

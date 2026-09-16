@@ -39,6 +39,13 @@ and `rmcp 3.3.0`. See the
 [3.0.0 release note](/blog/releases/2026/09/15/solverforge-cli-3-0-x/).
 <% end %>
 
+<%= render Ui::Callout.new(title: "Update, September 16, 2026") do %>
+`solverforge-cli 3.1.0` is published on crates.io and released on GitHub. It
+targets `solverforge 0.19.5`, `solverforge-ui 0.9.0`, `solverforge-maps 2.1.4`,
+and `rmcp 3.4.0`, and makes the skill installer agent-centric. See the
+[3.1.0 release note](/blog/releases/2026/09/16/solverforge-cli-3-1-x/).
+<% end %>
+
 ```bash
 cargo install solverforge-cli --force
 solverforge --version

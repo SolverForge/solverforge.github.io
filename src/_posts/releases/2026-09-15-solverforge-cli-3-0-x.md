@@ -15,6 +15,16 @@ previous crates.io package, `solverforge-cli 2.2.3`, scaffolded
 `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`. Use
 `solverforge --version` to confirm exactly what an installed binary carries.
 
+<%= render Ui::Callout.new(title: "Update, September 16, 2026") do %>
+`solverforge-cli 3.1.0` is published and is now what `cargo install
+solverforge-cli` installs. It retargets fresh scaffolds to `solverforge 0.19.5`,
+`solverforge-ui 0.9.0`, and `rmcp 3.4.0`, extends `connect --write` to opencode,
+Claude Code, and Cursor, and makes the skill installer agent-centric
+(`--agent opencode|claude|codex`; `--only` and the implicit `~/.agents` default
+are removed). See the
+[3.1.0 release note](/blog/releases/2026/09/16/solverforge-cli-3-1-x/).
+<% end %>
+
 The 3.0.0 line is a major release for one reason: the CLI no longer produces
 only web, API, and CLI applications. It can also produce an MCP server, so the
 solver is reachable from any MCP-capable agent harness.
