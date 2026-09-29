@@ -74,6 +74,7 @@ generation and `solverforge.app.toml` after scaffolding.
 
 ## Where to Read More
 
+- [Use cases showcase](/use-cases/): narrated walkthroughs and annotated screenshots of all four apps
 - [CLI onboarding guide](/docs/solverforge-cli/getting-started/)
 - [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [SolverForge Lessons Use Case](/docs/getting-started/solverforge-lessons-use-case/)

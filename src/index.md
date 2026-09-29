@@ -17,7 +17,7 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
       <a class="button button--primary" href="<%= relative_url '/docs/solverforge-cli/getting-started/' %>">
         Start with solverforge-cli <i class="fa-solid fa-arrow-right"></i>
       </a>
-      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/' %>">
+      <a class="button button--secondary" href="<%= relative_url '/use-cases/' %>">
         Browse the Use Cases <i class="fa-solid fa-book-open"></i>
       </a>
     </div>
@@ -88,6 +88,23 @@ Model matrices, route geometry, and map-backed planning systems.
       <% end %>
       <%= render Ui::Card.new(title: "Core Solver", href: relative_url('/docs/solverforge/'), icon: "fa-brands fa-rust") do %>
 Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
+      <% end %>
+    </div>
+  </section>
+
+  <section class="home-section">
+    <p class="page-shell__eyebrow">Use cases</p>
+    <h2>Four planning surfaces you can watch, inspect, and run.</h2>
+    <p>
+      Hospital coverage, school timetabling, delivery routing, and field service routing.
+      Each case carries its data shape, its constraints, a narrated walkthrough of the
+      running app, and annotated screenshots of the same retained solve.
+    </p>
+    <div class="card-grid">
+      <% site.data.use_cases.each do |use_case| %>
+        <%= render Ui::Card.new(title: use_case["label"], href: relative_url("/use-cases/##{use_case["id"]}"), eyebrow: use_case["teaser_metric"], icon: use_case["icon"]) do %>
+<%= use_case["teaser_copy"] %>
+        <% end %>
       <% end %>
     </div>
   </section>
