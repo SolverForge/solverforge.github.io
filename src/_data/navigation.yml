@@ -1,6 +1,8 @@
 main:
   - title: Docs
     url: /docs/
+  - title: Use cases
+    url: /use-cases/
   - title: Blog
     url: /blog/
   - title: Reference
@@ -18,6 +20,8 @@ footer:
     links:
       - title: Documentation
         url: /docs/
+      - title: Use cases
+        url: /use-cases/
       - title: Reference
         url: /reference/
       - title: Blog

@@ -1,0 +1,414 @@
+# Content for the /use-cases/ showcase page.
+#
+# Each case renders as one slide of the carousel: a metrics strip, the constraint
+# summary, a narrated runtime walkthrough, and annotated screenshots.
+#
+# Every SolverForge use case is open source, so that is not what distinguishes
+# them here: a case with `space_url` gets the Hugging Face Space ribbon, the
+# Space link, and is marked runnable in the browser. Callout positions are
+# percentages of the 16:9 frame (top, then left) that place the annotation's
+# pointer dot, measured against the capture named in `image`.
+
+- id: hospital
+  label: "Hospital"
+  eyebrow: "Healthcare workforce coverage"
+  title: "688 shifts. 50 employees. 28 days of staffed coverage."
+  intro: "Hospital scheduling shows scalar assignment at serious density: every shift needs a qualified employee while overlap, rest, availability, preferences, and balance remain visible."
+  docs_url: "/docs/getting-started/solverforge-hospital-use-case/"
+  space_url: "https://huggingface.co/spaces/SolverForge/solverforge-hospital"
+  icon: "fa-solid fa-calendar-days"
+  teaser_metric: "688 shifts / 50 employees / 28 days"
+  teaser_copy: "Coverage, qualifications, rest, availability, preferences, and fairness across dense workforce schedules."
+  metrics:
+    - ["688", "Shifts"]
+    - ["50", "Employees"]
+    - ["28", "Days"]
+    - ["9", "Constraints"]
+    - ["6 / 3", "Hard / soft split"]
+    - ["2", "Schedule views"]
+  body:
+    - "Coverage planning breaks when qualification, availability, rest, overlap, and fairness are handled by separate tools. A schedule that fills every slot but violates rest or skill rules is not operationally usable."
+    - "The current app keeps location schedules, employee schedules, solver status, score analysis, data tables, and REST endpoints available from the same retained job."
+  constraints:
+    - ["Coverage", "Required shifts must receive staff."]
+    - ["Skills", "Employees must satisfy role and qualification requirements."]
+    - ["Overlap prevention", "Employees cannot be double-booked across overlapping work."]
+    - ["Rest and day limits", "Work sequences respect rest and one-shift-per-day rules."]
+    - ["Availability", "Unavailable employees are excluded from assignments."]
+    - ["Soft balance", "Preferences and workload balance remain inspectable tradeoffs."]
+  runtime:
+    video: "/videos/use-cases/solverforge-hospital-demo.mp4"
+    poster: "/images/use-cases/hospital-location-schedule.png"
+    label: Runtime walkthrough
+    copy: "Watch the coverage plan fill, then read the same retained job from the location view, the employee view, and score analysis."
+    caption: "Narrated walkthrough (2:29): the location schedule, the employee schedule, solver status, score analysis, the data tables, and the REST surface of one retained hospital solve."
+  screenshots:
+    - image: "/images/use-cases/hospital-location-schedule.png"
+      badge: "Location Schedule"
+      alt: "SolverForge Hospital location schedule showing many shifts across departments and days."
+      caption: "Location schedules keep coverage pressure visible by department and day."
+      callouts:
+        - text: "Department rows expose where coverage is required."
+          top: 22.0
+          left: 6.0
+        - text: "Dense shift placement stays visible across the 28-day horizon."
+          top: 38.0
+          left: 45.0
+    - image: "/images/use-cases/hospital-employee-schedule.png"
+      badge: "Employee Schedule"
+      alt: "SolverForge Hospital employee schedule showing assignments by employee across the planning horizon."
+      caption: "Employee schedules reveal whether the same plan works from the worker perspective."
+      callouts:
+        - text: "Employee rows expose workload and assignment spread."
+          top: 29.8
+          left: 1.5
+        - text: "The same retained job can be inspected by people instead of only by locations."
+          top: 41.0
+          left: 46.0
+    - image: "/images/use-cases/hospital-solver-status.png"
+      badge: "Solver Status"
+      alt: "SolverForge Hospital solver status surface showing retained-job lifecycle and telemetry controls."
+      caption: "Solver status keeps lifecycle and telemetry visible during retained workforce planning."
+      callouts:
+        - text: "Status controls keep solve lifecycle explicit."
+          top: 12.0
+          left: 42.0
+        - text: "Telemetry remains visible while the schedule is being reviewed."
+          top: 51.0
+          left: 37.0
+    - image: "/images/use-cases/hospital-score-analysis.png"
+      badge: "Score Analysis"
+      alt: "SolverForge Hospital score analysis modal showing constraint rows, scores, and match counts."
+      caption: "Score analysis explains which staffing rules are hard legality and which are soft tradeoffs."
+      callouts:
+        - text: "Hard staffing legality and soft balance are separated for audit."
+          top: 31.0
+          left: 38.0
+        - text: "Each row exposes contribution and match counts for review."
+          top: 58.0
+          left: 38.0
+    - image: "/images/use-cases/hospital-data.png"
+      badge: "Data View"
+      alt: "SolverForge Hospital data view showing employees, shifts, locations, skills, and availability tables."
+      caption: "Data views keep the facts behind the schedule close to the plan being inspected."
+      callouts:
+        - text: "Employees, shifts, locations, and availability remain inspectable."
+          top: 22.0
+          left: 7.0
+        - text: "Input facts stay adjacent to the generated schedule surface."
+          top: 56.0
+          left: 39.0
+    - image: "/images/use-cases/hospital-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Hospital REST API tab showing retained-job endpoints for demo data, solve creation, status, snapshots, and analysis."
+      caption: "REST endpoints expose the same retained workforce workflow for product integration."
+      callouts:
+        - text: "Endpoints expose solve creation, status, snapshots, and analysis."
+          top: 21.0
+          left: 6.0
+        - text: "The UI and integration API share the retained-job lifecycle."
+          top: 58.0
+          left: 6.0
+
+- id: lessons
+  label: "Lessons"
+  eyebrow: "School timetabling"
+  title: "300 lessons. 12 cohorts. 20 teachers. One inspectable school week."
+  intro: "Lesson timetabling shows two scalar decisions per lesson: which weekly timeslot and which room. Teacher availability, cohort availability, room capacity, and single-booking rules hold at the same time as soft timetable quality."
+  docs_url: "/docs/getting-started/solverforge-lessons-use-case/"
+  space_url: "https://huggingface.co/spaces/SolverForge/solverforge-lessons"
+  icon: "fa-solid fa-school"
+  teaser_metric: "300 lessons / 20 teachers / 10 rooms"
+  teaser_copy: "Two scalar decisions per lesson: which weekly timeslot fits the timetable, and which room fits the class."
+  metrics:
+    - ["300", "Lessons"]
+    - ["12", "Cohorts"]
+    - ["20", "Teachers"]
+    - ["40", "Weekly timeslots"]
+    - ["10", "Rooms"]
+    - ["11", "Constraints"]
+  body:
+    - "A timetable is not a table of slots. Every lesson needs a room that fits the class, a teacher who is available at that hour, and a cohort that is not already booked. No teacher can teach two lessons at once, no cohort can be in two places, and no room can host a double booking."
+    - "The app keeps the generated week, the retained job, score analysis, the input tables, and the REST surface on one inspectable timetable: cohort, room, and teacher views are three readings of the same retained plan."
+  constraints:
+    - ["Teacher availability", "Teachers can teach only the timeslots they are available for."]
+    - ["Cohort availability", "Student groups can attend only the timeslots they are available for."]
+    - ["Room capacity", "An assigned room must have capacity for the class size."]
+    - ["Single booking", "One teacher, one cohort, and one room cannot host overlapping lessons."]
+    - ["Assignment completeness", "Medium pressure keeps every lesson assigned to both a timeslot and a room."]
+    - ["Timetable quality", "Room kind, late-day lessons, and repeated subjects stay visible as soft pressure."]
+  runtime:
+    video: "/videos/use-cases/solverforge-lessons-demo.mp4"
+    poster: "/images/use-cases/lessons-group-timetable.png"
+    label: Runtime walkthrough
+    copy: "Watch the school week fill cohort by cohort, then check the same 300 lessons from rooms, teachers, and score analysis."
+    caption: "Narrated walkthrough (2:02): cohort timetables, room utilization, teacher loads, score analysis, the data tables, and the REST surface of one retained timetable solve."
+  screenshots:
+    - image: "/images/use-cases/lessons-group-timetable.png"
+      badge: "Group timetable"
+      alt: "SolverForge Lessons cohort timetable with solved Monday schedules, per-cohort scheduled badges, and the solver status strip."
+      caption: "The cohort view lays out each group's week across a fixed Monday-to-Friday teaching week, with the status strip, score, and constraint dots on the same surface."
+      callouts:
+        - text: "The status strip keeps lifecycle state, score, moves per second, and all 11 constraint dots visible."
+          top: 8.4
+          left: 14.4
+        - text: "Each scheduled lesson carries its room, teacher, and cohort inside the block."
+          top: 39.8
+          left: 24.4
+    - image: "/images/use-cases/lessons-room-utilization.png"
+      badge: "Room utilization"
+      alt: "SolverForge Lessons room utilization rail showing every room as a lane with its scheduled lesson blocks."
+      caption: "Room utilization turns the same retained plan around: every lane is one room, with booked lessons placed against the teaching day."
+      callouts:
+        - text: "Room lanes show how the building is used across the week."
+          top: 40.0
+          left: 8.0
+        - text: "The same 300 lessons, read from the rooms instead of the cohorts."
+          top: 35.2
+          left: 48.2
+    - image: "/images/use-cases/lessons-teacher-loads.png"
+      badge: "Teacher loads"
+      alt: "SolverForge Lessons teacher load rail showing each teacher as a lane with scheduled lessons and load badges."
+      caption: "Teacher loads expose the working week of every teacher, so a timetable that fits the cohorts can be checked against the people teaching it."
+      callouts:
+        - text: "Each view is one retained plan; only the grouping changes."
+          top: 28.5
+          left: 17.5
+        - text: "Teacher lanes expose that teacher's own week and load."
+          top: 39.8
+          left: 32.4
+    - image: "/images/use-cases/lessons-score-analysis.png"
+      badge: "Score analysis"
+      alt: "SolverForge Lessons score analysis modal listing all 11 constraints with type, score, and match counts."
+      caption: "Score analysis makes the timetable auditable: hard legality, medium assignment pressure, and soft quality stay separated with match counts."
+      callouts:
+        - text: "Hard, medium, and soft score components stay separate."
+          top: 26.7
+          left: 28.3
+        - text: "Soft pressure keeps its contribution and match count per constraint."
+          top: 50.2
+          left: 28.3
+    - image: "/images/use-cases/lessons-data.png"
+      badge: "Data view"
+      alt: "SolverForge Lessons data view showing the lesson table with duration, group, subject, teacher, room kind, and assigned timeslot columns."
+      caption: "Data views keep cohorts, subjects, teachers, rooms, and timeslots next to the plan, with the assigned timeslot and room visible per lesson."
+      callouts:
+        - text: "Input facts stay in the same surface as the generated plan."
+          top: 19.6
+          left: 2.6
+        - text: "Assignment columns show the chosen room and timeslot per lesson."
+          top: 17.5
+          left: 84.0
+    - image: "/images/use-cases/lessons-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Lessons REST API guide listing health, info, demo data, job, snapshot, and analysis endpoints with curl examples."
+      caption: "The REST guide exposes the same retained workflow for integration: demo data, solve creation, status, snapshots, analysis, lifecycle actions, and events."
+      callouts:
+        - text: "Every endpoint ships a copyable curl example."
+          top: 23.5
+          left: 46.0
+        - text: "Retained-job endpoints cover create, status, snapshot, analysis, and events."
+          top: 82.1
+          left: 1.6
+
+- id: deliveries
+  label: "Deliveries"
+  eyebrow: "Urban delivery routing"
+  title: "82 Philadelphia deliveries. 10 vehicles. Ordered routes you can inspect."
+  intro: "Delivery routing proves list-variable planning: each vehicle owns an ordered route while capacity, time windows, travel time, retained snapshots, route geometry, and insertion recommendations stay inspectable."
+  docs_url: "/docs/getting-started/solverforge-deliveries-use-case/"
+  space_url: "https://huggingface.co/spaces/SolverForge/solverforge-deliveries"
+  icon: "fa-solid fa-route"
+  teaser_metric: "82 deliveries / 10 vehicles / ordered routes"
+  teaser_copy: "Route ownership, capacity, time windows, recommendations, and REST workflows on one inspectable surface."
+  metrics:
+    - ["82", "Deliveries"]
+    - ["10", "Vehicles"]
+    - ["3", "City datasets"]
+    - ["4", "Constraints"]
+    - ["3 / 1", "Hard / soft split"]
+    - ["Retained", "Job lifecycle"]
+  body:
+    - "A delivery plan is not just assignment. Vehicle order matters, time windows matter, capacity matters, and changes need repair workflows that preserve useful route structure instead of throwing the plan away."
+    - "The current app exposes the route map, vehicle timeline, delivery timeline, recommendations, score analysis, retained snapshots, and REST endpoints as one planning surface."
+  constraints:
+    - ["Assignment coverage", "Every delivery must belong to exactly one route."]
+    - ["Vehicle capacity", "Route load stays within vehicle capacity."]
+    - ["Time windows", "Deliveries stay inside the promised service window."]
+    - ["Travel time", "Soft pressure keeps total route travel efficient."]
+    - ["Route geometry", "Retained snapshots expose the route path and ordered stops."]
+    - ["Insertion recommendations", "Route repair suggestions can be inspected before action."]
+  runtime:
+    video: "/videos/use-cases/solverforge-deliveries-demo.mp4"
+    poster: "/images/use-cases/deliveries-overview.png"
+    label: Runtime walkthrough
+    copy: "Watch ordered routes take shape, then inspect route geometry, insertion recommendations, and the retained-job workflow."
+    caption: "Narrated walkthrough (2:49): route ownership, vehicle and delivery timelines, error repair with recommendations, score analysis, and the REST surface of one retained route solve."
+  screenshots:
+    - image: "/images/use-cases/deliveries-overview.png"
+      badge: "Route Overview"
+      alt: "SolverForge Deliveries overview showing vehicle route cards beside a Philadelphia route map."
+      caption: "Route ownership stays visible as both ordered vehicle lists and map geometry."
+      callouts:
+        - text: "Vehicle route cards keep stop order and load visible."
+          top: 22.0
+          left: 6.0
+        - text: "The map renders retained route geometry from the same solve snapshot."
+          top: 27.0
+          left: 49.0
+    - image: "/images/use-cases/deliveries-vehicle-timeline.png"
+      badge: "Vehicle Timeline"
+      alt: "SolverForge Deliveries vehicle timeline showing route load and time placement by vehicle."
+      caption: "Vehicle timelines expose route pressure across the fleet instead of reducing the plan to a table."
+      callouts:
+        - text: "Each lane owns an ordered route and capacity context."
+          top: 49.4
+          left: 5.0
+        - text: "Timeline placement makes route density and idle gaps inspectable."
+          top: 38.0
+          left: 42.0
+    - image: "/images/use-cases/deliveries-delivery-timeline.png"
+      badge: "Delivery Timeline"
+      alt: "SolverForge Deliveries delivery timeline showing delivery placement against service windows."
+      caption: "Delivery-level timing makes service-window pressure visible across the day."
+      callouts:
+        - text: "Delivery rows expose service-window and assignment context."
+          top: 51.6
+          left: 6.3
+        - text: "Time placement shows where the route sequence is under pressure."
+          top: 52.0
+          left: 49.0
+    - image: "/images/use-cases/deliveries-recommendations.png"
+      badge: "Recommendations"
+      alt: "SolverForge Deliveries recommendations modal showing insertion options for route repair."
+      caption: "Recommendations turn retained plans into inspectable repair options instead of opaque reruns."
+      callouts:
+        - text: "Insertion options are ranked before a user commits a repair."
+          top: 28.0
+          left: 47.0
+        - text: "The affected delivery remains visible while alternatives are inspected."
+          top: 63.0
+          left: 45.0
+    - image: "/images/use-cases/deliveries-score-analysis.png"
+      badge: "Score Analysis"
+      alt: "SolverForge Deliveries score analysis modal showing constraint types, scores, and match counts."
+      caption: "Score analysis separates hard route legality from soft travel-time pressure."
+      callouts:
+        - text: "Hard constraints show whether the route plan is legal."
+          top: 32.0
+          left: 38.0
+        - text: "Soft travel-time pressure remains visible for tradeoff review."
+          top: 58.0
+          left: 38.0
+    - image: "/images/use-cases/deliveries-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Deliveries REST API tab showing retained-job endpoints for routes, snapshots, status, and analysis."
+      caption: "REST endpoints expose the same retained route workflow for integration."
+      callouts:
+        - text: "Retained-job endpoints expose creation, status, snapshots, and analysis."
+          top: 22.0
+          left: 6.0
+        - text: "Route and recommendation APIs keep repair workflows product-embeddable."
+          top: 57.0
+          left: 6.0
+
+- id: field-service
+  label: "Field service"
+  eyebrow: "Field service routing"
+  title: "48 Bergamo service visits. 6 technicians. Skills, parts, shifts, and road-network routes."
+  intro: "Field service routing keeps technician-owned ordered routes together with skills, parts, time windows, shift capacity, territory preference, and route geometry."
+  docs_url: "/docs/getting-started/solverforge-fsr-use-case/"
+  space_url: "https://huggingface.co/spaces/SolverForge/solverforge-fsr"
+  icon: "fa-solid fa-screwdriver-wrench"
+  teaser_metric: "48 visits / 6 technicians / road routes"
+  teaser_copy: "Technician routes, skills, parts, shifts, territories, time windows, and road geometry in one retained workflow."
+  metrics:
+    - ["48", "Service visits"]
+    - ["6", "Technicians"]
+    - ["26", "Locations"]
+    - ["10", "Constraints"]
+    - ["6 / 4", "Hard / soft split"]
+    - ["Retained", "Route geometry"]
+  body:
+    - "This is not just dispatch. A valid plan has to decide which technician owns each visit, then order those visits against service duration, travel, time windows, skills, parts, shift capacity, and territory fit."
+    - "The current proof keeps map routes, technician route cards, a route timeline, data tables, score analysis, retained snapshots, route-geometry endpoints, and REST workflow on one inspectable surface."
+  constraints:
+    - ["Assignment coverage", "Every service visit must appear in exactly one technician route."]
+    - ["Reachability", "Invalid visit indexes and unreachable travel legs are hard route issues."]
+    - ["Skills and parts", "Technician skills and inventory must cover visit requirements."]
+    - ["Time and capacity", "Time windows and shift capacity constrain the service day."]
+    - ["Territory affinity", "Routes prefer territory fit without hiding legality."]
+    - ["Soft tradeoffs", "Travel time, workload balance, priority slack, and territory affinity remain visible."]
+  runtime:
+    video: "/videos/use-cases/solverforge-fsr-demo.mp4"
+    poster: "/images/use-cases/fsr-map.png"
+    label: Runtime walkthrough
+    copy: "Watch technician routes form across Bergamo, then read skills, parts, shifts, and route geometry from the same solve."
+    caption: "Narrated walkthrough (2:37): assignment, road-network routes, skills and parts pressure, score analysis, and the snapshot-bound route geometry of one retained FSR solve."
+  screenshots:
+    - image: "/images/use-cases/fsr-map.png"
+      badge: "Route Map"
+      alt: "SolverForge Field Service Routing map showing assigned Bergamo technician routes, route cards, status bar, and colored route geometry."
+      caption: "The map keeps technician route ownership, assigned visits, retained route geometry, and solver state visible together."
+      callouts:
+        - text: "The status and summary row expose assigned visits, hard issues, and current score without leaving the map."
+          top: 8.0
+          left: 7.0
+        - text: "Colored route geometry comes from the retained route snapshot, not a separate drawing layer."
+          top: 48.0
+          left: 55.0
+    - image: "/images/use-cases/fsr-route-focus.png"
+      badge: "Route Focus"
+      alt: "SolverForge Field Service Routing map with one technician route highlighted and route cards beside the Bergamo map."
+      caption: "Route focus lets an operator isolate one technician route while preserving the surrounding fleet context."
+      callouts:
+        - text: "Route cards expose technician, travel, service time, territory, and stop count."
+          top: 18.0
+          left: 10.0
+        - text: "Focused route markers and path geometry make the selected technician's ordered work inspectable."
+          top: 44.0
+          left: 46.0
+    - image: "/images/use-cases/fsr-routes.png"
+      badge: "Route Timeline"
+      alt: "SolverForge Field Service Routing route timeline showing ordered service visits per technician across the work day."
+      caption: "The route timeline shows the same plan as ordered technician lanes across the 08:00-18:00 service day."
+      callouts:
+        - text: "Each technician lane carries stops, travel, service time, and feasibility badges."
+          top: 26.0
+          left: 8.0
+        - text: "Visit blocks show the ordered route against the service-day clock."
+          top: 37.0
+          left: 50.0
+    - image: "/images/use-cases/fsr-score-analysis.png"
+      badge: "Score Analysis"
+      alt: "SolverForge Field Service Routing score analysis modal showing constraints, weights, scores, and match counts."
+      caption: "Score analysis makes all 10 constraints inspectable with weights, scores, and match counts."
+      callouts:
+        - text: "Hard route legality and soft routing tradeoffs are separated in the analysis modal."
+          top: 33.0
+          left: 33.0
+        - text: "Match counts show where assignment, travel, priority, and territory pressure comes from."
+          top: 52.0
+          left: 56.0
+    - image: "/images/use-cases/fsr-data.png"
+      badge: "Data View"
+      alt: "SolverForge Field Service Routing data tab showing technician routes, service visits, locations, skills, parts, windows, and territories."
+      caption: "Data views keep routes, visits, locations, skills, parts, windows, and territory facts adjacent to the plan."
+      callouts:
+        - text: "Technician-route rows expose shifts, skills, inventory, territory, and assigned visit order."
+          top: 26.0
+          left: 20.0
+        - text: "Service visits keep duration, windows, priority, skill masks, parts, and territory visible."
+          top: 74.0
+          left: 20.0
+    - image: "/images/use-cases/fsr-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Field Service Routing REST API tab showing demo data, retained jobs, snapshots, route geometry, events, and analysis endpoints."
+      caption: "REST endpoints expose demo data, retained jobs, snapshots, route geometry, SSE events, and analysis for integration."
+      callouts:
+        - text: "Retained-job endpoints expose creation, events, snapshots, and analysis."
+          top: 20.0
+          left: 18.0
+        - text: "Route geometry is available through a snapshot-scoped endpoint for product integration."
+          top: 69.0
+          left: 36.0

@@ -1,0 +1,196 @@
+<section class="use-case-carousel" data-use-case-carousel aria-label="SolverForge use cases">
+  <button
+    class="use-case-carousel__arrow use-case-carousel__arrow--prev"
+    type="button"
+    data-use-case-prev
+    aria-label="Previous use case"
+  >
+    <span aria-hidden="true">&lsaquo;</span>
+  </button>
+  <button
+    class="use-case-carousel__arrow use-case-carousel__arrow--next"
+    type="button"
+    data-use-case-next
+    aria-label="Next use case"
+  >
+    <span aria-hidden="true">&rsaquo;</span>
+  </button>
+
+  <div class="use-case-carousel__selectors" role="tablist" aria-label="Select a use case">
+    <% cases.each_with_index do |use_case, index| %>
+      <a
+        class="<%= ["use-case-carousel__selector", ("use-case-carousel__selector--space" if space?(use_case))].compact.join(" ") %>"
+        id="use-case-tab-<%= use_case.fetch("id") %>"
+        href="#<%= use_case.fetch("id") %>"
+        role="tab"
+        data-use-case-select="<%= use_case.fetch("id") %>"
+        aria-controls="<%= use_case.fetch("id") %>"
+        aria-selected="<%= index.zero? %>"
+      >
+        <span><%= use_case.fetch("label") %></span>
+        <% if space?(use_case) %>
+          <span class="use-case-carousel__selector-ribbon">Space</span>
+        <% end %>
+      </a>
+    <% end %>
+  </div>
+
+  <div class="use-case-carousel__slides">
+    <% cases.each_with_index do |use_case, index| %>
+      <article
+        class="use-case-carousel__slide"
+        id="<%= use_case.fetch("id") %>"
+        role="tabpanel"
+        aria-labelledby="use-case-tab-<%= use_case.fetch("id") %>"
+        data-use-case-slide
+        data-use-case-case="<%= use_case.fetch("id") %>"
+        tabindex="-1"
+        <%= "hidden" unless index.zero? %>
+      >
+        <div class="use-case-carousel__meta">
+          <% if space?(use_case) %>
+            <span class="use-case-space-ribbon">Hugging Face Space</span>
+            <%= link_to "Open the Space on Hugging Face", use_case.fetch("space_url"),
+                  class: "use-case-space-link",
+                  target: "_blank",
+                  rel: "noopener",
+                  aria: { label: "Open the #{use_case.fetch("label")} Space on Hugging Face" } %>
+          <% end %>
+          <%= link_to "Read the #{use_case.fetch("label")} guide", relative_url(use_case.fetch("docs_url")),
+                class: "use-case-doc-link" %>
+        </div>
+
+        <header class="use-case-carousel__header">
+          <div>
+            <p class="use-case-eyebrow"><%= use_case.fetch("eyebrow") %></p>
+            <h2 class="use-case-carousel__title"><%= use_case.fetch("title") %></h2>
+          </div>
+          <p class="use-case-carousel__intro"><%= use_case.fetch("intro") %></p>
+        </header>
+
+        <div class="use-case-proof">
+          <div class="use-case-proof__metrics" aria-label="<%= use_case.fetch("label") %> data shape">
+            <% use_case.fetch("metrics").each do |value, label| %>
+              <div class="use-case-proof__metric">
+                <span class="use-case-proof__metric-value"><%= value %></span>
+                <span class="use-case-proof__metric-label"><%= label %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="use-case-proof__body">
+            <div>
+              <% use_case.fetch("body").each do |paragraph| %>
+                <p><%= paragraph %></p>
+              <% end %>
+            </div>
+
+            <div class="use-case-proof__constraints" aria-label="<%= use_case.fetch("label") %> constraint summary">
+              <% use_case.fetch("constraints").each do |title, copy| %>
+                <div class="use-case-proof__constraint">
+                  <strong><%= title %></strong>
+                  <span><%= copy %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <figure class="use-case-runtime">
+          <div class="use-case-runtime__frame">
+            <% if videos?(use_case) %>
+              <video
+                class="use-case-runtime__video"
+                controls
+                playsinline
+                preload="metadata"
+                poster="<%= relative_url(use_case.fetch("runtime").fetch("poster")) %>"
+                aria-label="<%= use_case.fetch("runtime").fetch("caption") %>"
+              >
+                <source src="<%= relative_url(use_case.fetch("runtime").fetch("video")) %>" type="video/mp4" />
+              </video>
+            <% end %>
+          </div>
+          <figcaption class="use-case-runtime__caption">
+            <span class="use-case-runtime__label"><%= use_case.fetch("runtime").fetch("label") %></span>
+            <span><%= use_case.fetch("runtime").fetch("copy") %></span>
+            <span class="use-case-runtime__detail"><%= use_case.fetch("runtime").fetch("caption") %></span>
+          </figcaption>
+        </figure>
+
+        <div class="use-case-showcase" aria-label="Annotated <%= use_case.fetch("label") %> screenshots">
+          <% use_case.fetch("screenshots").each_slice(2) do |pair| %>
+            <div class="use-case-showcase__pair">
+              <% pair.each do |shot| %>
+                <figure class="use-case-showcase__item">
+                  <button
+                    class="use-case-showcase__trigger"
+                    type="button"
+                    aria-label="Open the <%= shot.fetch("badge") %> screenshot"
+                    data-use-case-lightbox
+                    data-use-case-lightbox-src="<%= relative_url(shot.fetch("image")) %>"
+                    data-use-case-lightbox-alt="<%= shot.fetch("alt") %>"
+                    data-use-case-lightbox-caption="<%= shot.fetch("badge") %>: <%= shot.fetch("caption") %>"
+                  >
+                    <img
+                      class="use-case-showcase__image"
+                      src="<%= relative_url(shot.fetch("image")) %>"
+                      alt="<%= shot.fetch("alt") %>"
+                      width="1600"
+                      height="900"
+                      loading="lazy"
+                    />
+                    <% shot.fetch("callouts").each do |callout| %>
+                      <span class="use-case-showcase__callout" style="<%= callout_style(callout) %>"><%= callout.fetch("text") %></span>
+                    <% end %>
+                  </button>
+                  <figcaption class="use-case-showcase__caption">
+                    <span class="use-case-showcase__badge"><%= shot.fetch("badge") %></span>
+                    <span><%= shot.fetch("caption") %></span>
+                  </figcaption>
+                </figure>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+
+  <div class="use-case-cta">
+    <div>
+      <p class="use-case-eyebrow">Run one yourself</p>
+      <h2>Run these examples, then model your own decision.</h2>
+      <p class="use-case-cta__copy">
+        Every case above is a working app with a guide in the docs, and each one is
+        marked with the Hugging Face Space you can open and drive yourself. Scaffold
+        the generic project shell, follow one worked example, or start from a Space.
+      </p>
+    </div>
+    <div class="use-case-cta__actions">
+      <a class="button button--primary" href="<%= relative_url '/docs/solverforge-cli/getting-started/' %>">
+        Start with solverforge-cli <i class="fa-solid fa-arrow-right"></i>
+      </a>
+      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/' %>">
+        Browse the use-case guides <i class="fa-solid fa-book-open"></i>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div
+  class="use-case-lightbox"
+  data-use-case-lightbox-root
+  role="dialog"
+  aria-modal="true"
+  aria-label="Use case screenshot viewer"
+  hidden
+>
+  <button class="use-case-lightbox__close" type="button" data-use-case-lightbox-close aria-label="Close screenshot viewer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <figure class="use-case-lightbox__figure">
+    <img class="use-case-lightbox__image" alt="" />
+    <figcaption class="use-case-lightbox__caption"></figcaption>
+  </figure>
+</div>
