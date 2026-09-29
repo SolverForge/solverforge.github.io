@@ -53,8 +53,8 @@ doctor:
 	@command -v bundle >/dev/null || { printf 'missing required command: bundle\n' >&2; exit 1; }
 	@command -v node >/dev/null || { printf 'missing required command: node\n' >&2; exit 1; }
 	@command -v npm >/dev/null || { printf 'missing required command: npm\n' >&2; exit 1; }
-	@ruby -e 'required = ENV.fetch("RUBY_VERSION_REQUIRED"); actual = RUBY_VERSION; abort("Ruby #{required}.x required; found #{actual}") unless actual.start_with?("#{required}.")'
-	@node -e 'const required = process.env.NODE_VERSION_REQUIRED; const actual = process.versions.node; if (!actual.startsWith(`$${required}.`)) { console.error(`Node $${required}.x required; found $${actual}`); process.exit(1); }'
+	@ruby -e 'required = ENV.fetch("RUBY_VERSION_REQUIRED"); actual = RUBY_VERSION; abort("Ruby #{required}.x or newer required; found #{actual}") unless actual.split(".").first.to_i >= required.to_i'
+	@node -e 'const required = Number(process.env.NODE_VERSION_REQUIRED); const actual = Number(process.versions.node.split(".")[0]); if (actual < required) { console.error(`Node $${required}.x or newer required; found $${process.versions.node}`); process.exit(1); }'
 	@printf 'Ruby:   '; ruby -v
 	@printf 'Bundler: '; bundle -v
 	@printf 'Node:   '; node -v
