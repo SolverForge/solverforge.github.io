@@ -5,29 +5,29 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/docs/solverforge/index.md" => [
-    "solverforge 0.19.5",
-    "solverforge-cli 3.1.0",
+    "solverforge 0.19.7",
+    "solverforge-cli 3.2.0",
     "solverforge 0.19.4",
-    "docs.rs/solverforge/0.19.5/solverforge/"
+    "docs.rs/solverforge/0.19.7/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
-    "solverforge-py 0.6.6",
-    "solverforge==0.6.6",
-    "solverforge 0.19.4",
-    "solverforge-ui 0.7.0"
+    "solverforge-py 0.6.9",
+    "solverforge==0.6.9",
+    "solverforge 0.19.7",
+    "solverforge-ui 0.9.0"
   ],
   "src/docs/solverforge-python/modeling.md" => [
     "`candidate_values` is also the native hard domain",
     "`same_value_conflict_field`"
   ],
   "src/docs/solverforge-cli/index.md" => [
-    "solverforge-cli 3.1.0",
+    "solverforge-cli 3.3.1",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 3.1.0",
-    "SolverForge crate target 0.19.5",
-    "Scaffold MCP target: rmcp 3.4.0",
+    "solverforge-cli 3.3.1",
+    "SolverForge crate target 0.19.7",
+    "Scaffold MCP target: rmcp 3.5.0",
     "solverforge connect"
   ],
   "src/docs/solverforge-cli/generator-commands.md" => [
@@ -57,7 +57,7 @@ REQUIRED_TEXT = {
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.1.0",
+    "solverforge-cli 3.2.0",
     "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
@@ -89,8 +89,9 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/agent-skill/"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
+    "solverforge 0.19.7",
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.1.0"
+    "solverforge-cli 3.3.1"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
     "`3.1.0` | 2026-09-16",
@@ -112,32 +113,34 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "solverforge 0.19.5",
-    "solverforge-py 0.6.6",
-    "solverforge-cli 3.1.0",
+    "solverforge 0.19.7",
+    "solverforge-py 0.6.9",
+    "solverforge-cli 3.3.1",
     "solverforge-ui 0.9.0",
-    "solverforge-hospital@2.0.7",
-    "solverforge-lessons@2.0.7",
-    "solverforge-deliveries@2.0.7",
-    "solverforge-fsr@2.0.8"
+    "solverforge-hospital@2.0.8",
+    "solverforge-lessons@2.0.10",
+    "solverforge-deliveries@2.0.9",
+    "solverforge-fsr@2.0.10"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@2.0.7",
-    "solverforge 0.19.4"
+    "solverforge-hospital@2.0.8",
+    "solverforge 0.19.7"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
-    "solverforge-lessons@2.0.7",
-    "solverforge 0.19.4"
+    "solverforge-lessons@2.0.10",
+    "solverforge 0.19.7"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@2.0.7",
-    "solverforge 0.19.4"
+    "solverforge-deliveries@2.0.9",
+    "solverforge 0.19.7"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@2.0.8",
-    "solverforge 0.19.4"
+    "solverforge-fsr@2.0.10",
+    "solverforge 0.19.7"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
+    "`0.19.7` | 2026-09-25",
+    "`0.19.6` | 2026-09-25",
     "`0.19.5` | 2026-09-15",
     "`0.19.4` | 2026-08-11",
     "`0.19.3` | 2026-07-29",
@@ -145,6 +148,7 @@ REQUIRED_TEXT = {
     "solverforge-hospital@2.0.7"
   ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [
+    "`0.6.9` | 2026-09-29",
     "`0.6.6` | 2026-08-11",
     "`0.6.5` | 2026-07-29",
     "`0.6.4` | 2026-07-26"

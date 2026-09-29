@@ -47,8 +47,8 @@ jobs:
         with:
           repository: SolverForge/solverforge-usecases
           # The coordinated releases were cut sequentially; the final tag
-          # contains all four published app versions.
-          ref: "solverforge-lessons@2.0.7"
+          # contains the app versions this site documents.
+          ref: "solverforge-lessons@2.0.10"
           path: .ci/solverforge-usecases
 
       - name: Install Rust 1.95
