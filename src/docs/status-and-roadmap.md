@@ -32,9 +32,9 @@ The worked-use-case bundle ships eight apps on one `solverforge 0.19.7` line:
 `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`, all on
 `solverforge-ui 0.9.0`; bundle CI and the four tag-triggered Space sync workflows
 pass, and the other four apps are repository-only. SolverForge Python has a
-tagged `solverforge-py 0.6.9` source line for CPython 3.14, compiled onto the
+tagged `solverforge-py 0.6.10` source line for CPython 3.14, compiled onto the
 `solverforge 0.19.7` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
-serves `solverforge 0.6.9`. The current UI line is `solverforge-ui 0.9.0`, which
+serves `solverforge 0.6.10`. The current UI line is `solverforge-ui 0.9.0`, which
 moved the bundled agent skill into the `solverforge-cli` repository, where both
 SolverForge skills now live.
 <% end %>
@@ -45,7 +45,7 @@ SolverForge skills now live.
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.7` |
 | **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.3.1` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`, and adds multi-client `connect --write` plus the agent-centric skill installer; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.6.9` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.9` |
+| **Python** | Published; CI and release passed | `solverforge-py 0.6.10` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.10` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.8`, `solverforge-lessons@2.0.10`, `solverforge-deliveries@2.0.9`, `solverforge-fsr@2.0.10`, plus the repository-only `solverforge-furnace@2.0.2`, `solverforge-orders@0.1.2`, `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`; all eight target `solverforge 0.19.7` and `solverforge-ui 0.9.0` |
 | **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.2.0` and later scaffold `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
@@ -114,8 +114,8 @@ SolverForge skills now live.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.6.9"`; use the
-  matching `solverforge-py` `v0.6.9` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.6.10"`; use the
+  matching `solverforge-py` `v0.6.10` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
   metrics, hard per-row scalar candidate domains, native static same-value
@@ -320,12 +320,12 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.6.9` is the current tagged SolverForge Python source line for
+`solverforge-py 0.6.10` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
 `solverforge 0.19.7` runtime, removes the wrapper-owned search path, specializes
 safe native constraint plans, adds qualified retained candidate diagnostics,
 and keeps shared `solverforge-ui 0.9.0` assets. The automatic release workflow
-published the 0.6.9 source distribution and CPython 3.14 wheels to PyPI. This
+published the 0.6.10 source distribution and CPython 3.14 wheels to PyPI. This
 patch enforces each row's imported candidate set as the hard domain for every
 native scalar mutation and adds `same_value_conflict_field` for static
 assignment conflict graphs without callback transitions. It also carries the

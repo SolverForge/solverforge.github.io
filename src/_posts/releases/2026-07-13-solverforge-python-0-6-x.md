@@ -199,8 +199,8 @@ line. Their current boundaries are:
 
 | Surface | Current line |
 | ------- | ------------ |
-| SolverForge Python source | tagged `solverforge-py 0.6.6` |
-| Public PyPI package | published `solverforge 0.6.6` |
+| SolverForge Python source | tagged `solverforge-py 0.6.10` |
+| Public PyPI package | published `solverforge 0.6.10` |
 | Rust runtime base | published `solverforge 0.19.4` |
 | Embedded UI base | published `solverforge-ui 0.7.0` |
 | CLI scaffold runtime | published `solverforge-cli 2.2.3` scaffolds `solverforge 0.19.3` |
@@ -232,6 +232,7 @@ line. Their current boundaries are:
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.6.10` | 2026-09-29 | Current published package on the `solverforge 0.19.7` base with `solverforge-ui 0.9.0` assets. |
 | `0.6.9` | 2026-09-29 | Aligns the exact SolverForge Rust crate set with 0.19.7 and embeds the `solverforge-ui 0.9.0` assets. |
 | `0.6.8` | 2026-09-29 | Moves the binding onto the SolverForge 0.19.7 runtime line. |
 | `0.6.7` | 2026-09-29 | Picks up the 0.19.7 construction and telemetry behavior for Python-authored models. |

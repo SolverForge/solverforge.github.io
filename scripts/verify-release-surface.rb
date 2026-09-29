@@ -11,8 +11,8 @@ REQUIRED_TEXT = {
     "docs.rs/solverforge/0.19.7/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
-    "solverforge-py 0.6.9",
-    "solverforge==0.6.9",
+    "solverforge-py 0.6.10",
+    "solverforge==0.6.10",
     "solverforge 0.19.7",
     "solverforge-ui 0.9.0"
   ],
@@ -114,7 +114,7 @@ REQUIRED_TEXT = {
   ],
   "src/docs/status-and-roadmap.md" => [
     "solverforge 0.19.7",
-    "solverforge-py 0.6.9",
+    "solverforge-py 0.6.10",
     "solverforge-cli 3.3.1",
     "solverforge-ui 0.9.0",
     "solverforge-hospital@2.0.8",
@@ -147,8 +147,35 @@ REQUIRED_TEXT = {
     "`0.19.2` | 2026-07-19",
     "solverforge-hospital@2.0.7"
   ],
+  "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
+    "solverforge 0.19.6",
+    "solverforge 0.19.7",
+    "`0.19.6` | 2026-09-25",
+    "`0.19.7` | 2026-09-25",
+    "pinned"
+  ],
+  "src/_posts/releases/2026-09-29-solverforge-cli-3-2-3-3-x.md" => [
+    "solverforge-cli 3.3.1",
+    "solverforge 0.19.7",
+    "rmcp 3.5.0",
+    "`3.2.0` | 2026-09-29",
+    "`3.3.0` | 2026-09-29"
+  ],
+  "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
+    "solverforge-py 0.6.10",
+    "solverforge==0.6.10",
+    "solverforge 0.19.7",
+    "solverforge-ui 0.9.0"
+  ],
+  "src/_posts/releases/2026-09-27-solverforge-usecases-repository-apps.md" => [
+    "solverforge-furnace 2.0.2",
+    "solverforge-orders 0.1.2",
+    "solverforge-fleet 0.1.5",
+    "solverforge-flightcrew 0.1.2",
+    "repository-only"
+  ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [
-    "`0.6.9` | 2026-09-29",
+    "`0.6.10` | 2026-09-29",
     "`0.6.6` | 2026-08-11",
     "`0.6.5` | 2026-07-29",
     "`0.6.4` | 2026-07-26"

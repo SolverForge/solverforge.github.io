@@ -11,9 +11,9 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-This section documents the tagged `solverforge-py 0.6.9` source line for
+This section documents the tagged `solverforge-py 0.6.10` source line for
 CPython 3.14. The automatic release workflow completed and the public PyPI
-package is `solverforge 0.6.9`. The source compiles Python models into the
+package is `solverforge 0.6.10`. The source compiles Python models into the
 `solverforge 0.19.7` Rust runtime and embeds `solverforge-ui 0.9.0` assets for
 Python-hosted examples. GitHub CI and the final-tag release workflow completed
 successfully.
@@ -31,7 +31,7 @@ selector or move engine.
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.6.9"
+python3.14 -m pip install "solverforge==0.6.10"
 ```
 
 Use the tagged source checkout when developing the repository examples or
@@ -40,7 +40,7 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.9
+git checkout v0.6.10
 make develop
 . .venv/bin/activate
 ```
@@ -75,8 +75,8 @@ make develop
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.6.9` |
-| Published PyPI version | `0.6.9` |
+| Documented source line | `0.6.10` |
+| Published PyPI version | `0.6.10` |
 | Python requirement | `>=3.14` |
 | Runtime base | `solverforge 0.19.7` |
 | Embedded UI base | `solverforge-ui 0.9.0` |
@@ -103,5 +103,5 @@ make develop
 ## Links
 
 - [SolverForge Python 0.6.x release notes](/blog/releases/2026/07/13/solverforge-python-0-6-x/)
-- [PyPI package 0.6.9](https://pypi.org/project/solverforge/0.6.9/)
-- [Python v0.6.9 source](https://github.com/SolverForge/solverforge-py/tree/v0.6.9)
+- [PyPI package 0.6.10](https://pypi.org/project/solverforge/0.6.10/)
+- [Python v0.6.10 source](https://github.com/SolverForge/solverforge-py/tree/v0.6.10)
