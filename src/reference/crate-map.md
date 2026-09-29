@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.5` crate and current
+This map is aligned with the published `solverforge 0.19.7` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -67,8 +67,8 @@ lower-level solver internals directly.
 - Start with `solverforge-cli` to scaffold the app shell.
 - Start with the PyPI `solverforge` package when the application surface is
   Python and you do not need a generated Rust web/API/CLI shell. PyPI publishes
-  `solverforge 0.6.6`; use the matching `solverforge-py v0.6.6` tag for source
-  and example development on SolverForge 0.19.4.
+  `solverforge 0.6.10`; use the matching `solverforge-py v0.6.10` tag for source
+  and example development on SolverForge 0.19.7.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
 - Keep scalar/list model declarations in the `planning_model!` manifest and

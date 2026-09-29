@@ -88,6 +88,10 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/mcp-shell/",
     "/docs/solverforge-cli/agent-skill/"
   ],
+  "src/reference/crate-map.md" => [
+    "solverforge 0.19.7",
+    "solverforge 0.6.10"
+  ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge 0.19.7",
     "solverforge-ui 0.9.0",
