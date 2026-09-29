@@ -1,0 +1,164 @@
+---
+layout: default
+---
+<% use_case = data.use_case %>
+<article class="page-shell page-shell--use-case use-case-detail">
+  <header class="use-case-detail__hero">
+    <div>
+      <p class="use-case-eyebrow"><%= use_case.fetch("eyebrow") %></p>
+      <h1><%= use_case.fetch("title") %></h1>
+      <p class="use-case-detail__intro"><%= use_case.fetch("intro") %></p>
+    </div>
+    <ul class="use-case-detail__links">
+      <% if use_case["space_url"] %>
+        <li>
+          <a class="use-case-space-link" href="<%= use_case.fetch("space_url") %>" target="_blank" rel="noopener">
+            Open the Space <i class="fa-solid fa-arrow-up-right-from-square"></i>
+          </a>
+        </li>
+      <% end %>
+      <% if use_case["docs_url"] %>
+        <li>
+          <a class="use-case-doc-link" href="<%= relative_url(use_case.fetch("docs_url")) %>">
+            Read the guide <i class="fa-solid fa-book-open"></i>
+          </a>
+        </li>
+      <% end %>
+      <% if use_case["repo_url"] %>
+        <li>
+          <a class="use-case-doc-link" href="<%= use_case.fetch("repo_url") %>" target="_blank" rel="noopener">
+            App source <i class="fa-brands fa-github"></i>
+          </a>
+        </li>
+      <% end %>
+    </ul>
+  </header>
+
+  <div class="use-case-proof__metrics" aria-label="<%= use_case.fetch("label") %> data shape">
+    <% use_case.fetch("metrics").each do |value, label| %>
+      <div class="use-case-proof__metric">
+        <span class="use-case-proof__metric-value"><%= value %></span>
+        <span class="use-case-proof__metric-label"><%= label %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="use-case-proof__body use-case-detail__body">
+    <div>
+      <% use_case.fetch("body").each do |paragraph| %>
+        <p><%= paragraph %></p>
+      <% end %>
+    </div>
+
+    <div class="use-case-proof__constraints" aria-label="<%= use_case.fetch("label") %> constraint summary">
+      <% use_case.fetch("constraints").each do |title, copy| %>
+        <div class="use-case-proof__constraint">
+          <strong><%= title %></strong>
+          <span><%= copy %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <figure class="use-case-runtime">
+    <div class="use-case-runtime__frame">
+      <% if use_case.fetch("runtime")["video"].to_s.empty? %>
+        <img
+          class="use-case-runtime__image"
+          src="<%= relative_url(use_case.fetch("runtime").fetch("poster")) %>"
+          alt="<%= use_case.fetch("runtime").fetch("copy") %>"
+          width="1600"
+          height="900"
+          loading="lazy"
+        />
+      <% else %>
+        <video
+          class="use-case-runtime__video"
+          controls
+          playsinline
+          preload="metadata"
+          poster="<%= relative_url(use_case.fetch("runtime").fetch("poster")) %>"
+          aria-label="<%= use_case.fetch("runtime").fetch("caption") %>"
+        >
+          <source src="<%= relative_url(use_case.fetch("runtime").fetch("video")) %>" type="video/mp4" />
+        </video>
+      <% end %>
+    </div>
+    <figcaption class="use-case-runtime__caption">
+      <span class="use-case-runtime__label"><%= use_case.fetch("runtime").fetch("label") %></span>
+      <span><%= use_case.fetch("runtime").fetch("copy") %></span>
+      <span class="use-case-runtime__detail"><%= use_case.fetch("runtime").fetch("caption") %></span>
+    </figcaption>
+  </figure>
+
+  <div class="use-case-showcase" aria-label="Annotated <%= use_case.fetch("label") %> screenshots">
+    <% use_case.fetch("screenshots").each_slice(2) do |pair| %>
+      <div class="use-case-showcase__pair">
+        <% pair.each do |shot| %>
+          <figure class="use-case-showcase__item">
+            <button
+              class="use-case-showcase__trigger"
+              type="button"
+              aria-label="Open the <%= shot.fetch("badge") %> screenshot"
+              data-use-case-lightbox
+              data-use-case-lightbox-src="<%= relative_url(shot.fetch("image")) %>"
+              data-use-case-lightbox-alt="<%= shot.fetch("alt") %>"
+              data-use-case-lightbox-caption="<%= shot.fetch("badge") %>: <%= shot.fetch("caption") %>"
+            >
+              <img
+                class="use-case-showcase__image"
+                src="<%= relative_url(shot.fetch("image")) %>"
+                alt="<%= shot.fetch("alt") %>"
+                width="1600"
+                height="900"
+                loading="lazy"
+              />
+              <% shot.fetch("callouts").each do |callout| %>
+                <%# A callout is anchored by its dot; boxes in the right half grow
+                    leftward and boxes in the lower third grow upward, so an
+                    annotation near a frame edge cannot spill out of it. %>
+                <span
+                  class="use-case-showcase__callout<%= " use-case-showcase__callout--right" if callout.fetch("left").to_f > 50 %><%= " use-case-showcase__callout--low" if callout.fetch("top").to_f > 65 %>"
+                  style="--use-case-callout-top: <%= callout.fetch("top") %>%; --use-case-callout-left: <%= callout.fetch("left") %>%"
+                ><%= callout.fetch("text") %></span>
+              <% end %>
+            </button>
+            <figcaption class="use-case-showcase__caption">
+              <span class="use-case-showcase__badge"><%= shot.fetch("badge") %></span>
+              <span><%= shot.fetch("caption") %></span>
+            </figcaption>
+          </figure>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <nav class="use-case-detail__nav" aria-label="Other use cases">
+    <p class="use-case-eyebrow">Keep inspecting</p>
+    <div class="card-grid">
+      <% site.data.use_cases.each do |other| %>
+        <% next if other.fetch("id") == use_case.fetch("id") %>
+        <%= render Ui::Card.new(title: other.fetch("label"), href: relative_url("/use-cases/#{other.fetch("id")}/"), eyebrow: other.fetch("teaser_metric"), icon: other.fetch("icon")) do %>
+<%= other.fetch("teaser_copy") %>
+        <% end %>
+      <% end %>
+    </div>
+  </nav>
+</article>
+
+<div
+  class="use-case-lightbox"
+  data-use-case-lightbox-root
+  role="dialog"
+  aria-modal="true"
+  aria-label="<%= use_case.fetch("label") %> screenshot viewer"
+  hidden
+>
+  <button class="use-case-lightbox__close" type="button" data-use-case-lightbox-close aria-label="Close screenshot viewer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <figure class="use-case-lightbox__figure">
+    <img class="use-case-lightbox__image" alt="" />
+    <figcaption class="use-case-lightbox__caption"></figcaption>
+  </figure>
+</div>

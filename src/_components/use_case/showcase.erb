@@ -57,7 +57,15 @@
                   aria: { label: "Open the #{use_case.fetch("label")} Space on Hugging Face" } %>
           <% end %>
           <%= link_to "Read the #{use_case.fetch("label")} guide", relative_url(use_case.fetch("docs_url")),
+                class: "use-case-doc-link" if use_case["docs_url"] %>
+          <%= link_to "#{use_case.fetch("label")} case page", relative_url("/use-cases/#{use_case.fetch("id")}/"),
                 class: "use-case-doc-link" %>
+          <% if use_case["repo_url"] %>
+            <%= link_to "App source", use_case.fetch("repo_url"),
+                  class: "use-case-doc-link",
+                  target: "_blank",
+                  rel: "noopener" %>
+          <% end %>
         </div>
 
         <header class="use-case-carousel__header">
@@ -141,7 +149,7 @@
                       loading="lazy"
                     />
                     <% shot.fetch("callouts").each do |callout| %>
-                      <span class="use-case-showcase__callout" style="<%= callout_style(callout) %>"><%= callout.fetch("text") %></span>
+                      <span class="<%= callout_class(callout) %>" style="<%= callout_style(callout) %>"><%= callout.fetch("text") %></span>
                     <% end %>
                   </button>
                   <figcaption class="use-case-showcase__caption">
