@@ -285,6 +285,166 @@ async function checkLayout(origin, paths) {
   return failures;
 }
 
+async function checkUseCaseShowcase(origin) {
+  const browser = await chromium.launch({
+    ...chromiumOptions(),
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1100 },
+  });
+  const page = await context.newPage();
+  const failures = [];
+  const path = "/use-cases/";
+
+  try {
+    await page.goto(`${origin}${path}`, { waitUntil: "load" });
+
+    const showcase = await page.evaluate(() => {
+      const carousel = document.querySelector("[data-use-case-carousel]");
+      if (!carousel) return null;
+
+      const slides = [...carousel.querySelectorAll("[data-use-case-slide]")];
+      const selectors = [...carousel.querySelectorAll("[data-use-case-select]")];
+
+      return {
+        slides: slides.map((slide) => ({
+          id: slide.dataset.useCaseCase,
+          hidden: slide.hidden,
+          metrics: slide.querySelectorAll(".use-case-proof__metric").length,
+          constraints: slide.querySelectorAll(".use-case-proof__constraint").length,
+          screenshots: slide.querySelectorAll(".use-case-showcase__item").length,
+          annotated: slide.querySelectorAll(".use-case-showcase__callout").length,
+          calloutsOffFrame: [...slide.querySelectorAll(".use-case-showcase__callout")].filter((callout) => {
+            const frame = callout.closest(".use-case-showcase__trigger").getBoundingClientRect();
+            const box = callout.getBoundingClientRect();
+            return box.right > frame.right + 2 || box.bottom > frame.bottom + 2;
+          }).length,
+          videos: [...slide.querySelectorAll("video")].map((video) => ({
+            poster: Boolean(video.getAttribute("poster")),
+            src: video.querySelector("source")?.getAttribute("src") || "",
+          })),
+          badges: slide.querySelectorAll(".use-case-showcase__badge").length,
+          spaceRibbon: slide.querySelectorAll(".use-case-space-ribbon").length,
+          docs: slide.querySelector(".use-case-doc-link")?.getAttribute("href") || "",
+          space: slide.querySelector(".use-case-space-link")?.getAttribute("href") || "",
+        })),
+        selectors: selectors.map((selector) => selector.dataset.useCaseSelect),
+        selected: selectors.filter((selector) => selector.getAttribute("aria-selected") === "true").map((selector) => selector.dataset.useCaseSelect),
+      };
+    });
+
+    if (!showcase) {
+      failures.push({ path, issue: "missing use-case carousel" });
+    } else {
+      if (showcase.slides.length !== 4) failures.push({ path, issue: "expected 4 slides", found: showcase.slides.length });
+      if (showcase.selectors.length !== showcase.slides.length) {
+        failures.push({ path, issue: "selector count does not match slide count", selectors: showcase.selectors.length, slides: showcase.slides.length });
+      }
+
+      const visible = showcase.slides.filter((slide) => !slide.hidden);
+      if (visible.length !== 1) failures.push({ path, issue: "expected exactly one visible slide", visible: visible.length });
+
+      for (const slide of showcase.slides) {
+        if (slide.metrics !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 metrics", found: slide.metrics });
+        if (slide.constraints !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 constraints", found: slide.constraints });
+        if (slide.screenshots !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 screenshots", found: slide.screenshots });
+        if (slide.annotated !== 12) failures.push({ path, slide: slide.id, issue: "expected 12 annotations", found: slide.annotated });
+        if (slide.badges !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 screenshot captions", found: slide.badges });
+        if (slide.calloutsOffFrame !== 0) failures.push({ path, slide: slide.id, issue: "annotations extend past their capture", found: slide.calloutsOffFrame });
+        if (slide.videos.length !== 1) failures.push({ path, slide: slide.id, issue: "expected one runtime video", found: slide.videos.length });
+        if (!slide.videos[0]?.poster) failures.push({ path, slide: slide.id, issue: "runtime video is missing its poster" });
+        if (!slide.videos[0]?.src.includes(`/videos/use-cases/solverforge-${slide.id === "field-service" ? "fsr" : slide.id}-demo.mp4`)) {
+          failures.push({ path, slide: slide.id, issue: "unexpected runtime video source", src: slide.videos[0]?.src });
+        }
+        if (!slide.docs.startsWith("/docs/getting-started/")) failures.push({ path, slide: slide.id, issue: "missing docs link", docs: slide.docs });
+        const hasSpace = slide.space.startsWith("https://huggingface.co/spaces/SolverForge/");
+        // The Space badge is the page's discriminant, so it must track the link.
+        if (hasSpace && slide.spaceRibbon !== 1) failures.push({ path, slide: slide.id, issue: "Space case without its badge", spaceRibbon: slide.spaceRibbon });
+        if (!hasSpace && slide.spaceRibbon !== 0) failures.push({ path, slide: slide.id, issue: "badge without a Space link", spaceRibbon: slide.spaceRibbon, space: slide.space });
+      }
+
+      // Switching cases must move the selection, the visible slide, and the URL hash.
+      const second = showcase.selectors[1];
+      await page.click(`[data-use-case-select="${second}"]`);
+      const afterSelect = await page.evaluate(() => {
+        const carousel = document.querySelector("[data-use-case-carousel]");
+        const slides = [...carousel.querySelectorAll("[data-use-case-slide]")];
+        const selectors = [...carousel.querySelectorAll("[data-use-case-select]")];
+        return {
+          hash: window.location.hash,
+          visible: slides.filter((slide) => !slide.hidden).map((slide) => slide.dataset.useCaseCase),
+          selected: selectors.filter((selector) => selector.getAttribute("aria-selected") === "true").map((selector) => selector.dataset.useCaseSelect),
+          active: carousel.dataset.useCaseActive,
+        };
+      });
+
+      if (afterSelect.visible.length !== 1 || afterSelect.visible[0] !== second) {
+        failures.push({ path, issue: "selector click did not reveal its slide", ...afterSelect });
+      }
+      if (afterSelect.selected.length !== 1 || afterSelect.selected[0] !== second) {
+        failures.push({ path, issue: "selector click did not move aria-selected", ...afterSelect });
+      }
+      if (afterSelect.active !== second || !afterSelect.hash.endsWith(`#${second}`)) {
+        failures.push({ path, issue: "selector click did not update the deep link", ...afterSelect });
+      }
+
+      // Deep links activate the matching case on load.
+      await page.goto(`${origin}${path}#${second}`, { waitUntil: "load" });
+      const deepLinked = await page.evaluate(() => {
+        const carousel = document.querySelector("[data-use-case-carousel]");
+        return [...carousel.querySelectorAll("[data-use-case-slide]")]
+          .filter((slide) => !slide.hidden)
+          .map((slide) => slide.dataset.useCaseCase);
+      });
+      if (deepLinked.length !== 1 || deepLinked[0] !== second) {
+        failures.push({ path, issue: "deep link did not activate its case", hash: second, visible: deepLinked });
+      }
+
+      // Arrow keys move between cases.
+      await page.evaluate(() => document.querySelector("[data-use-case-carousel]").focus());
+      await page.keyboard.press("ArrowRight");
+      const afterArrow = await page.evaluate(() => {
+        const carousel = document.querySelector("[data-use-case-carousel]");
+        return {
+          active: carousel.dataset.useCaseActive,
+          visible: [...carousel.querySelectorAll("[data-use-case-slide]")].filter((slide) => !slide.hidden).map((slide) => slide.dataset.useCaseCase),
+        };
+      });
+      if (afterArrow.visible.length !== 1 || afterArrow.visible[0] === second) {
+        failures.push({ path, issue: "ArrowRight did not advance the carousel", ...afterArrow });
+      }
+
+      // The viewer opens the clicked capture and closes on Escape.
+      const trigger = page.locator("[data-use-case-slide]:not([hidden]) [data-use-case-lightbox]").first();
+      const expectedCaption = await trigger.getAttribute("data-use-case-lightbox-caption");
+      await trigger.click();
+      const opened = await page.evaluate(() => {
+        const lightbox = document.querySelector("[data-use-case-lightbox-root]");
+        return {
+          hidden: lightbox.hidden,
+          src: lightbox.querySelector(".use-case-lightbox__image")?.getAttribute("src") || "",
+          caption: lightbox.querySelector(".use-case-lightbox__caption")?.textContent || "",
+          bodyLocked: document.body.classList.contains("use-case-lightbox-open"),
+        };
+      });
+
+      if (opened.hidden || !opened.src.includes("/images/use-cases/") || opened.caption !== expectedCaption || !opened.bodyLocked) {
+        failures.push({ path, issue: "lightbox did not open with the capture metadata", ...opened });
+      }
+
+      await page.keyboard.press("Escape");
+      const closed = await page.evaluate(() => document.querySelector("[data-use-case-lightbox-root]").hidden);
+      if (!closed) failures.push({ path, issue: "lightbox did not close on Escape" });
+    }
+  } catch (error) {
+    failures.push({ path, issue: "showcase check threw", error: String(error) });
+  }
+
+  await context.close();
+  await browser.close();
+  return failures;
+}
+
 async function checkDocsSidebarActive(origin) {
   const browser = await chromium.launch({
     ...chromiumOptions(),
@@ -341,10 +501,12 @@ const docsIndexTargets = checkDocsIndexTargets();
 const { server, origin } = await startServer();
 let layoutFailures = [];
 let docsSidebarActive = [];
+let useCaseShowcase = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
   docsSidebarActive = await checkDocsSidebarActive(origin);
+  useCaseShowcase = await checkUseCaseShowcase(origin);
 } finally {
   server.close();
 }
@@ -356,11 +518,19 @@ const summary = {
   missingLinks,
   docsIndexTargets,
   docsSidebarActive,
+  useCaseShowcase,
   layoutFailures,
 };
 
 console.log(JSON.stringify(summary, null, 2));
 
-if (staleCopy.length || missingLinks.length || docsIndexTargets.length || docsSidebarActive.length || layoutFailures.length) {
+if (
+  staleCopy.length ||
+  missingLinks.length ||
+  docsIndexTargets.length ||
+  docsSidebarActive.length ||
+  useCaseShowcase.length ||
+  layoutFailures.length
+) {
   process.exit(1);
 }

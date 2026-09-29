@@ -9,6 +9,10 @@ This repository is the dedicated Bridgetown source for
 - `src/reference/**` for dense engineering reference and clearly labeled
   maintainer notes
 - `src/_posts/**` for blog and release posts
+- `src/use-cases.md`, `src/_data/use_cases.yml`, `src/images/use-cases/**`, and
+  `src/videos/use-cases/**` for the public use-case showcase: one slide per
+  case with its metrics, constraints, narrated runtime walkthrough, and
+  annotated screenshots
 - `frontend/**` for bundled CSS/JS sources
 - `plugins/**` for build-time extensions, including static search generation
 
@@ -45,9 +49,10 @@ Direct Bridgetown commands:
 3. `bundle exec rake frontend:build`
 4. `bundle exec bridgetown build`
 5. `ruby scripts/verify-cli-release.rb`
-6. `ruby scripts/verify-hospital-tutorial.rb`
-7. `ruby scripts/verify-deliveries-tutorial.rb`
-8. `bundle exec bridgetown start -P 4017`
+6. `ruby scripts/verify-use-cases-page.rb`
+7. `ruby scripts/verify-hospital-tutorial.rb`
+8. `ruby scripts/verify-deliveries-tutorial.rb`
+9. `bundle exec bridgetown start -P 4017`
 
 `make verify-hospital-tutorial` always runs site-local copy and snippet checks.
 When `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` point to local
