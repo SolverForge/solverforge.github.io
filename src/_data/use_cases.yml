@@ -412,3 +412,444 @@
         - text: "Route geometry is available through a snapshot-scoped endpoint for product integration."
           top: 69.0
           left: 36.0
+
+- id: furnace
+  label: "Furnace"
+  eyebrow: "Industrial heat treatment"
+  title: "155 heat-treatment orders. 11 furnaces. 39 operators. One coupled plan."
+  intro: "Heat-treatment planning couples machine capacity, thermal sequencing, batch placement, task operators, monitoring load, and the shift roster into a single model, so a furnace plan that ignores operator coverage cannot look legal."
+  repo_url: "https://github.com/SolverForge/solverforge-usecases/tree/main/uc-furnace"
+  icon: "fa-solid fa-fire"
+  teaser_metric: "155 orders / 11 furnaces / 39 operators"
+  teaser_copy: "Furnace capacity, thermal sequencing, task operators, monitoring load, and shift rosters solved as one plan."
+  metrics:
+    - ["155", "Work orders"]
+    - ["11", "Furnaces"]
+    - ["39", "Operators"]
+    - ["30", "Constraints"]
+    - ["22 / 8", "Hard / soft split"]
+    - ["7", "Days"]
+  body:
+    - "The answer is only valid if furnace assignment, time placement, task operators, monitoring capacity, and roster coverage all hold together. Staging those decisions can produce schedules that look legal in one layer and fail in another."
+    - "The app keeps the furnace timeline, the operator roster, the order table, score analysis, the retained job, and the REST surface inspectable from one operating artifact."
+  constraints:
+    - ["Batch assignment", "Every work order is scheduled, and only on a compatible furnace."]
+    - ["Furnace feasibility", "Process, temperature ceiling, and load capacity all have to hold."]
+    - ["Sequencing", "Batches cannot overlap and must respect the thermal changeover gap."]
+    - ["Task operators", "Load build, program, quench, and unload tasks need a skilled operator on the owning shift."]
+    - ["Coverage and monitoring", "Role coverage and 15-minute monitoring capacity are solved with the same plan."]
+    - ["Soft tradeoffs", "Priority-weighted lateness, thermal changeover, early starts, night starts, overtime, and load balance."]
+  runtime:
+    video: "/videos/use-cases/solverforge-furnace-demo.mp4"
+    poster: "/images/use-cases/furnace-schedule.png"
+    label: Runtime walkthrough
+    copy: "Watch the furnace lanes fill under a live hard score, then read the roster, the order table, and the constraint ledger behind it."
+    caption: "Narrated walkthrough (2:41): the unassigned baseline, the solve in progress, the finished furnace schedule, the operator roster, the order table, score analysis, and the REST surface."
+  screenshots:
+    - image: "/images/use-cases/furnace-workspace-unassigned.png"
+      badge: "Unassigned baseline"
+      alt: "SolverForge Furnace before solving: eleven empty furnace lanes, the summary strip showing 155 unassigned orders, and the status bar ready."
+      caption: "The baseline opens with every order unassigned, so the starting point is explicit rather than hidden behind a spinner."
+      callouts:
+        - text: "The status bar starts Ready with the score empty and all 30 constraint dots present."
+          top: 7.8
+          left: 28.5
+        - text: "Eleven furnace lanes wait for the solve; 155 orders are still unassigned."
+          top: 41.3
+          left: 7.6
+    - image: "/images/use-cases/furnace-schedule-solving.png"
+      badge: "Mid-solve"
+      alt: "SolverForge Furnace mid-solve: hard score counting down, moves per second climbing, and order blocks already placed across furnace lanes."
+      caption: "Caught mid-solve, the same surface shows hard score improving while blocks land in lanes, so the search is observable rather than opaque."
+      callouts:
+        - text: "Hard score is still counting down while the search is live."
+          top: 7.8
+          left: 4.3
+        - text: "Order blocks appear in the lanes as construction and local search place them."
+          top: 38.4
+          left: 26.3
+    - image: "/images/use-cases/furnace-schedule.png"
+      badge: "Furnace schedule"
+      alt: "SolverForge Furnace schedule after solving: eleven furnace lanes over a seven-day horizon with 155 scheduled orders and zero unassigned."
+      caption: "The finished plan places all 155 orders across eleven furnace lanes with the retained job completed at zero hard."
+      callouts:
+        - text: "Lane headers keep furnace type, maximum temperature, order count, and load capacity."
+          top: 37.6
+          left: 3.5
+        - text: "Each block carries its work-order code, customer, and process in the lane."
+          top: 38.4
+          left: 26.3
+    - image: "/images/use-cases/furnace-crew.png"
+      badge: "Operator roster"
+      alt: "SolverForge Furnace operator roster showing role, availability, planned shifts, and skill mask for every operator."
+      caption: "The roster is part of the same model: role, availability, planned shifts, and skill masks all constrain which operator can own a task."
+      callouts:
+        - text: "Operators carry role, availability, planned shifts, and their skill mask."
+          top: 15.7
+          left: 38.4
+        - text: "Every manual task must land on an operator rostered on the owning shift."
+          top: 11.6
+          left: 3.8
+    - image: "/images/use-cases/furnace-orders.png"
+      badge: "Order placement"
+      alt: "SolverForge Furnace order table showing assigned furnace, scheduled window, due date, and delay per work order."
+      caption: "The order table answers the operational question directly: which furnace runs this order, when it starts and ends, and whether it is late."
+      callouts:
+        - text: "Assigned furnace and scheduled window are readable per work order."
+          top: 11.6
+          left: 53.2
+        - text: "Delay per order exposes whether priority-weighted lateness reached the plan."
+          top: 15.7
+          left: 48.3
+    - image: "/images/use-cases/furnace-score-analysis.png"
+      badge: "Score analysis"
+      alt: "SolverForge Furnace score analysis modal listing all 30 constraints with type, score, and match counts."
+      caption: "Score analysis makes the model auditable: 22 hard feasibility rules and 8 soft operating tradeoffs, each with its own score and match count."
+      callouts:
+        - text: "Hard feasibility and soft operating pressure stay separated by type."
+          top: 23.8
+          left: 30.3
+        - text: "Every constraint reports its score and match count for review."
+          top: 21.9
+          left: 47.8
+    - image: "/images/use-cases/furnace-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Furnace REST API guide listing demo data, retained jobs, status, snapshots, analysis, and event endpoints with curl examples."
+      caption: "The REST guide exposes the same retained workflow the browser uses, with copyable curl examples for every endpoint."
+      callouts:
+        - text: "Every endpoint ships a copyable curl example."
+          top: 18.9
+          left: 16.2
+        - text: "Retained-job endpoints cover create, status, snapshot, analysis, and events."
+          top: 14.4
+          left: 4.6
+- id: orders
+  label: "Order picking"
+  eyebrow: "Warehouse order picking"
+  title: "8 grocery orders. 145 pick items. 5 trolleys. One inspectable walking plan."
+  intro: "Order picking treats warehouse trolley routes as ordered lists: every item, bucket limit, order split, product location, and walking-metre tradeoff stays visible on the plan an operator would actually walk."
+  repo_url: "https://github.com/SolverForge/solverforge-usecases/tree/main/uc-orders"
+  icon: "fa-solid fa-dolly"
+  teaser_metric: "8 orders / 145 items / 5 trolleys"
+  teaser_copy: "Item assignment, bucket capacity, order splits, product locations, and closed walking routes on one warehouse canvas."
+  metrics:
+    - ["8", "Orders"]
+    - ["145", "Pick items"]
+    - ["37", "Products"]
+    - ["5", "Trolleys"]
+    - ["3", "Constraints"]
+    - ["2 / 1", "Hard / soft split"]
+  body:
+    - "A picking plan is only useful if items are assigned to ordered trolley routes, the buckets can carry the grouped volume, and the walk is short enough to operate. Treating assignment and route order as separate cleanup steps makes the plan look tidy while order ownership or bucket capacity quietly fails."
+    - "The app keeps the isometric warehouse canvas, the trolley legend, the picking-plan cards, the input tables, score analysis, and the retained job on one surface."
+  constraints:
+    - ["Item coverage", "Every pick item appears in exactly one trolley route."]
+    - ["Bucket capacity", "Each order's volume fits four buckets on its trolley."]
+    - ["Order incidence", "Orders are kept on fewer trolleys where possible."]
+    - ["Walking distance", "Closed-route metres through the shelving grid stay a soft pressure."]
+    - ["Warehouse geometry", "Shelf, side, and row facts decide the aisle path drawn on the canvas."]
+    - ["Retained workflow", "Status, snapshots, score analysis, and lifecycle actions stay on the stock contract."]
+  runtime:
+    video: "/videos/use-cases/solverforge-orders-demo.mp4"
+    poster: "/images/use-cases/orders-workspace.png"
+    label: Runtime walkthrough
+    copy: "Watch trolley routes appear across the warehouse, then read the picking plan card by card."
+    caption: "Narrated walkthrough (2:01): the unassigned warehouse, the solve in progress, the drawn trolley routes, the picking-plan cards, the data panel, and score analysis."
+  screenshots:
+    - image: "/images/use-cases/orders-workspace-unassigned.png"
+      badge: "Unassigned warehouse"
+      alt: "SolverForge Orders before solving: the isometric warehouse canvas empty, with 8 orders and 145 items in the stats panel."
+      caption: "The unassigned baseline shows the warehouse and the demand before any route exists: 8 orders, 145 pick items, no active trolley."
+      callouts:
+        - text: "The stats panel states the demand before the solve: orders, items, active trolleys, closed metres."
+          top: 31.6
+          left: 4.9
+        - text: "The warehouse canvas is drawn and waiting; no trolley route exists yet."
+          top: 41.1
+          left: 53.5
+    - image: "/images/use-cases/orders-schedule-solving.png"
+      badge: "Mid-solve"
+      alt: "SolverForge Orders mid-solve: trolley routes forming across the warehouse canvas with the solver still improving the score."
+      caption: "Mid-solve, the canvas already shows route ownership and pick markers while the solver keeps improving."
+      callouts:
+        - text: "The solver is still improving, with the route plan changing under it."
+          top: 7.8
+          left: 4.1
+        - text: "Trolley paths and numbered pick markers appear as routes are constructed."
+          top: 44.2
+          left: 49.2
+    - image: "/images/use-cases/orders-workspace.png"
+      badge: "Picking workspace"
+      alt: "SolverForge Orders after solving: trolley routes drawn as coloured paths with numbered pick markers, beside the trolley legend."
+      caption: "The finished plan is one inspectable warehouse surface: ordered trolley routes, numbered pick markers, and the legend that ties colour to trolley."
+      callouts:
+        - text: "Coloured paths show trolley ownership; numbered markers expose the pick order itself."
+          top: 42.3
+          left: 49.2
+        - text: "The legend ties each colour to its trolley and item count."
+          top: 25.9
+          left: 89.9
+    - image: "/images/use-cases/orders-picking-plan.png"
+      badge: "Picking plan"
+      alt: "SolverForge Orders picking-plan cards: one per trolley with item count, bucket-volume capacity bar, and the numbered ordered item list."
+      caption: "Below the canvas, each trolley card states its item count, bucket capacity, and the exact ordered list an operator would walk."
+      callouts:
+        - text: "Each trolley card carries its item count and bucket-volume capacity."
+          top: 53.1
+          left: 8.4
+        - text: "The ordered item list is numbered, so the walking sequence is explicit."
+          top: 54.8
+          left: 4.2
+    - image: "/images/use-cases/orders-data.png"
+      badge: "Data panel"
+      alt: "SolverForge Orders data panel with Orders, Trolleys, and Buckets controls plus Generate New over the warehouse canvas."
+      caption: "The data panel regenerates the scenario through the published contract: order count, trolley count, and bucket size are inputs, not hidden constants."
+      callouts:
+        - text: "Scenario inputs are explicit: order count, trolley count, and bucket count."
+          top: 36.2
+          left: 53.5
+        - text: "Generate New rebuilds the dataset through the same demo-data contract."
+          top: 12.7
+          left: 6.0
+    - image: "/images/use-cases/orders-score-analysis.png"
+      badge: "Score analysis"
+      alt: "SolverForge Orders score analysis overlay listing order_incidence, required_buckets, and route_distance with their scores."
+      caption: "Score analysis is small here on purpose: three constraints decide the plan, and their weights are readable at a glance."
+      callouts:
+        - text: "required_buckets is the hard rule; bucket overflow is not a preference."
+          top: 47.1
+          left: 41.6
+        - text: "order_incidence and route_distance carry the soft pressure."
+          top: 55.9
+          left: 41.6
+- id: fleet
+  label: "Fleet readiness"
+  eyebrow: "Asset readiness planning"
+  title: "24 vessels. 56 days. 66 decisions. Maintenance, training, and readiness in one plan."
+  intro: "Fleet readiness is a synthetic asset planner: work packages, inspections, training, docks, technician pools, parts arrivals, and daily readiness floors share one scenario surface and one repair workflow."
+  repo_url: "https://github.com/SolverForge/solverforge-usecases/tree/main/uc-fleet"
+  icon: "fa-solid fa-anchor"
+  teaser_metric: "24 vessels / 56 days / 66 decisions"
+  teaser_copy: "Maintenance, inspections, training, docks, technicians, parts, and daily readiness floors in one operating plan."
+  metrics:
+    - ["24", "Vessels"]
+    - ["56", "Days"]
+    - ["66", "Decisions"]
+    - ["15", "Constraints"]
+    - ["9 / 6", "Hard / soft split"]
+    - ["5", "Docks"]
+  body:
+    - "Readiness planning couples asset windows, dock compatibility, technician capacity, parts arrivals, inspection and training precedence, and daily readiness floors. Optimizing any one layer alone can make another infeasible."
+    - "The app keeps the vessel timeline, the daily readiness ledger, technician pressure, parts posture, disruption repair, score analysis, and the REST surface together."
+  constraints:
+    - ["Required assignments", "Non-deferrable work, inspections, and training are all placed."]
+    - ["Dock feasibility", "Class compatibility, per-dock capacity, and persisted outages constrain placement."]
+    - ["Precedence", "Inspections follow maintenance, and training follows inspections."]
+    - ["Resource pressure", "Daily technician demand stays inside regular plus overtime capacity and parts stock."]
+    - ["Readiness floors", "Patrol-cutter, frigate-like, and support thresholds hold on every one of the 56 days."]
+    - ["Soft tradeoffs", "Ready vessel-days, shortfall, inspection lateness, overtime, churn, and allowed deferrals."]
+  runtime:
+    video: "/videos/use-cases/solverforge-fleet-demo.mp4"
+    poster: "/images/use-cases/fleet-schedule.png"
+    label: Runtime walkthrough
+    copy: "Watch the 56-day plan take shape, then read readiness by day, technician pressure, and the repair controls."
+    caption: "Narrated walkthrough (2:37): the unassigned baseline, the solve in progress, the vessel schedule, the daily readiness ledger, technician pools, disruption repair, score analysis, and the REST surface."
+  screenshots:
+    - image: "/images/use-cases/fleet-workspace-unassigned.png"
+      badge: "Unassigned baseline"
+      alt: "SolverForge Fleet before solving: 24 vessels unplanned, 66 decisions outstanding, and the readiness summary at 112 ready vessel-days."
+      caption: "The baseline states the whole planning problem before any decision is made: 24 vessels, 24 work packages, 66 unassigned decisions."
+      callouts:
+        - text: "The summary strip counts vessels, work packages, decisions, and dock utilization."
+          top: 19.2
+          left: 33.9
+        - text: "Every vessel lane is present and empty; nothing is silently pre-placed."
+          top: 49.3
+          left: 8.1
+    - image: "/images/use-cases/fleet-schedule-solving.png"
+      badge: "Mid-solve"
+      alt: "SolverForge Fleet mid-solve: work packages landing on the vessel timeline while the solver is still running."
+      caption: "Mid-solve, work packages, inspections, and training are already landing in lanes while the solver keeps going."
+      callouts:
+        - text: "The solver is live and the score is still moving."
+          top: 7.8
+          left: 3.7
+        - text: "Work packages land in the vessel timeline as decisions are made."
+          top: 46.0
+          left: 25.0
+    - image: "/images/use-cases/fleet-schedule.png"
+      badge: "Vessel schedule"
+      alt: "SolverForge Fleet vessel schedule after solving: 24 vessel lanes over a 56-day horizon with work packages, inspections, and training placed."
+      caption: "The finished plan lays 56 days across 24 vessel lanes, with maintenance, inspections, and training placed against readiness logic."
+      callouts:
+        - text: "Lanes show placement and readiness windows per vessel."
+          top: 51.4
+          left: 6.7
+        - text: "Blocks carry the work package, its class, and its priority on the day axis."
+          top: 46.0
+          left: 22.8
+    - image: "/images/use-cases/fleet-readiness.png"
+      badge: "Readiness by day"
+      alt: "SolverForge Fleet readiness table showing ready counts per day against patrol-cutter, frigate-like, support, and floor commitments."
+      caption: "Readiness is enforced daily, not sampled weekly: every one of the 56 days reports ready counts against three class thresholds."
+      callouts:
+        - text: "Readiness is reported per day across the full 56-day horizon."
+          top: 17.5
+          left: 33.9
+        - text: "The floor columns show the hard commitment the plan must hold."
+          top: 13.4
+          left: 57.9
+    - image: "/images/use-cases/fleet-resources.png"
+      badge: "Technician pools"
+      alt: "SolverForge Fleet technician pool table showing peak day, peak capacity, utilization, overtime headroom, and days over capacity."
+      caption: "Resource pressure is stated as planning fact: peak day, peak capacity, utilization, and overtime headroom per technician pool."
+      callouts:
+        - text: "Each pool reports its peak day and peak capacity."
+          top: 20.6
+          left: 19.5
+        - text: "Utilization and overtime headroom explain why the plan is constrained."
+          top: 16.5
+          left: 57.9
+    - image: "/images/use-cases/fleet-disruptions.png"
+      badge: "Disruption repair"
+      alt: "SolverForge Fleet disruption repair controls: technician drop, dock outage, delayed parts, and raised readiness floor."
+      caption: "Repair is explicit rather than hidden inside a rerun: an operator states the disruption, then the plan is re-solved and the two revisions compared."
+      callouts:
+        - text: "Four named disruptions describe the scenario before it is solved."
+          top: 7.8
+          left: 33.8
+        - text: "A repair seeds a baseline from the plan on screen and compares both revisions."
+          top: 7.8
+          left: 48.8
+    - image: "/images/use-cases/fleet-score-analysis.png"
+      badge: "Score analysis"
+      alt: "SolverForge Fleet score analysis modal listing 15 constraints with type, weight, score, and match counts."
+      caption: "Score analysis separates the hard commitments from six soft objectives, including maximizing ready vessel-days and minimizing churn."
+      callouts:
+        - text: "Nine hard rules cover assignment, windows, docks, precedence, capacity, parts, and readiness floors."
+          top: 29.8
+          left: 30.3
+        - text: "Soft objectives keep their weight, score, and match counts."
+          top: 20.2
+          left: 48.3
+    - image: "/images/use-cases/fleet-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Fleet REST API guide listing demo data, retained jobs, snapshots, analysis, lifecycle, and event endpoints with curl examples."
+      caption: "The REST guide exposes the same retained planning, snapshot, analysis, and repair workflow for integration."
+      callouts:
+        - text: "Retained-job endpoints cover create, status, snapshot, analysis, and lifecycle."
+          top: 20.7
+          left: 17.8
+        - text: "Every endpoint ships a copyable curl example."
+          top: 16.2
+          left: 6.1
+- id: flightcrew
+  label: "Flight crew"
+  eyebrow: "Airline crew scheduling"
+  title: "10 flight legs. 24 crew. 42 required seats. Rotations that respect rest."
+  intro: "Crew scheduling fills every required cockpit and cabin seat while qualification, overlap, connection continuity, availability, and every rest and recovery window hold at the same time."
+  repo_url: "https://github.com/SolverForge/solverforge-usecases/tree/main/uc-flightcrew"
+  icon: "fa-solid fa-plane"
+  teaser_metric: "10 legs / 24 crew / 42 seats"
+  teaser_copy: "Qualification, connectivity, availability, and rest and recovery rules solved as one rotation."
+  metrics:
+    - ["10", "Flight legs"]
+    - ["24", "Crew"]
+    - ["42", "Required seats"]
+    - ["12", "Constraints"]
+    - ["10 / 2", "Hard / soft split"]
+    - ["6", "Airports"]
+  body:
+    - "A valid rotation is more than a name in a seat. Every seat needs a qualified crew member, no two duties may overlap, connected flights must be operated in sequence, and each person has to be available. Rest is where it gets hard: home-base and away-base minimums, 36-hour extended recovery, and 48-hour recovery after long-haul duty all hold together."
+    - "Solve those rules one at a time and you get a roster that looks fine in one view and strands a crew member in another. The app keeps the crew timeline, the by-flight manifests, score analysis, the data tables, and the retained job in one model."
+  constraints:
+    - ["Seat coverage", "Every required cockpit and cabin seat is assigned."]
+    - ["Qualification", "Pilot and cabin seats require the matching skill."]
+    - ["Overlap prevention", "No crew member holds two duties that overlap in time."]
+    - ["Connection continuity", "Connected consecutive flights are operated in sequence."]
+    - ["Rest and recovery", "Home and away minimums, 36-hour extended recovery, and 48-hour long-haul recovery."]
+    - ["Soft preference", "The first departure and last return prefer each crew member's home base."]
+  runtime:
+    video: "/videos/use-cases/solverforge-flightcrew-demo.mp4"
+    poster: "/images/use-cases/flightcrew-by-crew.png"
+    label: Runtime walkthrough
+    copy: "Watch duty blocks land in the crew lanes, then confirm every leg seat by seat."
+    caption: "Narrated walkthrough (2:04): the unassigned rotation, the solve in progress, crew rotations with unavailable-day overlays, the by-flight manifests, score analysis, the data view, and the REST surface."
+  screenshots:
+    - image: "/images/use-cases/flightcrew-crew-unassigned.png"
+      badge: "Unassigned rotation"
+      alt: "SolverForge Flight Crew before solving: 24 crew lanes with no duties assigned and 42 required seats outstanding."
+      caption: "The unassigned baseline states the problem plainly: 10 flights, 24 crew members, 42 required seats, none filled."
+      callouts:
+        - text: "Required seats and unassigned seats are stated before the solve."
+          top: 11.6
+          left: 33.4
+        - text: "Crew lanes carry home base and role; no duty block exists yet."
+          top: 46.1
+          left: 5.5
+    - image: "/images/use-cases/flightcrew-crew-solving.png"
+      badge: "Mid-solve"
+      alt: "SolverForge Flight Crew mid-solve: duty blocks appearing in crew lanes while the solver is still running."
+      caption: "Mid-solve, duty blocks are already appearing in the crew lanes while rest and recovery rules keep being checked."
+      callouts:
+        - text: "Duty blocks land in crew lanes as seats are assigned."
+          top: 40.7
+          left: 58.3
+        - text: "The solver is live and the score is still improving."
+          top: 7.8
+          left: 4.3
+    - image: "/images/use-cases/flightcrew-by-crew.png"
+      badge: "Crew rotations"
+      alt: "SolverForge Flight Crew rotation timeline with duty blocks per crew member and unavailable-day overlays, fully assigned."
+      caption: "The crew view is the rotation itself: duty blocks per employee with unavailable days overlaid, so rest is visible rather than inferred."
+      callouts:
+        - text: "Lane headers keep each crew member's role, home base, and flight count."
+          top: 46.1
+          left: 5.5
+        - text: "Duty blocks sit against the day axis, with unavailable days overlaid."
+          top: 40.7
+          left: 58.3
+    - image: "/images/use-cases/flightcrew-by-flight.png"
+      badge: "Flight manifests"
+      alt: "SolverForge Flight Crew by-flight view showing every leg with its required cockpit and cabin seats filled."
+      caption: "The by-flight view turns the same plan around so operations can confirm each leg is covered seat by seat."
+      callouts:
+        - text: "Each row is one flight leg with its seat requirement."
+          top: 46.1
+          left: 5.2
+        - text: "Seat blocks name the crew members assigned to that leg."
+          top: 40.7
+          left: 23.1
+    - image: "/images/use-cases/flightcrew-score-analysis.png"
+      badge: "Score analysis"
+      alt: "SolverForge Flight Crew score analysis modal listing 12 constraints with type, weight, matches, and score."
+      caption: "Score analysis separates feasibility from quality: ten hard rules cover coverage, skill, overlap, connection, availability, and every rest window."
+      callouts:
+        - text: "Coverage, skill, overlap, connection, availability, and rest are hard rules."
+          top: 33.1
+          left: 30.3
+        - text: "Home-base return stays visible as soft pressure on its own."
+          top: 26.6
+          left: 48.3
+    - image: "/images/use-cases/flightcrew-data.png"
+      badge: "Data view"
+      alt: "SolverForge Flight Crew data view listing airports, employees, flights, and crew assignments."
+      caption: "The data view keeps the facts behind the rotation next to the plan: airports, employees with qualifications, flight legs, and the assignment table."
+      callouts:
+        - text: "Crew assignments expose which employee owns which required seat."
+          top: 15.7
+          left: 38.8
+        - text: "Employees carry qualifications and home base as input facts."
+          top: 11.6
+          left: 33.8
+    - image: "/images/use-cases/flightcrew-rest-api.png"
+      badge: "REST API"
+      alt: "SolverForge Flight Crew REST API guide listing demo data, retained jobs, status, snapshots, analysis, lifecycle, and event endpoints."
+      caption: "The REST surface exposes the retained-job workflow for integration: create a solve, read status, fetch snapshots, analyze, pause, resume, cancel, and stream events."
+      callouts:
+        - text: "Retained-job endpoints cover create, status, snapshot, and analysis."
+          top: 16.4
+          left: 16.2
+        - text: "Lifecycle actions and the event stream are integration points as well."
+          top: 14.4
+          left: 4.6
