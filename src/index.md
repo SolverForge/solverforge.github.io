@@ -94,18 +94,24 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
 
   <section class="home-section">
     <p class="page-shell__eyebrow">Use cases</p>
-    <h2>Four planning surfaces you can watch, inspect, and run.</h2>
+    <h2>Eight planning surfaces you can watch, inspect, and run.</h2>
     <p>
-      Hospital coverage, school timetabling, delivery routing, and field service routing.
-      Each case carries its data shape, its constraints, a narrated walkthrough of the
-      running app, and annotated screenshots of the same retained solve.
+      Machine scheduling, warehouse picking, crew rotas, asset readiness, hospital
+      coverage, school timetabling, delivery routing, and field service routing.
+      Each case carries its data shape, its constraints, a narrated walkthrough of
+      the running app, and annotated screenshots of the same retained solve.
     </p>
     <div class="card-grid">
       <% site.data.use_cases.each do |use_case| %>
-        <%= render Ui::Card.new(title: use_case["label"], href: relative_url("/use-cases/##{use_case["id"]}"), eyebrow: use_case["teaser_metric"], icon: use_case["icon"]) do %>
+        <%= render Ui::Card.new(title: use_case["label"], href: relative_url("/use-cases/#{use_case["id"]}/"), eyebrow: use_case["teaser_metric"], icon: use_case["icon"]) do %>
 <%= use_case["teaser_copy"] %>
         <% end %>
       <% end %>
+    </div>
+    <div class="button-row">
+      <a class="button button--primary" href="<%= relative_url '/use-cases/' %>">
+        Compare every use case <i class="fa-solid fa-arrow-right"></i>
+      </a>
     </div>
   </section>
 
