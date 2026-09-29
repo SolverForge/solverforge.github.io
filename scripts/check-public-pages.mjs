@@ -412,6 +412,40 @@ async function checkUseCaseShowcase(origin) {
         failures.push({ path, issue: "deep link did not activate its case", hash: second, visible: deepLinked });
       }
 
+      // Switching cases must stop the previous walkthrough: `hidden` alone
+      // leaves a playing video audible in the background.
+      await page.goto(`${origin}${path}`, { waitUntil: "load" });
+      const playingSlide = await page.evaluate(async () => {
+        const carousel = document.querySelector("[data-use-case-carousel]");
+        const slides = [...carousel.querySelectorAll("[data-use-case-slide]")];
+        const first = slides[0];
+        const video = first.querySelector("video");
+        if (!video) return { skipped: true };
+        // Autoplay is muted so the check does not need user activation.
+        video.muted = true;
+        try {
+          await video.play();
+        } catch (error) {
+          return { skipped: true, reason: String(error) };
+        }
+        return { skipped: false, playing: !video.paused, id: first.dataset.useCaseCase };
+      });
+
+      if (!playingSlide.skipped) {
+        const otherCase = await page.evaluate(() => {
+          const carousel = document.querySelector("[data-use-case-carousel]");
+          return [...carousel.querySelectorAll("[data-use-case-slide]")][1].dataset.useCaseCase;
+        });
+        await page.click(`[data-use-case-select="${otherCase}"]`);
+        const afterSwitch = await page.evaluate(() => {
+          const all = [...document.querySelectorAll("[data-use-case-slide] video")];
+          return all.map((video) => ({ paused: video.paused }));
+        });
+        if (afterSwitch.some((entry) => !entry.paused)) {
+          failures.push({ path, issue: "a previous case's walkthrough kept playing after switching", videos: afterSwitch });
+        }
+      }
+
       // Arrow keys move between cases.
       await page.evaluate(() => document.querySelector("[data-use-case-carousel]").focus());
       await page.keyboard.press("ArrowRight");

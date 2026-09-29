@@ -18,11 +18,21 @@ export const initializeUseCaseCarousel = () => {
     const caseIdFor = index => slides[index].dataset.useCaseCase
     const indexForCase = caseId => slides.findIndex(slide => slide.dataset.useCaseCase === caseId)
 
+    // Leaving a slide must stop its walkthrough. `hidden` only takes the slide
+    // out of rendering, so a playing video keeps its audio running in the
+    // background until it is paused explicitly.
+    const pauseMedia = slide => {
+      slide.querySelectorAll("video, audio").forEach(media => {
+        if (!media.paused && !media.ended) media.pause()
+      })
+    }
+
     const activate = (index, { updateHash = false, focusTab = false, scroll = false } = {}) => {
       activeIndex = (index + slides.length) % slides.length
 
       slides.forEach((slide, slideIndex) => {
         const active = slideIndex === activeIndex
+        if (!active && !slide.hidden) pauseMedia(slide)
         slide.hidden = !active
       })
 
