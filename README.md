@@ -10,9 +10,12 @@ This repository is the dedicated Bridgetown source for
   maintainer notes
 - `src/_posts/**` for blog and release posts
 - `src/use-cases.md`, `src/_data/use_cases.yml`, `src/images/use-cases/**`, and
-  `src/videos/use-cases/**` for the public use-case showcase: one slide per
-  case with its metrics, constraints, narrated runtime walkthrough, and
-  annotated screenshots
+  `src/videos/use-cases/**` for the public use-case showcase: one slide per case
+  with its metrics, constraints, narrated runtime walkthrough, and annotated
+  screenshots
+- `plugins/use_case_page_generator.rb` and `src/_layouts/use_case.erb` for the
+  per-case pages at `/use-cases/<id>/`, generated from the same data file so the
+  carousel and the individual pages cannot disagree about a case
 - `frontend/**` for bundled CSS/JS sources
 - `plugins/**` for build-time extensions, including static search generation
 
