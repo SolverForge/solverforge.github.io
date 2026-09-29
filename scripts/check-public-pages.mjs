@@ -325,7 +325,9 @@ async function checkUseCaseShowcase(origin) {
           })),
           badges: slide.querySelectorAll(".use-case-showcase__badge").length,
           spaceRibbon: slide.querySelectorAll(".use-case-space-ribbon").length,
-          docs: slide.querySelector(".use-case-doc-link")?.getAttribute("href") || "",
+          docs: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => href?.startsWith("/docs/")) || "",
+          repo: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => href?.includes("github.com/SolverForge")) || "",
+          casePage: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => /^\/use-cases\/[a-z-]+\/$/.test(href || "")) || "",
           space: slide.querySelector(".use-case-space-link")?.getAttribute("href") || "",
         })),
         selectors: selectors.map((selector) => selector.dataset.useCaseSelect),
@@ -336,7 +338,7 @@ async function checkUseCaseShowcase(origin) {
     if (!showcase) {
       failures.push({ path, issue: "missing use-case carousel" });
     } else {
-      if (showcase.slides.length !== 4) failures.push({ path, issue: "expected 4 slides", found: showcase.slides.length });
+      if (showcase.slides.length !== 8) failures.push({ path, issue: "expected 8 slides", found: showcase.slides.length });
       if (showcase.selectors.length !== showcase.slides.length) {
         failures.push({ path, issue: "selector count does not match slide count", selectors: showcase.selectors.length, slides: showcase.slides.length });
       }
@@ -347,20 +349,30 @@ async function checkUseCaseShowcase(origin) {
       for (const slide of showcase.slides) {
         if (slide.metrics !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 metrics", found: slide.metrics });
         if (slide.constraints !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 constraints", found: slide.constraints });
-        if (slide.screenshots !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 screenshots", found: slide.screenshots });
-        if (slide.annotated !== 12) failures.push({ path, slide: slide.id, issue: "expected 12 annotations", found: slide.annotated });
-        if (slide.badges !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 screenshot captions", found: slide.badges });
+        // Every case carries at least six annotated captures; a case may ship more.
+        if (slide.screenshots < 6) failures.push({ path, slide: slide.id, issue: "expected at least 6 screenshots", found: slide.screenshots });
+        if (slide.annotated !== slide.screenshots * 2) {
+          failures.push({ path, slide: slide.id, issue: "expected two annotations per capture", found: slide.annotated, screenshots: slide.screenshots });
+        }
+        if (slide.badges !== slide.screenshots) failures.push({ path, slide: slide.id, issue: "each capture needs its caption", found: slide.badges, screenshots: slide.screenshots });
         if (slide.calloutsOffFrame !== 0) failures.push({ path, slide: slide.id, issue: "annotations extend past their capture", found: slide.calloutsOffFrame });
         if (slide.videos.length !== 1) failures.push({ path, slide: slide.id, issue: "expected one runtime video", found: slide.videos.length });
         if (!slide.videos[0]?.poster) failures.push({ path, slide: slide.id, issue: "runtime video is missing its poster" });
         if (!slide.videos[0]?.src.includes(`/videos/use-cases/solverforge-${slide.id === "field-service" ? "fsr" : slide.id}-demo.mp4`)) {
           failures.push({ path, slide: slide.id, issue: "unexpected runtime video source", src: slide.videos[0]?.src });
         }
-        if (!slide.docs.startsWith("/docs/getting-started/")) failures.push({ path, slide: slide.id, issue: "missing docs link", docs: slide.docs });
+        // Each case links to its own page, generated from this same data file.
+        if (slide.casePage !== `/use-cases/${slide.id}/`) {
+          failures.push({ path, slide: slide.id, issue: "case page link does not match the case", casePage: slide.casePage });
+        }
         const hasSpace = slide.space.startsWith("https://huggingface.co/spaces/SolverForge/");
         // The Space badge is the page's discriminant, so it must track the link.
         if (hasSpace && slide.spaceRibbon !== 1) failures.push({ path, slide: slide.id, issue: "Space case without its badge", spaceRibbon: slide.spaceRibbon });
         if (!hasSpace && slide.spaceRibbon !== 0) failures.push({ path, slide: slide.id, issue: "badge without a Space link", spaceRibbon: slide.spaceRibbon, space: slide.space });
+        // A case with a written guide links it; a repository-only case must not.
+        const hasGuide = slide.docs.startsWith("/docs/getting-started/");
+        const hasRepo = slide.repo.startsWith("https://github.com/SolverForge/solverforge-usecases/");
+        if (!hasGuide && !hasRepo) failures.push({ path, slide: slide.id, issue: "case links neither a guide nor its app source", docs: slide.docs });
       }
 
       // Switching cases must move the selection, the visible slide, and the URL hash.
@@ -445,6 +457,105 @@ async function checkUseCaseShowcase(origin) {
   return failures;
 }
 
+// Each case also has its own page, generated from the same data file. It has to
+// carry that case's proof and its own viewer, and the home page has to reach it.
+async function checkUseCasePages(origin) {
+  const browser = await chromium.launch({
+    ...chromiumOptions(),
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1100 },
+  });
+  const page = await context.newPage();
+  const failures = [];
+
+  const cases = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew"];
+
+  try {
+    for (const caseId of cases) {
+      const response = await page.goto(`${origin}/use-cases/${caseId}/`, { waitUntil: "load" });
+      const status = response?.status() ?? 0;
+      if (status >= 400) {
+        failures.push({ path: `/use-cases/${caseId}/`, issue: "case page not served", status });
+        continue;
+      }
+
+      const detail = await page.evaluate(() => {
+        const root = document.querySelector(".use-case-detail");
+        if (!root) return null;
+        const callouts = [...root.querySelectorAll(".use-case-showcase__callout")];
+        return {
+          metrics: root.querySelectorAll(".use-case-proof__metric").length,
+          constraints: root.querySelectorAll(".use-case-proof__constraint").length,
+          screenshots: root.querySelectorAll(".use-case-showcase__item").length,
+          annotated: callouts.length,
+          offFrame: callouts.filter((callout) => {
+            const frame = callout.closest(".use-case-showcase__trigger").getBoundingClientRect();
+            const box = callout.getBoundingClientRect();
+            return box.right > frame.right + 2 || box.bottom > frame.bottom + 2;
+          }).length,
+          videos: root.querySelectorAll("video").length,
+          poster: Boolean(root.querySelector("video")?.getAttribute("poster")),
+          viewer: Boolean(document.querySelector("[data-use-case-lightbox-root]")),
+          otherCases: [...root.querySelectorAll(".use-case-detail__nav a")].length,
+          stylesheets: [...document.querySelectorAll('link[rel="stylesheet"]')].length,
+          heading: root.querySelector("h1")?.textContent?.trim() || "",
+        };
+      });
+
+      if (!detail) {
+        failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no detail shell" });
+        continue;
+      }
+      // A page rendered without the site layout carries no stylesheet at all.
+      if (detail.stylesheets === 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page loaded without the site stylesheet" });
+      if (detail.metrics !== 6) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected 6 metrics", found: detail.metrics });
+      if (detail.constraints !== 6) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected 6 constraints", found: detail.constraints });
+      if (detail.screenshots < 6) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected at least 6 screenshots", found: detail.screenshots });
+      if (detail.annotated !== detail.screenshots * 2) {
+        failures.push({ path: `/use-cases/${caseId}/`, issue: "expected two annotations per capture", found: detail.annotated, screenshots: detail.screenshots });
+      }
+      if (detail.offFrame !== 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "annotations extend past their capture", found: detail.offFrame });
+      if (detail.videos !== 1 || !detail.poster) failures.push({ path: `/use-cases/${caseId}/`, issue: "runtime walkthrough missing", videos: detail.videos, poster: detail.poster });
+      if (!detail.viewer) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no screenshot viewer" });
+      if (detail.otherCases !== 7) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected links to the other 7 cases", found: detail.otherCases });
+      if (detail.heading.length === 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no heading" });
+    }
+
+    // The viewer must work on a case page, not only in the carousel.
+    await page.goto(`${origin}/use-cases/furnace/`, { waitUntil: "load" });
+    const trigger = page.locator("[data-use-case-lightbox]").first();
+    const expectedCaption = await trigger.getAttribute("data-use-case-lightbox-caption");
+    await trigger.click();
+    const opened = await page.evaluate(() => {
+      const lightbox = document.querySelector("[data-use-case-lightbox-root]");
+      return {
+        hidden: lightbox.hidden,
+        src: lightbox.querySelector(".use-case-lightbox__image")?.getAttribute("src") || "",
+        caption: lightbox.querySelector(".use-case-lightbox__caption")?.textContent || "",
+      };
+    });
+    if (opened.hidden || !opened.src.includes("/images/use-cases/") || opened.caption !== expectedCaption) {
+      failures.push({ path: "/use-cases/furnace/", issue: "case page viewer did not open with the capture metadata", ...opened });
+    }
+    await page.keyboard.press("Escape");
+    const closed = await page.evaluate(() => document.querySelector("[data-use-case-lightbox-root]").hidden);
+    if (!closed) failures.push({ path: "/use-cases/furnace/", issue: "case page viewer did not close on Escape" });
+
+    // The home page has to reach the case pages, not only the carousel.
+    await page.goto(`${origin}/`, { waitUntil: "load" });
+    const homeLinks = await page.evaluate(() =>
+      [...document.querySelectorAll(".home-section a")].map((link) => link.getAttribute("href")).filter((href) => /^\/use-cases\/[a-z-]+\/$/.test(href || "")));
+    if (homeLinks.length !== 8) failures.push({ path: "/", issue: "home page does not link all 8 case pages", found: homeLinks.length });
+  } catch (error) {
+    failures.push({ path: "/use-cases/<id>/", issue: "case page check threw", error: String(error) });
+  }
+
+  await context.close();
+  await browser.close();
+  return failures;
+}
+
 async function checkDocsSidebarActive(origin) {
   const browser = await chromium.launch({
     ...chromiumOptions(),
@@ -502,11 +613,13 @@ const { server, origin } = await startServer();
 let layoutFailures = [];
 let docsSidebarActive = [];
 let useCaseShowcase = [];
+let useCasePages = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
   docsSidebarActive = await checkDocsSidebarActive(origin);
   useCaseShowcase = await checkUseCaseShowcase(origin);
+  useCasePages = await checkUseCasePages(origin);
 } finally {
   server.close();
 }
@@ -519,6 +632,7 @@ const summary = {
   docsIndexTargets,
   docsSidebarActive,
   useCaseShowcase,
+  useCasePages,
   layoutFailures,
 };
 
@@ -530,6 +644,7 @@ if (
   docsIndexTargets.length ||
   docsSidebarActive.length ||
   useCaseShowcase.length ||
+  useCasePages.length ||
   layoutFailures.length
 ) {
   process.exit(1);

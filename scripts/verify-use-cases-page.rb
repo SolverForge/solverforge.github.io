@@ -11,16 +11,23 @@ require "yaml"
 ROOT = File.expand_path("..", __dir__)
 
 DATA_PATH = "src/_data/use_cases.yml"
-EXPECTED_CASES = %w[hospital lessons deliveries field-service].freeze
+EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew].freeze
+# Cases with a written guide keep it; the repository-only cases ship the app
+# source instead, and every case has its own page generated from this file.
 EXPECTED_DOCS = {
   "hospital" => ["/docs/getting-started/solverforge-hospital-use-case/", "src/docs/getting-started/solverforge-hospital-use-case.md"],
   "lessons" => ["/docs/getting-started/solverforge-lessons-use-case/", "src/docs/getting-started/solverforge-lessons-use-case.md"],
   "deliveries" => ["/docs/getting-started/solverforge-deliveries-use-case/", "src/docs/getting-started/solverforge-deliveries-use-case.md"],
   "field-service" => ["/docs/getting-started/solverforge-fsr-use-case/", "src/docs/getting-started/solverforge-fsr-use-case.md"]
 }.freeze
+EXPECTED_SPACES = %w[hospital lessons deliveries field-service].freeze
+REPO_CASES = %w[furnace orders fleet flightcrew].freeze
+REPO_URL_PATTERN = %r{\Ahttps://github\.com/SolverForge/solverforge-usecases/tree/main/uc-[a-z]+\z}
 EXPECTED_METRICS = 6
 EXPECTED_CONSTRAINTS = 6
 MINIMUM_SCREENSHOTS = 6
+EXPECTED_PAGE_LAYOUT = "use_case"
+EXPECTED_GENERATOR = "plugins/use_case_page_generator.rb"
 
 def source_path(asset_url)
   File.join(ROOT, "src", asset_url.sub(%r{\A/}, ""))
@@ -41,7 +48,9 @@ failures << "#{DATA_PATH} must define an array of cases" unless cases.is_a?(Arra
 ids = cases.map { |use_case| use_case["id"] }
 failures << "#{DATA_PATH} cases #{ids.inspect} != #{EXPECTED_CASES.inspect}" unless ids == EXPECTED_CASES
 
-REQUIRED_TEXT_FIELDS = %w[id label eyebrow title intro docs_url space_url teaser_metric teaser_copy icon].freeze
+# Every case states what it is and what it looks like; the guide/Space/source
+# links are case-dependent and checked separately below.
+REQUIRED_TEXT_FIELDS = %w[id label eyebrow title intro teaser_metric teaser_copy icon].freeze
 
 cases.each do |use_case|
   id = use_case["id"] || "(missing id)"
@@ -67,13 +76,23 @@ cases.each do |use_case|
     failures << "#{id}: constraint #{name.to_s.inspect} is missing its description" if copy.to_s.strip.empty?
   end
 
-  docs_target = EXPECTED_DOCS[id]
-  failures << "#{id}: unexpected docs_url #{use_case['docs_url'].inspect}" unless docs_target && use_case["docs_url"] == docs_target[0]
-  failures << "#{id}: docs guide is missing at #{docs_target[1]}" unless docs_target && File.file?(File.join(ROOT, docs_target[1]))
+  if EXPECTED_DOCS.key?(id)
+    docs_target = EXPECTED_DOCS[id]
+    failures << "#{id}: unexpected docs_url #{use_case['docs_url'].inspect}" unless use_case["docs_url"] == docs_target[0]
+    failures << "#{id}: docs guide is missing at #{docs_target[1]}" unless File.file?(File.join(ROOT, docs_target[1]))
+  else
+    failures << "#{id}: unexpected docs_url #{use_case['docs_url'].inspect}" if use_case["docs_url"].to_s.strip.length.positive?
+  end
 
-  space_url = use_case["space_url"].to_s
-  unless space_url.start_with?("https://huggingface.co/spaces/SolverForge/solverforge-")
-    failures << "#{id}: space_url #{space_url.inspect} is not a SolverForge Hugging Face Space"
+  if EXPECTED_SPACES.include?(id)
+    space_url = use_case["space_url"].to_s
+    unless space_url.start_with?("https://huggingface.co/spaces/SolverForge/solverforge-")
+      failures << "#{id}: space_url #{space_url.inspect} is not a SolverForge Hugging Face Space"
+    end
+  else
+    failures << "#{id}: repository-only case must not claim a Space" if use_case["space_url"].to_s.strip.length.positive?
+    repo_url = use_case["repo_url"].to_s
+    failures << "#{id}: repo_url #{repo_url.inspect} is not this case's directory in solverforge-usecases" unless repo_url.match?(REPO_URL_PATTERN)
   end
 
   runtime = use_case["runtime"] || {}
@@ -118,14 +137,18 @@ cases.each do |use_case|
   end
 end
 
-# The page, the component, and the navigation must stay wired to the data file.
+# The page, the component, the navigation, and the per-case pages must stay
+# wired to the data file: the carousel and the individual pages read the same
+# source, so neither can drift from it.
 PAGE_WIRING = {
   "src/use-cases.md" => ["layout: use_cases", "UseCase::Showcase.new(cases: site.data.use_cases)"],
-  "src/_components/use_case/showcase.erb" => ["data-use-case-carousel", "data-use-case-lightbox-root", "use-case-showcase__callout"],
-  "frontend/styles/index.scss" => ["use-case-space-ribbon"],
+  "src/_components/use_case/showcase.erb" => ["data-use-case-carousel", "data-use-case-lightbox-root", "callout_class(callout)", "use_case[\"repo_url\"]"],
+  "frontend/styles/index.scss" => ["use-case-space-ribbon", "use-case-detail"],
   "src/_layouts/use_cases.erb" => ["page-shell--use-cases"],
   "src/_data/navigation.yml" => ["url: /use-cases/"],
-  "src/index.md" => ["site.data.use_cases"]
+  "src/index.md" => ["site.data.use_cases"],
+  EXPECTED_GENERATOR => ["Bridgetown::Generator", "use-cases/", "use_case"],
+  "src/_layouts/use_case.erb" => ["layout: default", "use-case-detail", "data-use-case-lightbox-root", "site.data.use_cases"]
 }.freeze
 
 PAGE_WIRING.each do |relative_path, needles|
