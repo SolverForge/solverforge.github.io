@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the checked-in SolverForge 0.19.4 use-case dependency shape
+- keep the checked-in SolverForge 0.19.7 use-case dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -118,17 +118,17 @@ surface, Docker build, and validation commands.
 
 ### Keep the Published Dependency Shape
 
-The tagged `solverforge-lessons@2.0.7` use-case source targets the published
-SolverForge 0.19.4 line:
+The tagged `solverforge-lessons@2.0.10` use-case source targets the published
+SolverForge 0.19.7 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.4", features = [
+solverforge = { version = "0.19.7", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = { version = "0.6.5" }
+solverforge-ui = { version = "0.9.0" }
 
 # Web server
 axum = "0.8.9"
@@ -148,8 +148,8 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.1.0` scaffolds `solverforge 0.19.5`; the finished Lessons app
-records an app-owned `solverforge 0.19.4` runtime target while retaining
+`solverforge-cli 3.2.0` scaffolds `solverforge 0.19.7`; the finished Lessons app
+records an app-owned `solverforge 0.19.7` runtime target while retaining
 its original `2.2.2` scaffold provenance:
 
 ```toml
@@ -160,9 +160,9 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.19.4"
-runtime_source = "crates.io: solverforge 0.19.4"
-ui_source = "crates.io: solverforge-ui 0.6.5"
+target = "solverforge 0.19.7"
+runtime_source = "crates.io: solverforge 0.19.7"
+ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
 default_size = "LARGE"
@@ -594,7 +594,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@2.0.7` |
+| Tagged app release | `solverforge-lessons@2.0.10` |
 | Local run | `make run-release` |
 | Standard validation | `make test` |
 | Full local validation | `make ci-local` |

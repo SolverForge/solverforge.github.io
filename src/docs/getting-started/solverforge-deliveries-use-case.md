@@ -135,19 +135,19 @@ delivery-routing code.
 
 Start from the CLI's current published scaffold line, then keep the finished
 app's recorded release contract explicit. `solverforge-cli 3.1.0` scaffolds
-`solverforge 0.19.5` with `solverforge-ui 0.9.0`; the tagged
-`solverforge-deliveries@2.0.7` reference app records an app-owned
-`solverforge 0.19.4` runtime while retaining the
-`solverforge-ui 0.6.5` and `solverforge-maps 2.1.4` companion lines:
+`solverforge 0.19.7` with `solverforge-ui 0.9.0`; the tagged
+`solverforge-deliveries@2.0.9` reference app records an app-owned
+`solverforge 0.19.7` runtime on the
+`solverforge-ui 0.9.0` and `solverforge-maps 2.1.4` companion lines:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.4", features = [
+solverforge = { version = "0.19.7", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.6.5"
+solverforge-ui = "0.9.0"
 solverforge-maps = "2.1.4"
 
 # Web server
@@ -181,9 +181,9 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.19.4"
-runtime_source = "crates.io: solverforge 0.19.4"
-ui_source = "crates.io: solverforge-ui 0.6.5"
+target = "solverforge 0.19.7"
+runtime_source = "crates.io: solverforge 0.19.7"
+ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
 default_size = "PHILADELPHIA"
@@ -410,7 +410,7 @@ pub struct Vehicle {
 }
 ```
 
-The CVRP domain profile is stock SolverForge 0.19.4. It expands to the
+The CVRP domain profile is stock SolverForge 0.19.7. It expands to the
 `VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
 assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
 metric class. The delivery app now keeps city-level routing preparation in the
@@ -772,7 +772,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@2.0.7`      |
+| Tagged app release               | `solverforge-deliveries@2.0.9`      |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |

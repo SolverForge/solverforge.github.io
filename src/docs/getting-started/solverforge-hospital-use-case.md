@@ -123,20 +123,20 @@ CLI scaffold plus manual hospital scheduling code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then keep the finished
-app's recorded release contract explicit. `solverforge-cli 3.1.0` scaffolds
-`solverforge 0.19.5` with `solverforge-ui 0.9.0`; the tagged
-`solverforge-hospital@2.0.7` reference app records an app-owned
-`solverforge 0.19.4` runtime while retaining
-`solverforge-ui 0.6.5` for the shipped web-shell assets:
+app's recorded release contract explicit. `solverforge-cli 3.2.0` scaffolds
+`solverforge 0.19.7` with `solverforge-ui 0.9.0`; the tagged
+`solverforge-hospital@2.0.8` reference app records an app-owned
+`solverforge 0.19.7` runtime on the
+`solverforge-ui 0.9.0` web-shell assets:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.4", features = [
+solverforge = { version = "0.19.7", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.6.5"
+solverforge-ui = "0.9.0"
 rand = "0.10.1"
 
 axum = "0.8.9"
@@ -166,9 +166,9 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.19.4"
-runtime_source = "crates.io: solverforge 0.19.4"
-ui_source = "crates.io: solverforge-ui 0.6.5"
+target = "solverforge 0.19.7"
+runtime_source = "crates.io: solverforge 0.19.7"
+ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
 default_size = "LARGE"
@@ -710,7 +710,7 @@ make test-slow
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
-| Tagged app release               | `solverforge-hospital@2.0.7`               |
+| Tagged app release               | `solverforge-hospital@2.0.8`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |
