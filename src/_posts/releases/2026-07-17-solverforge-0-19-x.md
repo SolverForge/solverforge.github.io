@@ -289,6 +289,8 @@ datasets, or solver policies.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.7` | 2026-09-25 | Owns every workspace version surface from the release tooling, so the workspace, crates, and tags are cut from one declaration. |
+| `0.19.6` | 2026-09-25 | Exposes the typed planning pin predicate, rejects scalar edits to pinned entities, preserves pinned list owners across construction and search, retains pinned assignments in exhaustive search, and skips pin scanning for models without pins. |
 | `0.19.5` | 2026-09-15 | Retains the complete solution on cancellation, initializes score history with a slice fill, and preserves complete Clarke-Wright construction. |
 | `0.19.4` | 2026-08-11 | Commits direct required assignments in the dense hard-first batch, defers augmenting rematches to a retaining cursor, and exposes the unified construction progress contract. |
 | `0.19.3` | 2026-07-29 | Restores shared assignment rotation. |

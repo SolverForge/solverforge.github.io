@@ -232,6 +232,9 @@ line. Their current boundaries are:
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.6.9` | 2026-09-29 | Aligns the exact SolverForge Rust crate set with 0.19.7 and embeds the `solverforge-ui 0.9.0` assets. |
+| `0.6.8` | 2026-09-29 | Moves the binding onto the SolverForge 0.19.7 runtime line. |
+| `0.6.7` | 2026-09-29 | Picks up the 0.19.7 construction and telemetry behavior for Python-authored models. |
 | `0.6.6` | 2026-08-11 | Aligns the exact SolverForge Rust crate set with 0.19.4, enforces imported row candidate sets across every native scalar mutation, and adds `same_value_conflict_field` for static assignment conflict graphs. |
 | `0.6.5` | 2026-07-29 | Consumes the SolverForge 0.19.3 shared-assignment rotation repair and pins Ruff to the lint contract. |
 | `0.6.4` | 2026-07-26 | Consumes the SolverForge 0.19.2 construction repair without changing the Python authoring surface. |
