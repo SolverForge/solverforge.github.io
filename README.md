@@ -74,6 +74,25 @@ and the portable tutorial verifiers.
 `make pre-release` first installs the published `solverforge-cli` release into
 `/tmp`, verifies the scaffold targets, and then delegates to the local CI gate.
 
+## Benchmark snapshot
+
+`/benchmarks/` renders a checked-in warehouse snapshot, grouped by problem. Refresh
+it with `python3 scripts/import-benchmarks.py` (requires `psql`; defaults to the
+local `solverforge_bench` database, or uses `BENCH_DATABASE_URL`). The importer uses
+one read-only transaction and **never runs benchmarks**. It selects the latest
+publishable full canonical nightly candidate run per problem, excluding quick,
+custom, partial, and publication-rejected runs.
+
+`src/_data/benchmarks.json` holds computed summaries; `src/benchmarks/results.json`
+is the downloadable evidence, including every selected result and tested solver
+version. Missing full runs are shown as unavailable, not replaced by smaller
+runs. Publication timestamps and versions describe the recorded runs, not current
+package releases. Normal builds and CI need no warehouse connection.
+
+`make verify-benchmarks` recomputes summaries from the evidence and checks full-run
+scope, versions, matrix completeness, and rejection of quick or partial data.
+This gate runs in `make test` and `make ci-local`.
+
 ## Lint follow-up
 
 The current `make lint` target is dependency-light and only performs Ruby and

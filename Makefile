@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial start clean version
+.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial start clean version
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -35,6 +35,7 @@ help:
 	@printf '  make lint                       Run Ruby and JavaScript syntax checks\n'
 	@printf '  make check-public-pages         Check public copy, internal links, nav, and layout\n'
 	@printf '  make verify-release-surface     Verify current package and app version contracts\n'
+	@printf '  make verify-benchmarks          Verify recorded full-run benchmark evidence\n'
 	@printf '  make verify-use-cases           Verify the use-case showcase content and assets\n'
 	@printf '  make verify-cli-release         Install the published CLI and verify scaffold targets\n'
 	@printf '  make verify-rust-snippets       Compile-check Rust snippets in docs\n'
@@ -78,7 +79,7 @@ build: frontend
 	$(call status,Building Bridgetown site)
 	@bundle exec bridgetown build
 
-test: frontend
+test: frontend verify-benchmarks
 	$(call status,Building Bridgetown site in test mode)
 	@BRIDGETOWN_ENV=test bundle exec rake test
 	$(call status,Verifying current release documentation contracts)
@@ -106,7 +107,7 @@ check-public-pages:
 	$(call status,Checking public page copy, links, nav, and layout)
 	@node scripts/check-public-pages.mjs
 
-ci-local: doctor lint verify-release-surface verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -118,6 +119,10 @@ verify-cli-release:
 verify-release-surface:
 	$(call status,Verifying current release documentation contracts)
 	@ruby scripts/verify-release-surface.rb
+
+verify-benchmarks:
+	$(call status,Verifying recorded full-run benchmark evidence)
+	@python3 scripts/verify-benchmarks.py
 
 verify-use-cases:
 	$(call status,Verifying the use-case showcase contract)
