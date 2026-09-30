@@ -35,6 +35,17 @@
     <% end %>
   </div>
 
+  <%
+    # Labels are placed as a set per capture, so two annotations in one frame are
+    # arranged against each other rather than in isolation.
+    placed_callouts = {}
+    cases.each do |use_case|
+      use_case.fetch("screenshots").each do |shot|
+        placed_callouts[shot.fetch("image")] = UseCaseCalloutLayout.number(shot.fetch("callouts"))
+      end
+    end
+  %>
+
   <div class="use-case-carousel__slides">
     <% cases.each_with_index do |use_case, index| %>
       <article
@@ -148,14 +159,26 @@
                       height="900"
                       loading="lazy"
                     />
-                    <% shot.fetch("callouts").each do |callout| %>
-                      <span class="<%= callout_class(callout) %>" style="<%= callout_style(callout) %>"><%= callout.fetch("text") %></span>
+                    <% placed_callouts.fetch(shot.fetch("image")).each do |callout| %>
+                      <span
+                        class="use-case-showcase__marker"
+                        style="<%= marker_style(callout) %>"
+                        aria-hidden="true"
+                      ><%= callout.fetch("marker") %></span>
                     <% end %>
                   </button>
                   <figcaption class="use-case-showcase__caption">
                     <span class="use-case-showcase__badge"><%= shot.fetch("badge") %></span>
                     <span><%= shot.fetch("caption") %></span>
                   </figcaption>
+                  <ol class="use-case-showcase__legend">
+                    <% placed_callouts.fetch(shot.fetch("image")).each do |callout| %>
+                      <li class="use-case-showcase__legend-item">
+                        <span class="use-case-showcase__legend-number" aria-hidden="true"><%= callout.fetch("marker") %></span>
+                        <span><%= callout.fetch("text") %></span>
+                      </li>
+                    <% end %>
+                  </ol>
                 </figure>
               <% end %>
             </div>
@@ -198,7 +221,11 @@
     <span aria-hidden="true">&times;</span>
   </button>
   <figure class="use-case-lightbox__figure">
-    <img class="use-case-lightbox__image" alt="" />
+    <div class="use-case-lightbox__frame">
+      <img class="use-case-lightbox__image" alt="" />
+      <div class="use-case-lightbox__markers" data-use-case-lightbox-markers aria-hidden="true"></div>
+    </div>
     <figcaption class="use-case-lightbox__caption"></figcaption>
+    <ol class="use-case-showcase__legend use-case-lightbox__legend" data-use-case-lightbox-legend hidden></ol>
   </figure>
 </div>

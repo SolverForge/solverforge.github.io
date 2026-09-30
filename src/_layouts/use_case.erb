@@ -2,6 +2,10 @@
 layout: default
 ---
 <% use_case = data.use_case %>
+<% placed_callouts = {} %>
+<% use_case.fetch("screenshots").each do |candidate| %>
+  <% placed_callouts[candidate.fetch("image")] = UseCaseCalloutLayout.number(candidate.fetch("callouts")) %>
+<% end %>
 <article class="page-shell page-shell--use-case use-case-detail">
   <header class="use-case-detail__hero">
     <div>
@@ -113,20 +117,28 @@ layout: default
                 height="900"
                 loading="lazy"
               />
-              <% shot.fetch("callouts").each do |callout| %>
-                <%# A callout is anchored by its dot; boxes in the right half grow
-                    leftward and boxes in the lower third grow upward, so an
-                    annotation near a frame edge cannot spill out of it. %>
+              <% placed_callouts.fetch(shot.fetch("image")).each do |callout| %>
+                <%# The marker sits exactly on the measured point; its number
+                    pairs it with the legend line below the capture. %>
                 <span
-                  class="use-case-showcase__callout<%= " use-case-showcase__callout--right" if callout.fetch("left").to_f > 50 %><%= " use-case-showcase__callout--low" if callout.fetch("top").to_f > 65 %>"
+                  class="use-case-showcase__marker"
                   style="--use-case-callout-top: <%= callout.fetch("top") %>%; --use-case-callout-left: <%= callout.fetch("left") %>%"
-                ><%= callout.fetch("text") %></span>
+                  aria-hidden="true"
+                ><%= callout.fetch("marker") %></span>
               <% end %>
             </button>
             <figcaption class="use-case-showcase__caption">
               <span class="use-case-showcase__badge"><%= shot.fetch("badge") %></span>
               <span><%= shot.fetch("caption") %></span>
             </figcaption>
+            <ol class="use-case-showcase__legend">
+              <% placed_callouts.fetch(shot.fetch("image")).each do |callout| %>
+                <li class="use-case-showcase__legend-item">
+                  <span class="use-case-showcase__legend-number" aria-hidden="true"><%= callout.fetch("marker") %></span>
+                  <span><%= callout.fetch("text") %></span>
+                </li>
+              <% end %>
+            </ol>
           </figure>
         <% end %>
       </div>
@@ -158,7 +170,11 @@ layout: default
     <span aria-hidden="true">&times;</span>
   </button>
   <figure class="use-case-lightbox__figure">
-    <img class="use-case-lightbox__image" alt="" />
+    <div class="use-case-lightbox__frame">
+      <img class="use-case-lightbox__image" alt="" />
+      <div class="use-case-lightbox__markers" data-use-case-lightbox-markers aria-hidden="true"></div>
+    </div>
     <figcaption class="use-case-lightbox__caption"></figcaption>
+    <ol class="use-case-showcase__legend use-case-lightbox__legend" data-use-case-lightbox-legend hidden></ol>
   </figure>
 </div>

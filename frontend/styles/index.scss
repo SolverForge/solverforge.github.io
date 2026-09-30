@@ -1525,66 +1525,64 @@ h3 {
   object-fit: cover;
 }
 
-/* The pin sits at the top-left of the box, so the annotation hangs below and to
-   the right of the interface element it describes. */
-.use-case-showcase__callout {
+/* An annotation marker: small enough to sit exactly on the measured point, so
+   the reader can always see which part of the interface the number names. */
+.use-case-showcase__marker {
   position: absolute;
   top: var(--use-case-callout-top);
   left: var(--use-case-callout-left);
-  z-index: 1;
-  max-width: 220px;
-  padding: 0.45rem 0.75rem;
-  border: 1px solid rgba(16, 185, 129, 0.4);
-  border-radius: 4px;
-  background: rgba(2, 6, 23, 0.8);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  color: #f8fafc;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 1px solid rgba(52, 211, 153, 0.9);
+  border-radius: 50%;
+  background: rgba(2, 6, 23, 0.85);
+  box-shadow: 0 0 0 2px rgba(2, 6, 23, 0.6), 0 0 10px rgba(52, 211, 153, 0.5);
+  color: #a7f3d0;
   font-family: "JetBrains Mono", monospace;
-  font-size: 0.7rem;
-  font-weight: 600;
-  line-height: 1.45;
-  text-align: left;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
   pointer-events: none;
 }
 
-.use-case-showcase__callout::before {
-  position: absolute;
-  top: -5px;
-  left: 16px;
-  content: "";
-  width: 8px;
-  height: 8px;
+/* The legend carries the annotation text below the capture at a readable size.
+   Nothing is positioned over the image, so nothing can overlap. */
+.use-case-showcase__legend {
+  margin: 0.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.use-case-showcase__legend-item {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: 0.5rem;
+  align-items: start;
+  color: var(--sf-text-muted);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+.use-case-showcase__legend-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid rgba(52, 211, 153, 0.55);
   border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 6px rgba(52, 211, 153, 0.6);
-}
-
-/* Right-half annotations grow leftward from their dot, so a box near the frame
-   edge stays inside it when the capture is displayed at half width. */
-.use-case-showcase__callout--right {
-  transform: translateX(-100%);
-  text-align: right;
-}
-
-.use-case-showcase__callout--right::before {
-  left: auto;
-  right: 16px;
-}
-
-/* Low annotations grow upward for the same reason: a box anchored at 82% of a
-   half-width frame has no room below it. */
-.use-case-showcase__callout--low {
-  transform: translateY(-100%);
-}
-
-.use-case-showcase__callout--low.use-case-showcase__callout--right {
-  transform: translate(-100%, -100%);
-}
-
-.use-case-showcase__callout--low::before {
-  top: auto;
-  bottom: -5px;
+  color: #6ee7b7;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .use-case-showcase__caption {
@@ -1620,7 +1618,43 @@ body.use-case-lightbox-open {
   align-items: center;
   justify-items: center;
   padding: clamp(1rem, 3vw, 2.5rem);
-  background: rgba(2, 6, 23, 0.88);
+  /* Fully opaque: any translucency lets the page text behind the viewer show
+     through and read as part of the legend. */
+  background: #020617;
+}
+
+/* The zoomed capture keeps its numbered markers, positioned against the image
+   itself so a marker cannot drift away from what it marks when the frame resizes. */
+.use-case-lightbox__frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  line-height: 0;
+}
+
+.use-case-lightbox__frame .use-case-lightbox__image {
+  grid-area: 1 / 1;
+}
+
+.use-case-lightbox__markers {
+  grid-area: 1 / 1;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.use-case-lightbox__markers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.use-case-lightbox__legend {
+  max-width: 60rem;
+  margin: 0.9rem auto 0;
+  text-align: left;
 }
 
 .use-case-lightbox__figure {
@@ -1629,6 +1663,7 @@ body.use-case-lightbox-open {
   width: min(94vw, 82rem);
   max-height: 92vh;
   margin: 0;
+  overflow-y: auto;
 }
 
 .use-case-lightbox__image {
