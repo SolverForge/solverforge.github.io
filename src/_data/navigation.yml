@@ -3,6 +3,8 @@ main:
     url: /docs/
   - title: Use cases
     url: /use-cases/
+  - title: Benchmarks
+    url: /benchmarks/
   - title: Blog
     url: /blog/
   - title: Reference
@@ -22,6 +24,8 @@ footer:
         url: /docs/
       - title: Use cases
         url: /use-cases/
+      - title: Benchmarks
+        url: /benchmarks/
       - title: Reference
         url: /reference/
       - title: Blog

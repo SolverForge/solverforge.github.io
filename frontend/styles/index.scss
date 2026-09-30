@@ -98,7 +98,7 @@ img {
 .site-header__inner {
   display: grid;
   align-items: center;
-  grid-template-columns: auto minmax(20rem, 1fr) auto;
+  grid-template-columns: auto minmax(12rem, 1fr) auto;
   gap: 1.25rem;
   min-height: 5.5rem;
 }
@@ -114,6 +114,10 @@ img {
   display: flex;
   justify-content: center;
   min-width: 0;
+}
+
+.site-brand {
+  min-width: 11rem;
 }
 
 .site-brand img {
@@ -143,7 +147,7 @@ img {
 .site-nav__link {
   display: inline-flex;
   align-items: center;
-  padding: 0.7rem 1rem;
+  padding: 0.7rem 0.5rem;
   border-radius: var(--sf-radius-sm);
   color: rgba(236, 253, 245, 0.85);
   text-decoration: none;
@@ -677,6 +681,40 @@ h3 {
   padding: 0.8rem;
   border-bottom: 1px solid var(--sf-border);
   text-align: left;
+}
+
+.benchmark-problem {
+  margin: 2.5rem 0;
+}
+
+.benchmark-problem details {
+  margin: 1rem 0;
+}
+
+.benchmark-problem summary {
+  color: var(--sf-accent-strong);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.benchmark-table {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.benchmark-table table {
+  display: table;
+}
+
+.benchmark-table small {
+  display: block;
+  color: var(--sf-text-soft);
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.benchmark-solverforge {
+  background: rgba(16, 185, 129, 0.08);
 }
 
 .prose blockquote {
@@ -1739,13 +1777,19 @@ body.use-case-lightbox-open {
 }
 
 @media (max-width: 1120px) {
+  .site-header__actions {
+    grid-column: 1 / -1;
+    justify-self: center;
+  }
+
   .site-header__inner {
-    grid-template-columns: auto minmax(11rem, 16rem) auto;
+    grid-template-columns: auto minmax(11rem, 1fr);
     gap: 0.9rem;
+    padding-block: 0.75rem;
   }
 
   .site-nav__link {
-    padding-inline: 0.72rem;
+    padding-inline: 0.5rem;
   }
 
   .site-search-trigger {
@@ -1878,6 +1922,8 @@ body.use-case-lightbox-open {
   }
 
   .site-header__actions {
+    grid-column: auto;
+    justify-self: end;
     gap: 0.5rem;
   }
 
