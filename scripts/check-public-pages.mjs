@@ -67,6 +67,10 @@ function contentType(path) {
       return "image/jpeg";
     case ".ico":
       return "image/x-icon";
+    case ".mp4":
+      return "video/mp4";
+    case ".webm":
+      return "video/webm";
     default:
       return "text/html";
   }
@@ -87,8 +91,26 @@ function startServer() {
       return;
     }
 
-    res.writeHead(200, { "content-type": contentType(normalized) });
-    res.end(readFileSync(normalized));
+    const body = readFileSync(normalized);
+    const type = contentType(normalized);
+    // Chromium fetches media with a Range request and will not settle a video
+    // element without a 206, so serve ranges the way a real host does.
+    const range = req.headers.range;
+    const match = range && /bytes=(\d+)-(\d*)/.exec(range);
+    if (match) {
+      const start = Number(match[1]);
+      const end = match[2] ? Number(match[2]) : body.length - 1;
+      res.writeHead(206, {
+        "content-type": type,
+        "content-range": `bytes ${start}-${end}/${body.length}`,
+        "accept-ranges": "bytes",
+      });
+      res.end(body.subarray(start, end + 1));
+      return;
+    }
+
+    res.writeHead(200, { "content-type": type, "accept-ranges": "bytes" });
+    res.end(body);
   });
 
   return new Promise((resolveServer) => {
@@ -420,11 +442,24 @@ async function checkUseCaseShowcase(origin) {
         const slides = [...carousel.querySelectorAll("[data-use-case-slide]")];
         const first = slides[0];
         const video = first.querySelector("video");
-        if (!video) return { skipped: true };
-        // Autoplay is muted so the check does not need user activation.
+        if (!video) return { skipped: true, reason: "no video" };
+        // Autoplay is muted so the check does not need user activation. `play()`
+        // is wrapped in a bounded race so a media element that cannot settle can
+        // never stall the gate. readiness is taken from readyState rather than a
+        // `loadeddata` listener, which can fire before this code runs.
         video.muted = true;
+        if (video.readyState < 2) {
+          const ready = await Promise.race([
+            new Promise((resolve) => video.addEventListener("loadeddata", () => resolve(true), { once: true })),
+            new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
+          ]);
+          if (!ready) return { skipped: true, reason: "media never became ready" };
+        }
         try {
-          await video.play();
+          await Promise.race([
+            video.play(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error("play() did not settle")), 8000)),
+          ]);
         } catch (error) {
           return { skipped: true, reason: String(error) };
         }
