@@ -15,10 +15,12 @@ description: >-
   </div>
   <p class="use-case-hero__summary">
     Every SolverForge use case is open source, so what marks a case here is
-    whether it exposes a Hugging Face Space you can open and drive in the browser.
-    Today all four do. Each one carries source-backed data, explicit constraints,
-    a retained-job workflow, a narrated runtime walkthrough, and annotated
-    screenshots of the same solve.
+    whether it ships a Hugging Face Space you can open and drive in the browser.
+    Four of the eight do, and a Space is a running service that may be stopped
+    between sessions, so the app source is the durable entry point either way.
+    Each case carries source-backed data, explicit constraints, a retained-job
+    workflow, a narrated runtime walkthrough, and annotated screenshots of the
+    same solve.
   </p>
 </section>
 

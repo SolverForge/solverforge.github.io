@@ -19,6 +19,9 @@ jobs:
   build:
     if: ${{ github.server_url == 'https://github.com' }}
     runs-on: ubuntu-latest
+    # A wedged step must fail the run, not sit on it. The default is six hours,
+    # which is how a hanging browser check burned a deploy instead of reporting.
+    timeout-minutes: 20
 
     steps:
       - uses: actions/checkout@v4
@@ -94,6 +97,7 @@ jobs:
     if: ${{ github.server_url == 'https://github.com' && github.event_name != 'pull_request' }}
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
