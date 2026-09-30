@@ -91,14 +91,39 @@ export const initializeUseCaseLightbox = () => {
 
   const image = lightbox.querySelector(".use-case-lightbox__image")
   const caption = lightbox.querySelector(".use-case-lightbox__caption")
+  const markers = lightbox.querySelector("[data-use-case-lightbox-markers]")
+  const legend = lightbox.querySelector("[data-use-case-lightbox-legend]")
   const closeButton = lightbox.querySelector("[data-use-case-lightbox-close]")
   let lastActiveElement = null
 
+  // The markers and legend are rebuilt from the trigger's own capture, so the
+  // zoomed view explains itself exactly as the page does. Showing the bare image
+  // here would strand the numbered markers with nothing to explain them.
   const open = trigger => {
     lastActiveElement = document.activeElement
     image.src = trigger.dataset.useCaseLightboxSrc || ""
     image.alt = trigger.dataset.useCaseLightboxAlt || ""
     caption.textContent = trigger.dataset.useCaseLightboxCaption || ""
+
+    const frame = trigger.closest(".use-case-showcase__item")
+    if (markers) {
+      markers.innerHTML = ""
+      frame.querySelectorAll(".use-case-showcase__marker").forEach(marker => {
+        const clone = document.createElement("span")
+        clone.className = "use-case-showcase__marker"
+        clone.setAttribute("style", marker.getAttribute("style") || "")
+        clone.textContent = marker.textContent
+        markers.append(clone)
+      })
+    }
+    if (legend) {
+      legend.innerHTML = ""
+      frame.querySelectorAll(".use-case-showcase__legend-item").forEach(item => {
+        legend.append(item.cloneNode(true))
+      })
+      legend.hidden = legend.children.length === 0
+    }
+
     lightbox.hidden = false
     document.body.classList.add("use-case-lightbox-open")
     closeButton.focus()
@@ -109,6 +134,8 @@ export const initializeUseCaseLightbox = () => {
     document.body.classList.remove("use-case-lightbox-open")
     image.removeAttribute("src")
     caption.textContent = ""
+    if (markers) markers.innerHTML = ""
+    if (legend) legend.innerHTML = ""
 
     if (lastActiveElement && typeof lastActiveElement.focus === "function") {
       lastActiveElement.focus()

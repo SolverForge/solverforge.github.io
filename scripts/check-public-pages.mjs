@@ -8,6 +8,10 @@ import {
 import { extname, join, dirname, normalize, relative, resolve } from "node:path";
 import { chromium } from "playwright";
 
+// Markers are small, but two can still land on the same interface element. An
+// overlap means the reader cannot tell which number names which region. This is
+// injected into the page, so it is written as a string rather than a closure.
+
 const outputDir = resolve("output");
 const stalePatterns = [
   /public surface/i,
@@ -335,12 +339,28 @@ async function checkUseCaseShowcase(origin) {
           metrics: slide.querySelectorAll(".use-case-proof__metric").length,
           constraints: slide.querySelectorAll(".use-case-proof__constraint").length,
           screenshots: slide.querySelectorAll(".use-case-showcase__item").length,
-          annotated: slide.querySelectorAll(".use-case-showcase__callout").length,
-          calloutsOffFrame: [...slide.querySelectorAll(".use-case-showcase__callout")].filter((callout) => {
-            const frame = callout.closest(".use-case-showcase__trigger").getBoundingClientRect();
-            const box = callout.getBoundingClientRect();
-            return box.right > frame.right + 2 || box.bottom > frame.bottom + 2;
+          annotated: slide.querySelectorAll(".use-case-showcase__marker").length,
+          calloutsOffFrame: [...slide.querySelectorAll(".use-case-showcase__marker")].filter((marker) => {
+            const frame = marker.closest(".use-case-showcase__trigger").getBoundingClientRect();
+            const box = marker.getBoundingClientRect();
+            return box.left < frame.left - 2 || box.right > frame.right + 2
+              || box.top < frame.top - 2 || box.bottom > frame.bottom + 2;
           }).length,
+          calloutLegend: slide.querySelectorAll(".use-case-showcase__legend-item").length,
+          calloutOverlaps: (() => {
+            let overlaps = 0;
+            for (const item of slide.querySelectorAll(".use-case-showcase__item")) {
+              const boxes = [...item.querySelectorAll(".use-case-showcase__marker")].map((m) => m.getBoundingClientRect());
+              for (let a = 0; a < boxes.length; a += 1) {
+                for (let b = a + 1; b < boxes.length; b += 1) {
+                  const x = Math.min(boxes[a].right, boxes[b].right) - Math.max(boxes[a].left, boxes[b].left);
+                  const y = Math.min(boxes[a].bottom, boxes[b].bottom) - Math.max(boxes[a].top, boxes[b].top);
+                  if (x > 1 && y > 1) overlaps += 1;
+                }
+              }
+            }
+            return overlaps;
+          })(),
           videos: [...slide.querySelectorAll("video")].map((video) => ({
             poster: Boolean(video.getAttribute("poster")),
             src: video.querySelector("source")?.getAttribute("src") || "",
@@ -378,6 +398,8 @@ async function checkUseCaseShowcase(origin) {
         }
         if (slide.badges !== slide.screenshots) failures.push({ path, slide: slide.id, issue: "each capture needs its caption", found: slide.badges, screenshots: slide.screenshots });
         if (slide.calloutsOffFrame !== 0) failures.push({ path, slide: slide.id, issue: "annotations extend past their capture", found: slide.calloutsOffFrame });
+        if (slide.calloutLegend !== slide.annotated) failures.push({ path, slide: slide.id, issue: "every marker needs a legend line", markers: slide.annotated, legend: slide.calloutLegend });
+        if (slide.calloutOverlaps !== 0) failures.push({ path, slide: slide.id, issue: "markers overlap, so a number cannot be matched to its region", found: slide.calloutOverlaps });
         if (slide.videos.length !== 1) failures.push({ path, slide: slide.id, issue: "expected one runtime video", found: slide.videos.length });
         if (!slide.videos[0]?.poster) failures.push({ path, slide: slide.id, issue: "runtime video is missing its poster" });
         if (!slide.videos[0]?.src.includes(`/videos/use-cases/solverforge-${slide.id === "field-service" ? "fsr" : slide.id}-demo.mp4`)) {
@@ -552,16 +574,36 @@ async function checkUseCasePages(origin) {
       const detail = await page.evaluate(() => {
         const root = document.querySelector(".use-case-detail");
         if (!root) return null;
-        const callouts = [...root.querySelectorAll(".use-case-showcase__callout")];
+        const callouts = [...root.querySelectorAll(".use-case-showcase__marker")];
         return {
           metrics: root.querySelectorAll(".use-case-proof__metric").length,
           constraints: root.querySelectorAll(".use-case-proof__constraint").length,
           screenshots: root.querySelectorAll(".use-case-showcase__item").length,
           annotated: callouts.length,
-          offFrame: callouts.filter((callout) => {
-            const frame = callout.closest(".use-case-showcase__trigger").getBoundingClientRect();
-            const box = callout.getBoundingClientRect();
-            return box.right > frame.right + 2 || box.bottom > frame.bottom + 2;
+          offFrame: callouts.filter((marker) => {
+            const frame = marker.closest(".use-case-showcase__trigger").getBoundingClientRect();
+            const box = marker.getBoundingClientRect();
+            return box.left < frame.left - 2 || box.right > frame.right + 2
+              || box.top < frame.top - 2 || box.bottom > frame.bottom + 2;
+          }).length,
+          markerOverlaps: (() => {
+            let overlaps = 0;
+            for (const item of root.querySelectorAll(".use-case-showcase__item")) {
+              const boxes = [...item.querySelectorAll(".use-case-showcase__marker")].map((m) => m.getBoundingClientRect());
+              for (let a = 0; a < boxes.length; a += 1) {
+                for (let b = a + 1; b < boxes.length; b += 1) {
+                  const x = Math.min(boxes[a].right, boxes[b].right) - Math.max(boxes[a].left, boxes[b].left);
+                  const y = Math.min(boxes[a].bottom, boxes[b].bottom) - Math.max(boxes[a].top, boxes[b].top);
+                  if (x > 1 && y > 1) overlaps += 1;
+                }
+              }
+            }
+            return overlaps;
+          })(),
+          legendMismatch: [...root.querySelectorAll(".use-case-showcase__item")].filter((item) => {
+            const markers = [...item.querySelectorAll(".use-case-showcase__marker")].map((m) => m.textContent.trim());
+            const legend = [...item.querySelectorAll(".use-case-showcase__legend-number")].map((n) => n.textContent.trim());
+            return JSON.stringify(markers) !== JSON.stringify(legend);
           }).length,
           videos: root.querySelectorAll("video").length,
           poster: Boolean(root.querySelector("video")?.getAttribute("poster")),
@@ -576,6 +618,44 @@ async function checkUseCasePages(origin) {
         failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no detail shell" });
         continue;
       }
+
+      // The zoomed viewer must explain itself the same way the page does. A
+      // bare image here would strand the numbered markers with no legend.
+      const lightboxState = await page.evaluate(() => {
+        const trigger = document.querySelector(".use-case-showcase__trigger");
+        if (!trigger) return null;
+        trigger.click();
+        const root = document.querySelector("[data-use-case-lightbox-root]");
+        if (!root || root.hidden) return { opened: false };
+        const frame = root.querySelector(".use-case-lightbox__frame")?.getBoundingClientRect();
+        const markers = [...root.querySelectorAll("[data-use-case-lightbox-markers] .use-case-showcase__marker")].map((marker) => {
+          const box = marker.getBoundingClientRect();
+          return {
+            number: marker.textContent.trim(),
+            x: frame ? ((box.left + box.width / 2 - frame.left) / frame.width) * 100 : -1,
+            y: frame ? ((box.top + box.height / 2 - frame.top) / frame.height) * 100 : -1,
+          };
+        });
+        const legend = [...root.querySelectorAll("[data-use-case-lightbox-legend] li .use-case-showcase__legend-number")].map((n) => n.textContent.trim());
+        // Markers must sit on the capture, not off its edges.
+        const strayed = markers.filter((marker) => marker.x < 0 || marker.x > 100 || marker.y < 0 || marker.y > 100).length;
+        return { opened: true, markers, legend, strayed };
+      });
+
+      if (lightboxState && lightboxState.opened) {
+        const numbers = lightboxState.markers.map((marker) => marker.number);
+        if (JSON.stringify(numbers) !== JSON.stringify(lightboxState.legend)) {
+          failures.push({ path: `/use-cases/${caseId}/`, issue: "zoomed view markers do not match its legend", markers: numbers, legend: lightboxState.legend });
+        }
+        if (lightboxState.strayed !== 0) {
+          failures.push({ path: `/use-cases/${caseId}/`, issue: "zoomed view markers sit outside the capture", found: lightboxState.strayed });
+        }
+        if (lightboxState.markers.length === 0) {
+          failures.push({ path: `/use-cases/${caseId}/`, issue: "zoomed view lost the capture annotations" });
+        }
+      } else if (lightboxState && !lightboxState.opened) {
+        failures.push({ path: `/use-cases/${caseId}/`, issue: "screenshot viewer did not open" });
+      }
       // A page rendered without the site layout carries no stylesheet at all.
       if (detail.stylesheets === 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page loaded without the site stylesheet" });
       if (detail.metrics !== 6) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected 6 metrics", found: detail.metrics });
@@ -585,6 +665,8 @@ async function checkUseCasePages(origin) {
         failures.push({ path: `/use-cases/${caseId}/`, issue: "expected two annotations per capture", found: detail.annotated, screenshots: detail.screenshots });
       }
       if (detail.offFrame !== 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "annotations extend past their capture", found: detail.offFrame });
+      if (detail.markerOverlaps !== 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "markers overlap, so a number cannot be matched to its region", found: detail.markerOverlaps });
+      if (detail.legendMismatch !== 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "marker numbers do not match their legend lines", found: detail.legendMismatch });
       if (detail.videos !== 1 || !detail.poster) failures.push({ path: `/use-cases/${caseId}/`, issue: "runtime walkthrough missing", videos: detail.videos, poster: detail.poster });
       if (!detail.viewer) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no screenshot viewer" });
       if (detail.otherCases !== 7) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected links to the other 7 cases", found: detail.otherCases });

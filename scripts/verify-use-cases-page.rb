@@ -142,7 +142,7 @@ end
 # source, so neither can drift from it.
 PAGE_WIRING = {
   "src/use-cases.md" => ["layout: use_cases", "UseCase::Showcase.new(cases: site.data.use_cases)"],
-  "src/_components/use_case/showcase.erb" => ["data-use-case-carousel", "data-use-case-lightbox-root", "callout_class(callout)", "use_case[\"repo_url\"]"],
+  "src/_components/use_case/showcase.erb" => ["data-use-case-carousel", "data-use-case-lightbox-root", "marker_style(callout)", "use-case-showcase__legend-item", "use_case[\"repo_url\"]"],
   "frontend/styles/index.scss" => ["use-case-space-ribbon", "use-case-detail"],
   "src/_layouts/use_cases.erb" => ["page-shell--use-cases"],
   "src/_data/navigation.yml" => ["url: /use-cases/"],
