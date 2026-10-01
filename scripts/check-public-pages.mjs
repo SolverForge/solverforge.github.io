@@ -842,15 +842,36 @@ async function checkBenchmarksPage(origin) {
           issue: `${problem.benchmark_name} states no reference provenance`,
         });
       } else {
-        if (problem.reference_present) {
+        if (problem.reference_present && problem.reference_covers_run) {
+          if (!coverageText.includes(`all ${problem.instances} instances`)) {
+            failures.push({
+              path: "/benchmarks/",
+              issue: `${problem.benchmark_name} reference coverage disagrees with the catalog`,
+              found: coverageText.slice(0, 140),
+              expected: `all ${problem.instances} instances`,
+            });
+          }
+        } else if (problem.reference_present) {
+          // The catalog covers instances this run did not grade, so the page must
+          // say the run's instances are outside the published set rather than
+          // implying the gap was measured against something.
           if (!coverageText.includes(`${problem.reference_instances} of ${problem.instances}`)) {
             failures.push({
               path: "/benchmarks/",
               issue: `${problem.benchmark_name} reference coverage disagrees with the catalog`,
-              found: coverageText.slice(0, 120),
+              found: coverageText.slice(0, 140),
               expected: `${problem.reference_instances} of ${problem.instances}`,
             });
           }
+          if (!/not in this set|not these|outside the published/i.test(coverageText)) {
+            failures.push({
+              path: "/benchmarks/",
+              issue: `${problem.benchmark_name} does not say the run's instances are outside the published reference set`,
+              found: coverageText.slice(0, 140),
+            });
+          }
+        }
+        if (problem.reference_present) {
           for (const source of problem.reference_sources) {
             if (!coverageText.includes(source.name)) {
               failures.push({
@@ -868,14 +889,14 @@ async function checkBenchmarksPage(origin) {
             failures.push({
               path: "/benchmarks/",
               issue: `${problem.benchmark_name} presents best known bounds without saying they are not optima`,
-              found: coverageText.slice(0, 120),
+              found: coverageText.slice(0, 140),
             });
           }
         } else if (!/no published reference/i.test(coverageText)) {
           failures.push({
             path: "/benchmarks/",
             issue: `${problem.benchmark_name} has no references but does not say so`,
-            found: coverageText.slice(0, 120),
+            found: coverageText.slice(0, 140),
           });
         }
       }

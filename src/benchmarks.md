@@ -25,8 +25,13 @@ a solver that solved them all. Different problems are not combined into one scor
   </p>
   <% if problem.fetch('reference_present') %>
     <p class="benchmark-references">
-      Reference values for <strong><%= problem.fetch('reference_instances') %></strong> of
-      <%= problem.fetch('instances') %> instances, from
+      <% if problem.fetch('reference_covers_run') %>
+        Reference values for all <strong><%= problem.fetch('instances') %></strong> instances, from
+      <% else %>
+        Reference values for <strong><%= problem.fetch('reference_instances') %></strong> of
+        <%= problem.fetch('instances') %> instances — the run's instances are not in this set, so
+        their mean gap is not shown. The values come from
+      <% end %>
       <% problem.fetch('reference_sources').each_with_index do |source, index| %><%= ', ' if index > 0 %><%= source.fetch('name') %><% end %>:
       <% if problem.fetch('reference_kinds').include?('known_optimum') && problem.fetch('reference_kinds').include?('best_known_upper_bound') %>
         proven optima where the source closed the instance, best known bounds otherwise.

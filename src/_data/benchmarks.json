@@ -375,6 +375,8 @@
       ],
       "reference_present": true,
       "reference_instances": 100,
+      "reference_covered_run_instances": 100,
+      "reference_covers_run": true,
       "reference_kinds": [
         "best_known_upper_bound",
         "known_optimum"
@@ -587,6 +589,8 @@
       ],
       "reference_present": true,
       "reference_instances": 9,
+      "reference_covered_run_instances": 0,
+      "reference_covers_run": false,
       "reference_kinds": [
         "best_known_upper_bound"
       ],
@@ -798,6 +802,8 @@
       ],
       "reference_present": true,
       "reference_instances": 162,
+      "reference_covered_run_instances": 162,
+      "reference_covers_run": true,
       "reference_kinds": [
         "best_known_upper_bound",
         "known_optimum"

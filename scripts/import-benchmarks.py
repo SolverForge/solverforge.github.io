@@ -101,14 +101,21 @@ def summarize(snapshot):
                               if r['benchmark_name'] == name]
         kinds = sorted({r['reference_kind'] for r in problem_references})
         sources = sorted({(r['source_name'], r['source_revision']) for r in problem_references})
+        # Coverage is stated about the instances this run actually graded, so a
+        # problem whose catalog covers instances the run does not select says so
+        # instead of implying the gap was measured against a missing value.
+        run_instances = {r['instance'] for r in rows}
+        covered_run_instances = {r['instance'] for r in problem_references} & run_instances
         problems.append(dict(
             **run, title=title, description=description,
-            instances=len({r['instance'] for r in rows}),
+            instances=len(run_instances),
             datasets=sorted({r['dataset'] for r in rows}),
             dataset_sets=sorted({r['dataset_set'] for r in rows}),
             summaries=summaries,
             reference_present=bool(problem_references),
             reference_instances=len({r['instance'] for r in problem_references}),
+            reference_covered_run_instances=len(covered_run_instances),
+            reference_covers_run=bool(run_instances) and covered_run_instances == run_instances,
             reference_kinds=kinds,
             reference_sources=[dict(name=s[0], revision=s[1]) for s in sources],
         ))
