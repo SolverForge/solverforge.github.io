@@ -16,6 +16,36 @@ importer = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(importer)
 
 
+TOLERANCE = 1e-9
+
+
+def assert_summaries_equivalent(case, recomputed, stored, path=''):
+    """Compare two summaries, allowing last-bit float noise but nothing else.
+
+    Returns the count of numeric leaves compared, so a caller can assert the
+    comparison actually walked the document instead of two empty structures.
+    """
+    compared = 0
+    if isinstance(recomputed, dict) and isinstance(stored, dict):
+        case.assertEqual(sorted(recomputed.keys()), sorted(stored.keys()), f'{path}: key sets differ')
+        for key in recomputed:
+            compared += assert_summaries_equivalent(case, recomputed[key], stored[key], f'{path}.{key}')
+    elif isinstance(recomputed, list) and isinstance(stored, list):
+        case.assertEqual(len(recomputed), len(stored), f'{path}: lengths differ')
+        for index, (left, right) in enumerate(zip(recomputed, stored)):
+            compared += assert_summaries_equivalent(case, left, right, f'{path}[{index}]')
+    elif isinstance(recomputed, bool) or isinstance(stored, bool):
+        case.assertEqual(recomputed, stored, f'{path}: boolean differs')
+        compared += 1
+    elif isinstance(recomputed, (int, float)) and isinstance(stored, (int, float)):
+        case.assertAlmostEqual(recomputed, stored, delta=TOLERANCE, msg=f'{path}: value differs')
+        compared += 1
+    else:
+        case.assertEqual(recomputed, stored, f'{path}: value differs')
+        compared += 1
+    return compared
+
+
 class BenchmarkSnapshotTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -23,7 +53,13 @@ class BenchmarkSnapshotTest(unittest.TestCase):
         cls.summary = json.loads((ROOT / 'src/_data/benchmarks.json').read_text())
 
     def test_summary_matches_recorded_evidence(self):
-        self.assertEqual(importer.summarize(self.snapshot), self.summary)
+        # Recomputed means are compared with a tolerance, not for equality.
+        # Floating-point summation is not bit-reproducible across interpreter
+        # builds, and this gate runs on whatever python the CI runner happens to
+        # ship while the snapshot was generated on another, so an exact compare
+        # fails on the interpreter rather than on the evidence. The tolerance is
+        # far below any published precision: the page renders two decimals.
+        assert_summaries_equivalent(self, importer.summarize(self.snapshot), self.summary)
 
     def test_versions_are_present(self):
         for row in self.snapshot['results']:
@@ -74,7 +110,41 @@ class BenchmarkSnapshotTest(unittest.TestCase):
         changed = deepcopy(self.snapshot)
         row = next(r for r in changed['results'] if r['hard_feasible'] is False)
         row['quality_ratio'] = 999999
-        self.assertEqual(importer.summarize(changed), self.summary)
+        assert_summaries_equivalent(self, importer.summarize(changed), self.summary)
+
+    def test_comparison_walks_the_whole_summary(self):
+        """A comparison that silently walks nothing would pass on any evidence."""
+        compared = assert_summaries_equivalent(self, importer.summarize(self.snapshot), self.summary)
+        self.assertGreater(compared, 100, 'summary comparison saw almost no values')
+
+    def test_numeric_drift_beyond_tolerance_is_rejected(self):
+        changed = deepcopy(self.summary)
+        changed['problems'][0]['summaries'][0]['gap_percent'] += 1e-4
+        with self.assertRaises(AssertionError):
+            assert_summaries_equivalent(self, importer.summarize(self.snapshot), changed)
+
+    def test_recorded_drift_is_only_floating_point_noise(self):
+        """The stored snapshot must be a recomputation, not a different run."""
+        recomputed = importer.summarize(self.snapshot)
+
+        def numeric_leaves(left, right, path=''):
+            if isinstance(left, dict):
+                for key in left:
+                    yield from numeric_leaves(left[key], right[key], f'{path}.{key}')
+            elif isinstance(left, list):
+                for index, (a, b) in enumerate(zip(left, right)):
+                    yield from numeric_leaves(a, b, f'{path}[{index}]')
+            elif isinstance(left, (int, float)) and not isinstance(left, bool):
+                yield path, left, right
+
+        worst_path, worst_relative = '', 0.0
+        for path, left, right in numeric_leaves(recomputed, self.summary):
+            relative = abs(left - right) / max(abs(left), 1.0)
+            if relative > worst_relative:
+                worst_path, worst_relative = path, relative
+        # Anything above float summation noise means the evidence was swapped,
+        # not recomputed on another interpreter.
+        self.assertLess(worst_relative, 1e-12, f'numeric drift at {worst_path} is {worst_relative}')
 
 
 if __name__ == '__main__':
