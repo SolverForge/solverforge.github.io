@@ -776,9 +776,29 @@ async function checkBenchmarksPage(origin) {
 
   try {
     await page.goto(`${origin}/benchmarks/`, { waitUntil: "load" });
-    // Measuring bar widths reads layout, so the layout has to exist first: with
-    // three panels per problem the rows are narrower, and a read taken before
-    // the browser has laid them out reports every bar as zero-width.
+    // Every budget readout must remain readable without ellipsis or clipping.
+    for (const width of [1440, 1024, 390]) {
+      await page.setViewportSize({ width, height: 1100 });
+      const readouts = await page.evaluate(() => {
+        const rows = [...document.querySelectorAll(".benchmark-chart__row")];
+        return {
+          rows: rows.length,
+          invalid: rows.filter((row) => {
+            const tracks = row.querySelectorAll(".benchmark-chart__track");
+            const values = [...row.querySelectorAll(".benchmark-chart__value > span")];
+            return values.length !== tracks.length || values.some((value) =>
+              value.scrollWidth > value.clientWidth + 1 ||
+              !/^\d+s\s/.test(value.textContent.trim())
+            );
+          }).length,
+        };
+      });
+      if (!readouts.rows || readouts.invalid) {
+        failures.push({ path: "/benchmarks/", width, issue: "chart budget values are clipped or unlabelled", ...readouts });
+      }
+    }
+    await page.setViewportSize({ width: 1440, height: 1100 });
+    // Measuring bar widths requires the browser to finish laying out the page.
     await page.waitForFunction(
       () => {
         const panels = document.querySelectorAll("figure.benchmark-chart");

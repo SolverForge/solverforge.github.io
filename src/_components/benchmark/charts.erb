@@ -41,7 +41,12 @@
                 </span>
               <% end %>
             </span>
-            <span class="benchmark-chart__value"><%= budgets.map { |budget| summary(budget, solver) ? "#{summary(budget, solver).fetch('feasible')}/#{summary(budget, solver).fetch('total')}" : "—" }.join(" · ") %></span>
+            <span class="benchmark-chart__value">
+              <% budgets.each do |budget| %>
+                <% row = summary(budget, solver) %>
+                <span><small><%= budget %>s</small> <%= row ? "#{row.fetch('feasible')}/#{row.fetch('total')}" : "—" %></span>
+              <% end %>
+            </span>
           </li>
         <% end %>
       </ol>
@@ -92,7 +97,12 @@
                 </span>
               <% end %>
             </span>
-            <span class="benchmark-chart__value"><%= budgets.map { |budget| (row = summary(budget, solver)) && row['mean_feasible_seconds'] ? format('%.2f s', row['mean_feasible_seconds']) : "—" }.join(" · ") %></span>
+            <span class="benchmark-chart__value">
+              <% budgets.each do |budget| %>
+                <% row = summary(budget, solver) %>
+                <span><small><%= budget %>s</small> <%= row && row['mean_feasible_seconds'] ? format('%.2f s', row['mean_feasible_seconds']) : "—" %></span>
+              <% end %>
+            </span>
           </li>
         <% end %>
       </ol>
@@ -145,7 +155,12 @@
                 </span>
               <% end %>
             </span>
-            <span class="benchmark-chart__value"><%= budgets.map { |budget| (row = summary(budget, solver)) && row['gap_percent'] ? format('%.2f%%', row['gap_percent']) : "—" }.join(" · ") %></span>
+            <span class="benchmark-chart__value">
+              <% budgets.each do |budget| %>
+                <% row = summary(budget, solver) %>
+                <span><small><%= budget %>s</small> <%= row && row['gap_percent'] ? format('%.2f%%', row['gap_percent']) : "—" %></span>
+              <% end %>
+            </span>
           </li>
         <% end %>
       </ol>

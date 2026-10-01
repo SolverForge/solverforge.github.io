@@ -1,26 +1,17 @@
 ---
 title: Benchmarks
 eyebrow: Measured performance
+page_class: benchmarks-page
 description: Latest full benchmark results from solverforge-bench, grouped by problem and labeled with the versions actually tested.
 ---
 
-These are the latest publishable **full canonical runs** recorded in our benchmark
-warehouse, not new measurements of the current release. Each problem uses its own
-latest completed nightly candidate run. Quick runs and partial runs are excluded.
+Latest completed **full canonical nightly runs**, with the versions actually tested.
+Quick and partial runs are excluded; these are not measurements of newer releases.
 
-Results are presented in the order they are ranked by, and each step only ranks
-solvers that cleared the one before it:
-
-1. **Feasibility** — did the solver return a hard-feasible answer at all.
-2. **Time to a viable solution** — how quickly it returned one, measured over
-   the invocations that did. A solver that never delivers has no time to show.
-3. **Solution quality** — the mean gap to the reference, calculated only for
-   feasible results with a reference cost: **0% matches the reference; lower is
-   better**.
-
-Feasibility comes first because an average over fewer successful instances is not
-a win over a solver that solved them all. Different problems are not combined
-into one score.
+**Ranking:** feasibility → time to a viable solution → solution quality.
+Each priority breaks ties in the one before it. Time averages only feasible results;
+quality averages only feasible results with a reference. **0% gap matches the reference.**
+Problems are ranked separately.
 
 <% site.data.benchmarks.problems.each do |problem| %>
 <section class="benchmark-problem" id="<%= problem.fetch('benchmark_name') %>">
