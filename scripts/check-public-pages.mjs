@@ -1008,6 +1008,69 @@ async function checkBenchmarksPage(origin) {
   return failures;
 }
 
+async function checkBenchmarksDocs(origin) {
+  // The docs page is where a reader learns what a published gap was measured
+  // against. It must carry the reference mechanism and the per-problem coverage,
+  // and it must name the gate that keeps a hand-edited value from shipping.
+  const browser = await chromium.launch({
+    ...chromiumOptions(),
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1100 },
+  });
+  const page = await context.newPage();
+  const failures = [];
+  const path = "/docs/solverforge-bench/";
+
+  try {
+    const response = await page.goto(`${origin}${path}`, { waitUntil: "load" });
+    if (!response || response.status() !== 200) {
+      failures.push({ path, issue: "docs page not served", status: response?.status() });
+    }
+    const rendered = await page.evaluate(() => ({
+      stylesheets: [...document.querySelectorAll('link[rel="stylesheet"]')].length,
+      text: document.body.innerText.replace(/\s+/g, " "),
+    }));
+
+    if (rendered.stylesheets === 0) {
+      failures.push({ path, issue: "docs page loaded without the site stylesheet" });
+    }
+    for (const required of [
+      "Official References",
+      "make verify-reference-catalogs",
+      "make load-reference-catalogs",
+      "benchmark_reference_resolved",
+      "proven optimum",
+      "best known upper bound",
+    ]) {
+      if (!rendered.text.includes(required)) {
+        failures.push({ path, issue: `docs page does not state the reference mechanism`, missing: required });
+      }
+    }
+    // Coverage per problem must appear, and must match the imported catalogs.
+    const data = JSON.parse(readFileSync(benchmarksDataPath, "utf8"));
+    for (const problem of data.problems) {
+      const expected =
+        problem.reference_covers_run
+          ? `${problem.instances} of ${problem.instances}`
+          : `${problem.reference_instances} of ${problem.instances}`;
+      if (!rendered.text.includes(expected)) {
+        failures.push({
+          path,
+          issue: `docs page does not state ${problem.benchmark_name} reference coverage`,
+          expected,
+        });
+      }
+    }
+  } catch (error) {
+    failures.push({ path, issue: "benchmarks docs check threw", error: String(error) });
+  }
+
+  await context.close();
+  await browser.close();
+  return failures;
+}
+
 async function checkDocsSidebarActive(origin) {
   const browser = await chromium.launch({
     ...chromiumOptions(),
@@ -1067,6 +1130,7 @@ let docsSidebarActive = [];
 let useCaseShowcase = [];
 let useCasePages = [];
 let benchmarksPage = [];
+let benchmarksDocs = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
@@ -1074,6 +1138,7 @@ try {
   useCaseShowcase = await checkUseCaseShowcase(origin);
   useCasePages = await checkUseCasePages(origin);
   benchmarksPage = await checkBenchmarksPage(origin);
+  benchmarksDocs = await checkBenchmarksDocs(origin);
 } finally {
   server.close();
 }
@@ -1088,6 +1153,7 @@ const summary = {
   useCaseShowcase,
   useCasePages,
   benchmarksPage,
+  benchmarksDocs,
   layoutFailures,
 };
 
@@ -1101,6 +1167,7 @@ if (
   useCaseShowcase.length ||
   useCasePages.length ||
   benchmarksPage.length ||
+  benchmarksDocs.length ||
   layoutFailures.length
 ) {
   process.exit(1);
