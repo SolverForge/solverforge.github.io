@@ -372,6 +372,18 @@
           "errors": 0,
           "over_budget": 0
         }
+      ],
+      "reference_present": true,
+      "reference_instances": 100,
+      "reference_kinds": [
+        "best_known_upper_bound",
+        "known_optimum"
+      ],
+      "reference_sources": [
+        {
+          "name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+          "revision": "cvrplib-set-x-live-2026-10-01"
+        }
       ]
     },
     {
@@ -572,6 +584,17 @@
           "errors": 0,
           "over_budget": 0
         }
+      ],
+      "reference_present": true,
+      "reference_instances": 9,
+      "reference_kinds": [
+        "best_known_upper_bound"
+      ],
+      "reference_sources": [
+        {
+          "name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+          "revision": "inrc2-official-test-dataset-2014"
+        }
       ]
     },
     {
@@ -626,7 +649,7 @@
           "feasible": 135,
           "quality_samples": 135,
           "cost_samples": 135,
-          "gap_percent": 15.312378034285423,
+          "gap_percent": 15.312378034285402,
           "mean_cost": 2260.837037037037,
           "mean_seconds": 1.060427503752124,
           "errors": 27,
@@ -771,6 +794,18 @@
           "mean_seconds": 60.89443179541307,
           "errors": 0,
           "over_budget": 0
+        }
+      ],
+      "reference_present": true,
+      "reference_instances": 162,
+      "reference_kinds": [
+        "best_known_upper_bound",
+        "known_optimum"
+      ],
+      "reference_sources": [
+        {
+          "name": "ScheduleOpt/benchmarks",
+          "revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
         }
       ]
     }

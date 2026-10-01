@@ -87335,5 +87335,2446 @@
       "watchdog_killed": false,
       "error": false
     }
+  ],
+  "references": [
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n1001-k43",
+      "reference_cost": 72346,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n101-k25",
+      "reference_cost": 27591,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n106-k14",
+      "reference_cost": 26362,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n110-k13",
+      "reference_cost": 14971,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n115-k10",
+      "reference_cost": 12747,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n120-k6",
+      "reference_cost": 13332,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n125-k30",
+      "reference_cost": 55539,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n129-k18",
+      "reference_cost": 28940,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n134-k13",
+      "reference_cost": 10916,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n139-k10",
+      "reference_cost": 13590,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n143-k7",
+      "reference_cost": 15700,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n148-k46",
+      "reference_cost": 43448,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n153-k22",
+      "reference_cost": 21220,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n157-k13",
+      "reference_cost": 16876,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n162-k11",
+      "reference_cost": 14138,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n167-k10",
+      "reference_cost": 20557,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n172-k51",
+      "reference_cost": 45607,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n176-k26",
+      "reference_cost": 47812,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n181-k23",
+      "reference_cost": 25569,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n186-k15",
+      "reference_cost": 24145,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n190-k8",
+      "reference_cost": 16980,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n195-k51",
+      "reference_cost": 44225,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n200-k36",
+      "reference_cost": 58578,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n204-k19",
+      "reference_cost": 19565,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n209-k16",
+      "reference_cost": 30656,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n214-k11",
+      "reference_cost": 10856,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n219-k73",
+      "reference_cost": 117595,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n223-k34",
+      "reference_cost": 40437,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n228-k23",
+      "reference_cost": 25742,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n233-k16",
+      "reference_cost": 19230,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n237-k14",
+      "reference_cost": 27042,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n242-k48",
+      "reference_cost": 82751,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n247-k50",
+      "reference_cost": 37274,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n251-k28",
+      "reference_cost": 38684,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n256-k16",
+      "reference_cost": 18839,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n261-k13",
+      "reference_cost": 26558,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n266-k58",
+      "reference_cost": 75478,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n270-k35",
+      "reference_cost": 35291,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n275-k28",
+      "reference_cost": 21245,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n280-k17",
+      "reference_cost": 33503,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n284-k15",
+      "reference_cost": 20215,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n289-k60",
+      "reference_cost": 95151,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n294-k50",
+      "reference_cost": 47161,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n298-k31",
+      "reference_cost": 34231,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n303-k21",
+      "reference_cost": 21736,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n308-k13",
+      "reference_cost": 25859,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n313-k71",
+      "reference_cost": 94043,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n317-k53",
+      "reference_cost": 78355,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n322-k28",
+      "reference_cost": 29834,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n327-k20",
+      "reference_cost": 27532,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n331-k15",
+      "reference_cost": 31102,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n336-k84",
+      "reference_cost": 139111,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n344-k43",
+      "reference_cost": 42050,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n351-k40",
+      "reference_cost": 25896,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n359-k29",
+      "reference_cost": 51505,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n367-k17",
+      "reference_cost": 22814,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n376-k94",
+      "reference_cost": 147713,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n384-k52",
+      "reference_cost": 65928,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n393-k38",
+      "reference_cost": 38260,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n401-k29",
+      "reference_cost": 66154,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n411-k19",
+      "reference_cost": 19712,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n420-k130",
+      "reference_cost": 107798,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n429-k61",
+      "reference_cost": 65449,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n439-k37",
+      "reference_cost": 36391,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n449-k29",
+      "reference_cost": 55233,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n459-k26",
+      "reference_cost": 24139,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n469-k138",
+      "reference_cost": 221824,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n480-k70",
+      "reference_cost": 89449,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n491-k59",
+      "reference_cost": 66483,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n502-k39",
+      "reference_cost": 69226,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n513-k21",
+      "reference_cost": 24201,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n524-k153",
+      "reference_cost": 154593,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n536-k96",
+      "reference_cost": 94840,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n548-k50",
+      "reference_cost": 86700,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n561-k42",
+      "reference_cost": 42717,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n573-k30",
+      "reference_cost": 50673,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n586-k159",
+      "reference_cost": 190316,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n599-k92",
+      "reference_cost": 108451,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n613-k62",
+      "reference_cost": 59535,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n627-k43",
+      "reference_cost": 62164,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n641-k35",
+      "reference_cost": 63682,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n655-k131",
+      "reference_cost": 106780,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n670-k130",
+      "reference_cost": 146332,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n685-k75",
+      "reference_cost": 68205,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n701-k44",
+      "reference_cost": 81923,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n716-k35",
+      "reference_cost": 43350,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n733-k159",
+      "reference_cost": 136187,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n749-k98",
+      "reference_cost": 77269,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n766-k71",
+      "reference_cost": 114417,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n783-k48",
+      "reference_cost": 72386,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n801-k40",
+      "reference_cost": 73305,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n819-k171",
+      "reference_cost": 158121,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n837-k142",
+      "reference_cost": 193737,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n856-k95",
+      "reference_cost": 88965,
+      "reference_kind": "known_optimum",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n876-k59",
+      "reference_cost": 99299,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n895-k37",
+      "reference_cost": 53860,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n916-k207",
+      "reference_cost": 329179,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n936-k151",
+      "reference_cost": 132715,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n957-k87",
+      "reference_cost": 85465,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "cvrp",
+      "dataset": "CVRPLIB-X",
+      "instance": "X-n979-k58",
+      "reference_cost": 118940,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "CVRPLIB (Uchoa et al. 2017 Set X)",
+      "source_revision": "cvrplib-set-x-live-2026-10-01"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n005w4_H0_WD1-2-3-3",
+      "reference_cost": 1695,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n005w4_H1_WD5-3-1-0",
+      "reference_cost": 2010,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n005w4_H2_WD6-7-8-9",
+      "reference_cost": 1720,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n012w8_H0_WD3-5-0-2-0-4-5-2",
+      "reference_cost": 3295,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n012w8_H1_WD7-7-0-8-9-3-2-6",
+      "reference_cost": 3805,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n012w8_H2_WD4-5-6-7-2-1-2-1",
+      "reference_cost": 3745,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n021w4_H0_WD5-4-1-2",
+      "reference_cost": 2305,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n021w4_H1_WD0-6-1-6",
+      "reference_cost": 2305,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "employee-scheduling",
+      "dataset": "INRC-II",
+      "instance": "n021w4_H2_WD8-1-4-3",
+      "reference_cost": 2345,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "INRC-II official test dataset (mobiz.vives.be/inrc2)",
+      "source_revision": "inrc2-official-test-dataset-2014"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "abz5",
+      "reference_cost": 1234,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "abz6",
+      "reference_cost": 943,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "abz7",
+      "reference_cost": 656,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "abz8",
+      "reference_cost": 667,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "abz9",
+      "reference_cost": 678,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ft06",
+      "reference_cost": 55,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ft10",
+      "reference_cost": 930,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ft20",
+      "reference_cost": 1165,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la01",
+      "reference_cost": 666,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la02",
+      "reference_cost": 655,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la03",
+      "reference_cost": 597,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la04",
+      "reference_cost": 590,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la05",
+      "reference_cost": 593,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la06",
+      "reference_cost": 926,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la07",
+      "reference_cost": 890,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la08",
+      "reference_cost": 863,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la09",
+      "reference_cost": 951,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la10",
+      "reference_cost": 958,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la11",
+      "reference_cost": 1222,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la12",
+      "reference_cost": 1039,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la13",
+      "reference_cost": 1150,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la14",
+      "reference_cost": 1292,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la15",
+      "reference_cost": 1207,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la16",
+      "reference_cost": 945,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la17",
+      "reference_cost": 784,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la18",
+      "reference_cost": 848,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la19",
+      "reference_cost": 842,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la20",
+      "reference_cost": 902,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la21",
+      "reference_cost": 1046,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la22",
+      "reference_cost": 927,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la23",
+      "reference_cost": 1032,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la24",
+      "reference_cost": 935,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la25",
+      "reference_cost": 977,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la26",
+      "reference_cost": 1218,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la27",
+      "reference_cost": 1235,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la28",
+      "reference_cost": 1216,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la29",
+      "reference_cost": 1152,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la30",
+      "reference_cost": 1355,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la31",
+      "reference_cost": 1784,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la32",
+      "reference_cost": 1850,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la33",
+      "reference_cost": 1719,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la34",
+      "reference_cost": 1721,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la35",
+      "reference_cost": 1888,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la36",
+      "reference_cost": 1268,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la37",
+      "reference_cost": 1397,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la38",
+      "reference_cost": 1196,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la39",
+      "reference_cost": 1233,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "la40",
+      "reference_cost": 1222,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb01",
+      "reference_cost": 1059,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb02",
+      "reference_cost": 888,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb03",
+      "reference_cost": 1005,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb04",
+      "reference_cost": 1005,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb05",
+      "reference_cost": 887,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb06",
+      "reference_cost": 1010,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb07",
+      "reference_cost": 397,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb08",
+      "reference_cost": 899,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb09",
+      "reference_cost": 934,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "orb10",
+      "reference_cost": 944,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv01",
+      "reference_cost": 1407,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv02",
+      "reference_cost": 1475,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv03",
+      "reference_cost": 1398,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv04",
+      "reference_cost": 1464,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv05",
+      "reference_cost": 1424,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv06",
+      "reference_cost": 1667,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv07",
+      "reference_cost": 1594,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv08",
+      "reference_cost": 1751,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv09",
+      "reference_cost": 1655,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv10",
+      "reference_cost": 1743,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv11",
+      "reference_cost": 2983,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv12",
+      "reference_cost": 2972,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv13",
+      "reference_cost": 3104,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv14",
+      "reference_cost": 2968,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv15",
+      "reference_cost": 2885,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv16",
+      "reference_cost": 2924,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv17",
+      "reference_cost": 2794,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv18",
+      "reference_cost": 2852,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv19",
+      "reference_cost": 2843,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "swv20",
+      "reference_cost": 2823,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta01",
+      "reference_cost": 1231,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta02",
+      "reference_cost": 1244,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta03",
+      "reference_cost": 1218,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta04",
+      "reference_cost": 1175,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta05",
+      "reference_cost": 1224,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta06",
+      "reference_cost": 1238,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta07",
+      "reference_cost": 1227,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta08",
+      "reference_cost": 1217,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta09",
+      "reference_cost": 1274,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta10",
+      "reference_cost": 1241,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta11",
+      "reference_cost": 1357,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta12",
+      "reference_cost": 1367,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta13",
+      "reference_cost": 1342,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta14",
+      "reference_cost": 1345,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta15",
+      "reference_cost": 1339,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta16",
+      "reference_cost": 1360,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta17",
+      "reference_cost": 1462,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta18",
+      "reference_cost": 1396,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta19",
+      "reference_cost": 1332,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta20",
+      "reference_cost": 1348,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta21",
+      "reference_cost": 1642,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta22",
+      "reference_cost": 1600,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta23",
+      "reference_cost": 1557,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta24",
+      "reference_cost": 1644,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta25",
+      "reference_cost": 1595,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta26",
+      "reference_cost": 1643,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta27",
+      "reference_cost": 1680,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta28",
+      "reference_cost": 1603,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta29",
+      "reference_cost": 1625,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta30",
+      "reference_cost": 1584,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta31",
+      "reference_cost": 1764,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta32",
+      "reference_cost": 1783,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta33",
+      "reference_cost": 1791,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta34",
+      "reference_cost": 1828,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta35",
+      "reference_cost": 2007,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta36",
+      "reference_cost": 1819,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta37",
+      "reference_cost": 1771,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta38",
+      "reference_cost": 1673,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta39",
+      "reference_cost": 1795,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta40",
+      "reference_cost": 1669,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta41",
+      "reference_cost": 2005,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta42",
+      "reference_cost": 1937,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta43",
+      "reference_cost": 1846,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta44",
+      "reference_cost": 1978,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta45",
+      "reference_cost": 1997,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta46",
+      "reference_cost": 2002,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta47",
+      "reference_cost": 1889,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta48",
+      "reference_cost": 1937,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta49",
+      "reference_cost": 1960,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta50",
+      "reference_cost": 1923,
+      "reference_kind": "best_known_upper_bound",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta51",
+      "reference_cost": 2760,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta52",
+      "reference_cost": 2756,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta53",
+      "reference_cost": 2717,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta54",
+      "reference_cost": 2839,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta55",
+      "reference_cost": 2679,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta56",
+      "reference_cost": 2781,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta57",
+      "reference_cost": 2943,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta58",
+      "reference_cost": 2885,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta59",
+      "reference_cost": 2655,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta60",
+      "reference_cost": 2723,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta61",
+      "reference_cost": 2868,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta62",
+      "reference_cost": 2869,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta63",
+      "reference_cost": 2755,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta64",
+      "reference_cost": 2702,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta65",
+      "reference_cost": 2725,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta66",
+      "reference_cost": 2845,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta67",
+      "reference_cost": 2825,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta68",
+      "reference_cost": 2784,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta69",
+      "reference_cost": 3071,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta70",
+      "reference_cost": 2995,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta71",
+      "reference_cost": 5464,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta72",
+      "reference_cost": 5181,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta73",
+      "reference_cost": 5568,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta74",
+      "reference_cost": 5339,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta75",
+      "reference_cost": 5392,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta76",
+      "reference_cost": 5342,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta77",
+      "reference_cost": 5436,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta78",
+      "reference_cost": 5394,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta79",
+      "reference_cost": 5358,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "ta80",
+      "reference_cost": 5183,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "yn1",
+      "reference_cost": 884,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "yn2",
+      "reference_cost": 904,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "yn3",
+      "reference_cost": 892,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    },
+    {
+      "benchmark_name": "job-shop-scheduling",
+      "dataset": "JSPLIB",
+      "instance": "yn4",
+      "reference_cost": 967,
+      "reference_kind": "known_optimum",
+      "source_name": "ScheduleOpt/benchmarks",
+      "source_revision": "2f0500c4d4c1a5588778004dc47954240e65d399"
+    }
   ]
 }
