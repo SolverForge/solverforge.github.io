@@ -11,16 +11,6 @@
       "result_count": 2400,
       "git_commit": "3c171051003746b448c47cbc926b72a51defe4b8",
       "git_dirty": false,
-      "solvers": [
-        "pyvrp",
-        "ortools",
-        "vroom",
-        "timefold",
-        "rustvrp",
-        "pyhygese",
-        "solverforge",
-        "solverforge-py"
-      ],
       "time_limits_seconds": [
         1,
         10,
@@ -421,6 +411,16 @@
           "over_budget": 0
         }
       ],
+      "solvers": [
+        "ortools",
+        "pyvrp",
+        "vroom",
+        "pyhygese",
+        "rustvrp",
+        "solverforge",
+        "solverforge-py",
+        "timefold"
+      ],
       "reference_present": true,
       "reference_instances": 100,
       "reference_covered_run_instances": 100,
@@ -445,12 +445,6 @@
       "result_count": 504,
       "git_commit": "3c171051003746b448c47cbc926b72a51defe4b8",
       "git_dirty": false,
-      "solvers": [
-        "solverforge",
-        "solverforge-py",
-        "timefold",
-        "ortools"
-      ],
       "time_limits_seconds": [
         1,
         10,
@@ -659,8 +653,14 @@
           "over_budget": 0
         }
       ],
+      "solvers": [
+        "solverforge",
+        "solverforge-py",
+        "timefold",
+        "ortools"
+      ],
       "reference_present": true,
-      "reference_instances": 9,
+      "reference_instances": 37,
       "reference_covered_run_instances": 0,
       "reference_covers_run": false,
       "reference_kinds": [
@@ -682,12 +682,6 @@
       "result_count": 1944,
       "git_commit": "3c171051003746b448c47cbc926b72a51defe4b8",
       "git_dirty": false,
-      "solvers": [
-        "solverforge",
-        "solverforge-py",
-        "timefold",
-        "ortools"
-      ],
       "time_limits_seconds": [
         1,
         10,
@@ -895,6 +889,12 @@
           "errors": 0,
           "over_budget": 0
         }
+      ],
+      "solvers": [
+        "ortools",
+        "solverforge",
+        "solverforge-py",
+        "timefold"
       ],
       "reference_present": true,
       "reference_instances": 162,

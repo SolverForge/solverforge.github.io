@@ -55,6 +55,71 @@ LABELS = {
 }
 
 
+def rank_solvers(summaries, solver_order):
+    """Order solvers by the priorities the page presents: feasibility, then time
+    to a viable solution, then quality.
+
+    Each priority is compared only where the one before it ties, and a solver
+    that never delivered a viable solution sorts after every solver that did --
+    it has no time to compete on. The comparison is made across the run's whole
+    budget set, because a solver that only scales at a longer budget is not the
+    same tool as one that delivers at every budget.
+    """
+    totals = {row['solver']: row['total'] for row in summaries}
+    # A solver's feasibility is its worst budget, not its best: one that fails a
+    # third of the instances at the shortest budget has not solved them, and
+    # taking the best budget would rank it above a solver that never failed.
+    feasible = {}
+    for row in summaries:
+        solver = row['solver']
+        feasible[solver] = min(feasible.get(solver, row['total']), row['feasible'])
+    # Sum across budgets, so a solver is judged on the run rather than one budget.
+    seconds = {solver: 0.0 for solver in solver_order}
+    gaps = {solver: 0.0 for solver in solver_order}
+    missing_time = {solver: 0 for solver in solver_order}
+    missing_gap = {solver: 0 for solver in solver_order}
+    relative_times = {}
+    budgets = []
+    for row in summaries:
+        solver = row['solver']
+        budget = row['budget']
+        if budget not in budgets:
+            budgets.append(budget)
+        if row['mean_feasible_seconds'] is None:
+            missing_time[solver] += 1
+        else:
+            seconds[solver] += row['mean_feasible_seconds']
+            relative_times[(solver, budget)] = row['mean_feasible_seconds'] / budget
+        if row['gap_percent'] is None:
+            missing_gap[solver] += 1
+        else:
+            gaps[solver] += row['gap_percent']
+
+    def key(solver):
+        total = totals.get(solver, 0)
+        # 1. Feasibility: fewest unsolved instances first.
+        unsolved = total - feasible[solver]
+        # 2. Time to a viable solution: budgets with no viable solution sort last
+        #    within this priority, so a solver that delivered everywhere outranks
+        #    one that delivered fast where it delivered and not at all elsewhere.
+        #    Times are summed across budgets of very different lengths (1s and
+        #    60s), so they are expressed relative to each budget's own limit
+        #    first; otherwise the longest budget dominates and the ranking
+        #    records the budget, not the solver.
+        relative = sum(relative_times.get((solver, budget), 0.0) for budget in budgets)
+        # 3. Quality: same rule for budgets with no reference-backed gap.
+        return (
+            unsolved,
+            missing_time[solver],
+            relative,
+            missing_gap[solver],
+            gaps[solver],
+            solver,
+        )
+
+    return sorted(solver_order, key=key)
+
+
 def summarize(snapshot):
     runs = snapshot.get('runs') or []
     results = snapshot.get('results') or []
@@ -102,6 +167,12 @@ def summarize(snapshot):
             ))
         name = run['benchmark_name']
         title, description = LABELS.get(name, (name.replace('-', ' ').capitalize(), 'Lower validated cost is better; feasibility comes first.'))
+        # Rank the solvers by the priorities the page states, and carry that rank
+        # into every rendering of this problem: most instances solved, then
+        # fastest to a viable solution, then best quality. Ranking only the
+        # columns would present the priorities as a layout while the rows still
+        # read in whatever order the run recorded them.
+        solvers_ranked = rank_solvers(summaries, solver_order=run['solvers'])
         # Reference provenance travels with the problem: which instances have an
         # official value, how strong those values are, and where they came from.
         # A problem with no reference states that rather than showing a gap that
@@ -116,11 +187,13 @@ def summarize(snapshot):
         run_instances = {r['instance'] for r in rows}
         covered_run_instances = {r['instance'] for r in problem_references} & run_instances
         problems.append(dict(
-            **run, title=title, description=description,
+            **{k: v for k, v in run.items() if k != 'solvers'},
+            title=title, description=description,
             instances=len(run_instances),
             datasets=sorted({r['dataset'] for r in rows}),
             dataset_sets=sorted({r['dataset_set'] for r in rows}),
             summaries=summaries,
+            solvers=solvers_ranked,
             reference_present=bool(problem_references),
             reference_instances=len({r['instance'] for r in problem_references}),
             reference_covered_run_instances=len(covered_run_instances),
