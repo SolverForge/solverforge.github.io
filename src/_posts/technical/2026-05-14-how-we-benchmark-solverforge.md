@@ -180,14 +180,15 @@ cannot reproduce.
 
 Coverage differs per problem, and we say so rather than filling the gaps. CVRP
 has official values for every instance it runs. Job-shop has values for every
-instance, with the source closing most of them. Employee scheduling is the
-partial case: the INRC-II competition publishes its test instances together with
-their reference solutions and nothing else, and the canonical selection runs
-history and week combinations outside that published set. Nine instances have an
-official value; the rest are run without one, and their results carry
-feasibility rather than a mean gap. Substituting our own best result as a
-reference would make SolverForge the benchmark's judge of itself, which is
-exactly what a reference is supposed to prevent.
+instance, with the source closing most of them. Employee scheduling draws on two
+published sources: the reference solutions the competition ships with its test
+instances, and the validated results it recorded for each finalist on the late
+instances, 37 values in total. None of them name a tuple the canonical selection
+runs, which grades the first weeks of each instance rather than the competition's
+published history/week combinations, so that problem's results carry feasibility
+and are compared on the mean gap only when a reference resolves. Substituting our
+own best result as a reference would make SolverForge the benchmark's judge of
+itself, which is exactly what a reference is supposed to prevent.
 
 The published results page states this per problem, next to the numbers: how
 many instances have an official value, where it came from, and how strong it is.

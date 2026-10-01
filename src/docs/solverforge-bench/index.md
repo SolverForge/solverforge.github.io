@@ -232,7 +232,7 @@ be above the true optimum.
 | ------- | -------------------------------- | ------ |
 | CVRP | 100 of 100 | CVRPLIB Set X table; proven optima where the table marks the instance closed, best known bounds otherwise |
 | Job-shop scheduling | 162 of 162 | ScheduleOpt best-known catalogue |
-| Employee scheduling | 9 of 42 | INRC-II official test dataset; best known bounds, not optima |
+| Employee scheduling | 0 of 42 (37 values published off this run's tuples) | INRC-II official test dataset, plus the competition's validated finalist results; best known bounds, not optima |
 
 Results are presented in the order they are ranked by: feasibility, then time to
 a viable solution, then quality. Time to viable is the measured wall-clock time
