@@ -82,12 +82,21 @@ def summarize(snapshot):
             ratios = [r['quality_ratio'] for r in feasible if r['quality_ratio'] is not None]
             costs = [r['cost'] for r in feasible if r['cost'] is not None]
             times = [r['actual_time_seconds'] for r in group if r['actual_time_seconds'] is not None]
+            # Time to a viable solution is the harness's measured wall-clock time
+            # over the invocations that returned one. Averaging every invocation
+            # would fold in failures that ran to the watchdog, which measures
+            # time discipline rather than how quickly a usable answer arrives.
+            feasible_times = [r['actual_time_seconds'] for r in feasible
+                              if r['actual_time_seconds'] is not None]
             summaries.append(dict(
                 budget=budget, solver=solver, version=version, total=len(group),
                 feasible=len(feasible), quality_samples=len(ratios), cost_samples=len(costs),
+                feasible_time_samples=len(feasible_times),
                 gap_percent=100 * (sum(ratios) / len(ratios) - 1) if ratios else None,
                 mean_cost=sum(costs) / len(costs) if costs else None,
                 mean_seconds=sum(times) / len(times) if times else None,
+                mean_feasible_seconds=(sum(feasible_times) / len(feasible_times)
+                                       if feasible_times else None),
                 errors=sum(r['error'] is True for r in group),
                 over_budget=sum(r['wall_time_over_limit'] is True for r in group),
             ))

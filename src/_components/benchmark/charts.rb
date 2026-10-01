@@ -1,8 +1,10 @@
 class Benchmark::Charts < Bridgetown::Component
-  # Feasibility and mean reference gap for one problem, drawn from the same
-  # exported run data as the tables beside them. The two charts share a solver
-  # order and a budget legend so the reader can weigh feasibility against
-  # quality instead of reading either one alone.
+  # Three panels per problem, drawn from the same exported run data as the tables
+  # beside them and presented in the order the results are ranked by: whether a
+  # solver returned a usable answer at all, how quickly it returned one, and how
+  # good that answer was. The order is the ranking rule, not a layout choice --
+  # a fast bad answer does not beat a slow good one, but among solvers that
+  # deliver, the one that delivers sooner is the better tool.
   def initialize(problem:)
     @problem = problem
   end
@@ -30,6 +32,12 @@ class Benchmark::Charts < Bridgetown::Component
     @max_gap ||= summaries.filter_map { |row| row["gap_percent"] }.max
   end
 
+  # Time is compared against the longest mean time to a viable solution among
+  # solvers that produced one, so the slowest delivering solver is the full bar.
+  def max_feasible_seconds
+    @max_feasible_seconds ||= summaries.filter_map { |row| row["mean_feasible_seconds"] }.max
+  end
+
   def feasible_percent(row)
     return nil if row.nil? || row.fetch("total").zero?
 
@@ -41,6 +49,17 @@ class Benchmark::Charts < Bridgetown::Component
   # empty slot rather than a bar of length nothing.
   def gap_percent(row)
     row && row["gap_percent"]
+  end
+
+  # Time to a viable solution: the measured wall-clock time of the invocations
+  # that returned one. Nil when a solver never delivered, which is a different
+  # statement from delivering instantly.
+  def feasible_seconds(row)
+    row && row["mean_feasible_seconds"]
+  end
+
+  def feasible_time_samples(row)
+    row ? row.fetch("feasible_time_samples") : 0
   end
 
   # A measured zero has to be visibly different from a measurement that does not
@@ -56,6 +75,10 @@ class Benchmark::Charts < Bridgetown::Component
   # which does carry the comparison.
   def drawable_gaps?
     summaries.any? { |row| row["gap_percent"].to_f.positive? }
+  end
+
+  def drawable_times?
+    summaries.any? { |row| row["mean_feasible_seconds"].to_f.positive? }
   end
 
   def fill(value, scale)

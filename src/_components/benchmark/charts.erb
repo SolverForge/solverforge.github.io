@@ -47,7 +47,59 @@
       </ol>
     </figure>
 
-    <%# Then quality. Read together with feasibility above: the same solver can
+    <%# Then time to a viable solution. Read after feasibility and before
+        quality: a solver that never delivers has no time, and speed only ranks
+        solvers that actually produced an answer. %>
+    <figure class="benchmark-chart">
+      <figcaption class="benchmark-chart__caption">
+        <h3>Time to a viable solution</h3>
+        <% if drawable_times? %>
+          <p>
+            Measured wall-clock time of the invocations that returned a hard-feasible
+            solution; lower is better. Bars are scaled to this problem's longest such
+            mean, <strong><%= format('%.2f s', max_feasible_seconds) %></strong>.
+          </p>
+        <% else %>
+          <p>
+            No invocation in this run returned a hard-feasible solution, so there is no
+            time to a viable solution to show.
+          </p>
+        <% end %>
+      </figcaption>
+      <% if drawable_times? %>
+      <ol class="benchmark-chart__rows">
+        <% solvers.each do |solver| %>
+          <li class="benchmark-chart__row<%= ' benchmark-chart__row--solverforge' if solverforge?(solver) %>">
+            <span class="benchmark-chart__label"><%= solver %></span>
+            <span class="benchmark-chart__bars">
+              <% budgets.each do |budget| %>
+                <% row = summary(budget, solver) %>
+                <% seconds = feasible_seconds(row) %>
+                <% fill_percent = fill(seconds, max_feasible_seconds) %>
+                <span
+                  class="benchmark-chart__track"
+                  title="<%= solver %>, <%= budget %>s: <%= seconds ? "#{format('%.2f s', seconds)} mean over #{feasible_time_samples(row)} feasible results" : 'no feasible result' %>"
+                >
+                  <% if fill_percent %>
+                    <span
+                      class="benchmark-chart__bar benchmark-chart__bar--<%= budget %>s<%= ' benchmark-chart__bar--zero' if zero?(seconds) %>"
+                      style="--benchmark-bar-fill: <%= fill_percent %>%"
+                      data-benchmark-feasible-seconds="<%= seconds.round(3) %>"
+                    ></span>
+                  <% else %>
+                    <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
+                  <% end %>
+                </span>
+              <% end %>
+            </span>
+            <span class="benchmark-chart__value"><%= budgets.map { |budget| (row = summary(budget, solver)) && row['mean_feasible_seconds'] ? format('%.2f s', row['mean_feasible_seconds']) : "—" }.join(" · ") %></span>
+          </li>
+        <% end %>
+      </ol>
+      <% end %>
+    </figure>
+
+    <%# Then quality. Read together with the panels above: the same solver can
         top this chart only where it stayed feasible. %>
     <figure class="benchmark-chart">
       <figcaption class="benchmark-chart__caption">

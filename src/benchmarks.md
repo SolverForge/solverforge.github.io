@@ -8,10 +8,19 @@ These are the latest publishable **full canonical runs** recorded in our benchma
 warehouse, not new measurements of the current release. Each problem uses its own
 latest completed nightly candidate run. Quick runs and partial runs are excluded.
 
-Feasibility comes first. The mean gap is calculated only for feasible results with
-a reference cost: **0% matches the reference; lower is better**. Read it alongside
-the feasible count — an average over fewer successful instances is not a win over
-a solver that solved them all. Different problems are not combined into one score.
+Results are presented in the order they are ranked by, and each step only ranks
+solvers that cleared the one before it:
+
+1. **Feasibility** — did the solver return a hard-feasible answer at all.
+2. **Time to a viable solution** — how quickly it returned one, measured over
+   the invocations that did. A solver that never delivers has no time to show.
+3. **Solution quality** — the mean gap to the reference, calculated only for
+   feasible results with a reference cost: **0% matches the reference; lower is
+   better**.
+
+Feasibility comes first because an average over fewer successful instances is not
+a win over a solver that solved them all. Different problems are not combined
+into one score.
 
 <% site.data.benchmarks.problems.each do |problem| %>
 <section class="benchmark-problem" id="<%= problem.fetch('benchmark_name') %>">
@@ -52,12 +61,13 @@ a solver that solved them all. Different problems are not combined into one scor
     <% if index > 0 %><details><summary><%= budget %>-second budget</summary><% else %><h3><%= budget %>-second budget</h3><% end %>
     <div class="benchmark-table" role="region" aria-label="<%= problem.fetch('title') %>, <%= budget %>-second results" tabindex="0">
       <table>
-        <thead><tr><th scope="col">Solver / tested version</th><th scope="col">Feasible</th><th scope="col">Mean gap</th><th scope="col">Mean runtime</th><th scope="col">Over budget</th></tr></thead>
+        <thead><tr><th scope="col">Solver / tested version</th><th scope="col">Feasible</th><th scope="col">Time to viable</th><th scope="col">Mean gap</th><th scope="col">Mean runtime</th><th scope="col">Over budget</th></tr></thead>
         <tbody>
           <% problem.fetch('summaries').select { |row| row.fetch('budget') == budget }.each do |row| %>
             <tr class="<%= row.fetch('solver').start_with?('solverforge') ? 'benchmark-solverforge' : '' %>">
               <th scope="row"><%= row.fetch('solver') %> <small><%= row.fetch('version') %></small></th>
               <td><%= row.fetch('feasible') %> / <%= row.fetch('total') %></td>
+              <td><%= row['mean_feasible_seconds'].nil? ? '—' : format('%.2f s', row.fetch('mean_feasible_seconds')) %> <small>(<%= row.fetch('feasible_time_samples') %> feasible)</small></td>
               <td><%= row['gap_percent'].nil? ? '—' : format('%.2f%%', row.fetch('gap_percent')) %> <small>(<%= row.fetch('quality_samples') %> samples)</small></td>
               <td><%= row['mean_seconds'].nil? ? '—' : format('%.2f s', row.fetch('mean_seconds')) %></td>
               <td><%= row.fetch('over_budget') %> / <%= row.fetch('total') %></td>
@@ -85,10 +95,13 @@ a solver that solved them all. Different problems are not combined into one scor
 
 ## Evidence and methodology
 
-Runtime is measured wall-clock time, not the requested budget. “Over budget” counts
-results flagged by the harness's wall-time tolerance; late returned solutions are
-retained. The tables show the longest tested budget first; expand the shorter
-budgets to see those results.
+Runtime is measured wall-clock time, not the requested budget. “Time to viable”
+covers only invocations that returned a hard-feasible solution; “mean runtime”
+covers every invocation, so the difference between the two columns is what
+failed or ran to the watchdog. “Over budget” counts results flagged by the
+harness's wall-time tolerance; late returned solutions are retained. The tables
+show the longest tested budget first; expand the shorter budgets to see those
+results.
 
 [Download the recorded results and run metadata (JSON)](<%= relative_url '/benchmarks/results.json' %>) ·
 [How we benchmark SolverForge](<%= relative_url '/blog/technical/2026/05/14/how-we-benchmark-solverforge/' %>) ·
