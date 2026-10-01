@@ -55,65 +55,22 @@ LABELS = {
 }
 
 
-def rank_solvers(summaries, solver_order):
-    """Order solvers by the priorities the page presents: feasibility, then time
-    to a viable solution, then quality.
+def rank_solvers(summaries, solver_order, budget=None):
+    """Rank one budget by feasibility, measured time, then reference gap.
 
-    Each priority is compared only where the one before it ties, and a solver
-    that never delivered a viable solution sorts after every solver that did --
-    it has no time to compete on. The comparison is made across the run's whole
-    budget set, because a solver that only scales at a longer budget is not the
-    same tool as one that delivers at every budget.
+    The overview uses the longest budget, matching the first visible table.
+    Shorter budgets have their own ranking rather than inheriting an aggregate.
     """
-    totals = {row['solver']: row['total'] for row in summaries}
-    # A solver's feasibility is its worst budget, not its best: one that fails a
-    # third of the instances at the shortest budget has not solved them, and
-    # taking the best budget would rank it above a solver that never failed.
-    feasible = {}
-    for row in summaries:
-        solver = row['solver']
-        feasible[solver] = min(feasible.get(solver, row['total']), row['feasible'])
-    # Sum across budgets, so a solver is judged on the run rather than one budget.
-    seconds = {solver: 0.0 for solver in solver_order}
-    gaps = {solver: 0.0 for solver in solver_order}
-    missing_time = {solver: 0 for solver in solver_order}
-    missing_gap = {solver: 0 for solver in solver_order}
-    relative_times = {}
-    budgets = []
-    for row in summaries:
-        solver = row['solver']
-        budget = row['budget']
-        if budget not in budgets:
-            budgets.append(budget)
-        if row['mean_feasible_seconds'] is None:
-            missing_time[solver] += 1
-        else:
-            seconds[solver] += row['mean_feasible_seconds']
-            relative_times[(solver, budget)] = row['mean_feasible_seconds'] / budget
-        if row['gap_percent'] is None:
-            missing_gap[solver] += 1
-        else:
-            gaps[solver] += row['gap_percent']
+    if budget is None:
+        budget = max(row['budget'] for row in summaries)
+    rows = {row['solver']: row for row in summaries if row['budget'] == budget}
 
     def key(solver):
-        total = totals.get(solver, 0)
-        # 1. Feasibility: fewest unsolved instances first.
-        unsolved = total - feasible[solver]
-        # 2. Time to a viable solution: budgets with no viable solution sort last
-        #    within this priority, so a solver that delivered everywhere outranks
-        #    one that delivered fast where it delivered and not at all elsewhere.
-        #    Times are summed across budgets of very different lengths (1s and
-        #    60s), so they are expressed relative to each budget's own limit
-        #    first; otherwise the longest budget dominates and the ranking
-        #    records the budget, not the solver.
-        relative = sum(relative_times.get((solver, budget), 0.0) for budget in budgets)
-        # 3. Quality: same rule for budgets with no reference-backed gap.
+        row = rows[solver]
         return (
-            unsolved,
-            missing_time[solver],
-            relative,
-            missing_gap[solver],
-            gaps[solver],
+            row['total'] - row['feasible'],
+            row['mean_feasible_seconds'] if row['mean_feasible_seconds'] is not None else float('inf'),
+            row['gap_percent'] if row['gap_percent'] is not None else float('inf'),
             solver,
         )
 
@@ -194,6 +151,8 @@ def summarize(snapshot):
             dataset_sets=sorted({r['dataset_set'] for r in rows}),
             summaries=summaries,
             solvers=solvers_ranked,
+            solver_orders={str(budget): rank_solvers(summaries, run['solvers'], budget)
+                           for budget in run['time_limits_seconds']},
             reference_present=bool(problem_references),
             reference_instances=len({r['instance'] for r in problem_references}),
             reference_covered_run_instances=len(covered_run_instances),

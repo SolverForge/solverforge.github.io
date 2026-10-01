@@ -61,6 +61,25 @@ class BenchmarkSnapshotTest(unittest.TestCase):
         # far below any published precision: the page renders two decimals.
         assert_summaries_equivalent(self, importer.summarize(self.snapshot), self.summary)
 
+    def test_each_budget_ranks_feasibility_then_time_then_quality(self):
+        for problem in self.summary['problems']:
+            for budget in problem['time_limits_seconds']:
+                rows = [r for r in problem['summaries'] if r['budget'] == budget]
+                expected = [r['solver'] for r in sorted(rows, key=lambda r: (
+                    r['total'] - r['feasible'],
+                    r['mean_feasible_seconds'] if r['mean_feasible_seconds'] is not None else float('inf'),
+                    r['gap_percent'] if r['gap_percent'] is not None else float('inf'),
+                    r['solver'],
+                ))]
+                self.assertEqual(problem['solver_orders'][str(budget)], expected)
+                if budget == max(problem['time_limits_seconds']):
+                    self.assertEqual(problem['solvers'], expected)
+
+    def test_cvrp_overview_puts_fastest_fully_feasible_solver_first(self):
+        problem = next(p for p in self.summary['problems'] if p['benchmark_name'] == 'cvrp')
+        self.assertEqual(problem['solvers'][0], 'vroom')
+        self.assertEqual(problem['solver_orders']['1'][0], 'ortools')
+
     def test_versions_are_present(self):
         for row in self.snapshot['results']:
             self.assertTrue(row['solver_version'])

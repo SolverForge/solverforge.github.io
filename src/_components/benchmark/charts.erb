@@ -1,4 +1,5 @@
 <section class="benchmark-charts" aria-label="<%= @problem.fetch('title') %> summary charts">
+  <p class="benchmark-charts__ranking">Winner first at the <%= budgets.max %>-second budget: feasibility → time to viable → quality.</p>
   <div class="benchmark-charts__legend">
     <% budgets.each do |budget| %>
       <span class="benchmark-charts__legend-item">

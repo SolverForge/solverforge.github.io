@@ -11,7 +11,8 @@ Quick and partial runs are excluded; these are not measurements of newer release
 **Ranking:** feasibility → time to a viable solution → solution quality.
 Each priority breaks ties in the one before it. Time averages only feasible results;
 quality averages only feasible results with a reference. **0% gap matches the reference.**
-Problems are ranked separately.
+Each table ranks its own budget. Charts use the longest-budget ranking, matching
+the first table. Problems are ranked separately.
 
 <% site.data.benchmarks.problems.each do |problem| %>
 <section class="benchmark-problem" id="<%= problem.fetch('benchmark_name') %>">
@@ -51,11 +52,11 @@ Problems are ranked separately.
   <%= render Benchmark::Charts.new(problem: problem) %>
   <% problem.fetch('time_limits_seconds').sort.reverse.each_with_index do |budget, index| %>
     <% if index > 0 %><details><summary><%= budget %>-second budget</summary><% else %><h3><%= budget %>-second budget</h3><% end %>
-    <div class="benchmark-table" role="region" aria-label="<%= problem.fetch('title') %>, <%= budget %>-second results" tabindex="0">
+    <div class="benchmark-table" data-budget="<%= budget %>" role="region" aria-label="<%= problem.fetch('title') %>, <%= budget %>-second results" tabindex="0">
       <table>
         <thead><tr><th scope="col">Solver / tested version</th><th scope="col">Feasible</th><th scope="col">Time to viable</th><th scope="col">Mean gap</th><th scope="col">Mean runtime</th><th scope="col">Over budget</th></tr></thead>
         <tbody>
-          <% solver_rank = problem.fetch('solvers').each_with_index.to_h %>
+          <% solver_rank = problem.fetch('solver_orders').fetch(budget.to_s).each_with_index.to_h %>
           <% problem.fetch('summaries').select { |row| row.fetch('budget') == budget }.sort_by { |row| solver_rank.fetch(row.fetch('solver'), 999) }.each do |row| %>
             <tr class="<%= row.fetch('solver').start_with?('solverforge') ? 'benchmark-solverforge' : '' %>">
               <th scope="row"><%= row.fetch('solver') %> <small><%= row.fetch('version') %></small></th>

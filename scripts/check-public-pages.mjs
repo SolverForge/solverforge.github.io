@@ -18,50 +18,19 @@ const benchmarksDataPath = resolve("src/_data/benchmarks.json");
 // quality. This is an independent reimplementation of that rule: if it agreed
 // with the importer only by construction, a bug in the importer would move the
 // rendered order and the check would move with it instead of failing.
-function rankSolvers(problem) {
-  const budgets = problem.time_limits_seconds;
-  const rows = problem.summaries;
-  const unsolved = {};
-  const worstBudget = {};
-  const missingTime = {};
-  const missingGap = {};
-  const relativeTime = {};
-  const gapSum = {};
-  for (const solver of problem.solvers) {
-    unsolved[solver] = 0;
-    worstBudget[solver] = Infinity;
-    missingTime[solver] = 0;
-    missingGap[solver] = 0;
-    relativeTime[solver] = 0;
-    gapSum[solver] = 0;
-  }
-  const totals = {};
-  for (const row of rows) {
-    totals[row.solver] = row.total;
-    worstBudget[row.solver] = Math.min(worstBudget[row.solver], row.feasible);
-    if (row.mean_feasible_seconds === null || row.mean_feasible_seconds === undefined) {
-      missingTime[row.solver] += 1;
-    } else {
-      relativeTime[row.solver] += row.mean_feasible_seconds / row.budget;
-    }
-    if (row.gap_percent === null || row.gap_percent === undefined) {
-      missingGap[row.solver] += 1;
-    } else {
-      gapSum[row.solver] += row.gap_percent;
-    }
-  }
-  for (const solver of problem.solvers) {
-    unsolved[solver] = (totals[solver] ?? 0) - worstBudget[solver];
-  }
-  void budgets;
-  return [...problem.solvers].sort((a, b) => (
-    unsolved[a] - unsolved[b] ||
-    missingTime[a] - missingTime[b] ||
-    relativeTime[a] - relativeTime[b] ||
-    missingGap[a] - missingGap[b] ||
-    gapSum[a] - gapSum[b] ||
-    (a < b ? -1 : a > b ? 1 : 0)
-  ));
+function rankSolvers(problem, budget = Math.max(...problem.time_limits_seconds)) {
+  const rows = problem.summaries.filter((row) => row.budget === budget);
+  const compareOptional = (a, b) => {
+    if (a == null) return b == null ? 0 : 1;
+    if (b == null) return -1;
+    return a - b;
+  };
+  return [...rows].sort((a, b) => (
+    (a.total - a.feasible) - (b.total - b.feasible) ||
+    compareOptional(a.mean_feasible_seconds, b.mean_feasible_seconds) ||
+    compareOptional(a.gap_percent, b.gap_percent) ||
+    a.solver.localeCompare(b.solver)
+  )).map((row) => row.solver);
 }
 
 // Markers are small, but two can still land on the same interface element. An
@@ -817,6 +786,7 @@ async function checkBenchmarksPage(origin) {
         id: section.id,
         heading: section.querySelector("h2")?.textContent.trim() || "",
         tables: [...section.querySelectorAll(".benchmark-table table")].map((table) => ({
+          budget: Number(table.closest(".benchmark-table").getAttribute("data-budget")),
           headers: [...table.querySelectorAll("thead th")].map((th) => th.textContent.trim()),
           solvers: [...table.querySelectorAll("tbody th[scope='row']")]
             .map((th) => th.childNodes[0]?.textContent.trim() || ""),
@@ -1057,12 +1027,13 @@ async function checkBenchmarksPage(origin) {
         }
       }
       for (const table of section.tables) {
-        if (table.solvers.length > 0 && table.solvers.join("|") !== expectedRank.join("|")) {
+        const tableRank = rankSolvers(problem, table.budget);
+        if (table.solvers.length === 0 || table.solvers.join("|") !== tableRank.join("|")) {
           failures.push({
             path: "/benchmarks/",
-            issue: `${problem.benchmark_name} table does not rank solvers by feasibility, time, then quality`,
+            issue: `${problem.benchmark_name} ${table.budget}s table does not rank solvers by feasibility, time, then quality`,
             found: table.solvers,
-            expected: expectedRank,
+            expected: tableRank,
           });
           break;
         }
