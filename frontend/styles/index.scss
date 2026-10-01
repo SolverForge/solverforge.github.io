@@ -717,6 +717,151 @@ h3 {
   background: rgba(16, 185, 129, 0.08);
 }
 
+.benchmark-charts {
+  margin: 1.75rem 0 2rem;
+}
+
+.benchmark-charts__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  margin-bottom: 1.25rem;
+  color: var(--sf-text-soft);
+  font-size: 0.85rem;
+}
+
+.benchmark-charts__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.benchmark-charts__swatch {
+  display: inline-block;
+  width: 1.4rem;
+  height: 0.65rem;
+  border-radius: var(--sf-radius-sm);
+  background: var(--benchmark-budget-fill);
+}
+
+.benchmark-charts__panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.benchmark-chart {
+  margin: 0;
+  padding: 1.25rem 1.35rem;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius);
+  background: var(--sf-panel);
+}
+
+.benchmark-chart__caption h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.benchmark-chart__caption p {
+  margin: 0 0 1.1rem;
+  color: var(--sf-text-soft);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.benchmark-chart__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.benchmark-chart__row {
+  display: grid;
+  grid-template-columns: minmax(6rem, 8.5rem) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--sf-radius-sm);
+}
+
+.benchmark-chart__row--solverforge {
+  background: rgba(16, 185, 129, 0.08);
+}
+
+.benchmark-chart__label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
+  color: var(--sf-text);
+  overflow-wrap: anywhere;
+}
+
+.benchmark-chart__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.benchmark-chart__track {
+  display: block;
+  position: relative;
+  height: 0.6rem;
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-panel-soft);
+  overflow: hidden;
+}
+
+.benchmark-chart__bar {
+  display: block;
+  height: 100%;
+  width: var(--benchmark-bar-fill, 0%);
+  border-radius: var(--sf-radius-sm);
+  background: var(--benchmark-budget-fill);
+}
+
+/* A missing measurement is an empty slot, not a bar of length nothing. */
+.benchmark-chart__bar--missing {
+  width: 100%;
+  background: repeating-linear-gradient(
+    135deg,
+    var(--sf-panel-soft),
+    var(--sf-panel-soft) 4px,
+    var(--sf-border) 4px,
+    var(--sf-border) 8px
+  );
+}
+
+/* A measured zero keeps the budget colour so it reads as data, but is drawn at
+   a visible width: nothing at all is reserved for a measurement that does not
+   exist, and the two must not look alike. */
+.benchmark-chart__bar--zero {
+  width: 0.3rem;
+}
+
+.benchmark-chart__value {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--sf-text-soft);
+  white-space: nowrap;
+}
+
+/* Each budget keeps one colour across both charts, so a bar can be followed
+   from feasibility to quality without re-reading the legend. */
+.benchmark-chart__bar--1s,
+.benchmark-charts__swatch--1s {
+  --benchmark-budget-fill: var(--sf-gold);
+}
+
+.benchmark-chart__bar--10s,
+.benchmark-charts__swatch--10s {
+  --benchmark-budget-fill: var(--sf-accent);
+}
+
+.benchmark-chart__bar--60s,
+.benchmark-charts__swatch--60s {
+  --benchmark-budget-fill: var(--sf-panel-dark-soft);
+}
+
 .prose blockquote {
   padding: 1.1rem 1.2rem;
   border-left: 4px solid var(--sf-accent);
@@ -1905,9 +2050,22 @@ body.use-case-lightbox-open {
   .use-case-detail__hero {
     grid-template-columns: 1fr;
   }
+
+  .benchmark-charts__panels {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 760px) {
+  .benchmark-chart__row {
+    grid-template-columns: minmax(5rem, 7rem) minmax(0, 1fr);
+  }
+
+  .benchmark-chart__value {
+    grid-column: 1 / -1;
+    white-space: normal;
+  }
+
   .site-header__toggle {
     display: inline-flex;
     align-items: center;

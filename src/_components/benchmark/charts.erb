@@ -1,0 +1,103 @@
+<section class="benchmark-charts" aria-label="<%= @problem.fetch('title') %> summary charts">
+  <div class="benchmark-charts__legend">
+    <% budgets.each do |budget| %>
+      <span class="benchmark-charts__legend-item">
+        <span class="benchmark-charts__swatch benchmark-charts__swatch--<%= budget %>s"></span>
+        <%= budget %>-second budget
+      </span>
+    <% end %>
+  </div>
+
+  <div class="benchmark-charts__panels">
+    <%# Feasibility first: a quality average over fewer feasible instances is
+        not a win over a solver that solved them all. %>
+    <figure class="benchmark-chart">
+      <figcaption class="benchmark-chart__caption">
+        <h3>Feasible results</h3>
+        <p>Instances solved to a hard-feasible solution, out of <%= total_instances %>.</p>
+      </figcaption>
+      <ol class="benchmark-chart__rows">
+        <% solvers.each do |solver| %>
+          <li class="benchmark-chart__row<%= ' benchmark-chart__row--solverforge' if solverforge?(solver) %>">
+            <span class="benchmark-chart__label"><%= solver %></span>
+            <span class="benchmark-chart__bars">
+              <% budgets.each do |budget| %>
+                <% row = summary(budget, solver) %>
+                <% percent = feasible_percent(row) %>
+                <span
+                  class="benchmark-chart__track"
+                  title="<%= solver %>, <%= budget %>s: <%= row ? "#{row.fetch('feasible')} of #{row.fetch('total')} feasible" : 'not recorded' %>"
+                >
+                  <% if percent %>
+                    <span
+                      class="benchmark-chart__bar benchmark-chart__bar--<%= budget %>s<%= ' benchmark-chart__bar--zero' if zero?(percent) %>"
+                      style="--benchmark-bar-fill: <%= percent.round(2) %>%"
+                      data-benchmark-feasible="<%= row.fetch('feasible') %>"
+                      data-benchmark-total="<%= row.fetch('total') %>"
+                    ></span>
+                  <% else %>
+                    <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
+                  <% end %>
+                </span>
+              <% end %>
+            </span>
+            <span class="benchmark-chart__value"><%= budgets.map { |budget| summary(budget, solver) ? "#{summary(budget, solver).fetch('feasible')}/#{summary(budget, solver).fetch('total')}" : "—" }.join(" · ") %></span>
+          </li>
+        <% end %>
+      </ol>
+    </figure>
+
+    <%# Then quality. Read together with feasibility above: the same solver can
+        top this chart only where it stayed feasible. %>
+    <figure class="benchmark-chart">
+      <figcaption class="benchmark-chart__caption">
+        <h3>Mean gap to reference</h3>
+        <% if drawable_gaps? %>
+          <p>
+            Feasible results with a reference cost only. 0% matches the reference; lower is better.
+            <% if max_gap %>
+              Bars are scaled to this problem's largest mean gap, <strong><%= format('%.2f%%', max_gap) %></strong>.
+            <% end %>
+          </p>
+        <% else %>
+          <p>
+            This run holds no reference cost for <%= @problem.fetch('title').downcase %>, so no solver has a
+            mean gap to show. The feasible counts above are the comparison this run supports;
+            reference costs are added per problem, not inferred.
+          </p>
+        <% end %>
+      </figcaption>
+      <% if drawable_gaps? %>
+      <ol class="benchmark-chart__rows">
+        <% solvers.each do |solver| %>
+          <li class="benchmark-chart__row<%= ' benchmark-chart__row--solverforge' if solverforge?(solver) %>">
+            <span class="benchmark-chart__label"><%= solver %></span>
+            <span class="benchmark-chart__bars">
+              <% budgets.each do |budget| %>
+                <% row = summary(budget, solver) %>
+                <% gap = gap_percent(row) %>
+                <% fill_percent = fill(gap, max_gap) %>
+                <span
+                  class="benchmark-chart__track"
+                  title="<%= solver %>, <%= budget %>s: <%= gap ? "#{format('%.2f%%', gap)} mean gap over #{row.fetch('quality_samples')} samples" : 'no feasible result with a reference cost' %>"
+                >
+                  <% if fill_percent %>
+                    <span
+                      class="benchmark-chart__bar benchmark-chart__bar--<%= budget %>s"
+                      style="--benchmark-bar-fill: <%= fill_percent %>%"
+                      data-benchmark-gap="<%= gap.round(2) %>"
+                    ></span>
+                  <% else %>
+                    <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
+                  <% end %>
+                </span>
+              <% end %>
+            </span>
+            <span class="benchmark-chart__value"><%= budgets.map { |budget| (row = summary(budget, solver)) && row['gap_percent'] ? format('%.2f%%', row['gap_percent']) : "—" }.join(" · ") %></span>
+          </li>
+        <% end %>
+      </ol>
+      <% end %>
+    </figure>
+  </div>
+</section>
