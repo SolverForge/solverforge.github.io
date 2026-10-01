@@ -737,6 +737,7 @@ async function checkBenchmarksPage(origin) {
         rows: section.querySelectorAll("tbody tr").length,
         provenance: section.querySelector("details") ? true : false,
         completed: section.querySelector("time")?.getAttribute("datetime") || "",
+        referencesText: section.querySelector(".benchmark-references")?.textContent || "",
         // Two charts per problem, each with a row per solver and one bar per
         // tested budget. A bar whose fill is unset renders as zero-length at
         // every width, which is indistinguishable from a measured zero.
@@ -829,6 +830,54 @@ async function checkBenchmarksPage(origin) {
           found: section.completed,
           expected: problem.completed_at,
         });
+      }
+
+      // Reference provenance must be stated, and the page must agree with the
+      // imported catalogs: a gap whose reference is unstated is unauditable, and
+      // a page claiming full coverage for a partly covered problem is wrong.
+      const coverageText = (section.referencesText || "").replace(/\s+/g, " ");
+      if (!coverageText) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} states no reference provenance`,
+        });
+      } else {
+        if (problem.reference_present) {
+          if (!coverageText.includes(`${problem.reference_instances} of ${problem.instances}`)) {
+            failures.push({
+              path: "/benchmarks/",
+              issue: `${problem.benchmark_name} reference coverage disagrees with the catalog`,
+              found: coverageText.slice(0, 120),
+              expected: `${problem.reference_instances} of ${problem.instances}`,
+            });
+          }
+          for (const source of problem.reference_sources) {
+            if (!coverageText.includes(source.name)) {
+              failures.push({
+                path: "/benchmarks/",
+                issue: `${problem.benchmark_name} does not name its reference source`,
+                missing: source.name,
+              });
+            }
+          }
+          // A best-known bound must not be presented as a proven optimum.
+          const onlyBounds =
+            problem.reference_kinds.length === 1 &&
+            problem.reference_kinds[0] === "best_known_upper_bound";
+          if (onlyBounds && !/not proven optima/i.test(coverageText)) {
+            failures.push({
+              path: "/benchmarks/",
+              issue: `${problem.benchmark_name} presents best known bounds without saying they are not optima`,
+              found: coverageText.slice(0, 120),
+            });
+          }
+        } else if (!/no published reference/i.test(coverageText)) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} has no references but does not say so`,
+            found: coverageText.slice(0, 120),
+          });
+        }
       }
 
       // Charts must cover the same solvers and budgets the tables do, and every

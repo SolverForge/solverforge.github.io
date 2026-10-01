@@ -37,7 +37,14 @@ SELECT json_build_object(
         f.wall_time_over_limit, f.watchdog_killed,
         (NULLIF(f.run_error, '') IS NOT NULL OR NULLIF(f.validation_error, '') IS NOT NULL) AS error
       FROM publishable_benchmark_result_facts f JOIN selected s ON s.id = f.run_id
-    ) public_result)
+    ) public_result),
+  'references', (SELECT json_agg(row_to_json(reference_catalog) ORDER BY benchmark_name, instance)
+    FROM (
+      SELECT c.benchmark_name, c.dataset, c.instance, c.reference_cost, c.reference_kind,
+             c.source_name, c.source_revision
+      FROM benchmark_reference_catalog c
+      WHERE c.benchmark_name IN (SELECT benchmark_name FROM selected)
+    ) reference_catalog)
 );
 COMMIT;
 """
@@ -86,12 +93,24 @@ def summarize(snapshot):
             ))
         name = run['benchmark_name']
         title, description = LABELS.get(name, (name.replace('-', ' ').capitalize(), 'Lower validated cost is better; feasibility comes first.'))
+        # Reference provenance travels with the problem: which instances have an
+        # official value, how strong those values are, and where they came from.
+        # A problem with no reference states that rather than showing a gap that
+        # would be measured against nothing.
+        problem_references = [r for r in (snapshot.get('references') or [])
+                              if r['benchmark_name'] == name]
+        kinds = sorted({r['reference_kind'] for r in problem_references})
+        sources = sorted({(r['source_name'], r['source_revision']) for r in problem_references})
         problems.append(dict(
             **run, title=title, description=description,
             instances=len({r['instance'] for r in rows}),
             datasets=sorted({r['dataset'] for r in rows}),
             dataset_sets=sorted({r['dataset_set'] for r in rows}),
             summaries=summaries,
+            reference_present=bool(problem_references),
+            reference_instances=len({r['instance'] for r in problem_references}),
+            reference_kinds=kinds,
+            reference_sources=[dict(name=s[0], revision=s[1]) for s in sources],
         ))
     if sum(p['result_count'] for p in problems) != len(results):
         raise ValueError('Unexpected rows outside selected runs')
