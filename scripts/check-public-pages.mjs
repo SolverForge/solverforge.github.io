@@ -814,6 +814,13 @@ async function checkBenchmarksPage(origin) {
             .map((row) => row.querySelector(".benchmark-chart__label")?.textContent.trim() || ""),
           // An empty panel must carry its reason in prose, or the reader is
           // left to guess why a comparison is missing.
+          qualityContexts: figure.querySelector("h3")?.textContent.trim() === "Mean gap to reference"
+            ? [...figure.querySelectorAll(".benchmark-chart__row")].map((row) => ({
+              solver: row.querySelector(".benchmark-chart__label")?.textContent.trim(),
+              budget: Number(row.closest(".benchmark-chart__budget").dataset.budget),
+              text: row.querySelector(".benchmark-chart__context")?.textContent.replace(/\s+/g, " ").trim() || "",
+              visible: Boolean(row.querySelector(".benchmark-chart__context")?.getBoundingClientRect().height),
+            })) : [],
           captionReason: (figure.querySelector("figcaption p")?.textContent.trim() || "").length > 40,
           rows: figure.querySelectorAll(".benchmark-chart__row").length,
           bars: figure.querySelectorAll(".benchmark-chart__bar").length,
@@ -1053,6 +1060,22 @@ async function checkBenchmarksPage(origin) {
             expected: tableRank,
           });
           break;
+        }
+      }
+      const qualityChart = section.charts.find((chart) => chart.caption === "Mean gap to reference");
+      if (drawableGaps && qualityChart?.qualityContexts.length !== expectedBars) {
+        failures.push({ path: "/benchmarks/", issue: `${problem.benchmark_name} missing quality coverage context` });
+      }
+      for (const context of qualityChart?.qualityContexts || []) {
+        const row = problem.summaries.find((value) => value.solver === context.solver && value.budget === context.budget);
+        const earlier = [...problem.time_limits_seconds].sort((a, b) => a - b).filter((budget) => budget < context.budget);
+        const expected = `${row.feasible}/${row.total} feasible · ${row.quality_samples} gap samples` +
+          (earlier.length ? ` Earlier feasibility: ${earlier.map((budget) => {
+            const previous = problem.summaries.find((value) => value.solver === context.solver && value.budget === budget);
+            return `${budget}s ${previous.feasible}/${previous.total}`;
+          }).join(" · ")}` : "");
+        if (!context.visible || context.text !== expected) {
+          failures.push({ path: "/benchmarks/", issue: `${problem.benchmark_name} quality coverage context is missing or wrong`, context, expected });
         }
       }
       const gateChart = section.charts.find((chart) => chart.caption === "First feasible gate");

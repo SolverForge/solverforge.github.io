@@ -115,6 +115,8 @@
         <% if drawable_gaps? %>
           <p>
             Feasible results with a reference cost only. 0% matches the reference; lower is better.
+            Rows follow feasibility-first ranking, not gap alone. Coverage and sample counts
+            are shown on every row; means over different solved subsets are not like-for-like.
             <% if max_gap %>
               Bars are scaled to this problem's largest mean gap, <strong><%= format('%.2f%%', max_gap) %></strong>.
             <% end %>
@@ -158,6 +160,13 @@
             <span class="benchmark-chart__value">
                 <% row = summary(budget, solver) %>
                 <span><small><%= budget %>s</small> <%= row && row['gap_percent'] ? format('%.2f%%', row['gap_percent']) : "—" %></span>
+            </span>
+            <span class="benchmark-chart__context">
+              <span><%= row.fetch('feasible') %>/<%= row.fetch('total') %> feasible · <%= row.fetch('quality_samples') %> gap samples</span>
+              <% earlier = budgets.select { |gate| gate < budget } %>
+              <% unless earlier.empty? %>
+                <span>Earlier feasibility: <% earlier.each_with_index do |gate, index| %><%= ' · ' if index > 0 %><% previous = summary(gate, solver) %><%= gate %>s <%= previous.fetch('feasible') %>/<%= previous.fetch('total') %><% end %></span>
+              <% end %>
             </span>
           </li>
         <% end %>
