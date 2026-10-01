@@ -14,6 +14,56 @@ import { chromium } from "playwright";
 // problem that silently drops out fails.
 const benchmarksDataPath = resolve("src/_data/benchmarks.json");
 
+// The page ranks solvers by feasibility, then time to a viable solution, then
+// quality. This is an independent reimplementation of that rule: if it agreed
+// with the importer only by construction, a bug in the importer would move the
+// rendered order and the check would move with it instead of failing.
+function rankSolvers(problem) {
+  const budgets = problem.time_limits_seconds;
+  const rows = problem.summaries;
+  const unsolved = {};
+  const worstBudget = {};
+  const missingTime = {};
+  const missingGap = {};
+  const relativeTime = {};
+  const gapSum = {};
+  for (const solver of problem.solvers) {
+    unsolved[solver] = 0;
+    worstBudget[solver] = Infinity;
+    missingTime[solver] = 0;
+    missingGap[solver] = 0;
+    relativeTime[solver] = 0;
+    gapSum[solver] = 0;
+  }
+  const totals = {};
+  for (const row of rows) {
+    totals[row.solver] = row.total;
+    worstBudget[row.solver] = Math.min(worstBudget[row.solver], row.feasible);
+    if (row.mean_feasible_seconds === null || row.mean_feasible_seconds === undefined) {
+      missingTime[row.solver] += 1;
+    } else {
+      relativeTime[row.solver] += row.mean_feasible_seconds / row.budget;
+    }
+    if (row.gap_percent === null || row.gap_percent === undefined) {
+      missingGap[row.solver] += 1;
+    } else {
+      gapSum[row.solver] += row.gap_percent;
+    }
+  }
+  for (const solver of problem.solvers) {
+    unsolved[solver] = (totals[solver] ?? 0) - worstBudget[solver];
+  }
+  void budgets;
+  return [...problem.solvers].sort((a, b) => (
+    unsolved[a] - unsolved[b] ||
+    missingTime[a] - missingTime[b] ||
+    relativeTime[a] - relativeTime[b] ||
+    missingGap[a] - missingGap[b] ||
+    gapSum[a] - gapSum[b] ||
+    (a < b ? -1 : a > b ? 1 : 0)
+  ));
+}
+
 // Markers are small, but two can still land on the same interface element. An
 // overlap means the reader cannot tell which number names which region. This is
 // injected into the page, so it is written as a string rather than a closure.
@@ -748,6 +798,8 @@ async function checkBenchmarksPage(origin) {
         heading: section.querySelector("h2")?.textContent.trim() || "",
         tables: [...section.querySelectorAll(".benchmark-table table")].map((table) => ({
           headers: [...table.querySelectorAll("thead th")].map((th) => th.textContent.trim()),
+          solvers: [...table.querySelectorAll("tbody th[scope='row']")]
+            .map((th) => th.childNodes[0]?.textContent.trim() || ""),
         })),
         rows: section.querySelectorAll("tbody tr").length,
         provenance: section.querySelector("details") ? true : false,
@@ -758,6 +810,8 @@ async function checkBenchmarksPage(origin) {
         // every width, which is indistinguishable from a measured zero.
         charts: [...section.querySelectorAll("figure.benchmark-chart")].map((figure) => ({
           caption: figure.querySelector("h3")?.textContent.trim() || "",
+          solvers: [...figure.querySelectorAll(".benchmark-chart__row")]
+            .map((row) => row.querySelector(".benchmark-chart__label")?.textContent.trim() || ""),
           // An empty panel must carry its reason in prose, or the reader is
           // left to guess why a comparison is missing.
           captionReason: (figure.querySelector("figcaption p")?.textContent.trim() || "").length > 40,
@@ -888,18 +942,21 @@ async function checkBenchmarksPage(origin) {
             });
           }
         } else if (problem.reference_present) {
-          // The catalog covers instances this run did not grade, so the page must
-          // say the run's instances are outside the published set rather than
-          // implying the gap was measured against something.
-          if (!coverageText.includes(`${problem.reference_instances} of ${problem.instances}`)) {
+          // State what the run could grade against, not the catalog's size: a
+          // catalog holding values for tuples this run never selects covers
+          // none of them, and quoting its size beside the instance count reads
+          // as coverage the run does not have.
+          const expected =
+            `${problem.reference_covered_run_instances} of ${problem.instances}`;
+          if (!coverageText.includes(expected)) {
             failures.push({
               path: "/benchmarks/",
-              issue: `${problem.benchmark_name} reference coverage disagrees with the catalog`,
+              issue: `${problem.benchmark_name} reference coverage disagrees with what the run graded`,
               found: coverageText.slice(0, 140),
-              expected: `${problem.reference_instances} of ${problem.instances}`,
+              expected,
             });
           }
-          if (!/not in this set|not these|outside the published/i.test(coverageText)) {
+          if (!/not in this set|not these|outside the published|does not select/i.test(coverageText)) {
             failures.push({
               path: "/benchmarks/",
               issue: `${problem.benchmark_name} does not say the run's instances are outside the published reference set`,
@@ -953,6 +1010,42 @@ async function checkBenchmarksPage(origin) {
           issue: `${problem.benchmark_name} should draw ${expectedCharts} chart panels`,
           found: section.charts.length,
         });
+      }
+      // The solvers themselves are ranked, not merely the columns: each chart
+      // and table must read top to bottom in the page's stated priority order.
+      // The expected order is recomputed here from the committed measurements,
+      // not read from the file, so an importer bug cannot move both the page and
+      // the expectation together. A rank that is present but wrong is worse than
+      // no rank, because it reads as a considered ordering.
+      const expectedRank = rankSolvers(problem);
+      const pageRank = problem.solvers;
+      if (pageRank.join("|") !== expectedRank.join("|")) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} ranked solvers ${JSON.stringify(pageRank)} but the measurements rank them ${JSON.stringify(expectedRank)}`,
+        });
+      }
+      for (const chart of section.charts) {
+        if (chart.solvers.length > 0 && chart.solvers.join("|") !== expectedRank.join("|")) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart "${chart.caption}" does not rank solvers by feasibility, time, then quality`,
+            found: chart.solvers,
+            expected: expectedRank,
+          });
+          break;
+        }
+      }
+      for (const table of section.tables) {
+        if (table.solvers.length > 0 && table.solvers.join("|") !== expectedRank.join("|")) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} table does not rank solvers by feasibility, time, then quality`,
+            found: table.solvers,
+            expected: expectedRank,
+          });
+          break;
+        }
       }
       const expectedOrder = ["Feasible results", "Time to a viable solution", "Mean gap to reference"];
       const renderedOrder = section.charts.map((chart) => chart.caption);
@@ -1099,13 +1192,13 @@ async function checkBenchmarksDocs(origin) {
         failures.push({ path, issue: `docs page does not state the reference mechanism`, missing: required });
       }
     }
-    // Coverage per problem must appear, and must match the imported catalogs.
+    // Coverage per problem must appear, and must state what the run could
+    // actually grade against. The catalog's size is not that number: a catalog
+    // holding values for tuples the selection never runs covers none of them,
+    // and quoting its size beside the run's instance count reads as coverage.
     const data = JSON.parse(readFileSync(benchmarksDataPath, "utf8"));
     for (const problem of data.problems) {
-      const expected =
-        problem.reference_covers_run
-          ? `${problem.instances} of ${problem.instances}`
-          : `${problem.reference_instances} of ${problem.instances}`;
+      const expected = `${problem.reference_covered_run_instances} of ${problem.instances}`;
       if (!rendered.text.includes(expected)) {
         failures.push({
           path,

@@ -37,9 +37,10 @@ into one score.
       <% if problem.fetch('reference_covers_run') %>
         Reference values for all <strong><%= problem.fetch('instances') %></strong> instances, from
       <% else %>
-        Reference values for <strong><%= problem.fetch('reference_instances') %></strong> of
-        <%= problem.fetch('instances') %> instances — the run's instances are not in this set, so
-        their mean gap is not shown. The values come from
+        Reference values cover <strong><%= problem.fetch('reference_covered_run_instances') %></strong> of
+        <strong><%= problem.fetch('instances') %></strong> instances in this run — the catalog holds
+        <%= problem.fetch('reference_instances') %> published values for this problem, on
+        history/week tuples this run does not select — so their mean gap is not shown. The values come from
       <% end %>
       <% problem.fetch('reference_sources').each_with_index do |source, index| %><%= ', ' if index > 0 %><%= source.fetch('name') %><% end %>:
       <% if problem.fetch('reference_kinds').include?('known_optimum') && problem.fetch('reference_kinds').include?('best_known_upper_bound') %>
@@ -63,7 +64,8 @@ into one score.
       <table>
         <thead><tr><th scope="col">Solver / tested version</th><th scope="col">Feasible</th><th scope="col">Time to viable</th><th scope="col">Mean gap</th><th scope="col">Mean runtime</th><th scope="col">Over budget</th></tr></thead>
         <tbody>
-          <% problem.fetch('summaries').select { |row| row.fetch('budget') == budget }.each do |row| %>
+          <% solver_rank = problem.fetch('solvers').each_with_index.to_h %>
+          <% problem.fetch('summaries').select { |row| row.fetch('budget') == budget }.sort_by { |row| solver_rank.fetch(row.fetch('solver'), 999) }.each do |row| %>
             <tr class="<%= row.fetch('solver').start_with?('solverforge') ? 'benchmark-solverforge' : '' %>">
               <th scope="row"><%= row.fetch('solver') %> <small><%= row.fetch('version') %></small></th>
               <td><%= row.fetch('feasible') %> / <%= row.fetch('total') %></td>
