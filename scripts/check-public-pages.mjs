@@ -14,8 +14,8 @@ import { chromium } from "playwright";
 // problem that silently drops out fails.
 const benchmarksDataPath = resolve("src/_data/benchmarks.json");
 
-// The page ranks solvers by feasibility, then time to a viable solution, then
-// quality. This is an independent reimplementation of that rule: if it agreed
+// Rank by feasibility, earlier-gate coverage, then quality—not runtime.
+// This is an independent reimplementation of that rule: if it agreed
 // with the importer only by construction, a bug in the importer would move the
 // rendered order and the check would move with it instead of failing.
 function rankSolvers(problem, budget = Math.max(...problem.time_limits_seconds)) {
@@ -25,10 +25,20 @@ function rankSolvers(problem, budget = Math.max(...problem.time_limits_seconds))
     if (b == null) return -1;
     return a - b;
   };
+  const earlierCoverage = (a, b) => {
+    for (const gate of [...problem.time_limits_seconds].sort((x, y) => x - y)) {
+      if (gate >= budget) break;
+      const count = (solver) => problem.summaries.find((row) => row.solver === solver && row.budget === gate).feasible;
+      const difference = count(b) - count(a);
+      if (difference) return difference;
+    }
+    return 0;
+  };
   return [...rows].sort((a, b) => (
     (a.total - a.feasible) - (b.total - b.feasible) ||
-    compareOptional(a.mean_feasible_seconds, b.mean_feasible_seconds) ||
+    earlierCoverage(a.solver, b.solver) ||
     compareOptional(a.gap_percent, b.gap_percent) ||
+    compareOptional(a.mean_cost, b.mean_cost) ||
     a.solver.localeCompare(b.solver)
   )).map((row) => row.solver);
 }
@@ -818,6 +828,11 @@ async function checkBenchmarksPage(origin) {
           // A measured zero must be marked so it is drawn at a visible width:
           // a solver that failed every instance and a solver that was never run
           // must not render identically.
+          firstGates: [...figure.querySelectorAll("[data-benchmark-first-gate]")].map((bar) => ({
+            solver: bar.closest(".benchmark-chart__row").querySelector(".benchmark-chart__label").textContent.trim(),
+            budget: Number(bar.closest(".benchmark-chart__budget").dataset.budget),
+            count: Number(bar.dataset.benchmarkFirstGate),
+          })),
           measuredZero: [...figure.querySelectorAll(".benchmark-chart__bar")]
             .filter((bar) => parseFloat(bar.style.getPropertyValue("--benchmark-bar-fill")) === 0).length,
           markedZero: figure.querySelectorAll(".benchmark-chart__bar--zero").length,
@@ -866,13 +881,13 @@ async function checkBenchmarksPage(origin) {
           found: section.tables.length,
         });
       }
-      // The tables carry the same ranking order as the charts: feasibility,
-      // time to a viable solution, then quality.
+      // Tables and charts share gate coverage and quality ranking.
       const expectedHeaders = [
         "Solver / tested version",
         "Feasible",
-        "Time to viable",
         "Mean gap",
+        "Mean cost",
+        "Runtime (feasible)",
         "Mean runtime",
         "Over budget",
       ];
@@ -880,7 +895,7 @@ async function checkBenchmarksPage(origin) {
         if (table.headers.join("|") !== expectedHeaders.join("|")) {
           failures.push({
             path: "/benchmarks/",
-            issue: `${problem.benchmark_name} table columns do not follow feasibility, time, then quality`,
+            issue: `${problem.benchmark_name} table columns do not follow feasibility then quality`,
             found: table.headers,
             expected: expectedHeaders,
           });
@@ -985,13 +1000,13 @@ async function checkBenchmarksPage(origin) {
       }
 
       // Charts must cover the same solvers and budgets the tables do, in the
-      // order results are ranked by: feasibility, then time to a viable
-      // solution, then quality. Both the count and the order are checked, so a
+      // priority order: feasibility, earliest observed gate, then quality.
+      // Both the count and the order are checked, so a
       // panel cannot be dropped or moved below a lower-priority one.
       const expectedBars = problem.solvers.length * problem.time_limits_seconds.length;
       const drawableGaps = problem.summaries.some((row) => Number(row.gap_percent) > 0);
-      // Feasibility and time always draw: any run that selected instances has
-      // them. The quality panel is drawn only when the run holds a usable mean
+      // Feasibility and first-gate counts always draw, including measured zero.
+      // The quality panel is drawn only when the run holds a usable mean
       // gap, and states its absence in prose otherwise.
       const expectedCharts = 3;
       if (section.charts.length !== expectedCharts) {
@@ -1021,7 +1036,7 @@ async function checkBenchmarksPage(origin) {
         if (chart.solvers.length > 0 && chart.solvers.join("|") !== chartRank.join("|")) {
           failures.push({
             path: "/benchmarks/",
-            issue: `${problem.benchmark_name} chart "${chart.caption}" does not rank solvers by feasibility, time, then quality`,
+            issue: `${problem.benchmark_name} chart "${chart.caption}" does not rank solvers by feasibility then quality`,
             found: chart.solvers,
             expected: chartRank,
           });
@@ -1033,20 +1048,36 @@ async function checkBenchmarksPage(origin) {
         if (table.solvers.length === 0 || table.solvers.join("|") !== tableRank.join("|")) {
           failures.push({
             path: "/benchmarks/",
-            issue: `${problem.benchmark_name} ${table.budget}s table does not rank solvers by feasibility, time, then quality`,
+            issue: `${problem.benchmark_name} ${table.budget}s table does not rank solvers by feasibility then quality`,
             found: table.solvers,
             expected: tableRank,
           });
           break;
         }
       }
-      const expectedOrder = ["Feasible results", "Time to a viable solution", "Mean gap to reference"];
+      const gateChart = section.charts.find((chart) => chart.caption === "First feasible gate");
+      const evidence = JSON.parse(readFileSync("src/benchmarks/results.json", "utf8"));
+      const earliest = new Map();
+      for (const row of evidence.results) {
+        if (row.benchmark_name !== problem.benchmark_name || row.hard_feasible !== true) continue;
+        const key = `${row.solver}|${row.instance}`;
+        earliest.set(key, Math.min(earliest.get(key) ?? Infinity, row.time_limit_seconds));
+      }
+      if (!gateChart || gateChart.firstGates.length !== expectedBars) {
+        failures.push({ path: "/benchmarks/", issue: `${problem.benchmark_name} missing first feasible gate counts` });
+      } else {
+        for (const value of gateChart.firstGates) {
+          const count = [...earliest].filter(([key, gate]) => key.startsWith(`${value.solver}|`) && gate === value.budget).length;
+          if (value.count !== count) failures.push({ path: "/benchmarks/", issue: `${problem.benchmark_name} wrong first feasible gate count`, value, expected: count });
+        }
+      }
+      const expectedOrder = ["Feasible results", "First feasible gate", "Mean gap to reference"];
       const renderedOrder = section.charts.map((chart) => chart.caption);
       for (let i = 0; i < renderedOrder.length; i += 1) {
         if (renderedOrder[i] !== expectedOrder[i]) {
           failures.push({
             path: "/benchmarks/",
-            issue: `${problem.benchmark_name} chart order does not follow feasibility, time, then quality`,
+            issue: `${problem.benchmark_name} chart order does not follow feasibility then quality`,
             found: renderedOrder,
             expected: expectedOrder.slice(0, renderedOrder.length),
           });

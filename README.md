@@ -77,7 +77,7 @@ and the portable tutorial verifiers.
 ## Benchmark snapshot
 
 `/benchmarks/` renders a checked-in warehouse snapshot, grouped by problem. Refresh
-it with `python3 scripts/import-benchmarks.py` (requires `psql`; defaults to the
+it with `ruby scripts/import-benchmarks.rb` (requires `psql`; defaults to the
 local `solverforge_bench` database, or uses `BENCH_DATABASE_URL`). The importer uses
 one read-only transaction and **never runs benchmarks**. It selects the latest
 publishable full canonical nightly candidate run per problem, excluding quick,
@@ -89,12 +89,21 @@ version. Missing full runs are shown as unavailable, not replaced by smaller
 runs. Publication timestamps and versions describe the recorded runs, not current
 package releases. Normal builds and CI need no warehouse connection.
 
+Normal builds and CI use the site's existing Ruby toolchain; the benchmark
+importer and verifier require no extra gems. To recompute only the summary from
+committed evidence without contacting PostgreSQL:
+
+```sh
+ruby scripts/import-benchmarks.rb --snapshot src/benchmarks/results.json --summary-only
+```
+
 `make verify-benchmarks` recomputes summaries from the evidence and checks full-run
 scope, versions, matrix completeness, and rejection of quick or partial data.
 This gate runs in `make test` and `make ci-local`.
 
-Each problem renders two charts from that same data: feasibility per solver and
-budget, and mean gap to the run's reference costs. A problem whose run holds no
+Each problem renders gate-based charts from that same data: feasibility per
+solver and budget, first observed feasible gate per instance, and mean reference
+gap. Runtime is diagnostic only, never a ranking criterion. A problem whose run holds no
 reference cost states that in prose instead of drawing an empty panel, since no
 comparison exists to draw. `scripts/check-public-pages.mjs` reads
 `src/_data/benchmarks.json` and checks the rendered sections, budgets, rows, bar

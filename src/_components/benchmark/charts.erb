@@ -1,5 +1,5 @@
 <section class="benchmark-charts" aria-label="<%= @problem.fetch('title') %> summary charts">
-  <p class="benchmark-charts__ranking">Each budget has its own winner-first ranking: feasibility → time to viable → quality.</p>
+  <p class="benchmark-charts__ranking">Earliest feasible gate first; compare feasibility and quality within each gate. Runtime does not rank solutions.</p>
   <div class="benchmark-charts__legend">
     <% budgets.each do |budget| %>
       <span class="benchmark-charts__legend-item">
@@ -56,26 +56,17 @@
       </div>
     </figure>
 
-    <%# Then time to a viable solution. Read after feasibility and before
-        quality: a solver that never delivers has no time, and speed only ranks
-        solvers that actually produced an answer. %>
+    <%# Each instance contributes only to its earliest observed feasible gate. %>
     <figure class="benchmark-chart">
       <figcaption class="benchmark-chart__caption">
-        <h3>Time to a viable solution</h3>
-        <% if drawable_times? %>
-          <p>
-            Measured wall-clock time of the invocations that returned a hard-feasible
-            solution; lower is better. Bars are scaled to this problem's longest such
-            mean, <strong><%= format('%.2f s', max_feasible_seconds) %></strong>.
-          </p>
-        <% else %>
-          <p>
-            No invocation in this run returned a hard-feasible solution, so there is no
-            time to a viable solution to show.
-          </p>
-        <% end %>
+        <h3>First feasible gate</h3>
+        <p>Instances first observed feasible at this tested budget, out of <%= total_instances %>.
+          Each instance counts once: earlier is better. Independent budget runs, not
+          first-solution timestamps; late returns are retained. Never feasible:
+          <% solvers(budgets.first).each_with_index do |solver, index| %><%= '; ' if index > 0 %><%= solver %> <%= @problem.fetch('first_feasible_gates').fetch(solver).fetch('never') %><% end %>.
+        </p>
       </figcaption>
-      <% if drawable_times? %>
+      <% if total_instances.positive? %>
       <div class="benchmark-chart__budgets">
       <% budgets.each do |budget| %>
         <div class="benchmark-chart__budget" data-budget="<%= budget %>">
@@ -86,17 +77,17 @@
             <span class="benchmark-chart__label"><%= solver %></span>
             <span class="benchmark-chart__bars">
                 <% row = summary(budget, solver) %>
-                <% seconds = feasible_seconds(row) %>
-                <% fill_percent = fill(seconds, max_feasible_seconds) %>
+                <% count = @problem.fetch('first_feasible_gates').fetch(solver).fetch('counts').fetch(budget.to_s) %>
+                <% fill_percent = fill(count, total_instances) %>
                 <span
                   class="benchmark-chart__track"
-                  title="<%= solver %>, <%= budget %>s: <%= seconds ? "#{format('%.2f s', seconds)} mean over #{feasible_time_samples(row)} feasible results" : 'no feasible result' %>"
+                  title="<%= solver %>: <%= count %> instances first feasible at the <%= budget %>s gate"
                 >
                   <% if fill_percent %>
                     <span
-                      class="benchmark-chart__bar benchmark-chart__bar--<%= budget %>s<%= ' benchmark-chart__bar--zero' if zero?(seconds) %>"
+                      class="benchmark-chart__bar benchmark-chart__bar--<%= budget %>s<%= ' benchmark-chart__bar--zero' if zero?(count) %>"
                       style="--benchmark-bar-fill: <%= fill_percent %>%"
-                      data-benchmark-feasible-seconds="<%= seconds.round(3) %>"
+                      data-benchmark-first-gate="<%= count %>"
                     ></span>
                   <% else %>
                     <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
@@ -105,7 +96,7 @@
             </span>
             <span class="benchmark-chart__value">
                 <% row = summary(budget, solver) %>
-                <span><small><%= budget %>s</small> <%= row && row['mean_feasible_seconds'] ? format('%.2f s', row['mean_feasible_seconds']) : "—" %></span>
+                <span><small><%= budget %>s</small> <%= count %>/<%= total_instances %></span>
             </span>
           </li>
         <% end %>
@@ -131,7 +122,7 @@
         <% else %>
           <p>
             This run's instances are not in the published reference set, so no solver has a
-            mean gap to show. The feasible counts above are the comparison this run supports;
+            mean gap to show. Validated mean costs are in the tables below;
             the published values cover other instances of this problem, not these.
           </p>
         <% end %>

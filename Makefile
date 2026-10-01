@@ -122,7 +122,7 @@ verify-release-surface:
 
 verify-benchmarks:
 	$(call status,Verifying recorded full-run benchmark evidence)
-	@python3 scripts/verify-benchmarks.py
+	@ruby scripts/verify-benchmarks.rb
 
 verify-use-cases:
 	$(call status,Verifying the use-case showcase contract)

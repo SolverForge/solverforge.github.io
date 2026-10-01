@@ -3,6 +3,72 @@
   "selection": "Latest publishable full canonical nightly candidate run per problem, by completed_at",
   "problems": [
     {
+      "first_feasible_gates": {
+        "pyvrp": {
+          "counts": {
+            "1": 100,
+            "10": 0,
+            "60": 0
+          },
+          "never": 0
+        },
+        "ortools": {
+          "counts": {
+            "1": 100,
+            "10": 0,
+            "60": 0
+          },
+          "never": 0
+        },
+        "vroom": {
+          "counts": {
+            "1": 100,
+            "10": 0,
+            "60": 0
+          },
+          "never": 0
+        },
+        "timefold": {
+          "counts": {
+            "1": 14,
+            "10": 86,
+            "60": 0
+          },
+          "never": 0
+        },
+        "rustvrp": {
+          "counts": {
+            "1": 91,
+            "10": 9,
+            "60": 0
+          },
+          "never": 0
+        },
+        "pyhygese": {
+          "counts": {
+            "1": 98,
+            "10": 1,
+            "60": 1
+          },
+          "never": 0
+        },
+        "solverforge": {
+          "counts": {
+            "1": 84,
+            "10": 16,
+            "60": 0
+          },
+          "never": 0
+        },
+        "solverforge-py": {
+          "counts": {
+            "1": 58,
+            "10": 1,
+            "60": 17
+          },
+          "never": 24
+        }
+      },
       "id": "3614f02a-0336-4153-a575-f434697506fb",
       "benchmark_name": "cvrp",
       "completed_at": "2026-10-01T10:34:31.304855+00:00",
@@ -412,20 +478,20 @@
         }
       ],
       "solvers": [
-        "vroom",
-        "solverforge",
-        "rustvrp",
-        "ortools",
-        "pyhygese",
         "pyvrp",
+        "ortools",
+        "vroom",
+        "pyhygese",
+        "rustvrp",
+        "solverforge",
         "timefold",
         "solverforge-py"
       ],
       "solver_orders": {
         "1": [
-          "ortools",
           "pyvrp",
           "vroom",
+          "ortools",
           "pyhygese",
           "rustvrp",
           "solverforge",
@@ -433,22 +499,22 @@
           "timefold"
         ],
         "10": [
-          "solverforge",
-          "rustvrp",
-          "ortools",
           "pyvrp",
+          "ortools",
+          "rustvrp",
+          "solverforge",
           "timefold",
-          "pyhygese",
           "vroom",
+          "pyhygese",
           "solverforge-py"
         ],
         "60": [
-          "vroom",
-          "solverforge",
-          "rustvrp",
-          "ortools",
-          "pyhygese",
           "pyvrp",
+          "ortools",
+          "vroom",
+          "pyhygese",
+          "rustvrp",
+          "solverforge",
           "timefold",
           "solverforge-py"
         ]
@@ -469,6 +535,40 @@
       ]
     },
     {
+      "first_feasible_gates": {
+        "solverforge": {
+          "counts": {
+            "1": 42,
+            "10": 0,
+            "60": 0
+          },
+          "never": 0
+        },
+        "solverforge-py": {
+          "counts": {
+            "1": 42,
+            "10": 0,
+            "60": 0
+          },
+          "never": 0
+        },
+        "timefold": {
+          "counts": {
+            "1": 4,
+            "10": 38,
+            "60": 0
+          },
+          "never": 0
+        },
+        "ortools": {
+          "counts": {
+            "1": 0,
+            "10": 0,
+            "60": 0
+          },
+          "never": 42
+        }
+      },
       "id": "aeabc780-28fc-4e7d-b0fc-41fbbd2dbe97",
       "benchmark_name": "employee-scheduling",
       "completed_at": "2026-09-30T21:59:48.901833+00:00",
@@ -726,6 +826,40 @@
       ]
     },
     {
+      "first_feasible_gates": {
+        "solverforge": {
+          "counts": {
+            "1": 135,
+            "10": 27,
+            "60": 0
+          },
+          "never": 0
+        },
+        "solverforge-py": {
+          "counts": {
+            "1": 114,
+            "10": 48,
+            "60": 0
+          },
+          "never": 0
+        },
+        "timefold": {
+          "counts": {
+            "1": 104,
+            "10": 51,
+            "60": 7
+          },
+          "never": 0
+        },
+        "ortools": {
+          "counts": {
+            "1": 162,
+            "10": 0,
+            "60": 0
+          },
+          "never": 0
+        }
+      },
       "id": "2137acee-ec6d-4c85-a6ff-206a934f86c0",
       "benchmark_name": "job-shop-scheduling",
       "completed_at": "2026-10-01T06:42:42.762173+00:00",

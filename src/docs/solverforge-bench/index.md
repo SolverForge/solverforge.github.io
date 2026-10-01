@@ -234,11 +234,14 @@ be above the true optimum.
 | Job-shop scheduling | 162 of 162 | ScheduleOpt best-known catalogue |
 | Employee scheduling | 0 of 42 (37 values published off this run's tuples) | INRC-II official test dataset, plus the competition's validated finalist results; best known bounds, not optima |
 
-Results are presented in the order they are ranked by: feasibility, then time to
-a viable solution, then quality. Time to viable is the measured wall-clock time
-over the invocations that returned a hard-feasible solution; the tables also show
-the mean over every invocation, so the difference between the two columns is what
-failed or ran to the watchdog.
+Read tested gates in ascending order: 1s, 10s, 60s. The first feasible gate counts
+each instance at the earliest tested budget that returned a valid solution.
+Within each gate, feasibility ranks first, then feasibility coverage at earlier
+gates in ascending order, then solution quality (reference gap,
+or validated mean cost without references). Runtime is diagnostic, never a
+ranking criterion. Separate budget runs are not a continuous search trajectory,
+and first-incumbent timestamps were not recorded. Late returns remain visible
+and are flagged; requested budgets are not strict deadline guarantees.
 
 Regenerate a catalog from its source, or check that a committed one still
 matches the source it claims:
