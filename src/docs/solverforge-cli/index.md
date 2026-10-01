@@ -11,7 +11,7 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual documents the `solverforge-cli 3.3.1` interface. Fresh projects use
+This manual documents the `solverforge-cli 3.3.2` interface. Fresh projects use
 the scaffold targets baked into the binary you have installed; run
 `solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
 <% end %>

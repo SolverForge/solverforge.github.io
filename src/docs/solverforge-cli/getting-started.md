@@ -281,13 +281,22 @@ solverforge generate constraint preferred_shift --reward
 ```
 
 Constraint generation writes a skeleton into `src/constraints/` and updates
-`src/constraints/mod.rs`. Generated skeletons include placeholder TODOs, and
-pair templates intentionally panic inside the placeholder filter until you
-replace them with real domain logic.
+`src/constraints/mod.rs`. Generated skeletons stream from the accessors
+`#[planning_solution]` generates for each collection (`Plan::tasks()`,
+`Plan::resources()`, ...) rather than hand-written extractor functions, and
+they still include placeholder predicates and weights; placeholder filters
+intentionally panic until you replace them with real domain logic.
 
-Treat the generated file as a compile-time wiring aid. It gives you the module,
-constraint name, score shape, and stream pattern; you still own the real
-predicate, join keys, weights, and hard/soft decision.
+Keep the accessor streams exactly as generated. A hand-written extractor such
+as `fn entity_items(solution: &Plan) -> &[Task]` carries
+`ChangeSource::Unknown`; the incremental engine cannot localize per-move
+updates through it, and the first solver-applied move fails with
+`source Unknown cannot localize entity indexes`. The stub compiles and
+`solverforge check` passes, so the failure only surfaces mid-solve.
+
+Treat the generated file as a wiring aid. It gives you the module, constraint
+name, score shape, stream pattern, and the accessor wiring; you still own the
+real predicate, join keys, weights, and hard/soft decision.
 
 ### Add Model Resources
 
