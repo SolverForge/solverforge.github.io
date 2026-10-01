@@ -123,14 +123,27 @@ process kill. We can see both solution quality and time discipline.
 
 Ranking rules are part of the benchmark, not an afterthought.
 
-For employee scheduling, hard feasibility comes first. A lower soft cost does
-not beat a schedule with invalid coverage, invalid shift assignment, or a
-broken hard constraint. Once two results are hard-feasible, the validator cost
-is the comparison value.
+Results are ranked in three steps, and each step only orders the solvers that
+cleared the one before it:
 
-For routing, feasibility and route validity come before distance or objective
-quality. A short route that violates capacity or drops required visits is not a
-better route.
+1. **Feasibility.** Hard feasibility comes first. For employee scheduling, a
+   lower soft cost does not beat a schedule with invalid coverage, invalid shift
+   assignment, or a broken hard constraint. For routing, a short route that
+   violates capacity or drops required visits is not a better route.
+2. **Time to a viable solution.** Among solvers that deliver a usable answer,
+   the one that delivers sooner is the better tool. This is measured wall-clock
+   time over the invocations that returned a hard-feasible solution — not the
+   mean over every invocation, which mostly records how a failure ran to the
+   watchdog.
+3. **Solution quality.** Only then does the objective value separate them: the
+   validator cost for rostering, the recomputed route cost for routing, the
+   makespan for job-shop, and the gap to the official reference where one
+   exists.
+
+Once two results are hard-feasible, feasibility stops discriminating and the
+next step takes over. That is the point of the order: a fast bad answer does not
+beat a slow good one, and a good answer that arrives too late to be useful may
+still beat one that never arrived.
 
 This is why SolverForge benchmark tables should not collapse every result into
 one universal "quality ratio" without context. Some categories need

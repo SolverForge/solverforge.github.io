@@ -234,6 +234,12 @@ be above the true optimum.
 | Job-shop scheduling | 162 of 162 | ScheduleOpt best-known catalogue |
 | Employee scheduling | 9 of 42 | INRC-II official test dataset; best known bounds, not optima |
 
+Results are presented in the order they are ranked by: feasibility, then time to
+a viable solution, then quality. Time to viable is the measured wall-clock time
+over the invocations that returned a hard-feasible solution; the tables also show
+the mean over every invocation, so the difference between the two columns is what
+failed or ran to the watchdog.
+
 Regenerate a catalog from its source, or check that a committed one still
 matches the source it claims:
 
