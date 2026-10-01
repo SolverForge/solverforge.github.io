@@ -23,6 +23,25 @@ a solver that solved them all. Different problems are not combined into one scor
     <%= problem.fetch('result_count') %> recorded results ·
     Completed <time datetime="<%= problem.fetch('completed_at') %>"><%= problem.fetch('completed_at')[0, 10] %></time>
   </p>
+  <% if problem.fetch('reference_present') %>
+    <p class="benchmark-references">
+      Reference values for <strong><%= problem.fetch('reference_instances') %></strong> of
+      <%= problem.fetch('instances') %> instances, from
+      <% problem.fetch('reference_sources').each_with_index do |source, index| %><%= ', ' if index > 0 %><%= source.fetch('name') %><% end %>:
+      <% if problem.fetch('reference_kinds').include?('known_optimum') && problem.fetch('reference_kinds').include?('best_known_upper_bound') %>
+        proven optima where the source closed the instance, best known bounds otherwise.
+      <% elsif problem.fetch('reference_kinds').include?('known_optimum') %>
+        all proven optima.
+      <% else %>
+        best known bounds, not proven optima.
+      <% end %>
+    </p>
+  <% else %>
+    <p class="benchmark-references">
+      No published reference values exist for this problem's instances, so the mean gap is not shown;
+      feasibility is the comparison this run supports.
+    </p>
+  <% end %>
   <%= render Benchmark::Charts.new(problem: problem) %>
   <% problem.fetch('time_limits_seconds').sort.reverse.each_with_index do |budget, index| %>
     <% if index > 0 %><details><summary><%= budget %>-second budget</summary><% else %><h3><%= budget %>-second budget</h3><% end %>

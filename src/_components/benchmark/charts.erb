@@ -61,9 +61,10 @@
           </p>
         <% else %>
           <p>
-            This run holds no reference cost for <%= @problem.fetch('title').downcase %>, so no solver has a
+            This run's instances are not in the published reference set, so no solver has a
             mean gap to show. The feasible counts above are the comparison this run supports;
-            reference costs are added per problem, not inferred.
+            reference values cover <%= @problem.fetch('reference_instances') %> instances of this problem and are
+            listed above, not inferred.
           </p>
         <% end %>
       </figcaption>

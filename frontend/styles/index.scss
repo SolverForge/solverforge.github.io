@@ -721,6 +721,13 @@ h3 {
   margin: 1.75rem 0 2rem;
 }
 
+.benchmark-references {
+  color: var(--sf-text-soft);
+  font-size: 0.88rem;
+  border-left: 3px solid var(--sf-border-strong);
+  padding-left: 0.85rem;
+}
+
 .benchmark-charts__legend {
   display: flex;
   flex-wrap: wrap;
