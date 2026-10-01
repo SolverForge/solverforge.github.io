@@ -23,6 +23,7 @@ a solver that solved them all. Different problems are not combined into one scor
     <%= problem.fetch('result_count') %> recorded results ·
     Completed <time datetime="<%= problem.fetch('completed_at') %>"><%= problem.fetch('completed_at')[0, 10] %></time>
   </p>
+  <%= render Benchmark::Charts.new(problem: problem) %>
   <% problem.fetch('time_limits_seconds').sort.reverse.each_with_index do |budget, index| %>
     <% if index > 0 %><details><summary><%= budget %>-second budget</summary><% else %><h3><%= budget %>-second budget</h3><% end %>
     <div class="benchmark-table" role="region" aria-label="<%= problem.fetch('title') %>, <%= budget %>-second results" tabindex="0">
@@ -52,8 +53,10 @@ a solver that solved them all. Different problems are not combined into one scor
 <% end %>
 
 <% site.data.benchmarks.unavailable.each do |problem| %>
-<h2><%= problem.fetch('title') %></h2>
-<p>No publishable full canonical run is available in the warehouse. Smaller quick runs are not substituted.</p>
+<section class="benchmark-unavailable" id="<%= problem.fetch('id') %>">
+  <h2><%= problem.fetch('title') %></h2>
+  <p>No publishable full canonical run is available in the warehouse. Smaller quick runs are not substituted.</p>
+</section>
 <% end %>
 
 ## Evidence and methodology
