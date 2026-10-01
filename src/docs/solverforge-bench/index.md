@@ -60,10 +60,12 @@ refresh it through the repository workflow.
 | ------ | ---- | ----- |
 | CVRP | `list-variable/cvrp/` | List-variable route planning |
 | Employee scheduling | `scalar-variable/employee-scheduling/` | Scalar-variable shift assignment |
+| Job-shop scheduling | `scalar-variable/job-shop-scheduling/` | Scalar-variable sequencing and machine allocation |
 
-CVRP is the canonical list-variable benchmark. Employee scheduling is the
-canonical scalar-variable benchmark and uses INRC-II nurse-to-shift assignment
-instances.
+CVRP is the canonical list-variable benchmark. Employee scheduling and job-shop
+scheduling are the canonical scalar-variable benchmarks: the first covers
+nurse-to-shift assignment on INRC-II instances, the second covers operation
+sequencing on JSPLIB instances.
 
 ## Common Commands
 
@@ -213,6 +215,44 @@ PostgreSQL stores run catalog data, solver versions, and per-result rows.
 Display consumers should read `benchmark_result_facts`,
 `latest_benchmark_runs`, or `latest_benchmark_result_facts` instead of
 reconstructing the run/result join.
+
+## Official References
+
+A gap is only meaningful against a stated reference, so every problem resolves
+its reference from a versioned catalog beside its instances: one mechanism
+across routing, scheduling, and rostering, instead of one per problem.
+
+Each value carries the source that published it, that source's revision, and
+whether the value is a proven optimum or a best known upper bound. Those are
+different claims, so they are never mixed silently — a solver that matches a
+proven optimum has no gap, while one that matches a best known bound may still
+be above the true optimum.
+
+| Problem | Instances with an official value | Source |
+| ------- | -------------------------------- | ------ |
+| CVRP | 100 of 100 | CVRPLIB Set X table; proven optima where the table marks the instance closed, best known bounds otherwise |
+| Job-shop scheduling | 162 of 162 | ScheduleOpt best-known catalogue |
+| Employee scheduling | 9 of 42 | INRC-II official test dataset; best known bounds, not optima |
+
+Regenerate a catalog from its source, or check that a committed one still
+matches the source it claims:
+
+```bash
+make verify-reference-catalogs   # every catalog reproduces from its source
+make load-reference-catalogs     # carry the committed values into PostgreSQL
+```
+
+`verify-reference-catalogs` fails when a committed value no longer regenerates,
+so a hand-edited reference cannot reach the warehouse. Loading is idempotent and
+updates `benchmark_reference_catalog`; the `benchmark_reference_resolved` view
+then reports the effective reference for each result, preferring the pinned
+official value over whatever a run recorded.
+
+Where no official value exists, the run reports that absence rather than
+substituting a bound of its own. The employee-scheduling canonical selection
+runs history/week combinations the competition published no reference solutions
+for, so its results carry feasibility without a mean gap. On the published
+results page the coverage is stated per problem, next to the numbers.
 
 ## Result Columns
 

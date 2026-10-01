@@ -133,10 +133,51 @@ quality. A short route that violates capacity or drops required visits is not a
 better route.
 
 This is why SolverForge benchmark tables should not collapse every result into
-one universal "quality ratio" without context. Some rows have reference costs.
-Some rows do not. Some categories need feasibility-first ordering. Some need a
-domain-specific validator cost. A defensible article or chart must state the
-ranking rule beside the result.
+one universal "quality ratio" without context. Some categories need
+feasibility-first ordering. Some need a domain-specific validator cost. A
+defensible article or chart must state the ranking rule beside the result.
+
+## References Are Pinned, and Their Strength Is Stated
+
+A gap is a comparison, and a comparison needs a stated reference. We used to
+resolve references three different ways — a private catalogue module for
+job-shop, a bundled solution file for routing, a directory that might or might
+not exist for rostering — which meant the same published table mixed three
+different kinds of claim.
+
+Every problem now resolves its reference from one versioned catalog beside its
+instances, and each value records the source that published it, that source's
+revision, and whether it is a proven optimum or a best known upper bound. The
+kind travels with the value rather than being inferred from it, because a
+proven optimum and a best known bound are not the same statement: a solver that
+matches an optimum has nowhere left to go, while a solver that matches a bound
+may still be above the true optimum.
+
+The catalogs regenerate from their sources, and the gate fails when a committed
+value no longer does:
+
+```sh
+make verify-reference-catalogs   # every catalog reproduces from its source
+make load-reference-catalogs     # carry the committed values into the warehouse
+```
+
+That check is the point. A hand-edited number is indistinguishable from a
+measured one once it is in a table, so the pipeline refuses to trust a value it
+cannot reproduce.
+
+Coverage differs per problem, and we say so rather than filling the gaps. CVRP
+has official values for every instance it runs. Job-shop has values for every
+instance, with the source closing most of them. Employee scheduling is the
+partial case: the INRC-II competition publishes its test instances together with
+their reference solutions and nothing else, and the canonical selection runs
+history and week combinations outside that published set. Nine instances have an
+official value; the rest are run without one, and their results carry
+feasibility rather than a mean gap. Substituting our own best result as a
+reference would make SolverForge the benchmark's judge of itself, which is
+exactly what a reference is supposed to prevent.
+
+The published results page states this per problem, next to the numbers: how
+many instances have an official value, where it came from, and how strong it is.
 
 ## Run Kinds and Evidence
 
