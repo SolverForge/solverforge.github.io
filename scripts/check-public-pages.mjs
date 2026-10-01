@@ -726,6 +726,19 @@ async function checkBenchmarksPage(origin) {
 
   try {
     await page.goto(`${origin}/benchmarks/`, { waitUntil: "load" });
+    // Measuring bar widths reads layout, so the layout has to exist first: with
+    // three panels per problem the rows are narrower, and a read taken before
+    // the browser has laid them out reports every bar as zero-width.
+    await page.waitForFunction(
+      () => {
+        const panels = document.querySelectorAll("figure.benchmark-chart");
+        if (panels.length === 0) return false;
+        return [...document.querySelectorAll(".benchmark-chart__bar:not(.benchmark-chart__bar--missing)")]
+          .some((bar) => bar.getBoundingClientRect().width > 0.5);
+      },
+      null,
+      { timeout: 10000 },
+    );
 
     const rendered = await page.evaluate(() => ({
       stylesheets: [...document.querySelectorAll('link[rel="stylesheet"]')].length,
@@ -733,7 +746,9 @@ async function checkBenchmarksPage(origin) {
       sections: [...document.querySelectorAll("section.benchmark-problem")].map((section) => ({
         id: section.id,
         heading: section.querySelector("h2")?.textContent.trim() || "",
-        tables: [...section.querySelectorAll(".benchmark-table table")].length,
+        tables: [...section.querySelectorAll(".benchmark-table table")].map((table) => ({
+          headers: [...table.querySelectorAll("thead th")].map((th) => th.textContent.trim()),
+        })),
         rows: section.querySelectorAll("tbody tr").length,
         provenance: section.querySelector("details") ? true : false,
         completed: section.querySelector("time")?.getAttribute("datetime") || "",
@@ -800,12 +815,33 @@ async function checkBenchmarksPage(origin) {
           expected: problem.title,
         });
       }
-      if (section.tables !== problem.time_limits_seconds.length) {
+      if (section.tables.length !== problem.time_limits_seconds.length) {
         failures.push({
           path: "/benchmarks/",
           issue: `${problem.benchmark_name} shows ${problem.time_limits_seconds.length} budgets`,
-          found: section.tables,
+          found: section.tables.length,
         });
+      }
+      // The tables carry the same ranking order as the charts: feasibility,
+      // time to a viable solution, then quality.
+      const expectedHeaders = [
+        "Solver / tested version",
+        "Feasible",
+        "Time to viable",
+        "Mean gap",
+        "Mean runtime",
+        "Over budget",
+      ];
+      for (const table of section.tables) {
+        if (table.headers.join("|") !== expectedHeaders.join("|")) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} table columns do not follow feasibility, time, then quality`,
+            found: table.headers,
+            expected: expectedHeaders,
+          });
+          break;
+        }
       }
       // Every tested budget must contribute its own rows, derived from the run's
       // own summaries so adding a budget cannot pass by rendering an empty table.
@@ -901,19 +937,35 @@ async function checkBenchmarksPage(origin) {
         }
       }
 
-      // Charts must cover the same solvers and budgets the tables do, and every
-      // bar carrying a measurement must actually be drawn. Both panels are
-      // always present; the quality panel is drawn empty with a written reason
-      // when the run holds no usable mean gap, so an empty panel must carry no
-      // bars and a drawn one must carry all of them.
+      // Charts must cover the same solvers and budgets the tables do, in the
+      // order results are ranked by: feasibility, then time to a viable
+      // solution, then quality. Both the count and the order are checked, so a
+      // panel cannot be dropped or moved below a lower-priority one.
       const expectedBars = problem.solvers.length * problem.time_limits_seconds.length;
       const drawableGaps = problem.summaries.some((row) => Number(row.gap_percent) > 0);
-      if (section.charts.length !== 2) {
+      // Feasibility and time always draw: any run that selected instances has
+      // them. The quality panel is drawn only when the run holds a usable mean
+      // gap, and states its absence in prose otherwise.
+      const expectedCharts = 3;
+      if (section.charts.length !== expectedCharts) {
         failures.push({
           path: "/benchmarks/",
-          issue: `${problem.benchmark_name} should draw 2 chart panels`,
+          issue: `${problem.benchmark_name} should draw ${expectedCharts} chart panels`,
           found: section.charts.length,
         });
+      }
+      const expectedOrder = ["Feasible results", "Time to a viable solution", "Mean gap to reference"];
+      const renderedOrder = section.charts.map((chart) => chart.caption);
+      for (let i = 0; i < renderedOrder.length; i += 1) {
+        if (renderedOrder[i] !== expectedOrder[i]) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart order does not follow feasibility, time, then quality`,
+            found: renderedOrder,
+            expected: expectedOrder.slice(0, renderedOrder.length),
+          });
+          break;
+        }
       }
       for (const chart of section.charts) {
         if (chart.rows === 0) {
