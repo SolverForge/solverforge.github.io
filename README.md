@@ -93,6 +93,14 @@ package releases. Normal builds and CI need no warehouse connection.
 scope, versions, matrix completeness, and rejection of quick or partial data.
 This gate runs in `make test` and `make ci-local`.
 
+Each problem renders two charts from that same data: feasibility per solver and
+budget, and mean gap to the run's reference costs. A problem whose run holds no
+reference cost states that in prose instead of drawing an empty panel, since no
+comparison exists to draw. `scripts/check-public-pages.mjs` reads
+`src/_data/benchmarks.json` and checks the rendered sections, budgets, rows, bar
+fills, measured-zero marks, legends, and provenance against it, so a problem or
+budget that stops rendering fails the gate rather than quietly disappearing.
+
 ## Lint follow-up
 
 The current `make lint` target is dependency-light and only performs Ruby and

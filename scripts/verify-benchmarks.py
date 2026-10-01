@@ -30,13 +30,21 @@ class BenchmarkSnapshotTest(unittest.TestCase):
             self.assertTrue(row['solver_version'])
             self.assertGreater(row['time_limit_seconds'], 0)
 
-    def test_only_full_runs(self):
+    def test_only_full_runs(self) -> None:
         for run in self.snapshot['runs']:
             self.assertEqual(run['run_kind'], 'candidate')
             self.assertIs(run['nightly'], True)
             self.assertIs(run['git_dirty'], False)
         self.assertTrue(all(row['dataset_set'] == 'canonical' for row in self.snapshot['results']))
-        self.assertIn('employee-scheduling', [p['id'] for p in self.summary['unavailable']])
+
+    def test_published_problems_have_hand_written_copy(self) -> None:
+        """A problem must arrive with its own introduction, never a generated one."""
+        self.assertTrue(self.summary['problems'], 'no publishable problem is on the page')
+        for problem in self.summary['problems']:
+            self.assertIn(problem['benchmark_name'], importer.LABELS)
+            title, description = importer.LABELS[problem['benchmark_name']]
+            self.assertEqual(problem['title'], title)
+            self.assertEqual(problem['description'], description)
 
     def test_partial_snapshot_rejected(self):
         broken = deepcopy(self.snapshot)

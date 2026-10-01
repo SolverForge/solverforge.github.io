@@ -8,6 +8,12 @@ import {
 import { extname, join, dirname, normalize, relative, resolve } from "node:path";
 import { chromium } from "playwright";
 
+// The benchmarks page renders one section per publishable problem and one table
+// per tested budget. The expected set comes from the imported data file rather
+// than a hand-written list, so a problem that joins the page is checked and a
+// problem that silently drops out fails.
+const benchmarksDataPath = resolve("src/_data/benchmarks.json");
+
 // Markers are small, but two can still land on the same interface element. An
 // overlap means the reader cannot tell which number names which region. This is
 // injected into the page, so it is written as a string rather than a closure.
@@ -707,6 +713,231 @@ async function checkUseCasePages(origin) {
   return failures;
 }
 
+async function checkBenchmarksPage(origin) {
+  const data = JSON.parse(readFileSync(benchmarksDataPath, "utf8"));
+  const browser = await chromium.launch({
+    ...chromiumOptions(),
+  });
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 1100 },
+  });
+  const page = await context.newPage();
+  const failures = [];
+
+  try {
+    await page.goto(`${origin}/benchmarks/`, { waitUntil: "load" });
+
+    const rendered = await page.evaluate(() => ({
+      stylesheets: [...document.querySelectorAll('link[rel="stylesheet"]')].length,
+      bodyClasses: document.body.className,
+      sections: [...document.querySelectorAll("section.benchmark-problem")].map((section) => ({
+        id: section.id,
+        heading: section.querySelector("h2")?.textContent.trim() || "",
+        tables: [...section.querySelectorAll(".benchmark-table table")].length,
+        rows: section.querySelectorAll("tbody tr").length,
+        provenance: section.querySelector("details") ? true : false,
+        completed: section.querySelector("time")?.getAttribute("datetime") || "",
+        // Two charts per problem, each with a row per solver and one bar per
+        // tested budget. A bar whose fill is unset renders as zero-length at
+        // every width, which is indistinguishable from a measured zero.
+        charts: [...section.querySelectorAll("figure.benchmark-chart")].map((figure) => ({
+          caption: figure.querySelector("h3")?.textContent.trim() || "",
+          // An empty panel must carry its reason in prose, or the reader is
+          // left to guess why a comparison is missing.
+          captionReason: (figure.querySelector("figcaption p")?.textContent.trim() || "").length > 40,
+          rows: figure.querySelectorAll(".benchmark-chart__row").length,
+          bars: figure.querySelectorAll(".benchmark-chart__bar").length,
+          missing: figure.querySelectorAll(".benchmark-chart__bar--missing").length,
+          unfilled: [...figure.querySelectorAll(".benchmark-chart__bar:not(.benchmark-chart__bar--missing)")]
+            .filter((bar) => {
+              const declared = bar.style.getPropertyValue("--benchmark-bar-fill");
+              return !declared || !Number.isFinite(parseFloat(declared));
+            }).length,
+          painted: [...figure.querySelectorAll(".benchmark-chart__bar:not(.benchmark-chart__bar--missing)")]
+            .filter((bar) => bar.getBoundingClientRect().width > 0.5).length,
+          // A measured zero must be marked so it is drawn at a visible width:
+          // a solver that failed every instance and a solver that was never run
+          // must not render identically.
+          measuredZero: [...figure.querySelectorAll(".benchmark-chart__bar")]
+            .filter((bar) => parseFloat(bar.style.getPropertyValue("--benchmark-bar-fill")) === 0).length,
+          markedZero: figure.querySelectorAll(".benchmark-chart__bar--zero").length,
+          swatches: section.querySelectorAll(".benchmark-charts__legend-item").length,
+        })),
+      })),
+      unavailableHeadings: [...document.querySelectorAll("section.benchmark-unavailable h2")]
+        .map((heading) => heading.textContent.trim()),
+    }));
+
+    if (rendered.stylesheets === 0) {
+      failures.push({ path: "/benchmarks/", issue: "page loaded without the site stylesheet" });
+    }
+    if (rendered.sections.length !== data.problems.length) {
+      failures.push({
+        path: "/benchmarks/",
+        issue: `expected ${data.problems.length} problem sections`,
+        found: rendered.sections.length,
+      });
+    }
+    if (new Set(rendered.sections.map((section) => section.id)).size !== rendered.sections.length) {
+      failures.push({ path: "/benchmarks/", issue: "a problem section id is duplicated" });
+    }
+
+    for (const problem of data.problems) {
+      const section = rendered.sections.find((candidate) => candidate.id === problem.benchmark_name);
+      if (!section) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `publishable problem ${problem.benchmark_name} is not on the page`,
+        });
+        continue;
+      }
+      if (section.heading !== problem.title) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} shows the wrong heading`,
+          found: section.heading,
+          expected: problem.title,
+        });
+      }
+      if (section.tables !== problem.time_limits_seconds.length) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} shows ${problem.time_limits_seconds.length} budgets`,
+          found: section.tables,
+        });
+      }
+      // Every tested budget must contribute its own rows, derived from the run's
+      // own summaries so adding a budget cannot pass by rendering an empty table.
+      const expectedRows = problem.summaries.length;
+      if (section.rows !== expectedRows) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} expected ${expectedRows} solver rows`,
+          found: section.rows,
+        });
+      }
+      if (!section.provenance) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} publishes results without run provenance`,
+        });
+      }
+      if (section.completed.slice(0, 10) !== problem.completed_at.slice(0, 10)) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} shows the wrong completion date`,
+          found: section.completed,
+          expected: problem.completed_at,
+        });
+      }
+
+      // Charts must cover the same solvers and budgets the tables do, and every
+      // bar carrying a measurement must actually be drawn. Both panels are
+      // always present; the quality panel is drawn empty with a written reason
+      // when the run holds no usable mean gap, so an empty panel must carry no
+      // bars and a drawn one must carry all of them.
+      const expectedBars = problem.solvers.length * problem.time_limits_seconds.length;
+      const drawableGaps = problem.summaries.some((row) => Number(row.gap_percent) > 0);
+      if (section.charts.length !== 2) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} should draw 2 chart panels`,
+          found: section.charts.length,
+        });
+      }
+      for (const chart of section.charts) {
+        if (chart.rows === 0) {
+          if (chart.bars !== 0 || chart.missing !== 0 || chart.painted !== 0) {
+            failures.push({
+              path: "/benchmarks/",
+              issue: `${problem.benchmark_name} chart "${chart.caption}" is empty but still renders bars`,
+              bars: chart.bars,
+              missing: chart.missing,
+              painted: chart.painted,
+            });
+          }
+          continue;
+        }
+        if (chart.rows !== problem.solvers.length) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart "${chart.caption}" expected ${problem.solvers.length} solver rows`,
+            found: chart.rows,
+          });
+        }
+        if (chart.bars !== expectedBars) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart "${chart.caption}" expected ${expectedBars} bars`,
+            found: chart.bars,
+          });
+        }
+        if (chart.unfilled !== 0) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart "${chart.caption}" has bars with no measurable fill`,
+            found: chart.unfilled,
+          });
+        }
+        if (chart.painted !== chart.bars - chart.missing) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart "${chart.caption}" has a measurement that renders at zero width`,
+            painted: chart.painted,
+            expected: chart.bars - chart.missing,
+            missing: chart.missing,
+          });
+        }
+        if (chart.markedZero !== chart.measuredZero) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} chart "${chart.caption}" has a measured zero that is drawn like a missing measurement`,
+            measuredZero: chart.measuredZero,
+            markedZero: chart.markedZero,
+          });
+        }
+        if (chart.swatches !== problem.time_limits_seconds.length) {
+          failures.push({
+            path: "/benchmarks/",
+            issue: `${problem.benchmark_name} legend does not name every tested budget`,
+            found: chart.swatches,
+          });
+        }
+      }
+      // An empty quality panel is only honest if it says why it is empty.
+      const emptyGapPanel = !drawableGaps && section.charts.some((chart) => chart.rows === 0);
+      if (emptyGapPanel && !section.charts.some((chart) => chart.rows === 0 && chart.captionReason)) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} shows an empty quality panel without stating why`,
+        });
+      }
+    }
+
+    for (const problem of data.unavailable) {
+      if (!rendered.unavailableHeadings.some((heading) => heading === problem.title)) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `problem without a publishable run (${problem.id}) is not reported as unavailable`,
+        });
+      }
+    }
+    if (rendered.unavailableHeadings.length !== data.unavailable.length) {
+      failures.push({
+        path: "/benchmarks/",
+        issue: "unavailable-problem headings do not match the imported data",
+        found: rendered.unavailableHeadings,
+      });
+    }
+  } catch (error) {
+    failures.push({ path: "/benchmarks/", issue: "benchmarks page check threw", error: String(error) });
+  }
+
+  await context.close();
+  await browser.close();
+  return failures;
+}
+
 async function checkDocsSidebarActive(origin) {
   const browser = await chromium.launch({
     ...chromiumOptions(),
@@ -765,12 +996,14 @@ let layoutFailures = [];
 let docsSidebarActive = [];
 let useCaseShowcase = [];
 let useCasePages = [];
+let benchmarksPage = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
   docsSidebarActive = await checkDocsSidebarActive(origin);
   useCaseShowcase = await checkUseCaseShowcase(origin);
   useCasePages = await checkUseCasePages(origin);
+  benchmarksPage = await checkBenchmarksPage(origin);
 } finally {
   server.close();
 }
@@ -784,6 +1017,7 @@ const summary = {
   docsSidebarActive,
   useCaseShowcase,
   useCasePages,
+  benchmarksPage,
   layoutFailures,
 };
 
@@ -796,6 +1030,7 @@ if (
   docsSidebarActive.length ||
   useCaseShowcase.length ||
   useCasePages.length ||
+  benchmarksPage.length ||
   layoutFailures.length
 ) {
   process.exit(1);
