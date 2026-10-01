@@ -817,6 +817,39 @@ h3 {
   line-height: 1.5;
 }
 
+.benchmark-chart__budgets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.benchmark-chart__budget h4 {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+}
+
+.benchmark-chart__budget .benchmark-chart__row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.4rem;
+}
+
+.benchmark-chart__budget .benchmark-chart__label {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.benchmark-chart__budget .benchmark-chart__bars {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  grid-template-columns: 1fr;
+}
+
+.benchmark-chart__budget .benchmark-chart__value {
+  grid-column: 2;
+  grid-row: 1;
+  grid-template-columns: 1fr;
+}
+
 .benchmark-chart__rows {
   margin: 0;
   padding: 0;
@@ -2121,6 +2154,10 @@ body.use-case-lightbox-open {
 }
 
 @media (max-width: 760px) {
+  .benchmark-chart__budgets {
+    grid-template-columns: 1fr;
+  }
+
   .benchmark-chart {
     padding: 1rem;
   }

@@ -1,5 +1,5 @@
 <section class="benchmark-charts" aria-label="<%= @problem.fetch('title') %> summary charts">
-  <p class="benchmark-charts__ranking">Winner first at the <%= budgets.max %>-second budget: feasibility → time to viable → quality.</p>
+  <p class="benchmark-charts__ranking">Each budget has its own winner-first ranking: feasibility → time to viable → quality.</p>
   <div class="benchmark-charts__legend">
     <% budgets.each do |budget| %>
       <span class="benchmark-charts__legend-item">
@@ -17,12 +17,15 @@
         <h3>Feasible results</h3>
         <p>Instances solved to a hard-feasible solution, out of <%= total_instances %>.</p>
       </figcaption>
-      <ol class="benchmark-chart__rows">
-        <% solvers.each do |solver| %>
+      <div class="benchmark-chart__budgets">
+      <% budgets.each do |budget| %>
+        <div class="benchmark-chart__budget" data-budget="<%= budget %>">
+        <h4><%= budget %>-second budget</h4>
+        <ol class="benchmark-chart__rows">
+        <% solvers(budget).each do |solver| %>
           <li class="benchmark-chart__row<%= ' benchmark-chart__row--solverforge' if solverforge?(solver) %>">
             <span class="benchmark-chart__label"><%= solver %></span>
             <span class="benchmark-chart__bars">
-              <% budgets.each do |budget| %>
                 <% row = summary(budget, solver) %>
                 <% percent = feasible_percent(row) %>
                 <span
@@ -40,17 +43,17 @@
                     <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
                   <% end %>
                 </span>
-              <% end %>
             </span>
             <span class="benchmark-chart__value">
-              <% budgets.each do |budget| %>
                 <% row = summary(budget, solver) %>
                 <span><small><%= budget %>s</small> <%= row ? "#{row.fetch('feasible')}/#{row.fetch('total')}" : "—" %></span>
-              <% end %>
             </span>
           </li>
         <% end %>
-      </ol>
+        </ol>
+        </div>
+      <% end %>
+      </div>
     </figure>
 
     <%# Then time to a viable solution. Read after feasibility and before
@@ -73,12 +76,15 @@
         <% end %>
       </figcaption>
       <% if drawable_times? %>
-      <ol class="benchmark-chart__rows">
-        <% solvers.each do |solver| %>
+      <div class="benchmark-chart__budgets">
+      <% budgets.each do |budget| %>
+        <div class="benchmark-chart__budget" data-budget="<%= budget %>">
+        <h4><%= budget %>-second budget</h4>
+        <ol class="benchmark-chart__rows">
+        <% solvers(budget).each do |solver| %>
           <li class="benchmark-chart__row<%= ' benchmark-chart__row--solverforge' if solverforge?(solver) %>">
             <span class="benchmark-chart__label"><%= solver %></span>
             <span class="benchmark-chart__bars">
-              <% budgets.each do |budget| %>
                 <% row = summary(budget, solver) %>
                 <% seconds = feasible_seconds(row) %>
                 <% fill_percent = fill(seconds, max_feasible_seconds) %>
@@ -96,17 +102,17 @@
                     <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
                   <% end %>
                 </span>
-              <% end %>
             </span>
             <span class="benchmark-chart__value">
-              <% budgets.each do |budget| %>
                 <% row = summary(budget, solver) %>
                 <span><small><%= budget %>s</small> <%= row && row['mean_feasible_seconds'] ? format('%.2f s', row['mean_feasible_seconds']) : "—" %></span>
-              <% end %>
             </span>
           </li>
         <% end %>
-      </ol>
+        </ol>
+        </div>
+      <% end %>
+      </div>
       <% end %>
     </figure>
 
@@ -131,12 +137,15 @@
         <% end %>
       </figcaption>
       <% if drawable_gaps? %>
-      <ol class="benchmark-chart__rows">
-        <% solvers.each do |solver| %>
+      <div class="benchmark-chart__budgets">
+      <% budgets.each do |budget| %>
+        <div class="benchmark-chart__budget" data-budget="<%= budget %>">
+        <h4><%= budget %>-second budget</h4>
+        <ol class="benchmark-chart__rows">
+        <% solvers(budget).each do |solver| %>
           <li class="benchmark-chart__row<%= ' benchmark-chart__row--solverforge' if solverforge?(solver) %>">
             <span class="benchmark-chart__label"><%= solver %></span>
             <span class="benchmark-chart__bars">
-              <% budgets.each do |budget| %>
                 <% row = summary(budget, solver) %>
                 <% gap = gap_percent(row) %>
                 <% fill_percent = fill(gap, max_gap) %>
@@ -154,17 +163,17 @@
                     <span class="benchmark-chart__bar benchmark-chart__bar--missing" data-benchmark-missing="true"></span>
                   <% end %>
                 </span>
-              <% end %>
             </span>
             <span class="benchmark-chart__value">
-              <% budgets.each do |budget| %>
                 <% row = summary(budget, solver) %>
                 <span><small><%= budget %>s</small> <%= row && row['gap_percent'] ? format('%.2f%%', row['gap_percent']) : "—" %></span>
-              <% end %>
             </span>
           </li>
         <% end %>
-      </ol>
+        </ol>
+        </div>
+      <% end %>
+      </div>
       <% end %>
     </figure>
   </div>

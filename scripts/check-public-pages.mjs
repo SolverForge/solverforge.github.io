@@ -1015,13 +1015,15 @@ async function checkBenchmarksPage(origin) {
           issue: `${problem.benchmark_name} ranked solvers ${JSON.stringify(pageRank)} but the measurements rank them ${JSON.stringify(expectedRank)}`,
         });
       }
+      const chartRank = [...problem.time_limits_seconds].sort((a, b) => a - b)
+        .flatMap((budget) => rankSolvers(problem, budget));
       for (const chart of section.charts) {
-        if (chart.solvers.length > 0 && chart.solvers.join("|") !== expectedRank.join("|")) {
+        if (chart.solvers.length > 0 && chart.solvers.join("|") !== chartRank.join("|")) {
           failures.push({
             path: "/benchmarks/",
             issue: `${problem.benchmark_name} chart "${chart.caption}" does not rank solvers by feasibility, time, then quality`,
             found: chart.solvers,
-            expected: expectedRank,
+            expected: chartRank,
           });
           break;
         }
@@ -1064,10 +1066,10 @@ async function checkBenchmarksPage(origin) {
           }
           continue;
         }
-        if (chart.rows !== problem.solvers.length) {
+        if (chart.rows !== expectedBars) {
           failures.push({
             path: "/benchmarks/",
-            issue: `${problem.benchmark_name} chart "${chart.caption}" expected ${problem.solvers.length} solver rows`,
+            issue: `${problem.benchmark_name} chart "${chart.caption}" expected ${expectedBars} budget-specific solver rows`,
             found: chart.rows,
           });
         }

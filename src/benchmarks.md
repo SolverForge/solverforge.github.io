@@ -11,8 +11,7 @@ Quick and partial runs are excluded; these are not measurements of newer release
 **Ranking:** feasibility → time to a viable solution → solution quality.
 Each priority breaks ties in the one before it. Time averages only feasible results;
 quality averages only feasible results with a reference. **0% gap matches the reference.**
-Each table ranks its own budget. Charts use the longest-budget ranking, matching
-the first table. Problems are ranked separately.
+Each chart column and table ranks its own budget. Problems are ranked separately.
 
 <% site.data.benchmarks.problems.each do |problem| %>
 <section class="benchmark-problem" id="<%= problem.fetch('benchmark_name') %>">

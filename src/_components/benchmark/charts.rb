@@ -13,8 +13,8 @@ class Benchmark::Charts < Bridgetown::Component
     @budgets ||= @problem.fetch("time_limits_seconds").sort
   end
 
-  def solvers
-    @solvers ||= @problem.fetch("solvers")
+  def solvers(budget)
+    @problem.fetch("solver_orders").fetch(budget.to_s)
   end
 
   def total_instances
