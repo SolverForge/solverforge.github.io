@@ -8,8 +8,8 @@ description: >
   dependency baseline with the current releases.
 ---
 
-**solverforge-cli 3.3.1** is published on crates.io and released on GitHub
-(2026-09-29), so `cargo install solverforge-cli` installs 3.3.1 directly. The
+**solverforge-cli 3.3.1** was published on crates.io and released on GitHub
+(2026-09-29), so `cargo install solverforge-cli` installed 3.3.1 directly. The
 previous package, `solverforge-cli 3.1.0`, scaffolded `solverforge 0.19.5`,
 `solverforge-ui 0.9.0`, and `rmcp 3.4.0`. Use `solverforge --version` to confirm
 exactly what an installed binary carries.
@@ -20,6 +20,13 @@ New projects target:
 - `solverforge-ui 0.9.0` for the web shell
 - `solverforge-maps 2.1.4` for the web shell
 - `rmcp 3.5.0` for the MCP shell
+
+<%= render Ui::Callout.new(title: "Update, October 2, 2026") do %>
+This note covers the 3.2.0 through 3.3.1 patches and is history.
+`solverforge-cli 3.3.3` is now published and is the current CLI package with
+these same scaffold targets. See the
+[3.3.3 release note](/blog/releases/2026/10/02/solverforge-cli-3-3-3/).
+<% end %>
 
 ## What Changed
 

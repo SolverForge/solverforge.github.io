@@ -5,9 +5,11 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/docs/solverforge/index.md" => [
+    "These pages track the `solverforge 0.19.8` crate",
     "solverforge 0.19.8",
     "solverforge-cli 3.3.3",
     "solverforge 0.19.4",
+    "The `0.19.8` workspace declares Rust `1.95`.",
     "docs.rs/solverforge/0.19.8/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
@@ -49,6 +51,19 @@ REQUIRED_TEXT = {
     "`web`, `api`, `cli`, and `mcp`",
     "rmcp",
     "cargo run -- demo-data"
+  ],
+  "src/docs/solverforge/solver/configuration.md" => [
+    "SolverForge 0.19.8"
+  ],
+  "src/docs/solverforge-maps/index.md" => [
+    "solverforge-maps 2.1.4",
+    "solverforge-cli 3.3.3"
+  ],
+  "src/docs/solverforge-python/getting-started.md" => [
+    "SolverForge 0.19.7"
+  ],
+  "src/docs/solverforge-python/solving-and-runtime.md" => [
+    "0.19.7 runtime graph"
   ],
   "src/docs/solverforge-cli/mcp-shell.md" => [
     "get_candidate_trace",
@@ -114,6 +129,10 @@ REQUIRED_TEXT = {
     "`solverforge 0.19.5`",
     "`solverforge-ui 0.9.0`"
   ],
+  "src/_posts/releases/2026-05-31-solverforge-cli-2-2-x.md" => [
+    "`solverforge-cli 3.0.0` is published on crates.io",
+    "`solverforge-cli 3.1.0` is published on crates.io"
+  ],
   "src/_posts/releases/2026-09-15-solverforge-ui-0-8-x.md" => [
     "`0.8.0` | 2026-09-15",
     "SF.version",
@@ -127,7 +146,11 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "solverforge 0.19.8",
+    "documentation tracks the `solverforge 0.19.8` tag",
+    "The `v0.19.8` tag, workspace, and crates.io package are the",
+    "published on 2026-10-02, and docs.rs serves the 0.19.8 API.",
+    "The independently published CLI line is `solverforge-cli 3.3.3`",
+    "- **0.19.8 runtime line**: `v0.19.8` and the crates.io `solverforge 0.19.8`",
     "solverforge-py 0.6.10",
     "solverforge-cli 3.3.3",
     "solverforge-ui 0.9.0",
@@ -277,7 +300,18 @@ FORBIDDEN_TEXT = {
   "src/docs/getting-started/solverforge-lessons-use-case.md" => ["solverforge-lessons@2.0.6"],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => ["solverforge-deliveries@2.0.6"],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => ["solverforge-fsr@2.0.7"],
-  "src/reference/lifecycle-pause-resume-contract.md" => ["solverforge-cli 3.3.1", "solverforge-cli 3.3.2"]
+  "src/reference/lifecycle-pause-resume-contract.md" => ["solverforge-cli 3.3.1", "solverforge-cli 3.3.2"],
+  "src/_posts/releases/2026-09-29-solverforge-cli-3-2-3-3-x.md" => [
+    "**solverforge-cli 3.3.1** is published",
+    "installs 3.3.1 directly"
+  ],
+  "src/_posts/releases/2026-10-01-solverforge-cli-3-3-2.md" => [
+    "**solverforge-cli 3.3.2** is published",
+    "installs 3.3.2 directly"
+  ],
+  "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
+    "`cargo add solverforge` installs 0.19.7"
+  ]
 }.freeze
 
 failures = []
