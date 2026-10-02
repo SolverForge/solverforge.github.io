@@ -10,13 +10,11 @@ description: >
   behind in the seed.
 ---
 
-**solverforge-cli 3.3.3** is published on crates.io (2026-10-02), so
-`cargo install solverforge-cli` installs 3.3.3 directly. The GitHub Release for
-the tag follows the same validation the crates.io publish ran; check
-`solverforge --version` on the binary you install rather than assuming a release
-page exists. The previous package, `solverforge-cli 3.3.2`, carried the same
-scaffold targets; this release fixes two generator defects and changes no
-dependency.
+**solverforge-cli 3.3.3** is published on crates.io and released on GitHub
+(2026-10-02), so `cargo install solverforge-cli` installs 3.3.3 directly. The
+previous package, `solverforge-cli 3.3.2`, carried the same scaffold targets;
+this release fixes two generator defects and changes no dependency. Use
+`solverforge --version` to confirm exactly what an installed binary carries.
 
 New projects target:
 
