@@ -76,7 +76,7 @@ factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 | Operation | Purpose |
 | --------- | ------- |
 | `filter` | Keep only matches that satisfy a predicate |
-| `join` | Combine rows from the same stream or a second stream |
+| `join` | Combine rows from the same stream or a second stream; a keyed cross-bi stream chains another `.join((extractor_c, key_c))` to reach a third source |
 | `project` | Create retained scoring-only rows |
 | `flatten_last` | Expand a collection carried by the last joined item |
 | `group_by` | Group unary rows, projected rows, or cross-join pairs and apply a collector |
@@ -135,6 +135,35 @@ After a cross join, choose the operation that matches the rule:
 - score the joined pair directly with `penalize(...)` or `reward(...)`
 - group joined pairs directly with `.group_by(|left, right| key, collector)`
 - emit one retained scoring row per pair with `.project(|left, right| row)`
+
+A keyed cross join does not stop at two sources. The cross-bi stream carries an
+inherent `.join((extractor_c, key_c))` that extends the joined `(A, B)` pairs
+with a third source, so a rule over three keyed sources scores `(A, B, C)` rows
+directly:
+
+```rust
+type Streams = ConstraintFactory<Schedule, SoftScore>;
+
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::employees()),
+        equal_bi(
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
+        ),
+    ))
+    .join((Schedule::unavailability(), |u: &Unavailability| u.employee_idx))
+    .penalize(|_shift: &Shift, _employee: &Employee, _u: &Unavailability| SoftScore::of(1))
+    .named("Shift falls on an unavailability day")
+```
+
+The cross-bi keys stay authoritative for the first two sources, and the join
+target carries only the new source and its key, so the retained engine probes
+one shared key domain rather than a separate one per arity. A retained tri row
+requires `key_a(a) == key_b(b) == key_c(c)` plus the tri `.filter(...)`, and a
+change to any of the three sources localizes through that source's own retained
+key index.
 
 After `.project(...)`, the projected stream can self-join retained scoring rows.
 Use `equal(|row| key)` for symmetric same-key pairs and
@@ -324,6 +353,7 @@ scoring can retract and re-evaluate the correct joined rows:
 
 - same-source joins pass canonical entity indexes
 - cross joins pass the left and right source indexes
+- cross-tri joins pass `a_idx`, `b_idx`, and `c_idx` for their three sources
 - flattened rows pass the left source index and the owning right-side source
   index
 - projected self-joins, including directed projected self-joins, pass each

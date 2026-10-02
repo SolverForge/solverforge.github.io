@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.7` crate and current
+This map is aligned with the published `solverforge 0.19.8` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -23,7 +23,8 @@ custom-search, and retained runtime surface, including
 `ScalarGroup`, `ScalarAssignmentRule`, `ScalarGroupLimits`,
 `SharedNodeDiagnostics`, `SharedNodeId`, `SharedNodeOperation`, direct
 cross-join `.group_by(|left, right| key, collector)`, cross-join
-`.project(|left, right| row)` projected scoring, direct cross-join grouped
+`.project(|left, right| row)` projected scoring, keyed cross-tri joins through
+`.join((extractor_c, key_c))` on a cross-bi stream, direct cross-join grouped
 complements, symmetric and directed projected self-joins, projected grouped
 complements, score weight helpers such as `fixed_weight` and `hard_weight`,
 collector helpers such as `count`, `sum`, `load_balance`, `consecutive_runs`,
@@ -58,7 +59,7 @@ lower-level solver internals directly.
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
-| `solverforge-py`   | the tagged `v0.6.6` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
+| `solverforge-py`   | the tagged `v0.6.10` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
@@ -97,7 +98,7 @@ lower-level solver internals directly.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
-| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.6` source tag |
+| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.10` source tag |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |

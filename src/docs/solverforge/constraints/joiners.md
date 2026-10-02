@@ -95,6 +95,28 @@ Streams::new()
     ))
 ```
 
+**Third source on a keyed cross join** - a cross-bi stream carries an inherent
+`.join((extractor_c, key_c))` that extends the joined pair with a third source:
+
+```rust
+type Streams = ConstraintFactory<Schedule, SoftScore>;
+
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::employees()),
+        equal_bi(
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
+        ),
+    ))
+    .join((Schedule::unavailability(), |u: &Unavailability| u.employee_idx))
+```
+
+The retained `(A, B, C)` rows satisfy `key_a(a) == key_b(b) == key_c(c)`; the
+first two keys come from the cross-bi stream and the join target supplies only
+the new source and its key.
+
 After a cross join, the stream can score pairs directly, group the joined pairs
 with `.group_by(|left, right| key, collector)`, or project each pair into a
 retained scoring row with `.project(|left, right| row)`.

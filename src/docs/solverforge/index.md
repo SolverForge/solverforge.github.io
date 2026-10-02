@@ -17,9 +17,9 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.7` crate and current release
+These pages track the `solverforge 0.19.8` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
-runtime; the `solverforge-cli 3.2.0` line scaffolds `solverforge 0.19.7`, while
+runtime; the `solverforge-cli 3.3.3` line scaffolds `solverforge 0.19.7`, while
 apps scaffolded by earlier lines pin `solverforge 0.19.5` (3.1.0) or
 `solverforge 0.19.4` (3.0.0), so check `solverforge --version` when starting
 from a scaffold.
@@ -34,7 +34,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.7` workspace declares Rust `1.95`.
+The `0.19.8` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -144,6 +144,13 @@ The current release tightens several public contracts:
 - projected streams support symmetric self-joins with `equal(|row| key)` and
   directed same-output joins with `equal_bi(left_key, right_key)` when pair
   orientation is part of the rule
+- keyed cross joins extend to a third source: a cross-bi stream carries an
+  inherent `.join((extractor_c, key_c))` that scores `(A, B, C)` rows directly
+  instead of denormalizing a joined pair into a synthetic row type. The new
+  `cross_tri_incremental::Tri` constraint reuses one arity-generic
+  `CrossJoinEngine<N, K, Sc>` with `cross_bi_incremental::Bi`, so match rows,
+  per-source key indexes, and change localization behave the same at both
+  arities and a change to any of the three sources localizes symmetrically
 - direct cross-join grouped streams can call `complement(...)` against a
   generated fact or entity source, so missing target keys produce explicit
   default rows without a projected-row detour
@@ -292,8 +299,8 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.7](https://docs.rs/solverforge/0.19.7/solverforge/).
-The `0.19.7` crate is the registry source of truth. Source-line API maps for
+[docs.rs/solverforge 0.19.8](https://docs.rs/solverforge/0.19.8/solverforge/).
+The `0.19.8` crate is the registry source of truth. Source-line API maps for
 the local workspace live in the repository `crates/*/WIREFRAME.md` files.
 
 ## Sections

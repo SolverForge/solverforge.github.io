@@ -34,7 +34,9 @@ source or one joined pair, grouped streams can use collectors such as
 `consecutive_runs(...)`, `collect_vec(...)`, and `indexed_presence(...)`, and
 projected self-joins can be symmetric with `equal(...)` or directed with
 `equal_bi(left_key, right_key)`. Direct cross joins can group joined pairs
-without projecting them first. Direct cross-join groups can also call
+without projecting them first, and a keyed cross-bi stream can chain another
+`.join((extractor_c, key_c))` to score `(A, B, C)` rows over three sources.
+Direct cross-join groups can also call
 `complement(...)` against generated target sources, and filtered keyed joins
 retain the filter contract on both sides of the join.
 

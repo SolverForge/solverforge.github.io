@@ -271,6 +271,13 @@ datasets, or solver policies.
 > `solverforge 0.19.5` with `solverforge-ui 0.9.0` and `rmcp 3.4.0`, so fresh
 > scaffolds align with this core line. See the
 > [3.1.0 release note](/blog/releases/2026/09/16/solverforge-cli-3-1-x/).
+>
+> **Update, 2026-10-02:** `solverforge 0.19.8` is published and is the current
+> core runtime line, adding keyed cross-tri joins and the retained cross-tri
+> incremental constraint. The published `solverforge-cli 3.3.3` package still
+> scaffolds `solverforge 0.19.7`, so fresh scaffolds trail this core line until a
+> CLI release deliberately retargets them. See the
+> [0.19.8 release note](/blog/releases/2026/10/02/solverforge-0-19-8/).
 
 ## Upgrade Checklist
 
@@ -289,6 +296,7 @@ datasets, or solver policies.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.8` | 2026-10-02 | Adds a third join source to keyed cross streams and the retained cross-tri incremental constraint, both on one arity-generic cross-join engine; the local build gate runs the Rust checks CI runs. |
 | `0.19.7` | 2026-09-25 | Owns every workspace version surface from the release tooling, so the workspace, crates, and tags are cut from one declaration. |
 | `0.19.6` | 2026-09-25 | Exposes the typed planning pin predicate, rejects scalar edits to pinned entities, preserves pinned list owners across construction and search, retains pinned assignments in exhaustive search, and skips pin scanning for models without pins. |
 | `0.19.5` | 2026-09-15 | Retains the complete solution on cancellation, initializes score history with a slice fill, and preserves complete Clarke-Wright construction. |
