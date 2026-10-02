@@ -5,10 +5,10 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/docs/solverforge/index.md" => [
-    "solverforge 0.19.7",
-    "solverforge-cli 3.2.0",
+    "solverforge 0.19.8",
+    "solverforge-cli 3.3.3",
     "solverforge 0.19.4",
-    "docs.rs/solverforge/0.19.7/solverforge/"
+    "docs.rs/solverforge/0.19.8/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py 0.6.10",
@@ -21,11 +21,12 @@ REQUIRED_TEXT = {
     "`same_value_conflict_field`"
   ],
   "src/docs/solverforge-cli/index.md" => [
-    "solverforge-cli 3.3.2",
+    "solverforge-cli 3.3.3",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 3.3.2",
+    "solverforge-cli 3.3.3",
+    "CLI version: 3.3.3",
     "SolverForge crate target 0.19.7",
     "Scaffold MCP target: rmcp 3.5.0",
     "solverforge connect"
@@ -34,10 +35,12 @@ REQUIRED_TEXT = {
     "`--countable-range <FROM..TO>`",
     "`--runs`",
     "`--projected-group`",
-    "`SimpleScore` is not accepted"
+    "`SimpleScore` is not accepted",
+    "computing all rewrites before it writes any of them",
+    "re-renders\n`src/data/data_seed.rs`"
   ],
   "src/docs/solverforge-cli/configuration.md" => [
-    "cli_version = \"3.3.2\""
+    "cli_version = \"3.3.3\""
   ],
   "src/docs/solverforge-cli/getting-started.md" => [
     "cannot localize entity indexes"
@@ -63,7 +66,7 @@ REQUIRED_TEXT = {
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.2.0",
+    "solverforge-cli 3.3.3",
     "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
@@ -95,13 +98,14 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/agent-skill/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.19.7",
-    "solverforge 0.6.10"
+    "solverforge 0.19.8",
+    "solverforge 0.6.10",
+    "solverforge-py v0.6.10"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.19.7",
+    "solverforge 0.19.8",
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.3.2"
+    "solverforge-cli 3.3.3"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
     "`3.1.0` | 2026-09-16",
@@ -123,9 +127,9 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "solverforge 0.19.7",
+    "solverforge 0.19.8",
     "solverforge-py 0.6.10",
-    "solverforge-cli 3.3.2",
+    "solverforge-cli 3.3.3",
     "solverforge-ui 0.9.0",
     "solverforge-hospital@2.0.8",
     "solverforge-lessons@2.0.10",
@@ -149,6 +153,7 @@ REQUIRED_TEXT = {
     "solverforge 0.19.7"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
+    "`0.19.8` | 2026-10-02",
     "`0.19.7` | 2026-09-25",
     "`0.19.6` | 2026-09-25",
     "`0.19.5` | 2026-09-15",
@@ -160,16 +165,34 @@ REQUIRED_TEXT = {
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
     "solverforge 0.19.6",
     "solverforge 0.19.7",
+    "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",
     "pinned"
   ],
+  "src/_posts/releases/2026-10-02-solverforge-0-19-8.md" => [
+    "solverforge 0.19.8",
+    "`0.19.8` | 2026-10-02",
+    "cross_tri_incremental::Tri",
+    "CrossJoinEngine",
+    "`.join((extractor_c, key_c))`",
+    "docs.rs serves the\n0.19.8 API"
+  ],
   "src/_posts/releases/2026-10-01-solverforge-cli-3-3-2.md" => [
     "solverforge-cli 3.3.2",
+    "solverforge-cli 3.3.3",
     "solverforge 0.19.7",
     "rmcp 3.5.0",
-    "`3.3.1` | 2026-09-29",
-    "`3.3.2` | 2026-10-01"
+    "`3.3.2` | 2026-10-01",
+    "`3.3.3` | 2026-10-02"
+  ],
+  "src/_posts/releases/2026-10-02-solverforge-cli-3-3-3.md" => [
+    "solverforge-cli 3.3.3",
+    "solverforge 0.19.7",
+    "rmcp 3.5.0",
+    "`3.3.3` | 2026-10-02",
+    "`3.3.2` | 2026-10-01",
+    "src/data/data_seed.rs"
   ],
   "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
     "solverforge-py 0.6.10",
@@ -199,19 +222,31 @@ FORBIDDEN_TEXT = {
     "solverforge 0.19.3",
     "docs.rs/solverforge/0.19.4/"
   ],
-  "src/docs/solverforge-ui/index.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
+  "src/docs/solverforge-ui/index.md" => ["solverforge-ui 0.8.0", "sf.0.8.0", "solverforge-cli 3.2.0"],
   "src/docs/solverforge-ui/integration-assets.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
   "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.3", "solverforge==0.6.3"],
   "src/docs/solverforge-cli/index.md" => [
     "solverforge-cli 3.0.0",
     "solverforge-cli 3.3.1",
+    "solverforge-cli 3.3.2",
     "--only"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
     "solverforge-cli 3.0.0",
     "solverforge-cli 3.3.1",
+    "solverforge-cli 3.3.2",
+    "solverforge-cli 2.2.2",
+    "crate target 0.15.2",
     "rmcp 3.3.0",
-    "SolverForge crate target 0.19.4"
+    "SolverForge crate target 0.19.3",
+    "SolverForge crate target 0.19.4",
+    "Scaffold UI target: solverforge-ui 0.8.0"
+  ],
+  "src/docs/solverforge-cli/configuration.md" => [
+    "cli_version = \"3.0.0\"",
+    "cli_version = \"3.3.2\"",
+    "target = \"solverforge 0.19.4\"",
+    "solverforge-ui 0.7.0"
   ],
   "src/docs/solverforge-cli/scaffold-commands.md" => [
     "rmcp 3.3.0",
@@ -226,22 +261,12 @@ FORBIDDEN_TEXT = {
   "src/docs/solverforge-cli/agent-skill.md" => [
     "--only"
   ],
-  "src/docs/solverforge-cli/configuration.md" => [
-    "cli_version = \"3.0.0\"",
-    "target = \"solverforge 0.19.4\"",
-    "solverforge-ui 0.7.0"
-  ],
-  "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 2.2.2",
-    "crate target 0.15.2",
-    "SolverForge crate target 0.19.3",
-    "Scaffold UI target: solverforge-ui 0.8.0"
-  ],
   "src/docs/status-and-roadmap.md" => [
     "solverforge-py 0.6.3",
     "solverforge 0.19.1",
     "solverforge-cli 2.2.2` package",
     "solverforge-cli 3.3.1",
+    "solverforge-cli 3.3.2` package",
     "solverforge-ui 0.8.0",
     "solverforge-hospital@2.0.6",
     "solverforge-lessons@2.0.6",
@@ -252,7 +277,7 @@ FORBIDDEN_TEXT = {
   "src/docs/getting-started/solverforge-lessons-use-case.md" => ["solverforge-lessons@2.0.6"],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => ["solverforge-deliveries@2.0.6"],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => ["solverforge-fsr@2.0.7"],
-  "src/reference/lifecycle-pause-resume-contract.md" => ["solverforge-cli 3.3.1"]
+  "src/reference/lifecycle-pause-resume-contract.md" => ["solverforge-cli 3.3.1", "solverforge-cli 3.3.2"]
 }.freeze
 
 failures = []
