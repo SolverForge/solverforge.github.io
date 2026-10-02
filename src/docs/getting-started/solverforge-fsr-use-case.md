@@ -160,7 +160,7 @@ and route shadow values; most generated applications only need the top-level
 `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.2.0` scaffolds `solverforge 0.19.7`; the finished FSR app
+`solverforge-cli 3.3.3` scaffolds `solverforge 0.19.7`; the finished FSR app
 records an app-owned `solverforge 0.19.7` runtime target while retaining
 its original `2.2.2` scaffold provenance:
 

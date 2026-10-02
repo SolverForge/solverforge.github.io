@@ -9,12 +9,19 @@ description: >
   the bundled solverforge-modeling skill with the accessor-wired skeletons.
 ---
 
-**solverforge-cli 3.3.2** is published on crates.io and released on GitHub
-(2026-10-01), so `cargo install solverforge-cli` installs 3.3.2 directly. The
+**solverforge-cli 3.3.2** was published on crates.io and released on GitHub
+(2026-10-01), so `cargo install solverforge-cli` installed 3.3.2 directly. The
 previous package, `solverforge-cli 3.3.1`, carried the same scaffold targets;
-this release changes generated constraint skeletons and the bundled skill, not
+this release changed generated constraint skeletons and the bundled skill, not
 the dependency line. Use `solverforge --version` to confirm exactly what an
 installed binary carries.
+
+<%= render Ui::Callout.new(title: "Update, October 2, 2026") do %>
+This is a historical 3.3.2 release note. `solverforge-cli 3.3.3` is now
+published and is the current CLI line; it carries the same scaffold targets and
+fixes `generate score` and `destroy` in the generator. See the
+[3.3.3 release note](/blog/releases/2026/10/02/solverforge-cli-3-3-3/).
+<% end %>
 
 New projects target:
 
@@ -65,6 +72,7 @@ remediations documented.
 
 | Surface | Version | Scaffold target |
 | ------- | ------- | --------------- |
+| CLI | `solverforge-cli 3.3.3` | `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0` — current package |
 | CLI | `solverforge-cli 3.3.2` | `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0` |
 | CLI | `solverforge-cli 3.3.1` | `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0` |
 | CLI | `solverforge-cli 3.3.0` | `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0` |
@@ -75,6 +83,7 @@ remediations documented.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `3.3.3` | 2026-10-02 | Rewrites every score-bearing surface on `generate score` and resyncs the generated demo data on `destroy`; no scaffold-target change. |
 | `3.3.2` | 2026-10-01 | Streams generated constraint skeletons from the `#[planning_solution]` accessors and aligns the bundled skill docs; no scaffold-target change. |
 | `3.3.1` | 2026-09-29 | Aligns the CLI dependency baseline with the current releases; no scaffold-target change. |
 | `3.3.0` | 2026-09-29 | Retargets the MCP shell to `rmcp 3.5.0`. |

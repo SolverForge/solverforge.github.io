@@ -188,6 +188,11 @@ solverforge generate solution [OPTIONS] <NAME>
 A fresh neutral scaffold can be replaced once by this command. If the project
 is already shaped, destroy the existing solution first.
 
+The solution type and its score type are rewritten together across the generated
+contract as well as the solution file, so the web/API/MCP DTOs, the solver
+service, `lib.rs`, and the MCP files never keep a reference to the previous
+solution or score.
+
 ```bash
 solverforge generate solution schedule --score HardSoftScore
 ```
@@ -201,6 +206,13 @@ solverforge generate score [OPTIONS] <SCORE_TYPE>
 `<SCORE_TYPE>` can be `HardSoftScore`, `HardSoftDecimalScore`,
 `HardMediumSoftScore`, `SoftScore`, or a concrete bendable score such as
 `BendableScore<2, 3>`. `SimpleScore` is not accepted.
+
+The command rewrites the score type on every surface that carries it — the
+solution, every `src/constraints/*.rs` module, and the generated contract files
+(`src/solver/service.rs`, `src/api/dto.rs`, `src/lib.rs`, `src/mcp/dto.rs`,
+`src/mcp/tasks.rs`) — computing all rewrites before it writes any of them, so a
+score change cannot leave the project in a state that does not compile. Asking
+for the score type the project already uses is a no-op rather than an error.
 
 ```bash
 solverforge generate score HardSoftDecimalScore
@@ -302,7 +314,11 @@ solverforge generate conflict-repair required_assignment --provider repair_requi
 solverforge destroy [OPTIONS] <COMMAND>
 ```
 
-Removes generated resources and resyncs the app spec and UI model. The
+Removes generated resources and resyncs the app spec, the generated demo data,
+and the UI model. Destroying a fact, entity, or constraint re-renders
+`src/data/data_seed.rs` the same way the generate paths do, so a removed type
+does not stay behind in the seed; destroying the solution skips that render,
+because no planning solution remains to render the seed against. The
 confirmation flag belongs to the `destroy` command itself, so place it before
 the resource subcommand.
 

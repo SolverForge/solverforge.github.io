@@ -134,7 +134,7 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then keep the finished
-app's recorded release contract explicit. `solverforge-cli 3.2.0` scaffolds
+app's recorded release contract explicit. `solverforge-cli 3.3.3` scaffolds
 `solverforge 0.19.7` with `solverforge-ui 0.9.0`; the tagged
 `solverforge-deliveries@2.0.9` reference app records an app-owned
 `solverforge 0.19.7` runtime on the

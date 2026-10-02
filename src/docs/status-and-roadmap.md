@@ -10,21 +10,23 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.7` tag and calls out
+documentation tracks the `solverforge 0.19.8` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.7` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.8` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and the workspace crates were
-published on 2026-09-25, and docs.rs serves the 0.19.7 API.
+published on 2026-10-02, and docs.rs serves the 0.19.8 API.
 
-The independently published CLI line is `solverforge-cli 3.3.2`, which adds the
-`mcp` shell, `solverforge connect`, the `solverforge-modeling` and
+The independently published CLI line is `solverforge-cli 3.3.3`. The 3.3.x line
+adds the `mcp` shell, `solverforge connect`, the `solverforge-modeling` and
 `solverforge-ui` agent skills with an agent-centric installer, and multi-client
-MCP config writing. The published 3.3.2 package targets `solverforge 0.19.7`,
+MCP config writing; 3.3.2 moved generated constraint skeletons onto the
+`#[planning_solution]` accessors, fixing the mid-solve `source Unknown cannot
+localize entity indexes` panic that hand-written extractors triggered; and 3.3.3
+rewrites every score-bearing surface on `generate score` and resyncs the
+generated demo data on `destroy`, so a score change no longer leaves a project
+that does not compile. The published 3.3.3 package targets `solverforge 0.19.7`,
 with `solverforge-ui 0.9.0` and `solverforge-maps 2.1.4` for the web shell and
-`rmcp 3.5.0` for the MCP shell. 3.3.2 also streams generated constraint
-skeletons from the `#[planning_solution]` accessors, fixing the mid-solve
-`source Unknown cannot localize entity indexes` panic that hand-written
-extractors triggered. Apps scaffolded by the earlier lines pin
+`rmcp 3.5.0` for the MCP shell. Apps scaffolded by the earlier lines pin
 `solverforge 0.19.5` (`3.1.0`) or `solverforge 0.19.4` (`3.0.0`), and `3.0.0`
 carried `solverforge-ui 0.7.0` with `rmcp 3.3.0`.
 
@@ -46,11 +48,11 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.7` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.3.2` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`, and streams generated constraint skeletons from the planning-solution accessors; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.8`, which adds keyed cross-tri joins and the retained cross-tri incremental constraint over one arity-generic cross-join engine |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.3.3` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`; it rewrites every score-bearing surface on `generate score` and resyncs the generated demo data on `destroy`, and streams generated constraint skeletons from the planning-solution accessors; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.10` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.10` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.8`, `solverforge-lessons@2.0.10`, `solverforge-deliveries@2.0.9`, `solverforge-fsr@2.0.10`, plus the repository-only `solverforge-furnace@2.0.2`, `solverforge-orders@0.1.2`, `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`; all eight target `solverforge 0.19.7` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.2.0` and later scaffold `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.3.3` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -68,7 +70,7 @@ SolverForge skills now live.
   document the released Hospital 2.0.8, Lessons 2.0.10, Deliveries 2.0.9, and
   FSR 2.0.10 contracts on `solverforge 0.19.7`, while keeping their recorded
   `solverforge-cli 2.2.2` scaffold provenance separate from the current
-  `solverforge-cli 3.3.2` scaffold target.
+  `solverforge-cli 3.3.3` scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -147,12 +149,20 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **0.19.7 runtime line**: `v0.19.7` and the crates.io `solverforge 0.19.7`
+- **0.19.8 runtime line**: `v0.19.8` and the crates.io `solverforge 0.19.8`
   package are current, and the Rust toolchain floor remains `1.95`. The
-  published `solverforge-cli 3.3.2` package targets `solverforge 0.19.7` for
+  published `solverforge-cli 3.3.3` package targets `solverforge 0.19.7` for
   fresh scaffolds; apps scaffolded by `3.1.0` pin `0.19.5` and apps scaffolded
-  by `3.0.0` pin `0.19.4`, and both should move to `solverforge 0.19.7` only
+  by `3.0.0` pin `0.19.4`, and an app should move to a newer core line only
   when that app is deliberately upgraded and validated.
+- **Three-source keyed joins**: a keyed cross-bi stream carries an inherent
+  `.join((extractor_c, key_c))` that extends the joined pair with a third
+  source, so a rule over `(A, B, C)` scores the tri rows directly instead of
+  denormalizing a pair into a synthetic row type. Retained tri rows satisfy
+  `key_a(a) == key_b(b) == key_c(c)` plus the tri filter, `cross_tri_incremental::Tri`
+  reuses the same arity-generic `CrossJoinEngine<N, K, Sc>` as
+  `cross_bi_incremental::Bi`, and change localization is symmetric in whichever
+  of the three sources mutated.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
   inverse, index, previous, next, custom, cascading, and piggyback shadows.

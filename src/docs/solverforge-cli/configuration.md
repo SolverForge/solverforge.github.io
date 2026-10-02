@@ -87,7 +87,7 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "3.3.2"
+cli_version = "3.3.3"
 
 [runtime]
 target = "solverforge 0.19.7"
@@ -103,13 +103,17 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 3.3.2` web scaffold target. Fresh
+This example reflects the `solverforge-cli 3.3.3` web scaffold target. Fresh
 web generated apps target `solverforge 0.19.7`, take the CLI's
 `solverforge-ui 0.9.0` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.
 
 Record any later app-owned target changes explicitly in that app's dependency
 manifest and `solverforge.app.toml`.
+
+`solverforge.app.toml` is also one of the surfaces `generate score` rewrites:
+the CLI keeps `[solution].score` in step with the generated Rust when the score
+type changes, and re-renders the demo data when the domain changes.
 
 As you generate facts, entities, variables, constraints, scalar groups, and
 conflict repairs, the CLI also keeps these structural arrays in sync:
