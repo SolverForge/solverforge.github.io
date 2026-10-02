@@ -26,7 +26,10 @@ rewrites every score-bearing surface on `generate score` and resyncs the
 generated demo data on `destroy`, so a score change no longer leaves a project
 that does not compile. The published 3.3.3 package targets `solverforge 0.19.7`,
 with `solverforge-ui 0.9.0` and `solverforge-maps 2.1.4` for the web shell and
-`rmcp 3.5.0` for the MCP shell. Apps scaffolded by the earlier lines pin
+`rmcp 3.5.0` for the MCP shell. The crates.io publish and GitHub Release
+workflows passed for `v3.3.3`; [repository CI run 37060948778](https://github.com/SolverForge/solverforge-cli/actions/runs/37060948778)
+passed on commit `3015d6c1`, including Linux, macOS, Windows, and the full
+integration validation. Apps scaffolded by the earlier lines pin
 `solverforge 0.19.5` (`3.1.0`) or `solverforge 0.19.4` (`3.0.0`), and `3.0.0`
 carried `solverforge-ui 0.7.0` with `rmcp 3.3.0`.
 
