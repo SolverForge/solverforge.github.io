@@ -183,7 +183,8 @@ has official values for every instance it runs. Job-shop has values for every
 instance, with the source closing most of them. Employee scheduling draws on two
 published sources: the reference solutions the competition ships with its test
 instances, and the validated results it recorded for each finalist on the late
-instances, 37 values in total. None of them name a tuple the canonical selection
+instances: the 9 solutions the competition shipped and the 28 finalist scores its
+validator published, 37 values in total. None of them name a tuple the canonical selection
 runs, which grades the first weeks of each instance rather than the competition's
 published history/week combinations, so that problem's results carry feasibility
 and are compared on the mean gap only when a reference resolves. Substituting our
