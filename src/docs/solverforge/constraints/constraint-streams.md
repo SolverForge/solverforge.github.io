@@ -35,9 +35,12 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-Each constraint builder chain produces an `IncrementalUniConstraint`,
-`IncrementalBiConstraint`, or related constraint object through `.named()`.
-Return them as a tuple; SolverForge implements `ConstraintSet` for singleton
+Each constraint builder chain finalizes through `.named()`. In v0.19.9,
+direct pair scoring, chained joins, existence, flattening, and unary complemented grouping
+use concrete `stream::relational::operator` trees and the generic
+`constraint::relational::OperatorTerminal`, rather than separate retained
+engines for each shape. Unary scoring still has its own fluent terminal.
+Return terminals as a tuple; SolverForge implements `ConstraintSet` for singleton
 incremental constraints and for nested typed constraint sets, with tuple support
 up to 32 members.
 
@@ -76,7 +79,7 @@ factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 | Operation | Purpose |
 | --------- | ------- |
 | `filter` | Keep only matches that satisfy a predicate |
-| `join` | Combine rows from the same stream or a second stream; a keyed cross-bi stream chains another `.join((extractor_c, key_c))` to reach a third source |
+| `join` | Combine sources; chained `.join((target, equal_on(left_row_key, right_leaf_key)))` adds relationships with independent key domains |
 | `project` | Create retained scoring-only rows |
 | `flatten_last` | Expand a collection carried by the last joined item |
 | `group_by` | Group unary rows, projected rows, or cross-join pairs and apply a collector |
@@ -136,12 +139,15 @@ After a cross join, choose the operation that matches the rule:
 - group joined pairs directly with `.group_by(|left, right| key, collector)`
 - emit one retained scoring row per pair with `.project(|left, right| row)`
 
-A keyed cross join does not stop at two sources. The cross-bi stream carries an
-inherent `.join((extractor_c, key_c))` that extends the joined `(A, B)` pairs
-with a third source, so a rule over three keyed sources scores `(A, B, C)` rows
-directly:
+A cross join does not stop at two sources. A subsequent `.join((target,
+equal_on(left_row_key, right_leaf_key)))` relates the whole existing row to
+the new source. Each join has its own key type and domain; it need not reuse
+the first join's key. For example, match an employee by index, then match that
+shift's unavailability by `(employee index, date)`:
 
 ```rust
+use solverforge::stream::relational::{operator::Pair, Leaf};
+
 type Streams = ConstraintFactory<Schedule, SoftScore>;
 
 Streams::new()
@@ -153,17 +159,39 @@ Streams::new()
             |employee: &Employee| Some(employee.index),
         ),
     ))
-    .join((Schedule::unavailability(), |u: &Unavailability| u.employee_idx))
+    .join((
+        Schedule::unavailability(),
+        equal_on(
+            |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
+                (row.left.entity.employee_idx, row.left.entity.date)
+            },
+            |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
+        ),
+    ))
     .penalize(|_shift: &Shift, _employee: &Employee, _u: &Unavailability| SoftScore::of(1))
     .named("Shift falls on an unavailability day")
 ```
 
-The cross-bi keys stay authoritative for the first two sources, and the join
-target carries only the new source and its key, so the retained engine probes
-one shared key domain rather than a separate one per arity. A retained tri row
-requires `key_a(a) == key_b(b) == key_c(c)` plus the tri `.filter(...)`, and a
-change to any of the three sources localizes through that source's own retained
-key index.
+The first equality remains the employee-index relationship. The second uses a
+compound key and can inspect either member of the borrowed pair. `equal_on`
+receives `Pair<Leaf<A>, Leaf<B>>` on the left and `Leaf<C>` on the right;
+access entity values through `.entity`. The target is a collection extractor,
+such as the generated `Schedule::unavailability()`, not just a new key function.
+
+`Bi::join` produces `Tri`; further joins produce `Quad` and `Penta`.
+`Penta::join` enters the arbitrary-depth `Chain`, and `Chain::join` can keep
+nesting operators without a fixed arity ceiling. At each step the left row is
+nested: a triple is `Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. Named key functions
+with explicit borrowed row types are useful for deeper chains' higher-ranked
+lifetime bounds.
+
+`Tri`, `Quad`, and `Penta` keep value-oriented filter and weight closures with
+three, four, or five entity arguments. `Chain` instead passes `(&Solution,
+&BorrowedRow)` to filters and score-weight closures. Its dynamic weights are
+non-hard by default; use `.penalize(weight).hard().named(...)` (or the reward
+builder's `.hard()`) when hard classification is required. Each relationship
+keeps its own indexes, and updates from any source flow through the operator
+tree to the terminal.
 
 After `.project(...)`, the projected stream can self-join retained scoring rows.
 Use `equal(|row| key)` for symmetric same-key pairs and
@@ -232,7 +260,7 @@ Streams::new()
 ```
 
 Filters on the left source, right source, and complement source are preserved
-inside retained keyed join state. That means a filtered right-hand join source
+in the operator tree. That means a filtered right-hand join source
 or flattened keyed target does not leak excluded rows into incremental scoring.
 
 ## Constraint Node Sharing
@@ -353,7 +381,7 @@ scoring can retract and re-evaluate the correct joined rows:
 
 - same-source joins pass canonical entity indexes
 - cross joins pass the left and right source indexes
-- cross-tri joins pass `a_idx`, `b_idx`, and `c_idx` for their three sources
+- named multi-source adapters pass the semantic index for each source
 - flattened rows pass the left source index and the owning right-side source
   index
 - projected self-joins, including directed projected self-joins, pass each

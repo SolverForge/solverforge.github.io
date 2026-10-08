@@ -11,7 +11,7 @@ adding planning entities, problem facts, value ranges, or move-selector targets.
 They are retained inside the scoring layer and update incrementally as source
 entities change.
 
-## Two Projection Shapes
+## Projection and Join Shapes
 
 | Source shape | API | Emits |
 | ------------ | --- | ----- |
@@ -94,7 +94,11 @@ Streams::new()
 
 Since the `0.11.x` release line, joined-pair projected rows are retained by joined
 coordinates, so localized updates from either side of the join can update the
-cached scoring rows without materializing facts.
+cached scoring rows without materializing facts. In v0.19.9 the fluent
+`.project(|left, right| row)` shape is unchanged: it creates a projected
+`JoinedSource` and continues through the projected stream API. Do not confuse
+that projected terminal with direct pair scoring, which now finalizes onto
+`OperatorTerminal`.
 
 If the rule only needs an aggregate over joined pairs, use direct cross-join
 grouping instead:

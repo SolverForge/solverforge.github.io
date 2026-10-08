@@ -12,10 +12,17 @@ description: >
 
 **SolverForge 0.19.x** starts with
 [v0.19.0](https://github.com/SolverForge/solverforge/releases/tag/v0.19.0)
-on 2026-07-17. The current core release is
+on 2026-07-17. At the September 15 update, the core release was
 [0.19.5](https://crates.io/crates/solverforge/0.19.5), published on 2026-09-15.
 The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
 same version line.
+
+<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
+This is a historical release note. `solverforge 0.19.9` is the current core
+runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
+for the common operator tree that supersedes the older engines. CLI 3.3.3
+still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<% end %>
 
 > **Update, 2026-09-15:** SolverForge 0.19.5 retains the complete solution when
 > a job is cancelled, initializes score history with a slice fill, and preserves
@@ -63,8 +70,8 @@ the list runtime.
 No released SolverForge use case, Python model, or benchmark workload depended
 on chained variables. Those independently released surfaces therefore did not
 need a domain-model rewrite. At the time of the core release, they remained on
-their published 0.18-based lines until their own releases moved. The current
-published CLI is 3.1.0 and scaffolds SolverForge 0.19.5. Existing generated
+their published 0.18-based lines until their own releases moved. At the September 16 update, the
+published CLI was 3.1.0 and scaffolds SolverForge 0.19.5. Existing generated
 applications still own their dependency manifests and should move to 0.19.5
 only after app-level validation.
 
@@ -186,7 +193,9 @@ release are:
 
 ## Install And Version Boundaries
 
-For direct Rust applications:
+The following installation examples record the historical package boundaries;
+use the linked current manuals for new installations. For direct Rust
+applications on the September 15 line:
 
 ```toml
 [dependencies]
@@ -234,7 +243,7 @@ remain binding during mandatory construction; reaching one first raises from a
 direct solve or fails a retained job without publishing an incomplete snapshot.
 
 Python 0.6.4 and 0.6.5 then consumed the 0.19.2 construction repair and 0.19.3
-assignment-rotation repair. The current Python package is 0.6.6:
+assignment-rotation repair. The August 11 Python package was 0.6.6:
 
 ```bash
 python3.14 -m pip install "solverforge==0.6.6"
@@ -272,8 +281,8 @@ datasets, or solver policies.
 > scaffolds align with this core line. See the
 > [3.1.0 release note](/blog/releases/2026/09/16/solverforge-cli-3-1-x/).
 >
-> **Update, 2026-10-02:** `solverforge 0.19.8` is published and is the current
-> core runtime line, adding keyed cross-tri joins and the retained cross-tri
+> **Update, 2026-10-02:** `solverforge 0.19.8` was published as the
+> core runtime line at that update, adding keyed cross-tri joins and the retained cross-tri
 > incremental constraint. The published `solverforge-cli 3.3.3` package still
 > scaffolds `solverforge 0.19.7`, so fresh scaffolds trail this core line until a
 > CLI release deliberately retargets them. See the
@@ -296,6 +305,7 @@ datasets, or solver policies.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.9` | 2026-10-08 | Independent-key joins and Chain past Penta, grouped joins, composable low-level row producers over the common operator tree, and the lost resume wakeup fix. |
 | `0.19.8` | 2026-10-02 | Adds a third join source to keyed cross streams and the retained cross-tri incremental constraint, both on one arity-generic cross-join engine; the local build gate runs the Rust checks CI runs. |
 | `0.19.7` | 2026-09-25 | Owns every workspace version surface from the release tooling, so the workspace, crates, and tags are cut from one declaration. |
 | `0.19.6` | 2026-09-25 | Exposes the typed planning pin predicate, rejects scalar edits to pinned entities, preserves pinned list owners across construction and search, retains pinned assignments in exhaustive search, and skips pin scanning for models without pins. |
@@ -309,7 +319,7 @@ datasets, or solver policies.
 ## Documentation Changes
 
 - [SolverForge runtime docs](/docs/solverforge/) describe the scalar/list
-  boundary and current 0.19.5 runtime.
+  boundary; this post records the historical 0.19.5 runtime.
 - [CLI command reference](/docs/solverforge-cli/command-reference/) records the
   published 3.1.0 scaffold targets, which align with the 0.19.5 core.
 - [Crate & Runtime Map](/reference/crate-map/) aligns Rust, CLI, Python, and

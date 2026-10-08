@@ -51,7 +51,7 @@ independent.
 
 ## What Shares
 
-The 0.15.x compiler shares these grouped families:
+In v0.19.9, the compiler supports sharing these grouped families:
 
 | Shape | Example |
 | ----- | ------- |

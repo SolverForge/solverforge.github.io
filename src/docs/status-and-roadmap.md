@@ -10,11 +10,11 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.8` tag and calls out
+documentation tracks the `solverforge 0.19.9` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.8` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.9` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and the workspace crates were
-published on 2026-10-02, and docs.rs serves the 0.19.8 API.
+published on 2026-10-08, and docs.rs serves the 0.19.9 API.
 
 The independently published CLI line is `solverforge-cli 3.3.3`. The 3.3.x line
 adds the `mcp` shell, `solverforge connect`, the `solverforge-modeling` and
@@ -51,7 +51,7 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.8`, which adds keyed cross-tri joins and the retained cross-tri incremental constraint over one arity-generic cross-join engine |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.9`, which adds independent-key joins, arity-free Chain continuation, grouped joins, composable row producers over the common operator tree, and the lost resume wakeup fix |
 | **CLI Scaffold** | Published | `solverforge-cli 3.3.3` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`; it rewrites every score-bearing surface on `generate score` and resyncs the generated demo data on `destroy`, and streams generated constraint skeletons from the planning-solution accessors; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.10` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.10` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.8`, `solverforge-lessons@2.0.10`, `solverforge-deliveries@2.0.9`, `solverforge-fsr@2.0.10`, plus the repository-only `solverforge-furnace@2.0.2`, `solverforge-orders@0.1.2`, `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`; all eight target `solverforge 0.19.7` and `solverforge-ui 0.9.0` |
@@ -152,20 +152,29 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **0.19.8 runtime line**: `v0.19.8` and the crates.io `solverforge 0.19.8`
+- **0.19.9 runtime line**: `v0.19.9` and the crates.io `solverforge 0.19.9`
   package are current, and the Rust toolchain floor remains `1.95`. The
   published `solverforge-cli 3.3.3` package targets `solverforge 0.19.7` for
   fresh scaffolds; apps scaffolded by `3.1.0` pin `0.19.5` and apps scaffolded
   by `3.0.0` pin `0.19.4`, and an app should move to a newer core line only
   when that app is deliberately upgraded and validated.
-- **Three-source keyed joins**: a keyed cross-bi stream carries an inherent
-  `.join((extractor_c, key_c))` that extends the joined pair with a third
-  source, so a rule over `(A, B, C)` scores the tri rows directly instead of
-  denormalizing a pair into a synthetic row type. Retained tri rows satisfy
-  `key_a(a) == key_b(b) == key_c(c)` plus the tri filter, `cross_tri_incremental::Tri`
-  reuses the same arity-generic `CrossJoinEngine<N, K, Sc>` as
-  `cross_bi_incremental::Bi`, and change localization is symmetric in whichever
-  of the three sources mutated.
+- **Composable joins**: each later join can use `equal_on(left_row_key,
+  right_row_key)` over the complete prior row with its own key type. Named
+  cross `Bi`, `Tri`, `Quad`, and `Penta` adapters use the same typed operator
+  tree; `Penta::join` continues into `stream::chain::Chain` with no fixed arity
+  ceiling. Grouped results can join another collection. Equality, comparison,
+  overlap, and composed relationships compile into concrete index plans.
+- **Operator-tree boundary**: `JoinNode` and `OperatorTerminal` replace the
+  historical cross-bi/cross-tri and per-arity self-join engines. Low-level
+  collection, filter, bag-union, owned projection, grouping, semi/anti join,
+  flatten, complement, and self-join producers compose borrowed views with
+  generational identities and source provenance. Specialized stream families
+  still exist; arbitrary derived-consumer sharing is not supplied by these
+  producers. Existing compiler-owned grouped terminal sharing remains supported.
+- **Lost resume wakeup fixed**: resume and cancellation clear the pause request
+  and notify while holding the worker's pause gate, closing the race between
+  its predicate check and condition-variable wait without changing snapshot
+  publication boundaries.
 - **One sequence model**: planning list variables are the canonical model for
   routes and ordered assignments. They own the sequence directly and retain
   inverse, index, previous, next, custom, cascading, and piggyback shadows.

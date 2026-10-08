@@ -7,9 +7,16 @@ description: >
   route-distance handling, and exposes dynamic construction primitives.
 ---
 
+<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
+This is a historical release note. `solverforge 0.19.9` is the current core
+runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
+for the common operator tree that supersedes the older engines. CLI 3.3.3
+still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<% end %>
+
 **SolverForge 0.17.x** started with
 [v0.17.0](https://github.com/SolverForge/solverforge/releases/tag/v0.17.0)
-on 2026-06-15. The current core patch is
+on 2026-06-15. At this post’s update, the core patch was
 [v0.17.2](https://github.com/SolverForge/solverforge/releases/tag/v0.17.2),
 published on crates.io on 2026-07-02. The 0.17 line keeps the Rust `1.95`
 floor, publishes the workspace crates on one version line, makes stock CVRP

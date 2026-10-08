@@ -9,7 +9,7 @@ require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
 DEFAULT_SOLVERFORGE_RS_REPO = "/srv/lab/dev/solverforge/solverforge"
-DEFAULT_SOLVERFORGE_RS_REF = "v0.19.8"
+DEFAULT_SOLVERFORGE_RS_REF = "v0.19.9"
 DEFAULT_SOLVERFORGE_MAPS_REPO = "/srv/lab/dev/solverforge/solverforge-maps"
 DEFAULT_SOLVERFORGE_UI_REPO = "/srv/lab/dev/solverforge/solverforge-ui"
 
@@ -177,7 +177,8 @@ class ProfileResolver
     "src/_posts/releases/2026-05-05-solverforge-0-11-x.md" => "solverforge@0.11.1",
     "src/_posts/releases/2026-05-08-solverforge-0-12-x.md" => "solverforge@0.12.1",
     "src/_posts/releases/2026-05-12-solverforge-0-13-x.md" => "solverforge@0.13.1",
-    "src/_posts/releases/2026-05-16-solverforge-0-14-x.md" => "solverforge@0.14.1"
+    "src/_posts/releases/2026-05-16-solverforge-0-14-x.md" => "solverforge@0.14.1",
+    "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => "solverforge@0.15.2"
   }.freeze
 
   KNOWN_PROFILES = %w[
@@ -192,6 +193,7 @@ class ProfileResolver
     solverforge@0.12.1
     solverforge@0.13.1
     solverforge@0.14.1
+    solverforge@0.15.2
     solverforge-maps@1.0.0
     solverforge-maps@2.1.4
   ].freeze
@@ -563,7 +565,56 @@ class SnippetRenderer
     end
 
     if code.lstrip.start_with?("equal(", "equal_bi(", "less_than(", "greater_than(", "overlapping(", "filtering(")
+      # Since 0.19.9 equal_bi defers its key type to stream dispatch. A bare
+      # constructor excerpt has no dispatch site; recover the type from the
+      # entity closures without changing the published example.
+      if code.lstrip.start_with?("equal_bi(")
+        prelude += <<~RS
+          fn snippet_equal_bi<A, B, K: PartialEq, FA, FB>(left: FA, right: FB)
+              -> solverforge::stream::joiner::EqualJoiner<FA, FB, K>
+          where FA: Fn(&A) -> K + Send + Sync, FB: Fn(&B) -> K + Send + Sync {
+              equal_bi(left, right)
+          }
+        RS
+        code = code.sub("equal_bi(", "snippet_equal_bi(")
+      end
+      %w[less_than greater_than].each do |constructor|
+        next unless code.lstrip.start_with?("#{constructor}(")
+        result = constructor == "less_than" ? "LessThanJoiner" : "GreaterThanJoiner"
+        prelude += <<~RS
+          fn snippet_#{constructor}<A, B, K: Ord, FA, FB>(left: FA, right: FB)
+              -> solverforge::stream::joiner::#{result}<FA, FB, K>
+          where FA: Fn(&A) -> K + Send + Sync, FB: Fn(&B) -> K + Send + Sync {
+              #{constructor}(left, right)
+          }
+        RS
+        code = code.sub("#{constructor}(", "snippet_#{constructor}(")
+      end
+      if code.lstrip.start_with?("overlapping(")
+        prelude += <<~RS
+          fn snippet_overlapping<A, B, K: Ord, FA, FB, FC, FD>(a: FA, b: FB, c: FC, d: FD)
+              -> solverforge::stream::joiner::OverlappingJoiner<FA, FB, FC, FD, K>
+          where FA: Fn(&A) -> K + Send + Sync, FB: Fn(&A) -> K + Send + Sync,
+                FC: Fn(&B) -> K + Send + Sync, FD: Fn(&B) -> K + Send + Sync {
+              overlapping(a, b, c, d)
+          }
+        RS
+        code = code.sub("overlapping(", "snippet_overlapping(")
+      end
       return prelude + "\n" + wrap_function("let _joiner = #{code}", snippet)
+    end
+
+    if code.include?("equal_on(") && !code.include?(".join(")
+      # Constructor-only row-key examples also lack a consumer to infer K.
+      prelude += <<~RS
+        fn snippet_equal_on<L, R, K: PartialEq, FL, FR>(left: FL, right: FR)
+            -> solverforge::stream::joiner::EqualJoiner<FL, FR, K>
+        where FL: Fn(&L) -> K + Send + Sync, FR: Fn(&R) -> K + Send + Sync {
+            equal_on(left, right)
+        }
+      RS
+      code = code.sub("equal_on(", "snippet_equal_on(")
+      return prelude + "\n" + wrap_function(code, snippet)
     end
 
     if code.include?("fn main")

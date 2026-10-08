@@ -66,7 +66,7 @@ merely unnecessary.
 | CLI (previous line) | `solverforge-cli 3.1.0` | `solverforge 0.19.5`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.4.0` |
 
 The scaffold targets are unchanged since 3.3.0, and none of the 3.3.x patches
-retargets the core runtime: the current core release, `solverforge 0.19.8`, is
+retargets the core runtime: the current core release, `solverforge 0.19.9`, is
 ahead of the `solverforge 0.19.7` scaffold line by design.
 
 ## Patch History

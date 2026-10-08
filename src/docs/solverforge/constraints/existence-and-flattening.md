@@ -32,17 +32,19 @@ Streams::new()
 ```
 
 `if_exists` asks "does this item have at least one matching record over there?"
-`if_not_exists` asks the inverse. The public API stays simple while the runtime
-chooses faster internal bookkeeping for key shapes it can index directly.
+`if_not_exists` asks the inverse. Multiple right-side matches do not multiply
+the left row's score: an existence filter publishes only accepted left rows.
 
-## Indexed `usize` Keys
+## Relational Execution
 
-Direct and flattened existence constraints with exact `usize` keys use dense
-indexed storage internally. Other key shapes, including `Option<usize>`,
-newtype keys, strings, and compound keys, keep hashed storage.
-
-That storage decision does not change the stream API. Choose keys for modeling
-clarity first; the runtime uses the exact-key fast path when it is available.
+In v0.19.9 both operations use `stream::relational::operator::ExistenceNode`,
+a semi/anti join over concrete row producers. The compiled condition supplies
+the indexes; retained matching links track membership as either source changes.
+The terminal is `constraint::relational::OperatorTerminal`, not a separate
+existence scoring engine. The old exact-`usize` existence-engine storage
+specialization is not the current API contract. Choose `usize`, optional,
+string, or compound keys for the relationship you need, not to select a
+retired engine.
 
 ## `flatten_last`
 
@@ -75,6 +77,19 @@ The three arguments are:
 | slice extractor | returns the nested collection from the joined item |
 | flattened key | extracts a key from each nested element |
 | lookup key | extracts the matching key from the left-side row |
+
+This keyed pair operation emits `(left entity, child element)` matches, not
+`(left entity, parent entity, child element)` triples. Score or filter those
+matches with two value arguments. Both relationships must hold: the original
+join links the left entity to the parent, and the lookup key matches the
+child's flattened key.
+
+In v0.19.9 the fluent builder creates a `FlattenNode` over the parent source
+and joins it to the left collection using the compound `(parent key, child
+key)` relationship. It finalizes onto `OperatorTerminal`; there is no separate
+flattened-bi retained scoring engine. The three-argument `flatten_last` API
+remains the keyed `Bi` operation shown above, not a general promise that every
+arbitrary-depth `Chain` supports flattening.
 
 ## When To Use Which
 

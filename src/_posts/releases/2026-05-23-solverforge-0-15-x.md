@@ -9,7 +9,14 @@ description: >
   move-level runtime telemetry.
 ---
 
-**SolverForge 0.15.2** is the current core runtime patch in the 0.15 line. It is
+<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
+This is a historical release note. `solverforge 0.19.9` is the current core
+runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
+for the common operator tree that supersedes the older engines. CLI 3.3.3
+still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<% end %>
+
+**SolverForge 0.15.2** was the core runtime patch recorded for the 0.15 line. It is
 tagged as [v0.15.2](https://github.com/SolverForge/solverforge/releases/tag/v0.15.2),
 published by GitHub Actions on 2026-06-10, and available as
 `solverforge 0.15.2` on [crates.io](https://crates.io/crates/solverforge).
@@ -19,7 +26,7 @@ new package.
 <%= render Ui::Callout.new(title: "Update, July 2, 2026") do %>
 This is a historical 0.15.x release note. The live documentation now tracks
 `solverforge 0.17.2`; the published `solverforge-cli 2.2.2` package scaffolds
-`solverforge 0.15.2`; and the worked use-case bundle currently targets
+`solverforge 0.15.2`; and the worked use-case bundle then targeted
 `solverforge 0.17.1`.
 <% end %>
 
@@ -219,7 +226,7 @@ For generated apps, confirm the installed CLI target:
 solverforge --version
 ```
 
-The current `solverforge-cli 2.2.1` source line reports:
+The historical `solverforge-cli 2.2.1` source line reported:
 
 ```text
 CLI version: 2.2.1

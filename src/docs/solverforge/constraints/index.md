@@ -34,8 +34,13 @@ source or one joined pair, grouped streams can use collectors such as
 `consecutive_runs(...)`, `collect_vec(...)`, and `indexed_presence(...)`, and
 projected self-joins can be symmetric with `equal(...)` or directed with
 `equal_bi(left_key, right_key)`. Direct cross joins can group joined pairs
-without projecting them first, and a keyed cross-bi stream can chain another
-`.join((extractor_c, key_c))` to score `(A, B, C)` rows over three sources.
+without projecting them first. Chained joins use
+`.join((target, equal_on(left_row_key, right_leaf_key)))`, with an independent
+key domain for each relationship. `Tri`, `Quad`, and `Penta` provide named
+arity adapters; beyond five sources, `Chain` continues at arbitrary depth.
+In v0.19.9 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
+execute through concrete `stream::relational::operator` trees and the shared
+`OperatorTerminal`, not per-shape retained engines.
 Direct cross-join groups can also call
 `complement(...)` against generated target sources, and filtered keyed joins
 retain the filter contract on both sides of the join.

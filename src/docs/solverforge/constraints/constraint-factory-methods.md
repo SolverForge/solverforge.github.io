@@ -293,6 +293,9 @@ names, not these stream method names.
   instead of `Streams::new().for_each(Schedule::shifts())`.
 - Joining facts through a custom extractor or closure when `Schedule::employees()`
   is generated.
+- Extending a joined pair with only `(source, key_fn)`. Chained joins now need
+  `(source, equal_on(left_row_key, right_leaf_key))`, with borrowed row views
+  and a fresh condition for the added relationship.
 - Expecting generated method aliases that do not match the solution field name.
 - Using `for_each(...)` for projected rows that should keep localized source
   ownership.

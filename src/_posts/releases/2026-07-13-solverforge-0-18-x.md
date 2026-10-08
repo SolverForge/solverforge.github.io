@@ -8,9 +8,16 @@ description: >
   and hardens retained lifecycle control.
 ---
 
+<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
+This is a historical release note. `solverforge 0.19.9` is the current core
+runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
+for the common operator tree that supersedes the older engines. CLI 3.3.3
+still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<% end %>
+
 **SolverForge 0.18.x** started with
 [v0.18.0](https://github.com/SolverForge/solverforge/releases/tag/v0.18.0)
-on 2026-07-13. The current core patch is
+on 2026-07-13. At this post’s update, the core patch was
 [v0.18.0](https://crates.io/crates/solverforge/0.18.0). GitHub CI, the GitHub
 Release workflow, and the coordinated crates.io publish completed successfully.
 The 0.18 line keeps the Rust `1.95` floor and publishes the workspace crates on

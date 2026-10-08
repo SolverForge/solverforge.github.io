@@ -10,7 +10,7 @@ description: >
 ---
 
 **solverforge-cli 3.0.0** is published on crates.io and released on GitHub
-(2026-09-15), so `cargo install solverforge-cli` installs 3.0.0 directly. The
+(2026-09-15), at publication `cargo install solverforge-cli` installed 3.0.0 directly. The
 previous crates.io package, `solverforge-cli 2.2.3`, scaffolded
 `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`. Use
 `solverforge --version` to confirm exactly what an installed binary carries.

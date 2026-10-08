@@ -209,6 +209,12 @@ completion. Long-running work emits metadata-only phase pulses, paused time is
 excluded from active phase elapsed telemetry, and `pause()`, `cancel()`, or
 config termination unwind without app-side watchdog code.
 
+In the `v0.19.9` source, resume and cancellation clear the pause request and
+notify the condition variable while holding the worker's pause gate. This fixes
+the lost-wakeup race where a resume between the worker's predicate check and
+its wait could leave it blocked. It does not restart from the best solution or
+change the snapshot-availability gate described above.
+
 ## Snapshots and Analysis
 
 Every retained solution snapshot has a monotonic `snapshot_revision` within its

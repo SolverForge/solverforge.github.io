@@ -8,6 +8,13 @@ description: >
   line on crates.io.
 ---
 
+<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
+This is a historical release note. `solverforge 0.19.9` is the current core
+runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
+for the common operator tree that supersedes the older engines. CLI 3.3.3
+still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<% end %>
+
 **SolverForge 0.16.0** was published on crates.io and tagged as
 [v0.16.0](https://github.com/SolverForge/solverforge/releases/tag/v0.16.0).
 It kept the Rust `1.95` floor, published the workspace crates on the same
@@ -18,7 +25,7 @@ Clarke-Wright construction and k-opt route improvement.
 This is a historical 0.16.x release note. It was superseded by
 [SolverForge 0.17.x](/blog/releases/2026/06/15/solverforge-0-17-x/), which adds
 the stock `domain = "cvrp"` profile, route-distance hardening, and public
-dynamic construction primitives. The current core runtime is
+dynamic construction primitives. At this post’s update, the core runtime was
 `solverforge 0.17.2`.
 <% end %>
 

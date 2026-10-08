@@ -5,12 +5,12 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/docs/solverforge/index.md" => [
-    "These pages track the `solverforge 0.19.8` crate",
-    "solverforge 0.19.8",
+    "These pages track the `solverforge 0.19.9` crate",
+    "solverforge 0.19.9",
     "solverforge-cli 3.3.3",
     "solverforge 0.19.4",
-    "The `0.19.8` workspace declares Rust `1.95`.",
-    "docs.rs/solverforge/0.19.8/solverforge/"
+    "The `0.19.9` workspace declares Rust `1.95`.",
+    "docs.rs/solverforge/0.19.9/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py 0.6.10",
@@ -53,7 +53,7 @@ REQUIRED_TEXT = {
     "cargo run -- demo-data"
   ],
   "src/docs/solverforge/solver/configuration.md" => [
-    "SolverForge 0.19.8"
+    "SolverForge 0.19.9"
   ],
   "src/docs/solverforge-maps/index.md" => [
     "solverforge-maps 2.1.4",
@@ -113,12 +113,12 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/agent-skill/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.19.8",
+    "solverforge 0.19.9",
     "solverforge 0.6.10",
     "solverforge-py v0.6.10"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.19.8",
+    "solverforge 0.19.9",
     "solverforge-ui 0.9.0",
     "solverforge-cli 3.3.3"
   ],
@@ -146,11 +146,11 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "documentation tracks the `solverforge 0.19.8` tag",
-    "The `v0.19.8` tag, workspace, and crates.io package are the",
-    "published on 2026-10-02, and docs.rs serves the 0.19.8 API.",
+    "documentation tracks the `solverforge 0.19.9` tag",
+    "The `v0.19.9` tag, workspace, and crates.io package are the",
+    "published on 2026-10-08, and docs.rs serves the 0.19.9 API.",
     "The independently published CLI line is `solverforge-cli 3.3.3`",
-    "- **0.19.8 runtime line**: `v0.19.8` and the crates.io `solverforge 0.19.8`",
+    "- **0.19.9 runtime line**: `v0.19.9` and the crates.io `solverforge 0.19.9`",
     "solverforge-py 0.6.10",
     "solverforge-cli 3.3.3",
     "solverforge-ui 0.9.0",
@@ -176,6 +176,8 @@ REQUIRED_TEXT = {
     "solverforge 0.19.7"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
+    "`0.19.9` | 2026-10-08",
+    "0.19.9 release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.7` | 2026-09-25",
     "`0.19.6` | 2026-09-25",
@@ -188,6 +190,8 @@ REQUIRED_TEXT = {
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
     "solverforge 0.19.6",
     "solverforge 0.19.7",
+    "`0.19.9` | 2026-10-08",
+    "0.19.9 release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",
@@ -199,7 +203,22 @@ REQUIRED_TEXT = {
     "cross_tri_incremental::Tri",
     "CrossJoinEngine",
     "`.join((extractor_c, key_c))`",
-    "docs.rs serves the\n0.19.8 API"
+    "Historical 0.19.8 architecture",
+    "0.19.9 release note"
+  ],
+  "src/_posts/releases/2026-10-08-solverforge-0-19-9.md" => [
+    "solverforge 0.19.9",
+    "`0.19.9` | 2026-10-08",
+    "docs.rs serves the 0.19.9 API",
+    "equal_on(left_row_key, right_row_key)",
+    "Penta::join(...)",
+    "OperatorTerminal",
+    "GroupNode",
+    "derived operator\ntree across multiple consumers",
+    "same pause gate",
+    "solverforge-cli 3.3.3",
+    "Still scaffolds `solverforge 0.19.7`",
+    "551170ccd2d77433aca2ce566d89a012dc5dcc8b"
   ],
   "src/_posts/releases/2026-10-01-solverforge-cli-3-3-2.md" => [
     "solverforge-cli 3.3.2",
@@ -285,6 +304,8 @@ FORBIDDEN_TEXT = {
     "--only"
   ],
   "src/docs/status-and-roadmap.md" => [
+    "documentation tracks the `solverforge 0.19.8` tag",
+    "**Three-source keyed joins**",
     "solverforge-py 0.6.3",
     "solverforge 0.19.1",
     "solverforge-cli 2.2.2` package",

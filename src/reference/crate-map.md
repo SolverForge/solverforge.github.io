@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.8` crate and current
+This map is aligned with the published `solverforge 0.19.9` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -23,8 +23,8 @@ custom-search, and retained runtime surface, including
 `ScalarGroup`, `ScalarAssignmentRule`, `ScalarGroupLimits`,
 `SharedNodeDiagnostics`, `SharedNodeId`, `SharedNodeOperation`, direct
 cross-join `.group_by(|left, right| key, collector)`, cross-join
-`.project(|left, right| row)` projected scoring, keyed cross-tri joins through
-`.join((extractor_c, key_c))` on a cross-bi stream, direct cross-join grouped
+`.project(|left, right| row)` projected scoring, row-aware chained cross joins
+through `Bi`, `Tri`, `Quad`, `Penta`, and an arity-free `Chain`, direct cross-join grouped
 complements, symmetric and directed projected self-joins, projected grouped
 complements, score weight helpers such as `fixed_weight` and `hard_weight`,
 collector helpers such as `count`, `sum`, `load_balance`, `consecutive_runs`,
@@ -47,12 +47,43 @@ lower-level solver internals directly.
 | `solverforge`         | the public facade and re-exports                                         | you are building an app and want the normal public API                         |
 | `solverforge-core`    | score types, descriptors, domain traits, and dynamic capability contracts | you are extending lower-level abstractions or implementing core-facing helpers |
 | `solverforge-macros`  | `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]`, `#[solverforge_constraints]` | you need derive behavior, model glue, or constraint-function compilation |
-| `solverforge-scoring` | constraint streams, incremental scoring, and shared grouped node state    | you are working directly on scoring internals or advanced scoring extensions   |
+| `solverforge-scoring` | constraint streams, typed relational operators and terminals, incremental scoring, and shared grouped node state | you are working directly on scoring internals or advanced scoring extensions |
 | `solverforge-config`  | TOML/YAML parsing, resolved selector policy, candidate-trace config, acceptors, and builders | you need direct config construction or parsing outside the stock solve path    |
 | `solverforge-solver`  | runtime compiler, phases, cursor selectors, retained lifecycle, and telemetry | you are building custom runtime behavior beyond facade-level use               |
 | `solverforge-bridge`  | dynamic binding contracts, logical IDs, scores, explicit slot capabilities, and the compiled runner | you are implementing or maintaining a binding layer |
 | `solverforge-console` | tracing-driven console output                                            | you want the standard terminal UX or progress formatting                       |
 | `solverforge-cvrp`    | CVRP-specific helpers and distance utilities                             | your problem is route-centric and the domain benefits from these helpers       |
+
+## Relational scoring internals
+
+Fluent cross joins and same-collection unique combinations now score through
+`constraint::relational::OperatorTerminal`. Cross joins nest `JoinNode`s;
+same-collection combinations use `SelfJoinNode` with an identity-preserving
+filter. The old `cross_bi_incremental`, `cross_tri_incremental`, and per-arity
+self-join incremental constraint modules are no longer the implementation.
+
+Named cross `Bi`/`Tri`/`Quad`/`Penta` streams adapt the common tree. Cross
+`Penta::join` returns `stream::chain::Chain`; subsequent `Chain::join` calls
+extend it without a fixed arity ceiling. Each chained condition compiles
+independently, receives the whole prior borrowed row, and can use a key domain
+different from earlier relationships. Chain filters and weights receive the
+typed row rather than a new positional closure signature for every arity.
+
+Low-level `stream::relational::operator` types compose collection, filter,
+merge, project, group, join, self-join, existence, flatten, and complement
+producers. Derived payloads belong to evaluation or retained-state owners;
+borrowed views and generational row identities preserve lineage without
+retaining solution references. Group and membership changes can replace rows
+during either retraction or insertion, so consumers process both removed and
+inserted rows in `RowChanges`.
+
+This is not a claim that every fluent family has migrated. Specialized unary,
+grouped, projected, existence, and flattened constraint families still exist.
+Likewise, reusable grouped-node sharing remains distinct from automatic
+compiler-owned sharing of arbitrary derived consumers. Check the
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.9/crates/solverforge-scoring/src)
+when extending internals; the repository's architecture notes retain some
+intermediate-stage descriptions.
 
 ## Companion repositories
 

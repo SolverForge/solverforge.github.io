@@ -29,6 +29,28 @@ key extractors:
 equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx)
 ```
 
+### `equal_on`
+
+For chained joins, takes keys over the whole borrowed left row and the new
+right leaf. It does not inherit the first join's key domain:
+
+```rust
+use solverforge::stream::relational::{operator::Pair, Leaf};
+
+equal_on(
+    |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
+        (row.left.entity.employee_idx, row.left.entity.date)
+    },
+    |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
+)
+```
+
+The right key receives `Leaf<Unavailability>`, not `&Unavailability`.
+Use `.entity` to read its value. The left key can inspect either existing
+binding or combine them. Comparison joiners also provide row-aware variants
+such as `less_than_on` and `greater_than_on`; their left and right arguments
+use borrowed row views too.
+
 ### `less_than`
 
 Matches when the left value is less than the right. Takes two extractors.
@@ -95,10 +117,12 @@ Streams::new()
     ))
 ```
 
-**Third source on a keyed cross join** - a cross-bi stream carries an inherent
-`.join((extractor_c, key_c))` that extends the joined pair with a third source:
+**Third source with an independent relationship** - pass the new collection
+extractor and a row-aware joiner to `.join((target, equal_on(...)))`:
 
 ```rust
+use solverforge::stream::relational::{operator::Pair, Leaf};
+
 type Streams = ConstraintFactory<Schedule, SoftScore>;
 
 Streams::new()
@@ -110,12 +134,29 @@ Streams::new()
             |employee: &Employee| Some(employee.index),
         ),
     ))
-    .join((Schedule::unavailability(), |u: &Unavailability| u.employee_idx))
+    .join((
+        Schedule::unavailability(),
+        equal_on(
+            |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
+                (row.left.entity.employee_idx, row.left.entity.date)
+            },
+            |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
+        ),
+    ))
 ```
 
-The retained `(A, B, C)` rows satisfy `key_a(a) == key_b(b) == key_c(c)`; the
-first two keys come from the cross-bi stream and the join target supplies only
-the new source and its key.
+The first join matches the employee index; the second matches employee index
+and date. Each relationship compiles its own condition and indexes. The
+retained rows satisfy both relationships, not one equality across all sources.
+
+The fluent adapters continue through `Bi`, `Tri`, `Quad`, and `Penta`.
+Each added source nests the row view: the next left row after a triple is
+`Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. `Penta::join` continues at six sources
+as `Chain`, which accepts further `.join((target, condition))` calls without a
+fixed depth ceiling. `Chain` filters and weights take the solution and the
+borrowed nested row; the named arity adapters retain separate entity arguments
+for filters and weights. See [Constraint Streams](/docs/solverforge/constraints/constraint-streams/)
+for these terminal and lifetime boundaries.
 
 After a cross join, the stream can score pairs directly, group the joined pairs
 with `.group_by(|left, right| key, collector)`, or project each pair into a
@@ -127,7 +168,13 @@ projected self-join where row orientation is part of the rule.
 
 ## Performance Note
 
-Indexed joiners (`equal`, `equal_bi`, `less_than`, `greater_than`, `overlapping`) are much faster than `filtering` because they use index lookups instead of iterating all pairs. Prefer indexed joiners where possible and only use `filtering` for conditions that can't be expressed with indexed joiners.
+Equality conditions compile to hash-indexed plans; comparison conditions use
+ordered scans, and overlap conditions use interval narrowing. A bare
+`filtering` predicate uses a scan. Prefer a structural condition that narrows
+candidates before applying an arbitrary predicate. Compose conditions with
+`.and(...)`; the compiled plan still checks the complete condition. These
+strategies are shared across the relational operator tree rather than selected
+by a separate retained engine for each tuple arity.
 
 Low-level joined filters receive semantic source indexes in the current runtime.
 The fluent `filtering(|left, right| ...)` and `.filter(|left, right| ...)`

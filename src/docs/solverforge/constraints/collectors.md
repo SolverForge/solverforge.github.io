@@ -163,6 +163,13 @@ factory.for_each(Schedule::shifts())
     .named("Balanced workload")
 ```
 
+In v0.19.9 unary complemented groups use a relational `ComplementNode` and the
+shared `OperatorTerminal`, rather than a separate complemented scoring engine.
+The node relates the target domain to grouped results and owns default values
+for targets with no matching result. The public `complement(source, key,
+default)` authoring shape is unchanged. Direct cross-join and projected
+complemented groups still use their respective grouped terminal families.
+
 Projected grouped streams can also use `complement(...)` after grouping when
 the source rows were created by `project(...)`.
 
