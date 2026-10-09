@@ -66,6 +66,46 @@ owned sequence; do not encode ordered work as a chained scalar predecessor.
 | richer scoring context             | add immutable facts or derived helper methods instead of shoving logic into constraints              |
 | validation or import normalization | add app-side builders or conversion layers before solving                                            |
 
+## Assignment-Backed Scalar Groups
+
+Register a model-owned `Vec<ScalarGroup<Schedule>>` provider with
+`#[planning_solution(scalar_groups = "scalar_groups")]`. Declare an assignment
+using `ScalarGroup::assignment("shift_assignment",
+Schedule::shifts().scalar("employee_idx"))`; add `with_required_entity` for
+mandatory rows, `with_capacity_key` for shared resource capacity, and ordering
+hooks when the selected heuristic requires them.
+
+Field-level `allows_unassigned` permits `None`; the group's required-row
+predicate separately determines which rows must be assigned before publication.
+Assignment-owned slots use named grouped construction and the configured
+`grouped_scalar_move_selector`, not generic scalar or conflict-repair selectors.
+Keeping an optional row unassigned completes its exact group-slot decision,
+not the optional pass. Completed roots are skipped before candidate-domain reads
+or move generation, so later rows retain their budget. Assigned occupants remain
+available for required augmenting rematches.
+
+Model-owned `ScalarGroup::with_limits(...)` separates value candidates, grouped
+candidates, per-step moves, augmenting depth, and rematch size. The assignment
+defaults are depth 3 and rematch size 4, with rematch size clamped to at least 2.
+See [Construction](/docs/solverforge/solver/construction/) for the complete model
+and config example.
+
+## Filter Nullable Sources Before Equality Joins
+
+On the first unary keyed equality cross-join, put a unary
+`.filter(|row| row.employee_idx.is_some())` before `.join(...)` on every unary
+input whose key requires an assignment. Left membership is checked before key
+extraction and pair creation; a filtered unary right target retains its own
+membership. Original indexes and incremental change metadata remain intact.
+A pair filter after the join cannot protect key extraction.
+
+This left-source pushdown does not apply to comparison, overlap,
+composed-condition, predicate, or same-source self-join dispatch. Fluent right
+join targets implement `CollectionExtract`; arbitrary compatible derived
+producers instead feed low-level `JoinNode` inputs. See
+[Constraint Streams](/docs/solverforge/constraints/constraint-streams/) for
+examples and the cross-Penta continuation filter limitation.
+
 ## Suggested module layout
 
 ```text

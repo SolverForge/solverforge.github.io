@@ -32,7 +32,7 @@ scalar candidates, assignment-backed scalar groups, or conflict repair
 providers, the model must expose those capabilities through the generated model
 support layer.
 
-SolverForge 0.19.9 compiles the complete resolved policy before solving. A bad
+SolverForge 0.19.10 compiles the complete resolved policy before solving. A bad
 target, missing operation bundle, unknown provider or metric, invalid selector
 composition, or inconsistent construction source is a build error at its config
 path; the runtime does not defer schema discovery until a hot candidate loop.
@@ -192,6 +192,16 @@ score_tie_break = "random"
 type = "tabu_search"
 entity_tabu_size = 7
 ```
+
+When `phases` are omitted, the runtime runs state-aware construction: matching
+specialized list construction, named grouped `FirstFit` for required assignment
+rows followed by grouped `CheapestInsertion` for optional rows, and single-slot
+construction for remaining non-assignment-owned scalars. One streaming default
+local-search phase is eligible only when top-level termination contains an
+effective parsed limit. Missing termination, an empty termination object, or an
+invalid score-only limit leaves omitted phases construction-only. This is
+separate from omitting `move_selector` inside an explicit local-search phase.
+VND is never prepended implicitly.
 
 See [Phases](/docs/solverforge/solver/phases/) for all phase types and their options.
 
@@ -379,6 +389,19 @@ group_name = "required_shift_assignment"
 max_moves_per_step = 64
 require_hard_improvement = true
 ```
+
+Assignment augmenting depth and sequence/position rematch size are declared
+with `ScalarGroup::with_limits(ScalarGroupLimits { ... })`, not as additional
+TOML selector fields. `max_augmenting_depth` defaults to 3; `max_rematch_size`
+defaults to 4 and is clamped to at least 2. Construction config candidate limits
+override corresponding model limits; grouped local search exposes
+`value_candidate_limit` and `max_moves_per_step`. See
+[Assignment Limits](/docs/solverforge/solver/construction/#assignment-limits).
+
+Keeping an optional assignment unassigned completes that group-slot decision
+without ending the optional pass. Completed roots are excluded before candidate
+domains are read, preserving later rows' candidate budget. Assigned occupants
+remain available for required augmenting rematches.
 
 Grouped construction example:
 

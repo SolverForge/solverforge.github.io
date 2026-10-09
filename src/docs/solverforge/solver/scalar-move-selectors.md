@@ -152,7 +152,18 @@ require_hard_improvement = true
 ```
 
 Assignment-backed grouped repair pairs naturally with a preceding grouped
-construction phase that selects the same `group_name`.
+construction phase that selects the same `group_name`. Assignment-owned slots
+stay on this path: plain scalar and generic conflict-repair selectors do not
+edit them. This is a configured `grouped_scalar_move_selector`, not a public
+`GroupedScalarMoveSelector` type to import from the facade.
+
+The assignment's `max_augmenting_depth` and `max_rematch_size` come from
+model-owned `ScalarGroup::with_limits(...)`: defaults are 3 and 4 respectively,
+with rematch size clamped to at least 2. They are separate from the configured
+`value_candidate_limit` and `max_moves_per_step`; see
+[Assignment Limits](/docs/solverforge/solver/construction/#assignment-limits).
+Construction completion does not remove assigned occupants from required
+augmenting rematches or prevent later local-search assignment adjustments.
 
 ## Conflict Repair
 

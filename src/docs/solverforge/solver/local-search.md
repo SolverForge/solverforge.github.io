@@ -27,6 +27,15 @@ type = "change_move_selector"
 value_candidate_limit = 32
 ```
 
+## Default Phase Eligibility
+
+When `phases` are omitted, one streaming local-search phase follows state-aware
+construction only if top-level termination contains an effective parsed limit.
+Absent termination, an empty termination object, or invalid score-only
+termination leaves the solve construction-only. Omitted selector/acceptor/forager
+defaults inside an explicit local-search phase are a separate policy. VND must
+be selected explicitly; it is never inserted before default local search.
+
 ## Acceptor
 
 The acceptor decides whether a scored candidate can be accepted.

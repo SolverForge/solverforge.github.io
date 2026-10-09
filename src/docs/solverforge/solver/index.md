@@ -55,6 +55,12 @@ assigned before `BestSolution`, a completed snapshot, or local search can begin.
 Configured limits still apply during construction; reaching one first ends the
 job as `Failed` instead of returning a partial plan.
 
+With `phases` omitted, state-aware construction runs first and one default
+local-search phase is eligible only when top-level termination contains an
+effective parsed limit. Missing termination, an empty object, or invalid
+score-only termination leaves the solve construction-only. VND is explicit,
+not an implicit default phase.
+
 Local search uses capability-matched streaming defaults when `move_selector` is
 omitted. Scalar candidate limits, assignment-backed grouped scalar selectors,
 conflict repair, list permutation and precedence repair, per-leaf ordering,

@@ -163,7 +163,7 @@ factory.for_each(Schedule::shifts())
     .named("Balanced workload")
 ```
 
-In v0.19.9 unary complemented groups use a relational `ComplementNode` and the
+In v0.19.10 unary complemented groups use a relational `ComplementNode` and the
 shared `OperatorTerminal`, rather than a separate complemented scoring engine.
 The node relates the target domain to grouped results and owns default values
 for targets with no matching result. The public `complement(source, key,

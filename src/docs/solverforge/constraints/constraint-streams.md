@@ -35,7 +35,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-Each constraint builder chain finalizes through `.named()`. In v0.19.9,
+Each constraint builder chain finalizes through `.named()`. In v0.19.10,
 direct pair scoring, chained joins, existence, flattening, and unary complemented grouping
 use concrete `stream::relational::operator` trees and the generic
 `constraint::relational::OperatorTerminal`, rather than separate retained
@@ -96,9 +96,51 @@ factory.for_each(Schedule::shifts())
 
 ### `join`
 
-`join` dispatches on the target shape.
+`join` dispatches on the target shape. Fluent right-hand collection targets
+implement `CollectionExtract`, including generated sources and filtered unary
+streams. Arbitrary joined, projected, grouped, or complemented producers are
+not interchangeable fluent targets; compatible derived producers can be inputs
+on either side of a low-level `JoinNode`.
 
-Self-join by joining the same generated source on the right side:
+#### Unary source membership before equality keys
+
+On the first unary keyed equality cross-join (`join((target, equal_bi(...)))`),
+an accumulated left unary filter excludes rows before key extraction, index
+insertion, and pair creation. A filtered unary right target preserves its own
+source membership. Put nullable-row filters on each unary input whose keys
+require an assignment:
+
+```rust
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+Streams::new()
+    .for_each(Schedule::shifts())
+    .filter(|shift: &Shift| shift.employee_idx.is_some())
+    .join((
+        Streams::new()
+            .for_each(Schedule::unavailability())
+            .filter(|u: &Unavailability| u.employee_idx.is_some()),
+        equal_bi(
+            |shift: &Shift| shift.employee_idx.expect("filtered assigned shift"),
+            |u: &Unavailability| u.employee_idx.expect("filtered assigned row"),
+        ),
+    ))
+    .penalize(HardSoftScore::ONE_HARD)
+    .named("Assigned employee unavailable")
+```
+
+Original source indexes and change metadata survive incremental transitions
+into and out of membership. A filter after the join operates on joined rows;
+it cannot protect a key extractor from an excluded unary row. This left-source
+pushdown does **not** apply to comparison, overlap, composed-condition,
+predicate, or same-source self-join dispatch. In particular,
+`equal_bi(...).and(...)` is composed dispatch, not this first equality path.
+The membership adapter is hidden implementation detail, not a modeling API.
+
+To relate two independently oriented rows from the same collection, pass that
+collection as the right target of a keyed cross-join. This tuple form still
+uses the first unary equality cross-join dispatch and its source-membership
+boundary:
 
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
@@ -113,6 +155,12 @@ Streams::new()
         ),
     ))
 ```
+
+For same-source unique combinations instead, use `.join(equal(|row| key))`.
+That dispatch creates the same-source `BiConstraintStream`; it does not receive
+the left-source key-extraction pushdown described above. Do not confuse it with
+the keyed cross-stream tuple form, even when both tuple inputs name the same
+collection.
 
 Cross-join with a generated accessor plus `equal_bi`:
 
@@ -178,12 +226,16 @@ receives `Pair<Leaf<A>, Leaf<B>>` on the left and `Leaf<C>` on the right;
 access entity values through `.entity`. The target is a collection extractor,
 such as the generated `Schedule::unavailability()`, not just a new key function.
 
-`Bi::join` produces `Tri`; further joins produce `Quad` and `Penta`.
-`Penta::join` enters the arbitrary-depth `Chain`, and `Chain::join` can keep
+Cross-stream `Bi::join` produces `Tri`; further joins produce `Quad` and `Penta`.
+`stream::cross::Penta::join` enters the arbitrary-depth `Chain`, and `Chain::join` can keep
 nesting operators without a fixed arity ceiling. At each step the left row is
 nested: a triple is `Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. Named key functions
 with explicit borrowed row types are useful for deeper chains' higher-ranked
 lifetime bounds.
+
+In v0.19.10, continuing from cross `Penta` discards its authored penta filter.
+Apply the row filter on the returned `Chain` instead. Same-source
+`PentaConstraintStream` is terminal and has no join continuation.
 
 `Tri`, `Quad`, and `Penta` keep value-oriented filter and weight closures with
 three, four, or five entity arguments. `Chain` instead passes `(&Solution,
@@ -259,9 +311,11 @@ Streams::new()
     )
 ```
 
-Filters on the left source, right source, and complement source are preserved
-in the operator tree. That means a filtered right-hand join source
-or flattened keyed target does not leak excluded rows into incremental scoring.
+For the first unary keyed equality cross-join, left and right unary source
+membership is preserved before indexing. Filtered right-hand join sources,
+flattened keyed targets, and complement sources also retain their membership
+contracts. Do not generalize the left-source pushdown to other join dispatches
+or to the cross-Penta continuation limitation described above.
 
 ## Constraint Node Sharing
 

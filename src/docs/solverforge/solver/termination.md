@@ -8,6 +8,16 @@ description: >
 
 Termination conditions tell the solver when to stop searching. You can set termination globally or per-phase.
 
+## Omitted Phases Require an Effective Limit
+
+With `phases` omitted, state-aware construction runs first. Default local
+search is eligible only if top-level termination contains a parsed time, work,
+unimproved, or valid score limit. Missing termination, an empty object, or an
+invalid score-only limit does not enable it: those solves are construction-only.
+An explicit local-search phase and its omitted selector defaults are a separate
+configuration choice. A valid score target enables the default phase, but does
+not guarantee that the target can be reached.
+
 ## Termination Types
 
 ### Time-Based
@@ -46,7 +56,13 @@ best_score_limit = "0hard/-100soft"    # Stop when feasible with soft ≥ -100
 
 ## Composite Termination
 
-Combine multiple conditions — by default, the solver stops when **any** condition is met:
+The configured parser combines a time limit with one selected score/work
+criterion. It chooses the first effective criterion in this order: a valid
+`best_score_limit`, `step_count_limit`, `unimproved_step_count_limit`, then
+unimproved time. A malformed score target is ignored for this selection, so a
+later valid criterion can still apply. It does not OR every populated field
+together. The time guard and selected criterion stop the solver when **either**
+is met:
 
 ```toml
 [termination]
@@ -62,7 +78,7 @@ Each phase can have its own termination:
 ```toml
 [[phases]]
 type = "construction_heuristic"
-# No termination needed — runs until all variables are assigned
+# Runs until construction decisions finish; optional values may stay unassigned
 
 [[phases]]
 type = "local_search"

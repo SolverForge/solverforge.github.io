@@ -37,7 +37,7 @@ the left row's score: an existence filter publishes only accepted left rows.
 
 ## Relational Execution
 
-In v0.19.9 both operations use `stream::relational::operator::ExistenceNode`,
+In v0.19.10 both operations use `stream::relational::operator::ExistenceNode`,
 a semi/anti join over concrete row producers. The compiled condition supplies
 the indexes; retained matching links track membership as either source changes.
 The terminal is `constraint::relational::OperatorTerminal`, not a separate
@@ -84,7 +84,7 @@ matches with two value arguments. Both relationships must hold: the original
 join links the left entity to the parent, and the lookup key matches the
 child's flattened key.
 
-In v0.19.9 the fluent builder creates a `FlattenNode` over the parent source
+In v0.19.10 the fluent builder creates a `FlattenNode` over the parent source
 and joins it to the left collection using the compound `(parent key, child
 key)` relationship. It finalizes onto `OperatorTerminal`; there is no separate
 flattened-bi retained scoring engine. The three-argument `flatten_last` API

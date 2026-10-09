@@ -8,9 +8,23 @@ description: >
 
 The solver runs phases in sequence. Each phase uses a different strategy to improve the solution.
 
+## Omitted Phase Defaults
+
+When `phases` are omitted, the runtime runs state-aware construction: matching
+specialized list construction, named grouped `FirstFit` for required assignment
+rows followed by grouped `CheapestInsertion` for optional rows, and single-slot
+construction for remaining non-assignment-owned scalars. One streaming default
+local-search phase is eligible only when top-level termination contains an
+effective parsed limit. Missing termination, an empty termination object, or an
+invalid score-only limit leaves omitted phases construction-only. This is
+separate from omitting `move_selector` inside an explicit local-search phase.
+VND is never prepended implicitly.
+
 ## Construction Heuristic
 
-Builds an initial solution by assigning values to all planning variables. Runs first — local search then improves the result.
+Builds an initial solution by completing required planning work and deciding
+optional assignments. Optional variables may legally remain unassigned. Runs
+before any eligible or explicitly configured local search.
 
 ### Construction Heuristic Types
 

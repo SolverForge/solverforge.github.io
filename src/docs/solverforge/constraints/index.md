@@ -37,13 +37,22 @@ projected self-joins can be symmetric with `equal(...)` or directed with
 without projecting them first. Chained joins use
 `.join((target, equal_on(left_row_key, right_leaf_key)))`, with an independent
 key domain for each relationship. `Tri`, `Quad`, and `Penta` provide named
-arity adapters; beyond five sources, `Chain` continues at arbitrary depth.
-In v0.19.9 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
+cross-stream arity adapters; cross `Penta::join` continues into `Chain` at
+arbitrary depth. That continuation drops an authored penta filter in v0.19.10;
+apply the row filter on the returned `Chain`. Same-source
+`PentaConstraintStream` is terminal.
+In v0.19.10 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
 execute through concrete `stream::relational::operator` trees and the shared
 `OperatorTerminal`, not per-shape retained engines.
 Direct cross-join groups can also call
-`complement(...)` against generated target sources, and filtered keyed joins
-retain the filter contract on both sides of the join.
+`complement(...)` against generated target sources. On the first unary keyed
+equality cross-join, unary source membership is checked before keys and pairs
+are created; post-join filters remain row filters. This left-source pushdown
+does not apply to comparison, overlap, composed-condition, predicate, or
+same-source self-join dispatch. Fluent right targets implement
+`CollectionExtract`; arbitrary derived inputs belong at low-level `JoinNode`.
+See [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) for
+nullable-row examples and the exact dispatch boundary.
 
 Annotate reusable constraint functions with `#[solverforge_constraints]` when
 the same grouped stream feeds multiple named terminal constraints. SolverForge

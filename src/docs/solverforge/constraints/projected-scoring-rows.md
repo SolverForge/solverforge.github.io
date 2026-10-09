@@ -94,7 +94,7 @@ Streams::new()
 
 Since the `0.11.x` release line, joined-pair projected rows are retained by joined
 coordinates, so localized updates from either side of the join can update the
-cached scoring rows without materializing facts. In v0.19.9 the fluent
+cached scoring rows without materializing facts. In v0.19.10 the fluent
 `.project(|left, right| row)` shape is unchanged: it creates a projected
 `JoinedSource` and continues through the projected stream API. Do not confuse
 that projected terminal with direct pair scoring, which now finalizes onto

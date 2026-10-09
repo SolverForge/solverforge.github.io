@@ -19,6 +19,14 @@ construction_obligation = "preserve_unassigned"
 value_candidate_limit = 32
 ```
 
+With `phases` omitted, construction is state-aware: matching specialized list
+construction runs alongside named grouped `FirstFit` for required assignment
+rows, grouped `CheapestInsertion` for optional rows, and single-slot construction
+for remaining non-assignment-owned scalar variables. Default local search is
+eligible afterward only with an effective parsed top-level termination limit.
+See [Phases](/docs/solverforge/solver/phases/) for the distinction from explicit
+phases.
+
 ## Heuristic Types
 
 | Type | Use |
@@ -218,6 +226,40 @@ commits immediately. Required assignments may displace optional occupants or
 move required blockers through bounded augmenting paths. Optional assignments
 remain score-improving only unless the model marks them required and
 configuration uses `assign_when_candidate_exists`.
+
+Keeping an optional assignment unassigned completes that anchor decision, not
+the optional pass. Completed optional roots are skipped before reading their
+candidate domains or generating moves, so an earlier kept-unassigned row cannot
+consume the candidate budget intended for later rows. Completion recognizes the
+exact assignment group slot, including kept-unassigned decisions; it does not
+mark assigned occupants unavailable to later required augmenting rematches.
+Candidate-backed grouped decisions instead complete their exact group slot and
+the scalar slots covered by that decision.
+
+### Assignment Limits
+
+`ScalarGroupLimits` separates `value_candidate_limit`, `group_candidate_limit`,
+`max_moves_per_step`, `max_augmenting_depth`, and `max_rematch_size`. Construction
+config overrides its corresponding candidate limits and otherwise uses the
+model's `ScalarGroup::with_limits(...)` values. Local search exposes
+`value_candidate_limit` and `max_moves_per_step` through the configured
+`grouped_scalar_move_selector`.
+
+Assignment augmenting depth and sequence/position rematch size are model-owned
+limits set through `with_limits`, not extra TOML selector fields. Stock defaults
+are depth 3 and rematch size 4; rematch size is clamped to at least 2.
+
+```rust
+let group = ScalarGroup::assignment(
+    "required_shift_assignment",
+    Schedule::shifts().scalar("employee_idx"),
+)
+.with_limits(ScalarGroupLimits {
+    max_augmenting_depth: Some(3),
+    max_rematch_size: Some(4),
+    ..ScalarGroupLimits::new()
+});
+```
 
 ## Dynamic Construction Primitives
 

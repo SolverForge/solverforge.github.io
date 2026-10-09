@@ -4,13 +4,89 @@
 ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
+  "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note"
+  ],
+  "src/_posts/releases/2026-06-12-solverforge-0-16-x.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note"
+  ],
+  "src/_posts/releases/2026-06-15-solverforge-0-17-x.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note"
+  ],
+  "src/_posts/releases/2026-07-13-solverforge-0-18-x.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note"
+  ],
+
+  "src/docs/solverforge/solver/phases.md" => [
+    "effective parsed limit",
+    "empty termination object",
+    "construction-only"
+  ],
+  "src/docs/solverforge/solver/local-search.md" => [
+    "effective parsed limit",
+    "empty termination object",
+    "construction-only"
+  ],
+  "src/docs/solverforge/solver/index.md" => [
+    "effective parsed limit",
+    "construction-only"
+  ],
+  "src/docs/solverforge/solver/construction.md" => [
+    "Completed optional roots are skipped before reading their",
+    "candidate domains or generating moves",
+    "required augmenting"
+  ],
+  "src/docs/solverforge/constraints/constraint-streams.md" => [
+    "CollectionExtract",
+    "PentaConstraintStream",
+    "composed-condition",
+    "before key extraction"
+  ],
+  "src/docs/solverforge/constraints/joiners.md" => [
+    "CollectionExtract",
+    "PentaConstraintStream",
+    "drops the authored penta filter",
+    "prevent key extraction"
+  ],
+  "src/docs/solverforge/constraints/constraint-factory-methods.md" => [
+    "CollectionExtract",
+    "source membership",
+    "pushdown does not apply"
+  ],
+  "src/docs/solverforge/constraints/index.md" => [
+    "CollectionExtract",
+    "PentaConstraintStream",
+    "before keys and pairs"
+  ],
+
+  "src/_posts/releases/2026-10-09-solverforge-0-19-10.md" => [
+    "**solverforge 0.19.10** is published",
+    "`0.19.10` | 2026-10-09",
+    "a482be25ca262750725d96de9145154c708f1cdb",
+    "37953452666", "37953454901", "37953454974",
+    "before candidate-domain", "before key extraction and pair creation",
+    "effective parsed top-level termination", "construction-only",
+    "CollectionExtract", "PentaConstraintStream", "discards an authored penta filter",
+    "allocations", "allocated_bytes", "peak_live_bytes", "default 5%",
+    "equal-length staging paths", "same harness package name",
+    "diagnostic, not the acceptance criterion", "historical",
+    "Still scaffolds `solverforge 0.19.7`"
+  ],
+  "scripts/verify-rust-snippets.rb" => [
+    'DEFAULT_SOLVERFORGE_RS_REF = "v0.19.10"'
+  ],
+
   "src/docs/solverforge/index.md" => [
-    "These pages track the `solverforge 0.19.9` crate",
-    "solverforge 0.19.9",
+    "These pages track the `solverforge 0.19.10` crate",
+    "solverforge 0.19.10",
     "solverforge-cli 3.3.3",
     "solverforge 0.19.4",
-    "The `0.19.9` workspace declares Rust `1.95`.",
-    "docs.rs/solverforge/0.19.9/solverforge/"
+    "The `0.19.10` workspace declares Rust `1.95`.",
+    "docs.rs/solverforge/0.19.10/solverforge/"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py 0.6.10",
@@ -53,7 +129,9 @@ REQUIRED_TEXT = {
     "cargo run -- demo-data"
   ],
   "src/docs/solverforge/solver/configuration.md" => [
-    "SolverForge 0.19.9"
+    "SolverForge 0.19.10",
+    "effective parsed limit", "construction-only",
+    "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
   "src/docs/solverforge-maps/index.md" => [
     "solverforge-maps 2.1.4",
@@ -113,12 +191,12 @@ REQUIRED_TEXT = {
     "/docs/solverforge-cli/agent-skill/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.19.9",
+    "solverforge 0.19.10",
     "solverforge 0.6.10",
     "solverforge-py v0.6.10"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.19.9",
+    "solverforge 0.19.10",
     "solverforge-ui 0.9.0",
     "solverforge-cli 3.3.3"
   ],
@@ -146,11 +224,14 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "documentation tracks the `solverforge 0.19.9` tag",
-    "The `v0.19.9` tag, workspace, and crates.io package are the",
-    "published on 2026-10-08, and docs.rs serves the 0.19.9 API.",
+    "a482be25ca262750725d96de9145154c708f1cdb",
+    "37953452666", "37953454901", "37953454974",
+    "BENCH_TOLERANCE_PERCENT", "default 5%", "equal-length staging paths",
+    "documentation tracks the `solverforge 0.19.10` tag",
+    "The `v0.19.10` tag, workspace, and crates.io package are the",
+    "published on 2026-10-09, and docs.rs serves the 0.19.10 API.",
     "The independently published CLI line is `solverforge-cli 3.3.3`",
-    "- **0.19.9 runtime line**: `v0.19.9` and the crates.io `solverforge 0.19.9`",
+    "- **0.19.10 runtime line**: `v0.19.10` and the crates.io `solverforge 0.19.10`",
     "solverforge-py 0.6.10",
     "solverforge-cli 3.3.3",
     "solverforge-ui 0.9.0",
@@ -176,8 +257,10 @@ REQUIRED_TEXT = {
     "solverforge 0.19.7"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note",
+    "`0.19.10` | 2026-10-09",
     "`0.19.9` | 2026-10-08",
-    "0.19.9 release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.7` | 2026-09-25",
     "`0.19.6` | 2026-09-25",
@@ -188,28 +271,34 @@ REQUIRED_TEXT = {
     "solverforge-hospital@2.0.7"
   ],
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "`0.19.10` | 2026-10-09",
     "solverforge 0.19.6",
     "solverforge 0.19.7",
     "`0.19.9` | 2026-10-08",
-    "0.19.9 release note",
+    "0.19.10 release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",
     "pinned"
   ],
   "src/_posts/releases/2026-10-02-solverforge-0-19-8.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note",
+    "`0.19.10` | 2026-10-09",
     "solverforge 0.19.8",
     "`0.19.8` | 2026-10-02",
     "cross_tri_incremental::Tri",
     "CrossJoinEngine",
     "`.join((extractor_c, key_c))`",
-    "Historical 0.19.8 architecture",
-    "0.19.9 release note"
+    "Historical 0.19.8 architecture"
   ],
   "src/_posts/releases/2026-10-08-solverforge-0-19-9.md" => [
+    "`solverforge 0.19.10` is the current core",
+    "0.19.10 release note",
     "solverforge 0.19.9",
     "`0.19.9` | 2026-10-08",
-    "docs.rs serves the 0.19.9 API",
+    "docs.rs served the 0.19.9 API",
     "equal_on(left_row_key, right_row_key)",
     "Penta::join(...)",
     "OperatorTerminal",
@@ -229,6 +318,7 @@ REQUIRED_TEXT = {
     "`3.3.3` | 2026-10-02"
   ],
   "src/_posts/releases/2026-10-02-solverforge-cli-3-3-3.md" => [
+    "the current core release, `solverforge 0.19.10`",
     "solverforge-cli 3.3.3",
     "solverforge 0.19.7",
     "rmcp 3.5.0",
@@ -305,6 +395,7 @@ FORBIDDEN_TEXT = {
   ],
   "src/docs/status-and-roadmap.md" => [
     "documentation tracks the `solverforge 0.19.8` tag",
+    "documentation tracks the `solverforge 0.19.9` tag",
     "**Three-source keyed joins**",
     "solverforge-py 0.6.3",
     "solverforge 0.19.1",
@@ -359,7 +450,10 @@ FORBIDDEN_TEXT.each do |relative_path, needles|
 
   text = File.read(path)
   needles.each do |needle|
-    failures << "#{relative_path} still contains #{needle.inspect}" if text.include?(needle)
+    # A forbidden 0.19.1 must not also reject the current 0.19.10.
+    pattern = Regexp.escape(needle)
+    pattern += "(?![0-9])" if needle.match?(/[0-9]\z/)
+    failures << "#{relative_path} still contains #{needle.inspect}" if text.match?(Regexp.new(pattern))
   end
 end
 

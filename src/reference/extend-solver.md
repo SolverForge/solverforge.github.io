@@ -31,6 +31,23 @@ well-tested retained runtime path.
 | UI-specific progress display            | the edge layer, not the runtime                                                        |
 | experimental custom phases or selectors | app-side code using the lower-level crates                                             |
 
+## Omitted Phase Defaults
+
+When `phases` are omitted, the runtime runs state-aware construction: matching
+specialized list construction, named grouped `FirstFit` for required assignment
+rows followed by grouped `CheapestInsertion` for optional rows, and single-slot
+construction for remaining non-assignment-owned scalars. One streaming default
+local-search phase is eligible only when top-level termination contains an
+effective parsed limit. Missing termination, an empty termination object, or an
+invalid score-only limit leaves omitted phases construction-only. This is
+separate from omitting `move_selector` inside an explicit local-search phase.
+VND is never prepended implicitly.
+
+Keeping an optional assignment unassigned completes that group-slot decision,
+not the optional pass. Completed optional roots are excluded before candidate
+domains are read or moves generated, preserving later rows' candidate budget.
+Assigned occupants remain available for required augmenting rematches.
+
 ## Canonical selector defaults
 
 If `move_selector` is omitted, the stock runtime stays intentionally narrow:
@@ -49,7 +66,13 @@ If `move_selector` is omitted, the stock runtime stays intentionally narrow:
 
 Assignment-owned scalar variables stay on their grouped scalar selector path.
 Plain scalar defaults and conflict-repair defaults exclude slots owned by an
-assignment-backed `ScalarGroup`.
+assignment-backed `ScalarGroup`. The configured names are
+`grouped_scalar_move_selector` and `compound_conflict_repair_move_selector`,
+not facade-importable selector types. Assignment augmenting depth and
+sequence/position rematch size come from model-owned
+`ScalarGroup::with_limits(...)`: defaults are 3 and 4, with rematch size clamped
+to at least 2. They are distinct from config candidate and per-step move limits.
+See [Assignment Limits](/docs/solverforge/solver/construction/#assignment-limits).
 
 `limited_neighborhood` is the tool for putting a hard cap on one neighborhood
 that is otherwise too broad. It is not a substitute for understanding the

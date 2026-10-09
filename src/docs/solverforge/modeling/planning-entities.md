@@ -69,6 +69,15 @@ Common parameters:
   `construction_value_order_key = "fn_name"`: provide live construction-order
   keys for scalar-only construction heuristics
 
+Nullability is not the same as required coverage. An assignment-backed
+`ScalarGroup::assignment(...)` can mark nullable rows required with
+`with_required_entity`, and uses named grouped construction and
+`grouped_scalar_move_selector`. Optional kept-unassigned decisions complete
+only their anchor group slot and allow construction to continue to later rows;
+completed optional roots are skipped before reading candidate domains.
+See [Construction](/docs/solverforge/solver/construction/) for group declaration,
+capacity hooks, assignment limits, and completion semantics.
+
 The macro also generates an `.unassigned()` stream helper when the entity has
 exactly one `Option<_>` planning variable.
 

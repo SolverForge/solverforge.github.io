@@ -62,7 +62,7 @@ constraints, each terminal still contributes its own constraint metadata,
 score, match count, and detailed explanation. The shared node only removes
 duplicate retained update work.
 
-In v0.19.9 direct pair, chained-join, existence, flattened, and unary complemented terminals
+In v0.19.10 direct pair, chained-join, existence, flattened, and unary complemented terminals
 use `OperatorTerminal`. It retains signed scores by row handle and borrows the
 complete operator row for scoring and explanation; it does not retain borrowed
 entities or solution references. This execution change does not merge terminal

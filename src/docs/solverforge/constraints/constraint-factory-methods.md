@@ -178,6 +178,21 @@ stable. This is important for generated sources used with operations such as
 Custom `vec(...)` extractors passed to `for_each(...)` do not have descriptor
 source metadata. They are still supported, but they are a lower-level API.
 
+## Filtered Unary Join Targets
+
+A unary stream implements `CollectionExtract` and keeps its accumulated filter
+as source membership when used as a keyed or predicate right-hand cross-join
+target. For the first unary keyed equality cross-join, the left unary filter is
+also applied before key extraction and pair creation, without renumbering the
+source indexes or losing incremental change metadata. Put nullable-row filters
+before that equality join if a key extractor requires an assigned value.
+
+Post-join filters operate on joined rows, not source keys. The left-source
+pushdown does not apply to comparison, overlap, composed-condition, predicate,
+or same-source self-join dispatch. Fluent collection targets are not arbitrary
+derived operators: compatible derived producers can instead feed low-level
+`JoinNode` inputs. See [Constraint Streams](/docs/solverforge/constraints/constraint-streams/).
+
 ## `for_each(...)`
 
 `for_each(...)` starts a stream from any extractor that implements

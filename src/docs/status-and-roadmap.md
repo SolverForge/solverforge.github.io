@@ -10,11 +10,16 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.9` tag and calls out
+documentation tracks the `solverforge 0.19.10` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.9` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.10` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and the workspace crates were
-published on 2026-10-08, and docs.rs serves the 0.19.9 API.
+published on 2026-10-09, and docs.rs serves the 0.19.10 API. The release tag
+points to `a482be25ca262750725d96de9145154c708f1cdb`.
+[Upstream CI](https://github.com/SolverForge/solverforge/actions/runs/37953452666),
+[crate publication](https://github.com/SolverForge/solverforge/actions/runs/37953454901),
+and [GitHub Release](https://github.com/SolverForge/solverforge/actions/runs/37953454974)
+all completed successfully for this release.
 
 The independently published CLI line is `solverforge-cli 3.3.3`. The 3.3.x line
 adds the `mcp` shell, `solverforge connect`, the `solverforge-modeling` and
@@ -51,7 +56,7 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.9`, which adds independent-key joins, arity-free Chain continuation, grouped joins, composable row producers over the common operator tree, and the lost resume wakeup fix |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.10`, which fixes optional assignment construction progress and unary source filtering before keyed equality joins, and clarifies the existing operator-tree and runtime-default contracts |
 | **CLI Scaffold** | Published | `solverforge-cli 3.3.3` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`; it rewrites every score-bearing surface on `generate score` and resyncs the generated demo data on `destroy`, and streams generated constraint skeletons from the planning-solution accessors; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.10` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.10` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.8`, `solverforge-lessons@2.0.10`, `solverforge-deliveries@2.0.9`, `solverforge-fsr@2.0.10`, plus the repository-only `solverforge-furnace@2.0.2`, `solverforge-orders@0.1.2`, `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`; all eight target `solverforge 0.19.7` and `solverforge-ui 0.9.0` |
@@ -152,7 +157,7 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **0.19.9 runtime line**: `v0.19.9` and the crates.io `solverforge 0.19.9`
+- **0.19.10 runtime line**: `v0.19.10` and the crates.io `solverforge 0.19.10`
   package are current, and the Rust toolchain floor remains `1.95`. The
   published `solverforge-cli 3.3.3` package targets `solverforge 0.19.7` for
   fresh scaffolds; apps scaffolded by `3.1.0` pin `0.19.5` and apps scaffolded
@@ -161,8 +166,12 @@ SolverForge skills now live.
 - **Composable joins**: each later join can use `equal_on(left_row_key,
   right_row_key)` over the complete prior row with its own key type. Named
   cross `Bi`, `Tri`, `Quad`, and `Penta` adapters use the same typed operator
-  tree; `Penta::join` continues into `stream::chain::Chain` with no fixed arity
-  ceiling. Grouped results can join another collection. Equality, comparison,
+  tree; `stream::cross::Penta::join` continues into `stream::chain::Chain` with no fixed arity
+  ceiling. That continuation discards an authored penta filter; apply it on the
+  returned `Chain`. Same-source `PentaConstraintStream` is terminal. Fluent
+  targets implement `CollectionExtract`, including filtered unary streams;
+  arbitrary derived producers belong at the low-level `JoinNode` boundary.
+  Grouped results can join another collection. Equality, comparison,
   overlap, and composed relationships compile into concrete index plans.
 - **Operator-tree boundary**: `JoinNode` and `OperatorTerminal` replace the
   historical cross-bi/cross-tri and per-arity self-join engines. Low-level
@@ -171,6 +180,23 @@ SolverForge skills now live.
   generational identities and source provenance. Specialized stream families
   still exist; arbitrary derived-consumer sharing is not supplied by these
   producers. Existing compiler-owned grouped terminal sharing remains supported.
+- **Optional construction progress**: keeping an optional assignment unassigned
+  completes that decision, not the whole optional pass. Completed optional roots
+  are skipped before candidate-domain reads and move generation, preserving the
+  candidate budget for later rows; assigned occupants remain available to
+  required augmenting rematches.
+- **Unary keyed source membership**: the first unary keyed equality cross-join
+  applies source filters before key extraction and pair creation, preserving
+  original source indexes and descriptor-local change metadata. Post-join filters
+  operate on joined rows. Left-source pushdown does not extend to comparison,
+  overlap, composed-condition, predicate, or same-source self-join dispatch.
+- **Internal zero-regression gate**: deterministic allocation counters are checked
+  exactly without a noise allowance; noisy metric medians have a default 5%
+  regression tolerance through `BENCH_TOLERANCE_PERCENT`. Both sides share a
+  harness package name and equal-length staging paths, and record `.text` SHA-256
+  fingerprints. The paired bootstrap upper bound is diagnostic, not an acceptance
+  criterion. This changes internal qualification, not historical site benchmark
+  measurements or their tested versions.
 - **Lost resume wakeup fixed**: resume and cancellation clear the pause request
   and notify while holding the worker's pause gate, closing the race between
   its predicate check and condition-variable wait without changing snapshot
@@ -320,8 +346,10 @@ SolverForge skills now live.
   `nearby_value_candidates`, `nearby_entity_candidates`,
   `construction_entity_order_key`, and `construction_value_order_key` declare
   bounded scalar neighborhoods and construction ordering on the model.
-- **Model-aware defaults**: omitted runtime config builds construction plus one
-  streaming local-search phase. Capability-matched leaves use seeded random
+- **Model-aware defaults**: omitted phases run state-aware construction. A default
+  streaming local-search phase requires effective parsed top-level termination;
+  absent termination, an empty termination object, or invalid score-only
+  termination remains construction-only. Capability-matched leaves use seeded random
   order, multi-family unions use stratified-random scheduling, and
   assignment-owned scalar slots remain exclusively on their grouped path.
 - **Exact retained telemetry**: generated, evaluated, accepted, not-doable,

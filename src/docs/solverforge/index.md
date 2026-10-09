@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.9` crate and current release
+These pages track the `solverforge 0.19.10` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the `solverforge-cli 3.3.3` line scaffolds `solverforge 0.19.7`, while
 apps scaffolded by earlier lines pin `solverforge 0.19.5` (3.1.0) or
@@ -34,7 +34,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.9` workspace declares Rust `1.95`.
+The `0.19.10` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -53,7 +53,16 @@ hard-first batch with direct independent assignments, then leaves bounded
 augmenting rematches to the following required cursor where multi-entity edits
 can be retained. Optional scalar variables keep `None` when it is the best legal
 baseline unless configuration asks construction to assign whenever a candidate
-exists.
+exists. For assignment-backed groups, keeping an optional row unassigned
+completes its exact group-slot decision without ending the optional pass.
+Completed optional roots are skipped before candidate-domain reads or move
+generation, preserving later rows' candidate budget; assigned occupants remain
+available for required augmenting rematches.
+
+When `phases` are omitted, state-aware construction runs first. One streaming
+default local-search phase is eligible only when top-level termination contains
+an effective parsed limit; absent termination, an empty object, or invalid
+score-only termination stays construction-only. VND is never added implicitly.
 
 Startup telemetry is shape-aware: scalar solves report average `candidates`,
 list solves report element counts, and console output labels those solve shapes
@@ -151,7 +160,9 @@ The current release tightens several public contracts:
   and `Penta` adapters use that tree; cross `Penta::join` continues into the
   arity-free `stream::chain::Chain`, whose joins have no fixed binding-count
   ceiling. Chained conditions receive the whole prior borrowed row and can
-  use a different key type for each relationship
+  use a different key type for each relationship. In v0.19.10 that cross-Penta
+  continuation drops the authored penta filter; apply the row filter on the
+  returned `Chain`. Same-source `PentaConstraintStream` is terminal
 - same-collection unique combinations use the arity-generic `SelfJoinNode`
   with filtered rows and the same generic terminal, rather than per-arity
   incremental scorers. The former cross-bi/cross-tri incremental engines are
@@ -165,8 +176,19 @@ The current release tightens several public contracts:
 - direct cross-join grouped streams can call `complement(...)` against a
   generated fact or entity source, so missing target keys produce explicit
   default rows without a projected-row detour
-- filtered keyed joins preserve the filter contract on both joined sources,
-  flattened keyed targets, projected joined rows, and complement sources
+- on the first unary keyed equality cross-join, unary source membership excludes
+  rows before key extraction and pair creation while retaining original indexes
+  and incremental metadata. Post-join filters remain row filters. This left-source
+  pushdown does not apply to comparison, overlap, composed-condition, predicate,
+  or same-source self-join dispatch. Filtered right targets, flattened keyed
+  targets, projected joined rows, and complement sources retain their contracts
+- fluent right-hand join targets implement `CollectionExtract`, including
+  filtered unary streams; arbitrary compatible derived producers belong at
+  low-level `JoinNode` inputs, not interchangeable fluent targets
+- assignment limits separate value/group candidate bounds, per-step moves,
+  augmenting depth, and rematch size. Model-owned `ScalarGroup::with_limits`
+  sets depth and rematch bounds; defaults are 3 and 4 respectively, with rematch
+  size clamped to at least 2
 - projected outputs, projected self-join keys, and grouped collector values no
   longer require `Clone`
 - projected self-join ordering is coordinate-stable by source ownership and
@@ -310,9 +332,9 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.9](https://docs.rs/solverforge/0.19.9/solverforge/).
-The `0.19.9` crate is the registry source of truth. Consult the
-[`v0.19.9` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.9)
+[docs.rs/solverforge 0.19.10](https://docs.rs/solverforge/0.19.10/solverforge/).
+The `0.19.10` crate is the registry source of truth. Consult the
+[`v0.19.10` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.10)
 alongside the repository `crates/*/WIREFRAME.md` API maps.
 
 ## Sections

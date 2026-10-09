@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.9` crate and current
+This map is aligned with the published `solverforge 0.19.10` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -68,6 +68,18 @@ extend it without a fixed arity ceiling. Each chained condition compiles
 independently, receives the whole prior borrowed row, and can use a key domain
 different from earlier relationships. Chain filters and weights receive the
 typed row rather than a new positional closure signature for every arity.
+In v0.19.10 the cross-Penta continuation drops its authored penta filter;
+apply the row filter on the returned `Chain`. Same-source
+`PentaConstraintStream` is terminal.
+
+Fluent right-hand targets implement `CollectionExtract`, including filtered
+unary streams. Arbitrary compatible derived producers can feed either low-level
+`JoinNode` input, but are not interchangeable fluent collection targets.
+For the first unary keyed equality cross-join, the left unary filter becomes
+source membership before key extraction and pair creation. Original source
+indexes and incremental metadata are preserved; post-join filters remain joined
+row filters. This left-source pushdown does not apply to comparison, overlap,
+composed-condition, predicate, or same-source self-join dispatch.
 
 Low-level `stream::relational::operator` types compose collection, filter,
 merge, project, group, join, self-join, existence, flatten, and complement
@@ -78,10 +90,12 @@ during either retraction or insertion, so consumers process both removed and
 inserted rows in `RowChanges`.
 
 This is not a claim that every fluent family has migrated. Specialized unary,
-grouped, projected, existence, and flattened constraint families still exist.
+grouped, and projected constraint families still exist, including direct cross
+and projected grouped complements. Existence and keyed flattened terminals,
+and unary complemented groups, use the shared `OperatorTerminal`.
 Likewise, reusable grouped-node sharing remains distinct from automatic
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.9/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.10/crates/solverforge-scoring/src)
 when extending internals; the repository's architecture notes retain some
 intermediate-stage descriptions.
 

@@ -37,9 +37,12 @@ variables are direct one-slot assignments and do not have a chained mode.
 The current runtime resolves one `RuntimeModel` per planning model, then
 validates and freezes construction, selector, provider, and source bindings into
 one immutable search graph before solving. Scalar-only, list-only, mixed, and
-dynamic models therefore use the same compiled lifecycle. Generic `FirstFit`
-and `CheapestInsertion` handle matching list work, while specialized list
-heuristics remain explicit opt-in phases.
+dynamic models therefore use the same compiled lifecycle. Explicit generic
+`FirstFit` and `CheapestInsertion` handle matching list work. Omitted phases use
+state-aware defaults, including matching specialized list construction and
+required/optional assignment passes; default local search is eligible only
+with an effective parsed top-level termination limit. Missing termination, an
+empty object, or invalid score-only termination stays construction-only.
 
 ## Fast rules of thumb
 
@@ -66,8 +69,26 @@ With `allows_unassigned = true`, the stock runtime keeps optional-assignment
 semantics all the way through construction and local search:
 
 - construction can keep `None` when it is the best legal baseline
-- later moves can revisit previously completed optional slots
-- local search can both assign and unassign those variables
+- an assignment-backed kept-unassigned decision completes its exact group slot,
+  not the whole optional pass; completed optional roots are skipped before domain
+  reads or move generation, preserving later rows' candidate budget
+- assigned occupants remain available for required augmenting rematches
+- later local-search moves can revisit optional assignments and both assign and
+  unassign them
+
+Nullability is separate from required-row coverage: an assignment-backed
+`ScalarGroup` uses `with_required_entity` to declare mandatory rows. Its named
+construction and configured `grouped_scalar_move_selector` own those slots;
+generic scalar and conflict-repair selectors do not edit assignment-owned slots.
+Model-owned `with_limits(ScalarGroupLimits { ... })` bounds augmenting depth
+(default 3) and rematch size (default 4, clamped to at least 2).
+
+Filter nullable unary inputs before the first keyed equality cross-join if key
+extraction requires assignment. Left membership is checked before keys and
+pairs; post-join filters cannot protect keys. This pushdown is specific to the
+first equality dispatch, not comparison, overlap, composed-condition, predicate,
+or same-source self-joins. See
+[Constraint Streams](/docs/solverforge/constraints/constraint-streams/).
 
 ## Scalar Hooks
 

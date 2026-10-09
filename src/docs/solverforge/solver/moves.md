@@ -127,8 +127,6 @@ max_moves_per_step = 256
 require_hard_improvement = true
 ```
 
-### Conflict-Directed Hard Repair
-
 ### Required Assignment Repair
 
 ```toml

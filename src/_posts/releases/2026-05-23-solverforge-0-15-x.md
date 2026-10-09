@@ -9,11 +9,12 @@ description: >
   move-level runtime telemetry.
 ---
 
-<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
-This is a historical release note. `solverforge 0.19.9` is the current core
-runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
-for the common operator tree that supersedes the older engines. CLI 3.3.3
-still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<%= render Ui::Callout.new(title: "Update, October 9, 2026") do %>
+This is a historical release note. `solverforge 0.19.10` is the current core
+runtime line. See the [0.19.10 release note](/blog/releases/2026/10/09/solverforge-0-19-10/)
+for optional construction and keyed source-filter fixes and the clarified doc
+contracts. The common operator tree introduced in 0.19.9 remains in place.
+CLI 3.3.3 still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
 <% end %>
 
 **SolverForge 0.15.2** was the core runtime patch recorded for the 0.15 line. It is

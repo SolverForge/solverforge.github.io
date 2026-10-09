@@ -6,9 +6,11 @@ description: >
   Control which tuples are created when joining constraint streams.
 ---
 
-Joiners define the matching criteria when two streams are joined. Without
-joiners, a join produces every possible pair; joiners filter this down to only
-relevant combinations.
+Joiners define the matching criteria when sources are joined. Fluent cross
+joins take a target plus a condition or predicate; structural joiners narrow
+the candidate pairs, while a general predicate scans retained opposite rows.
+Use an indexed condition when the relationship can be expressed with keys,
+comparisons, or intervals.
 
 ## Available Joiners
 
@@ -88,7 +90,9 @@ filtering(|a: &Shift, b: &Shift| a.location.distance_to(&b.location) < 50.0)
 
 ## Using Joiners with `join`
 
-**Self-join** - join the same generated source on the right side:
+**Same-collection keyed cross-join** — pass the same generated source on the
+right. The tuple form uses keyed cross-join dispatch, not the same-source
+unique-combination dispatch of `.join(equal(|row| key))`:
 
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
@@ -151,7 +155,7 @@ retained rows satisfy both relationships, not one equality across all sources.
 
 The fluent adapters continue through `Bi`, `Tri`, `Quad`, and `Penta`.
 Each added source nests the row view: the next left row after a triple is
-`Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. `Penta::join` continues at six sources
+`Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. `stream::cross::Penta::join` continues at six sources
 as `Chain`, which accepts further `.join((target, condition))` calls without a
 fixed depth ceiling. `Chain` filters and weights take the solution and the
 borrowed nested row; the named arity adapters retain separate entity arguments
@@ -165,6 +169,25 @@ retained scoring row with `.project(|left, right| row)`.
 After a projected stream, `join(equal(|row| key))` creates a symmetric
 projected self-join. `join(equal_bi(left_key, right_key))` creates a directed
 projected self-join where row orientation is part of the rule.
+
+## Source Filters and Target Boundaries
+
+For the first unary keyed equality cross-join, apply nullable-row filters on
+both unary inputs before `join((target, equal_bi(...)))`. Left unary membership
+is checked before key extraction and pair creation; a filtered unary right
+target preserves its own membership. Original indexes and incremental change
+metadata are retained. A post-join filter only filters joined rows and does not
+prevent key extraction. This left-source pushdown is not implemented for
+comparison, overlap, composed-condition (`.and(...)`), predicate, or same-source
+self-join dispatch.
+
+Fluent right-hand targets implement `CollectionExtract`, including filtered
+unary streams. Compatible arbitrary derived producers belong at the low-level
+`JoinNode` input boundary, not as interchangeable fluent targets.
+
+In v0.19.10, `stream::cross::Penta::join` drops the authored penta filter;
+filter the returned `Chain` instead. Same-source `PentaConstraintStream` is
+terminal. These are distinct APIs despite sharing the five-source name.
 
 ## Performance Note
 

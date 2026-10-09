@@ -17,11 +17,12 @@ on 2026-07-17. At the September 15 update, the core release was
 The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
 same version line.
 
-<%= render Ui::Callout.new(title: "Update, October 8, 2026") do %>
-This is a historical release note. `solverforge 0.19.9` is the current core
-runtime line. See the [0.19.9 release note](/blog/releases/2026/10/08/solverforge-0-19-9/)
-for the common operator tree that supersedes the older engines. CLI 3.3.3
-still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<%= render Ui::Callout.new(title: "Update, October 9, 2026") do %>
+This is a historical release note. `solverforge 0.19.10` is the current core
+runtime line. See the [0.19.10 release note](/blog/releases/2026/10/09/solverforge-0-19-10/)
+for optional construction and keyed source-filter fixes and the clarified doc
+contracts. The common operator tree introduced in 0.19.9 remains in place.
+CLI 3.3.3 still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
 <% end %>
 
 > **Update, 2026-09-15:** SolverForge 0.19.5 retains the complete solution when
@@ -305,6 +306,7 @@ datasets, or solver policies.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.19.10` | 2026-10-09 | Fixes optional construction progress and unary keyed source filtering; clarifies contracts and corrects the internal zero-regression gate. |
 | `0.19.9` | 2026-10-08 | Independent-key joins and Chain past Penta, grouped joins, composable low-level row producers over the common operator tree, and the lost resume wakeup fix. |
 | `0.19.8` | 2026-10-02 | Adds a third join source to keyed cross streams and the retained cross-tri incremental constraint, both on one arity-generic cross-join engine; the local build gate runs the Rust checks CI runs. |
 | `0.19.7` | 2026-09-25 | Owns every workspace version surface from the release tooling, so the workspace, crates, and tags are cut from one declaration. |
