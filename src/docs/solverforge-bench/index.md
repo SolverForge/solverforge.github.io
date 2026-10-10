@@ -232,7 +232,7 @@ be above the true optimum.
 | ------- | -------------------------------- | ------ |
 | CVRP | 100 of 100 | CVRPLIB Set X table; proven optima where the table marks the instance closed, best known bounds otherwise |
 | Job-shop scheduling | 162 of 162 | ScheduleOpt best-known catalogue |
-| Employee scheduling | 0 of 42 (9 bundled reference solutions plus 28 validated finalist scores cover other tuples) | INRC-II official test dataset; best known bounds, not optima |
+| Employee scheduling | 37 of 37 (9 bundled reference solutions plus 28 validated finalist scores) | INRC-II official test dataset and validated competition results; best known bounds, not optima |
 
 Read tested gates in ascending order: 1s, 10s, 60s. The first feasible gate counts
 each instance at the earliest tested budget that returned a valid solution.
@@ -259,9 +259,10 @@ official value over whatever a run recorded.
 
 Where no official value exists, the run reports that absence rather than
 substituting a bound of its own. The employee-scheduling canonical selection
-runs history/week combinations the competition published no reference solutions
-for, so its results carry feasibility without a mean gap. On the published
-results page the coverage is stated per problem, next to the numbers.
+now grades the exact scenario, history, and ordered-week combinations covered
+by those 37 official values. Its results report both feasibility and reference
+gaps. On the published results page the coverage is stated per problem, next
+to the numbers.
 
 ## Result Columns
 
