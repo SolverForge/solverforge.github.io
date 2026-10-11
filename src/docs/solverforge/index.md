@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.10` crate and current release
+These pages track the `solverforge 0.19.13` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the `solverforge-cli 3.3.3` line scaffolds `solverforge 0.19.7`, while
 apps scaffolded by earlier lines pin `solverforge 0.19.5` (3.1.0) or
@@ -34,7 +34,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.10` workspace declares Rust `1.95`.
+The `0.19.13` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -160,7 +160,7 @@ The current release tightens several public contracts:
   and `Penta` adapters use that tree; cross `Penta::join` continues into the
   arity-free `stream::chain::Chain`, whose joins have no fixed binding-count
   ceiling. Chained conditions receive the whole prior borrowed row and can
-  use a different key type for each relationship. In v0.19.10 that cross-Penta
+  use a different key type for each relationship. In v0.19.12 that cross-Penta
   continuation drops the authored penta filter; apply the row filter on the
   returned `Chain`. Same-source `PentaConstraintStream` is terminal
 - same-collection unique combinations use the arity-generic `SelfJoinNode`
@@ -171,7 +171,9 @@ The current release tightens several public contracts:
   existence, flattened, and complemented row producers, including derived
   inputs on either side of a join. Owned derived values remain with their
   evaluation or retained-state owner; views borrow them, and provenance keeps
-  upstream bindings. These low-level capabilities are not all exposed through
+  upstream bindings. Since `v0.19.13`, incremental notifications emit into
+  caller-owned `Vec<RowHandle>` buffers (the former `RowChanges` return type is
+  gone). These low-level capabilities are not all exposed through
   every fluent stream family
 - direct cross-join grouped streams can call `complement(...)` against a
   generated fact or entity source, so missing target keys produce explicit
@@ -246,6 +248,44 @@ The current release tightens several public contracts:
   plus generation and evaluation durations. `moves_generated` counts candidates
   actually yielded, not an unrequested logical tail; `moves/s` is only a display
   metric
+
+## Changes in 0.19.11–0.19.13
+
+The current `0.19.13` line includes the `0.19.11` construction and scoring
+fixes, the `0.19.12` retained-bookkeeping refinement, and the `0.19.13`
+count-backed existence rewrite:
+
+- interrupted Clarke-Wright merge work can commit a complete buffered route set
+  using already verified owner-feasibility evidence, without another feasibility
+  scan or candidate budget. Savings-generation interruption keeps the previously
+  committed complete assignment. See [Construction](/docs/solverforge/solver/construction/).
+- relational existence scratch, link lists, flattened child-handle vectors, and
+  empty hash-bucket vectors are reused across incremental updates. Internal
+  index maps use deterministic fast hashing; ordered and interval reverse
+  side-tables use generation-checked handles. This is not a public ordering or
+  allocation-free scoring guarantee.
+- exact indexed view-equality candidates no longer repeat the same equality key
+  extractors. Composed conditions still check residual predicates. See
+  [Joiners](/docs/solverforge/constraints/joiners/).
+- `0.19.12` keeps occupied hash buckets and surviving existence match lists in
+  place. Old-key retraction, stale-generation rejection, duplicate-notification
+  handling, semi/anti membership, and flattening relationships remain intact.
+- since `0.19.13`, `ExistenceNode` answers semi and anti membership from
+  per-key occurrence counts — dense tables keyed by `usize` planning ids, hash
+  tables otherwise — without materializing right-side child rows or pair links;
+  a threshold-crossing key publishes or retracts its left rows idempotently per
+  event. `JoinerExistenceNode` remains the compiled-plan engine for existence
+  with residual predicates, and complement defaults restore through the plan's
+  retained equality keys. `Operator::retract`/`insert` emit into caller-owned
+  buffers instead of returning the removed `RowChanges` value. See
+  [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/)
+  and [Joiners](/docs/solverforge/constraints/joiners/).
+
+These are runtime implementation changes, not a new CLI scaffold, Python binding,
+app release, or benchmark measurement. Their independently pinned versions above
+remain unchanged. The [0.19.10…0.19.13 source comparison](https://github.com/SolverForge/solverforge/compare/v0.19.10...v0.19.13)
+and [final tagged source](https://github.com/SolverForge/solverforge/tree/d2eb5fb6f4b821ffaef9e69295667365343c8406)
+are the evidence for this update.
 
 ## Minimal Example
 
@@ -332,9 +372,9 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.10](https://docs.rs/solverforge/0.19.10/solverforge/).
-The `0.19.10` crate is the registry source of truth. Consult the
-[`v0.19.10` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.10)
+[docs.rs/solverforge 0.19.13](https://docs.rs/solverforge/0.19.13/solverforge/).
+The `0.19.13` crate is the registry source of truth. Consult the
+[`v0.19.13` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.13)
 alongside the repository `crates/*/WIREFRAME.md` API maps.
 
 ## Sections

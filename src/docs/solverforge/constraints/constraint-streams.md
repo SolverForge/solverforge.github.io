@@ -35,7 +35,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-Each constraint builder chain finalizes through `.named()`. In v0.19.10,
+Each constraint builder chain finalizes through `.named()`. Since v0.19.10,
 direct pair scoring, chained joins, existence, flattening, and unary complemented grouping
 use concrete `stream::relational::operator` trees and the generic
 `constraint::relational::OperatorTerminal`, rather than separate retained
@@ -233,7 +233,7 @@ nested: a triple is `Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. Named key functions
 with explicit borrowed row types are useful for deeper chains' higher-ranked
 lifetime bounds.
 
-In v0.19.10, continuing from cross `Penta` discards its authored penta filter.
+In v0.19.12, continuing from cross `Penta` discards its authored penta filter.
 Apply the row filter on the returned `Chain` instead. Same-source
 `PentaConstraintStream` is terminal and has no join continuation.
 
@@ -316,6 +316,13 @@ membership is preserved before indexing. Filtered right-hand join sources,
 flattened keyed targets, and complement sources also retain their membership
 contracts. Do not generalize the left-source pushdown to other join dispatches
 or to the cross-Penta continuation limitation described above.
+
+Since `v0.19.13`, the `if_exists`/`if_not_exists` terminal builds the
+count-backed `ExistenceNode`: its right side is the right stream's collection,
+whose key adapter expands flattened children in place, so flattened existence
+no longer creates child rows. Incremental notifications emit into
+caller-owned buffers. See
+[Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
 
 ## Constraint Node Sharing
 

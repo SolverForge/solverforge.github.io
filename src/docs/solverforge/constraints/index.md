@@ -38,10 +38,10 @@ without projecting them first. Chained joins use
 `.join((target, equal_on(left_row_key, right_leaf_key)))`, with an independent
 key domain for each relationship. `Tri`, `Quad`, and `Penta` provide named
 cross-stream arity adapters; cross `Penta::join` continues into `Chain` at
-arbitrary depth. That continuation drops an authored penta filter in v0.19.10;
+arbitrary depth. That continuation drops an authored penta filter in v0.19.12;
 apply the row filter on the returned `Chain`. Same-source
 `PentaConstraintStream` is terminal.
-In v0.19.10 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
+Since v0.19.13 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
 execute through concrete `stream::relational::operator` trees and the shared
 `OperatorTerminal`, not per-shape retained engines.
 Direct cross-join groups can also call

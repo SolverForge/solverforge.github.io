@@ -62,6 +62,25 @@ CVRP distance hooks turn unreachable or malformed matrix entries into large
 finite construction costs, and strict route hooks reject unreachable
 travel-time legs before route-local improvements commit them.
 
+### Clarke-Wright interruption and buffered merges
+
+Since `v0.19.11`, including `v0.19.13`, interruption during the merge loop no
+longer discards a complete, placeable buffered route set merely because the
+merges have not yet been committed. If at least one merge was admitted and the
+surviving routes can be assigned to distinct available owner slots from their
+retained feasibility evidence, the phase commits that complete assignment and
+its pending move telemetry atomically.
+
+This final assignment reuses the feasibility already established for every
+owner in a route's savings metric class (or every owner for an unscored route).
+It does not run another owner-feasibility scan or consume another candidate
+budget. If that evidence cannot place the buffered routes, the already committed
+complete assignment is kept instead. Interruption while generating savings also
+keeps the committed complete assignment; it is not permission to publish an
+incomplete route set. Cancellation and configured termination retain their
+normal lifecycle meanings, and the mandatory-construction publication gate
+still applies across the whole model.
+
 ### Stable list-source identity
 
 Generated `usize` list models supply a stable element-source key automatically.

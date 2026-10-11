@@ -7,11 +7,12 @@ description: >
   route-distance handling, and exposes dynamic construction primitives.
 ---
 
-<%= render Ui::Callout.new(title: "Update, October 9, 2026") do %>
-This is a historical release note. `solverforge 0.19.10` is the current core
-runtime line. See the [0.19.10 release note](/blog/releases/2026/10/09/solverforge-0-19-10/)
-for optional construction and keyed source-filter fixes and the clarified doc
-contracts. The common operator tree introduced in 0.19.9 remains in place.
+<%= render Ui::Callout.new(title: "Update, October 11, 2026") do %>
+This is a historical release note. `solverforge 0.19.13` is the current core
+runtime line. See the [0.19.13 release note](/blog/releases/2026/10/11/solverforge-0-19-13/)
+for the existence-engine rewrite: per-key occurrence counts answering semi/anti
+joins from retained keys, following the buffered Clarke-Wright interruption and
+in-place relationship bookkeeping in 0.19.11 and 0.19.12.
 CLI 3.3.3 still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
 <% end %>
 

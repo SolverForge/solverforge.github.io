@@ -185,7 +185,7 @@ Fluent right-hand targets implement `CollectionExtract`, including filtered
 unary streams. Compatible arbitrary derived producers belong at the low-level
 `JoinNode` input boundary, not as interchangeable fluent targets.
 
-In v0.19.10, `stream::cross::Penta::join` drops the authored penta filter;
+In v0.19.12, `stream::cross::Penta::join` drops the authored penta filter;
 filter the returned `Chain` instead. Same-source `PentaConstraintStream` is
 terminal. These are distinct APIs despite sharing the five-source name.
 
@@ -198,6 +198,28 @@ candidates before applying an arbitrary predicate. Compose conditions with
 `.and(...)`; the compiled plan still checks the complete condition. These
 strategies are shared across the relational operator tree rather than selected
 by a separate retained engine for each tuple arity.
+
+Since `v0.19.11`, the relational `ViewEqualPlan` treats membership in the exact
+equality-key bucket as proof of that equality: candidate validation does not
+repeat the same key extractors for every candidate. Keys are still extracted
+when indexing and probing; this is not a promise that key closures run only once
+per solve. Composed plans still evaluate residual conditions, and ordinary
+unindexed `matches(...)` still compares the keys.
+
+In `v0.19.12`, occupied hash buckets are updated in place on retraction; only an
+empty bucket is removed and its vector recycled. Retained old keys still remove
+the exact prior entry after a value changes, duplicate insertion of the same
+live handle does not multiply matches, and generational identities still
+protect slot reuse. These changes reduce internal work without changing join
+results or providing a public bucket-order guarantee.
+
+Since `v0.19.13`, existence relationships do not scan derived candidate rows:
+`ExistenceNode` keeps no child rows and no pair links, so a semi/anti stream's
+incremental path reads only relationship keys and the touched keys' left rows.
+The compiled per-pair path remains where a relationship needs it —
+`JoinerExistenceNode` for residual-predicate existence, and the complement node
+for scored defaults — together with the `JoinNode`, `SelfJoinNode`, and grouped
+families, which retain their pair-row engines.
 
 Low-level joined filters receive semantic source indexes in the current runtime.
 The fluent `filtering(|left, right| ...)` and `.filter(|left, right| ...)`

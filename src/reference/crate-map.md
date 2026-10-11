@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.10` crate and current
+This map is aligned with the published `solverforge 0.19.13` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -68,7 +68,7 @@ extend it without a fixed arity ceiling. Each chained condition compiles
 independently, receives the whole prior borrowed row, and can use a key domain
 different from earlier relationships. Chain filters and weights receive the
 typed row rather than a new positional closure signature for every arity.
-In v0.19.10 the cross-Penta continuation drops its authored penta filter;
+In v0.19.12 the cross-Penta continuation drops its authored penta filter;
 apply the row filter on the returned `Chain`. Same-source
 `PentaConstraintStream` is terminal.
 
@@ -87,7 +87,29 @@ producers. Derived payloads belong to evaluation or retained-state owners;
 borrowed views and generational row identities preserve lineage without
 retaining solution references. Group and membership changes can replace rows
 during either retraction or insertion, so consumers process both removed and
-inserted rows in `RowChanges`.
+inserted handles from each notification.
+
+Since `v0.19.13`, `Operator::retract` and `Operator::insert` emit into
+caller-owned `&mut Vec<RowHandle>` buffers instead of returning a `RowChanges`
+value; the type is gone from the current API. Every node chains its own reused
+scratch pairs through its children, so an event costs one copy per hop and no
+heap traffic on the notification path. Since `v0.19.11` relational operators
+reuse retired link, flattened
+child-handle, and hash-bucket vectors, and internal index maps use the private
+`stream/relational/hash.rs` deterministic fast hasher while ordered and interval
+side-tables use generation-checked `HandleMap`s; `v0.19.12` kept occupied hash
+buckets and surviving existence match lists in place during unlinking, and
+`v0.19.13` replaced the linked existence engine with per-key occurrence counts
+(dense tables for `usize` planning-id keys, hash tables otherwise), leaving
+`JoinerExistenceNode` as the compiled-plan semi/anti engine for residual
+predicates and moving complement default restoration to retained plan keys
+(`KeyOf`). Buffer reuse does not bypass old-key removal, generational checks,
+residual predicates, or duplicate-notification handling, and does not promise
+public iteration order or allocation-free updates. Exact `ViewEqualPlan`
+candidates rely on their equality bucket rather than re-extracting both keys;
+composed plans still evaluate residual conditions. See
+[Joiners](/docs/solverforge/constraints/joiners/) and
+[Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
 
 This is not a claim that every fluent family has migrated. Specialized unary,
 grouped, and projected constraint families still exist, including direct cross
@@ -95,7 +117,7 @@ and projected grouped complements. Existence and keyed flattened terminals,
 and unary complemented groups, use the shared `OperatorTerminal`.
 Likewise, reusable grouped-node sharing remains distinct from automatic
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.10/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.13/crates/solverforge-scoring/src)
 when extending internals; the repository's architecture notes retain some
 intermediate-stage descriptions.
 

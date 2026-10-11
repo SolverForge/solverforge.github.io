@@ -37,14 +37,47 @@ the left row's score: an existence filter publishes only accepted left rows.
 
 ## Relational Execution
 
-In v0.19.10 both operations use `stream::relational::operator::ExistenceNode`,
-a semi/anti join over concrete row producers. The compiled condition supplies
-the indexes; retained matching links track membership as either source changes.
-The terminal is `constraint::relational::OperatorTerminal`, not a separate
-existence scoring engine. The old exact-`usize` existence-engine storage
-specialization is not the current API contract. Choose `usize`, optional,
-string, or compound keys for the relationship you need, not to select a
-retired engine.
+Since v0.19.10 both operations use `stream::relational::operator::ExistenceNode`,
+a semi/anti join over concrete row producers, and finalize onto
+`constraint::relational::OperatorTerminal`, not a separate existence scoring
+engine. Key choice does not select an engine: since `v0.19.13` the node
+dispatches its key storage internally — dense tables for `usize` planning-id
+keys, hash tables otherwise — so choose `usize`, optional, string, or compound
+keys for the relationship you need.
+
+Since `v0.19.13`, the node answers membership from per-key occurrence counts
+instead of materializing child rows or pair links. It retains one occurrence
+count per right-side key, each right row's stored key contribution, and one
+bucket of left rows per key; a key whose count crosses the alive/dead
+threshold publishes or retracts every left row carrying it in one idempotent
+pass per event. Right-side children never become rows and never receive
+handles — when the right stream is flattened, a `ParentChildKeys` adapter
+reads each parent's children straight from the solution, and a grouped right
+stream keys off its aggregated result. Left rows are re-keyed from the live
+solution on insert, so a changed key moves the row between key domains, and
+only left rows are published, never scored pair rows.
+
+From `v0.19.10` through `v0.19.12` the node additionally retained per-pair
+matching links: `v0.19.11` reused retired link-list buffers and event scratch
+across incremental refreshes, and `v0.19.12` updated surviving opposite-side
+match lists in place rather than removing and reinserting those lists.
+`v0.19.13` moves the per-pair links to the relationship shapes that need them
+(see below) and keeps the reuse discipline for what the count-backed engine
+does retain: stored key contributions are recycled and every event reuses its
+notification and key scratch buffers.
+
+These are internal representation and allocation changes, not a change to
+membership: semi/anti joins still publish left rows according to whether any
+matching key is present. The per-event membership pass is idempotent, so a key
+removed and re-added inside one event settles on its final state; retained
+right-row key contributions remove exactly the old keys after a value changes;
+generational handles prevent a reused storage slot from reviving an old
+relationship; and reset clears retained keys, counts, contributions, and
+scratch before reinitialization. Relationships that need residual predicates
+beyond an equality key still run the compiled per-pair path: there
+`JoinerExistenceNode` retains matching pair links and evaluates the residual
+predicate, and complement defaults restore through the plan's retained
+equality keys.
 
 ## `flatten_last`
 
@@ -84,12 +117,18 @@ matches with two value arguments. Both relationships must hold: the original
 join links the left entity to the parent, and the lookup key matches the
 child's flattened key.
 
-In v0.19.10 the fluent builder creates a `FlattenNode` over the parent source
+Since v0.19.10 the fluent builder creates a `FlattenNode` over the parent source
 and joins it to the left collection using the compound `(parent key, child
 key)` relationship. It finalizes onto `OperatorTerminal`; there is no separate
 flattened-bi retained scoring engine. The three-argument `flatten_last` API
 remains the keyed `Bi` operation shown above, not a general promise that every
 arbitrary-depth `Chain` supports flattening.
+
+Since `v0.19.11`, the node recycles retired parent-to-child handle vectors and
+reserves space for replacement children. It still retracts every old child and
+creates fresh generational child handles when the parent refreshes. Reusing a
+vector allocation does not retain a stale child, change the compound-key
+relationship, or introduce a new fluent flattening API.
 
 ## When To Use Which
 

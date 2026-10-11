@@ -163,10 +163,13 @@ factory.for_each(Schedule::shifts())
     .named("Balanced workload")
 ```
 
-In v0.19.10 unary complemented groups use a relational `ComplementNode` and the
+Since v0.19.13 unary complemented groups use a relational `ComplementNode` and the
 shared `OperatorTerminal`, rather than a separate complemented scoring engine.
 The node relates the target domain to grouped results and owns default values
-for targets with no matching result. The public `complement(source, key,
+for targets with no matching result; since `v0.19.13` its default restoration
+reads the plan's retained equality keys, so a target whose last result row is
+retracted regains its default even after the target retracted and re-inserted
+earlier in the same event. The public `complement(source, key,
 default)` authoring shape is unchanged. Direct cross-join and projected
 complemented groups still use their respective grouped terminal families.
 

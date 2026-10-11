@@ -10,15 +10,15 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.10` tag and calls out
+documentation tracks the `solverforge 0.19.13` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.10` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.13` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and the workspace crates were
-published on 2026-10-09, and docs.rs serves the 0.19.10 API. The release tag
-points to `a482be25ca262750725d96de9145154c708f1cdb`.
-[Upstream CI](https://github.com/SolverForge/solverforge/actions/runs/37953452666),
-[crate publication](https://github.com/SolverForge/solverforge/actions/runs/37953454901),
-and [GitHub Release](https://github.com/SolverForge/solverforge/actions/runs/37953454974)
+published on 2026-10-11, and docs.rs serves the 0.19.13 API. The release tag
+points to `d2eb5fb6f4b821ffaef9e69295667365343c8406`.
+[Upstream CI](https://github.com/SolverForge/solverforge/actions/runs/38160058421),
+[crate publication](https://github.com/SolverForge/solverforge/actions/runs/38160059914),
+and [GitHub Release](https://github.com/SolverForge/solverforge/actions/runs/38160060053)
 all completed successfully for this release.
 
 The independently published CLI line is `solverforge-cli 3.3.3`. The 3.3.x line
@@ -56,7 +56,7 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.10`, which fixes optional assignment construction progress and unary source filtering before keyed equality joins, and clarifies the existing operator-tree and runtime-default contracts |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.13`, which rewrites the existence engine to answer semi/anti joins from per-key occurrence counts, following the 0.19.11 buffered Clarke-Wright interruption, relational buffer reuse, and exact indexed equality fixes and the 0.19.12 in-place retained relationship bookkeeping |
 | **CLI Scaffold** | Published | `solverforge-cli 3.3.3` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`; it rewrites every score-bearing surface on `generate score` and resyncs the generated demo data on `destroy`, and streams generated constraint skeletons from the planning-solution accessors; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.10` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.10` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.8`, `solverforge-lessons@2.0.10`, `solverforge-deliveries@2.0.9`, `solverforge-fsr@2.0.10`, plus the repository-only `solverforge-furnace@2.0.2`, `solverforge-orders@0.1.2`, `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`; all eight target `solverforge 0.19.7` and `solverforge-ui 0.9.0` |
@@ -157,7 +157,7 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **0.19.10 runtime line**: `v0.19.10` and the crates.io `solverforge 0.19.10`
+- **0.19.13 runtime line**: `v0.19.13` and the crates.io `solverforge 0.19.13`
   package are current, and the Rust toolchain floor remains `1.95`. The
   published `solverforge-cli 3.3.3` package targets `solverforge 0.19.7` for
   fresh scaffolds; apps scaffolded by `3.1.0` pin `0.19.5` and apps scaffolded
@@ -190,6 +190,30 @@ SolverForge skills now live.
   original source indexes and descriptor-local change metadata. Post-join filters
   operate on joined rows. Left-source pushdown does not extend to comparison,
   overlap, composed-condition, predicate, or same-source self-join dispatch.
+- **0.19.11 construction and scoring fixes**: interrupted Clarke-Wright merge
+  work can publish a complete buffered assignment using existing owner-feasibility
+  evidence, without extending the search budget. Interrupted savings generation
+  preserves the committed complete assignment. Relational operators reuse retired
+  buffers and probe scratch; exact typed equality buckets avoid repeating both
+  key extractors for each candidate pair.
+- **0.19.13 existence-engine rewrite**: `ExistenceNode` answers semi/anti joins
+  from one occurrence count per right-side key (dense for `usize` planning ids,
+  hash otherwise) with stored key contributions and one key bucket of left rows.
+  Threshold crossings publish or retract every left row carrying that key
+  idempotently per event; right-side children never become rows and never
+  receive handles. `JoinerExistenceNode` keeps pair joins for residual
+  predicates, and complements restore through retained `KeyOf` keys, not stale
+  row handles. Incremental notifications append into caller-owned
+  `&mut Vec<RowHandle>` buffers and `RowChanges` is gone: one memcpy per hop and
+  no heap allocation on this path. These implementation changes do not imply new
+  benchmark results or measured performance gains. See the
+  [0.19.11 release note](/blog/releases/2026/10/10/solverforge-0-19-11/),
+  [0.19.12 release note](/blog/releases/2026/10/10/solverforge-0-19-12/), and
+  [0.19.13 release note](/blog/releases/2026/10/11/solverforge-0-19-13/).
+- **0.19.12 retained bookkeeping**: occupied equality buckets and existence link
+  lists are updated in place. Empty buckets still retire their buffers for reuse;
+  generation checks, old-key retraction, residual predicates, and duplicate
+  suppression remain intact.
 - **Internal zero-regression gate**: deterministic allocation counters are checked
   exactly without a noise allowance; noisy metric medians have a default 5%
   regression tolerance through `BENCH_TOLERANCE_PERCENT`. Both sides share a

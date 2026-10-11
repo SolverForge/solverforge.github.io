@@ -129,9 +129,16 @@ receive the route owner, so heterogeneous fleets can score and check routes
 against the correct depot, distance matrix, capacity, and time-window context.
 Use `savings_metric_class_fn` when several owners share the same construction
 depot and distance behavior. Clarke-Wright computes savings once per savings
-metric class, then still asks the savings `feasible` hook for each candidate
-owner before assigning routes. Route-local feasibility remains available to
-k-opt and route assignment through `route_hooks`.
+metric class, while savings feasibility is still checked against the candidate
+owners needed to admit routes and merges. Metric classes share distance behavior,
+not a blanket feasibility policy. Since `v0.19.11`, interruption-time assignment
+of complete buffered merges reuses the already verified class-wide (or all-owner)
+feasibility evidence instead of calling `feasible` again or spending more
+candidate budget. If that evidence cannot place the route set, construction
+keeps its committed complete assignment. See
+[Construction](/docs/solverforge/solver/construction/#clarke-wright-interruption-and-buffered-merges).
+Route-local feasibility remains available to k-opt and route assignment through
+`route_hooks`.
 
 ## Ownership and Precedence Hooks
 
