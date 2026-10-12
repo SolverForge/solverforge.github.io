@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.13` crate and current release
+These pages track the `solverforge 0.19.14` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the `solverforge-cli 3.3.3` line scaffolds `solverforge 0.19.7`, while
 apps scaffolded by earlier lines pin `solverforge 0.19.5` (3.1.0) or
@@ -34,7 +34,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.13` workspace declares Rust `1.95`.
+The `0.19.14` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -159,8 +159,11 @@ The current release tightens several public contracts:
   into `constraint::relational::OperatorTerminal`. Named `Bi`, `Tri`, `Quad`,
   and `Penta` adapters use that tree; cross `Penta::join` continues into the
   arity-free `stream::chain::Chain`, whose joins have no fixed binding-count
-  ceiling. Chained conditions receive the whole prior borrowed row and can
-  use a different key type for each relationship. In v0.19.12 that cross-Penta
+  ceiling. Every second or later join uses view keys: `equal_on` receives the
+  whole prior borrowed row on the left and `Leaf<NewEntity>` on the right;
+  read entity fields through `.entity`. `equal_bi` with plain entity closures
+  belongs to the first join, not a continuation. Each relationship can
+  use a different key type. Since v0.19.12 that cross-Penta
   continuation drops the authored penta filter; apply the row filter on the
   returned `Chain`. Same-source `PentaConstraintStream` is terminal
 - same-collection unique combinations use the arity-generic `SelfJoinNode`
@@ -249,9 +252,33 @@ The current release tightens several public contracts:
   actually yielded, not an unrequested logical tail; `moves/s` is only a display
   metric
 
+## Changes in 0.19.14
+
+Released on October 12, 2026, `0.19.14` simplifies dense existence bookkeeping
+and clarifies the existing chained-join key contract:
+
+- `DenseKeys::add` and `take` check table length before growing and inline
+  first-touch marking, removing the separate `touch` helper and its redundant
+  growth check. Each key still enters the touched list only once per event;
+  semi/anti membership settles from the final count. Hash-key storage and
+  public existence authoring are unchanged. See
+  [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
+- every continuation (`Bi::join`, `Tri::join`, `Quad::join`, `Penta::join`,
+  and `Chain::join`) takes keys over borrowed row views, not plain entities.
+  Use `equal_on(left_row_key, right_leaf_key)`; entity-closure `equal_bi`
+  produces a type mismatch (`E0631`) at those boundaries. The first join
+  continues to use entity keys with `equal_bi`. This documents the existing
+  API, rather than changing the join signatures. See
+  [Joiners](/docs/solverforge/constraints/joiners/).
+
+The [0.19.13…0.19.14 source comparison](https://github.com/SolverForge/solverforge/compare/v0.19.13...v0.19.14)
+and [exact released source](https://github.com/SolverForge/solverforge/tree/075aa6285ea266fe192b82949e65f43a6e69e777)
+define this update. CLI scaffold, Python binding, app, and recorded benchmark
+versions are independent; this patch does not change them or add measurements.
+
 ## Changes in 0.19.11–0.19.13
 
-The current `0.19.13` line includes the `0.19.11` construction and scoring
+The earlier `0.19.13` release includes the `0.19.11` construction and scoring
 fixes, the `0.19.12` retained-bookkeeping refinement, and the `0.19.13`
 count-backed existence rewrite:
 
@@ -372,9 +399,9 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.13](https://docs.rs/solverforge/0.19.13/solverforge/).
-The `0.19.13` crate is the registry source of truth. Consult the
-[`v0.19.13` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.13)
+[docs.rs/solverforge 0.19.14](https://docs.rs/solverforge/0.19.14/solverforge/).
+The `0.19.14` crate is the registry source of truth. Consult the
+[`v0.19.14` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.14)
 alongside the repository `crates/*/WIREFRAME.md` API maps.
 
 ## Sections

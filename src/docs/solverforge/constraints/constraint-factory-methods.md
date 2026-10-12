@@ -310,7 +310,12 @@ names, not these stream method names.
   is generated.
 - Extending a joined pair with only `(source, key_fn)`. Chained joins now need
   `(source, equal_on(left_row_key, right_leaf_key))`, with borrowed row views
-  and a fresh condition for the added relationship.
+  and a fresh condition for the added relationship. At each of `Bi::join`,
+  `Tri::join`, `Quad::join`, `Penta::join`, and `Chain::join`, the left key
+  receives the whole prior row and the right key receives `&Leaf<'_, T>`;
+  read entity fields through `.entity`. `equal_bi` with plain entity closures
+  is for the first unary join and fails to typecheck at these continuations
+  (`E0631`).
 - Expecting generated method aliases that do not match the solution field name.
 - Using `for_each(...)` for projected rows that should keep localized source
   ownership.

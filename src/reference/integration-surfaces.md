@@ -27,7 +27,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 
 Use `solverforge-cli` to bootstrap the project, then move quickly into ordinary
 application modules and `solverforge` runtime code. Current core documentation
-tracks `solverforge 0.19.13`; the CLI 3.3.3 scaffold still targets core 0.19.7.
+tracks `solverforge 0.19.14`; the CLI 3.3.3 scaffold still targets core 0.19.7.
 Do not infer an application's dependency from the current core release.
 
 ### Runtime truth
@@ -50,7 +50,7 @@ problem; Rust still owns the indexed working state, compiled search graph,
 cursor execution, safe native score specializations, snapshots, retained jobs,
 candidate traces, and embedded shared UI asset bytes. The Python 0.6.10 line
 and its repository apps still use core 0.19.7, independently of the current
-core 0.19.13 release.
+core 0.19.14 release.
 
 ### UI as presentation and orchestration
 

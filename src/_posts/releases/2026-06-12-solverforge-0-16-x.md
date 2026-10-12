@@ -8,9 +8,9 @@ description: >
   line on crates.io.
 ---
 
-<%= render Ui::Callout.new(title: "Update, October 11, 2026") do %>
-This is a historical release note. `solverforge 0.19.13` is the current core
-runtime line. See the [0.19.13 release note](/blog/releases/2026/10/11/solverforge-0-19-13/)
+<%= render Ui::Callout.new(title: "Update, October 12, 2026") do %>
+This is a historical release note. `solverforge 0.19.14` is the current core
+runtime line. See the [0.19.14 release note](/blog/releases/2026/10/12/solverforge-0-19-14/)
 for the existence-engine rewrite: per-key occurrence counts answering semi/anti
 joins from retained keys, following the buffered Clarke-Wright interruption and
 in-place relationship bookkeeping in 0.19.11 and 0.19.12.

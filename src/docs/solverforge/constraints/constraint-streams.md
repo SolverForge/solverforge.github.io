@@ -231,9 +231,16 @@ Cross-stream `Bi::join` produces `Tri`; further joins produce `Quad` and `Penta`
 nesting operators without a fixed arity ceiling. At each step the left row is
 nested: a triple is `Pair<Pair<Leaf<A>, Leaf<B>>, Leaf<C>>`. Named key functions
 with explicit borrowed row types are useful for deeper chains' higher-ranked
-lifetime bounds.
+lifetime bounds. The view-key rule applies to every continuation: `Bi::join`
+reads the borrowed pair, `Tri::join` the borrowed triple, `Quad::join` the
+borrowed quadruple, `Penta::join` the borrowed quintuple, and `Chain::join`
+the whole `O::View<'_>`. Each right key reads `&Leaf<'_, NewEntity>` through
+`.entity`. Plain entity-closure `equal_bi` is only for the first unary join;
+using it at a continuation produces a type mismatch (`E0631`). Use `equal_on`
+and choose the prior binding explicitly. These existing signatures are
+clarified in the `0.19.14` source docs.
 
-In v0.19.12, continuing from cross `Penta` discards its authored penta filter.
+Since v0.19.12, including v0.19.14, continuing from cross `Penta` discards its authored penta filter.
 Apply the row filter on the returned `Chain` instead. Same-source
 `PentaConstraintStream` is terminal and has no join continuation.
 

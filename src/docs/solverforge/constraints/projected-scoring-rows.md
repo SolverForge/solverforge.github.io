@@ -98,8 +98,9 @@ cached scoring rows without materializing facts. Since v0.19.10 the fluent
 `.project(|left, right| row)` shape is unchanged: it creates a projected
 `JoinedSource` and continues through the projected stream API. Incremental
 notifications across the relational operator trees now emit into reused
-caller-owned handle buffers, keeping the per-event update path allocation-free
-on this surface. Do not confuse
+caller-owned handle buffers rather than returning `RowChanges` (since
+`v0.19.13`). This buffer-reuse contract is not a guarantee that projected
+payload creation or an entire incremental update is allocation-free. Do not confuse
 that projected terminal with direct pair scoring, which now finalizes onto
 `OperatorTerminal`.
 

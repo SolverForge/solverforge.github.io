@@ -64,7 +64,7 @@ travel-time legs before route-local improvements commit them.
 
 ### Clarke-Wright interruption and buffered merges
 
-Since `v0.19.11`, including `v0.19.13`, interruption during the merge loop no
+Since `v0.19.11`, including `v0.19.14`, interruption during the merge loop no
 longer discards a complete, placeable buffered route set merely because the
 merges have not yet been committed. If at least one merge was admitted and the
 surviving routes can be assigned to distinct available owner slots from their

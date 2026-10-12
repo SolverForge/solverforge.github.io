@@ -10,15 +10,15 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.19.13` tag and calls out
+documentation tracks the `solverforge 0.19.14` tag and calls out
 published crates.io, docs.rs, CLI scaffold targets, UI assets, maps, and Python
-bindings separately. The `v0.19.13` tag, workspace, and crates.io package are the
+bindings separately. The `v0.19.14` tag, workspace, and crates.io package are the
 current core runtime line. The GitHub Release and the workspace crates were
-published on 2026-10-11, and docs.rs serves the 0.19.13 API. The release tag
-points to `d2eb5fb6f4b821ffaef9e69295667365343c8406`.
-[Upstream CI](https://github.com/SolverForge/solverforge/actions/runs/38160058421),
-[crate publication](https://github.com/SolverForge/solverforge/actions/runs/38160059914),
-and [GitHub Release](https://github.com/SolverForge/solverforge/actions/runs/38160060053)
+published on 2026-10-12, and docs.rs serves the 0.19.14 API. The release tag
+points to `075aa6285ea266fe192b82949e65f43a6e69e777`.
+[Upstream CI](https://github.com/SolverForge/solverforge/actions/runs/38231493884),
+[crate publication](https://github.com/SolverForge/solverforge/actions/runs/38231524594),
+and [GitHub Release](https://github.com/SolverForge/solverforge/actions/runs/38231524550)
 all completed successfully for this release.
 
 The independently published CLI line is `solverforge-cli 3.3.3`. The 3.3.x line
@@ -56,7 +56,7 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.13`, which rewrites the existence engine to answer semi/anti joins from per-key occurrence counts, following the 0.19.11 buffered Clarke-Wright interruption, relational buffer reuse, and exact indexed equality fixes and the 0.19.12 in-place retained relationship bookkeeping |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.19.14`, which inlines dense-key existence bookkeeping and documents borrowed-row keys for later chained joins; it retains the 0.19.13 count-backed existence engine and the earlier construction and scoring fixes |
 | **CLI Scaffold** | Published | `solverforge-cli 3.3.3` targets `solverforge 0.19.7`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.0`; it rewrites every score-bearing surface on `generate score` and resyncs the generated demo data on `destroy`, and streams generated constraint skeletons from the planning-solution accessors; the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, and `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.10` compiles dynamic CPython 3.14 models into the `solverforge 0.19.7` runtime; PyPI publishes `solverforge 0.6.10` |
 | **Worked Use Cases** | Released, CI and Space syncs passed | `solverforge-hospital@2.0.8`, `solverforge-lessons@2.0.10`, `solverforge-deliveries@2.0.9`, `solverforge-fsr@2.0.10`, plus the repository-only `solverforge-furnace@2.0.2`, `solverforge-orders@0.1.2`, `solverforge-fleet@0.1.5`, and `solverforge-flightcrew@0.1.2`; all eight target `solverforge 0.19.7` and `solverforge-ui 0.9.0` |
@@ -157,14 +157,16 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **0.19.13 runtime line**: `v0.19.13` and the crates.io `solverforge 0.19.13`
+- **0.19.14 runtime line**: `v0.19.14` and the crates.io `solverforge 0.19.14`
   package are current, and the Rust toolchain floor remains `1.95`. The
   published `solverforge-cli 3.3.3` package targets `solverforge 0.19.7` for
   fresh scaffolds; apps scaffolded by `3.1.0` pin `0.19.5` and apps scaffolded
   by `3.0.0` pin `0.19.4`, and an app should move to a newer core line only
   when that app is deliberately upgraded and validated.
-- **Composable joins**: each later join can use `equal_on(left_row_key,
-  right_row_key)` over the complete prior row with its own key type. Named
+- **Composable joins**: each later join uses `equal_on(left_row_key,
+  right_row_key)` over the complete prior borrowed row and the new entity's
+  `Leaf` view, with its own key type. Entity-key `equal_bi` closures belong to
+  the first unary join; they do not typecheck on later joins. Named
   cross `Bi`, `Tri`, `Quad`, and `Penta` adapters use the same typed operator
   tree; `stream::cross::Penta::join` continues into `stream::chain::Chain` with no fixed arity
   ceiling. That continuation discards an authored penta filter; apply it on the
@@ -210,6 +212,11 @@ SolverForge skills now live.
   [0.19.11 release note](/blog/releases/2026/10/10/solverforge-0-19-11/),
   [0.19.12 release note](/blog/releases/2026/10/10/solverforge-0-19-12/), and
   [0.19.13 release note](/blog/releases/2026/10/11/solverforge-0-19-13/).
+- **0.19.14 dense-key refinement**: count additions and removals inline the
+  touched-key update and grow storage only when the key exceeds its current
+  length. Membership semantics stay unchanged. The release also documents the
+  borrowed-row key-shape rule at every later chained join. See the
+  [0.19.14 release note](/blog/releases/2026/10/12/solverforge-0-19-14/).
 - **0.19.12 retained bookkeeping**: occupied equality buckets and existence link
   lists are updated in place. Empty buckets still retire their buffers for reuse;
   generation checks, old-key retraction, residual predicates, and duplicate

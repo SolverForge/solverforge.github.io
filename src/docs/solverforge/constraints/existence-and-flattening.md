@@ -66,6 +66,16 @@ match lists in place rather than removing and reinserting those lists.
 does retain: stored key contributions are recycled and every event reuses its
 notification and key scratch buffers.
 
+In `v0.19.14`, dense `usize` count updates simplify that bookkeeping:
+`DenseKeys::add` and `take` check the table length before calling `grow`, then
+mark a key's first touch inline instead of invoking a separate `touch` helper
+that repeated the growth check. A key enters the touched list at most once
+per event, even when several right-side contributions change its count.
+Growth is still possible when a key exceeds the current table length; this is
+not an allocation-free update guarantee. Hash-key storage and the public
+existence methods are unchanged. See the
+[tagged count-state implementation](https://github.com/SolverForge/solverforge/blob/v0.19.14/crates/solverforge-scoring/src/stream/relational/count_state.rs).
+
 These are internal representation and allocation changes, not a change to
 membership: semi/anti joins still publish left rows according to whether any
 matching key is present. The per-event membership pass is idempotent, so a key

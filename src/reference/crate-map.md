@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.13` crate and current
+This map is aligned with the published `solverforge 0.19.14` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -68,7 +68,13 @@ extend it without a fixed arity ceiling. Each chained condition compiles
 independently, receives the whole prior borrowed row, and can use a key domain
 different from earlier relationships. Chain filters and weights receive the
 typed row rather than a new positional closure signature for every arity.
-In v0.19.12 the cross-Penta continuation drops its authored penta filter;
+Every continuation — `Bi::join`, `Tri::join`, `Quad::join`, `Penta::join`,
+and `Chain::join` — uses `equal_on` with the whole prior borrowed row on the
+left and `&Leaf<'_, NewEntity>` on the right. Select bindings through nested
+`.left` / `.right` and read fields through `.entity`. `equal_bi` with plain
+entity closures belongs to the first unary join and fails at a continuation
+(`E0631`); `0.19.14` clarifies this existing contract in the source docs.
+Since v0.19.12, including v0.19.14, the cross-Penta continuation drops its authored penta filter;
 apply the row filter on the returned `Chain`. Same-source
 `PentaConstraintStream` is terminal.
 
@@ -91,9 +97,10 @@ inserted handles from each notification.
 
 Since `v0.19.13`, `Operator::retract` and `Operator::insert` emit into
 caller-owned `&mut Vec<RowHandle>` buffers instead of returning a `RowChanges`
-value; the type is gone from the current API. Every node chains its own reused
-scratch pairs through its children, so an event costs one copy per hop and no
-heap traffic on the notification path. Since `v0.19.11` relational operators
+value; the type is gone from the current API. Nodes pass their reused scratch
+pairs through their children rather than allocating a returned change object
+per hop; buffers can still grow when more handles are needed. Since
+`v0.19.11` relational operators
 reuse retired link, flattened
 child-handle, and hash-bucket vectors, and internal index maps use the private
 `stream/relational/hash.rs` deterministic fast hasher while ordered and interval
@@ -111,13 +118,20 @@ composed plans still evaluate residual conditions. See
 [Joiners](/docs/solverforge/constraints/joiners/) and
 [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
 
+In `v0.19.14`, dense existence count updates inline first-touch marking and
+guard table growth with a length check, removing the separate `touch` helper
+and its repeated growth check. The touched list remains unique per event and
+membership still settles from final counts; hash-key storage, residual-predicate
+dispatch, and public authoring methods are unchanged. Larger keys can still
+grow the table, so this is not a blanket allocation-free or speedup claim.
+
 This is not a claim that every fluent family has migrated. Specialized unary,
 grouped, and projected constraint families still exist, including direct cross
 and projected grouped complements. Existence and keyed flattened terminals,
 and unary complemented groups, use the shared `OperatorTerminal`.
 Likewise, reusable grouped-node sharing remains distinct from automatic
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.13/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.14/crates/solverforge-scoring/src)
 when extending internals; the repository's architecture notes retain some
 intermediate-stage descriptions.
 

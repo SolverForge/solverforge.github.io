@@ -36,9 +36,12 @@ projected self-joins can be symmetric with `equal(...)` or directed with
 `equal_bi(left_key, right_key)`. Direct cross joins can group joined pairs
 without projecting them first. Chained joins use
 `.join((target, equal_on(left_row_key, right_leaf_key)))`, with an independent
-key domain for each relationship. `Tri`, `Quad`, and `Penta` provide named
+key domain for each relationship. Every second or later join takes the whole
+borrowed left row and a right `Leaf` view; read fields through `.entity`.
+Plain entity-closure `equal_bi` is for the first join, not a continuation.
+`Tri`, `Quad`, and `Penta` provide named
 cross-stream arity adapters; cross `Penta::join` continues into `Chain` at
-arbitrary depth. That continuation drops an authored penta filter in v0.19.12;
+arbitrary depth. Since v0.19.12, including v0.19.14, that continuation drops an authored penta filter;
 apply the row filter on the returned `Chain`. Same-source
 `PentaConstraintStream` is terminal.
 Since v0.19.13 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
