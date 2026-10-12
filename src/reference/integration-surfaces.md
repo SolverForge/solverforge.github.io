@@ -27,7 +27,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 
 Use `solverforge-cli` to bootstrap the project, then move quickly into ordinary
 application modules and `solverforge` runtime code. Current core documentation
-tracks `solverforge 0.19.14`; the CLI 3.3.3 scaffold still targets core 0.19.7.
+tracks `solverforge 0.20.1`; the CLI 3.3.3 scaffold still targets core 0.19.7.
 Do not infer an application's dependency from the current core release.
 
 ### Runtime truth

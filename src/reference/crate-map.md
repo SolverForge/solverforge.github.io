@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.19.14` crate and current
+This map is aligned with the published `solverforge 0.20.1` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -123,7 +123,12 @@ guard table growth with a length check, removing the separate `touch` helper
 and its repeated growth check. The touched list remains unique per event and
 membership still settles from final counts; hash-key storage, residual-predicate
 dispatch, and public authoring methods are unchanged. Larger keys can still
-grow the table, so this is not a blanket allocation-free or speedup claim.
+grow the table, so this is not a blanket allocation-free or speedup claim. In
+`0.20.0`, grouped-scalar default local search forages with `AcceptedCount(256)`
+— the list-model policy — so a step sweeps until the limit is accepted and
+applies the best; `0.20.1` pools precedence-route cycle-check scratch over the
+graph's live successor lists and the grouped-scalar construction feasibility
+probe buffers. Both are work-spending changes; no public API moved.
 
 This is not a claim that every fluent family has migrated. Specialized unary,
 grouped, and projected constraint families still exist, including direct cross
@@ -131,7 +136,7 @@ and projected grouped complements. Existence and keyed flattened terminals,
 and unary complemented groups, use the shared `OperatorTerminal`.
 Likewise, reusable grouped-node sharing remains distinct from automatic
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.19.14/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.20.1/crates/solverforge-scoring/src)
 when extending internals; the repository's architecture notes retain some
 intermediate-stage descriptions.
 
