@@ -94,14 +94,13 @@ Streams::new()
 
 Since the `0.11.x` release line, joined-pair projected rows are retained by joined
 coordinates, so localized updates from either side of the join can update the
-cached scoring rows without materializing facts. Since v0.19.10 the fluent
+cached scoring rows without materializing facts. The fluent
 `.project(|left, right| row)` shape is unchanged: it creates a projected
 `JoinedSource` and continues through the projected stream API. Incremental
-notifications across the relational operator trees now emit into reused
-caller-owned handle buffers rather than returning `RowChanges` (since
-`v0.19.13`). This buffer-reuse contract is not a guarantee that projected
-payload creation or an entire incremental update is allocation-free. Do not confuse
-that projected terminal with direct pair scoring, which now finalizes onto
+notifications across the relational operator trees emit into reused
+caller-owned handle buffers. Buffer reuse does not make projected payload
+creation or an entire incremental update allocation-free. Do not confuse that
+projected terminal with direct pair scoring, which finalizes onto
 `OperatorTerminal`.
 
 If the rule only needs an aggregate over joined pairs, use direct cross-join

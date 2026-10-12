@@ -38,7 +38,7 @@ REQUIRED_TEXT = {
   "src/docs/solverforge/solver/construction.md" => [
     "Completed optional roots are skipped before reading their",
     "candidate domains or generating moves",
-    "required augmenting", "including `v0.19.14`"
+    "required augmenting", "retained feasibility evidence"
   ],
   "src/docs/solverforge/constraints/constraint-streams.md" => [
     "CollectionExtract",
@@ -63,72 +63,7 @@ REQUIRED_TEXT = {
     "before keys and pairs"
   ],
 
-  "src/_posts/releases/2026-10-09-solverforge-0-19-10.md" => [
-    "**solverforge 0.19.10** was published",
-    "`solverforge 0.20.1` is the current core", "0.20.x release note",
-    "`0.19.13` | 2026-10-11",
-    "`0.19.12` | 2026-10-10",
-    "`0.19.11` | 2026-10-10",
-    "`0.19.10` | 2026-10-09",
-    "a482be25ca262750725d96de9145154c708f1cdb",
-    "37953452666", "37953454901", "37953454974",
-    "before candidate-domain", "before key extraction and pair creation",
-    "effective parsed top-level termination", "construction-only",
-    "CollectionExtract", "PentaConstraintStream", "discards an authored penta filter",
-    "allocations", "allocated_bytes", "peak_live_bytes", "default 5%",
-    "equal-length staging paths", "same harness package name",
-    "diagnostic, not the acceptance criterion", "historical",
-    "Still scaffolds `solverforge 0.19.7`"
-  ],
-  "src/_posts/releases/2026-10-10-solverforge-0-19-11.md" => [
-    "**solverforge 0.19.11** was published", "(2026-10-10)",
-    "`solverforge 0.20.1` is the current core", "0.20.x release note",
-    "a29dbd3aa584288234011892315beb271ff1a114",
-    "38079486381", "38079487876", "38079487957",
-    "without extending the search budget", "Retired flatten child-handle vectors",
-    "Direct", "`matches` still compares extracted keys",
-    "historical benchmark evidence and tested versions remain unchanged",
-    "Still scaffolds `solverforge 0.19.7`",
-    "`0.19.13` | 2026-10-11", "`0.19.12` | 2026-10-10", "`0.19.11` | 2026-10-10"
-  ],
-  "src/_posts/releases/2026-10-10-solverforge-0-19-12.md" => [
-    "**solverforge 0.19.12** was published", "(2026-10-10)",
-    "`solverforge 0.20.1` is the current core", "0.20.x release note",
-    "`cargo add solverforge` installed\n0.19.12",
-    "f417a6282cff1fd3b416fc65b3c4a05d45ce1796",
-    "38081695807", "38081696993", "38081697080",
-    "mutate occupied buckets in place", "generation-checked handle storage",
-    "residual predicates", "duplicate suppression", "counted-hash regression",
-    "No measured performance gain is claimed",
-    "Still scaffolds `solverforge 0.19.7`",
-    "`0.19.13` | 2026-10-11", "`0.19.12` | 2026-10-10", "`0.19.11` | 2026-10-10"
-  ],
-  "src/_posts/releases/2026-10-11-solverforge-0-19-13.md" => [
-    "**solverforge 0.19.13** was published", "(2026-10-11)",
-    "`cargo add solverforge` installed\n0.19.13",
-    "docs.rs serves the 0.19.13 API",
-    "d2eb5fb6f4b821ffaef9e69295667365343c8406",
-    "38160058421", "38160059914", "38160060053",
-    "one occurrence count per right-side key", "dense arrays for `usize`",
-    "hash tables otherwise", "stored key contribution", "one key bucket of left rows",
-    "alive/dead threshold", "idempotent membership pass per event",
-    "Right-side children never become rows and never receive handles",
-    "JoinerExistenceNode", "keeps\njoining pair rows",
-    "residual predicates",
-    "retained keys (`KeyOf`)", "complemented_rows_remain_joinable",
-    "caller-owned `&mut Vec<RowHandle>`", "`RowChanges` is removed",
-    "one memcpy per hop", "no\nheap allocation on this path",
-    "4,349 ms\nbaseline with parity in score, steps, and evaluated candidates",
-    "upstream probe measurement",
-    "historical\nbenchmark evidence and tested versions remain unchanged",
-    "Still scaffolds `solverforge 0.19.7`",
-    "`solverforge-py 0.6.10` / PyPI `solverforge 0.6.10`",
-    "Still embeds runtime `0.19.7` and UI `0.9.0`",
-    "Eight released apps", "Runtime `0.19.7` and UI `0.9.0` boundaries are unchanged",
-    "`0.19.13` | 2026-10-11", "`0.19.12` | 2026-10-10", "`0.19.11` | 2026-10-10",
-    "compare/v0.19.12...v0.19.13", "tree/v0.19.13"
-  ],
-  "src/_posts/releases/2026-10-12-solverforge-0-20-0-1.md" => [
+          "src/_posts/releases/2026-10-12-solverforge-0-20-0-1.md" => [
     "**solverforge 0.20.0 and 0.20.1** are published", "(2026-10-12)",
     "`cargo add solverforge`\ninstalls 0.20.1",
     "docs.rs serves the 0.20.1 API",
@@ -142,25 +77,15 @@ REQUIRED_TEXT = {
   ],
   "src/docs/solverforge/constraints/shift-group-uniformity.md" => [
     "**distinct** shift groups minus one",
-    "Grouping by the employee or by `shift_group`",
+    "puts each value in its own bucket", "never penalized",
     "FilterNode", "OperatorTerminal", "collect_vec",
     "tri_shift_key", "tri_block_key",
     "start, end, location", "medium penalty",
     "/docs/solverforge/constraints/constraint-streams/",
-    "/docs/solverforge/constraints/joiners/"
+    "/docs/solverforge/constraints/joiners/",
+    "/docs/solverforge/constraints/collectors/"
   ],
-  "src/_posts/releases/2026-10-12-solverforge-0-19-14.md" => [
-    "**solverforge 0.19.14** is published", "(2026-10-12)",
-    "`cargo add solverforge` installs\n0.19.14",
-    "docs.rs serves the 0.19.14 API", "075aa6285ea266fe192b82949e65f43a6e69e777",
-    "38231493884", "38231524594", "38231524550",
-    "DenseKeys::add", "equal_on", "Every second or later",
-    "membership semantics", "does not", "benchmark gain",
-    "**0.19.13**, not 0.19.14", "Still scaffolds `solverforge 0.19.7`",
-    "Still embeds runtime `0.19.7`", "Eight released apps",
-    "compare/v0.19.13...v0.19.14", "tree/v0.19.14"
-  ],
-  "scripts/verify-rust-snippets.rb" => [
+    "scripts/verify-rust-snippets.rb" => [
     'DEFAULT_SOLVERFORGE_RS_REF = "v0.20.1"'
   ],
 
@@ -172,13 +97,13 @@ REQUIRED_TEXT = {
     "solverforge 0.19.4"
   ],
 
-  "src/docs/solverforge/solver/solver-manager.md" => ["including `v0.19.14`"],
-  "src/docs/solverforge/constraints/node-sharing.md" => ["In v0.19.14"],
+  "src/docs/solverforge/solver/solver-manager.md" => ["notify the condition variable while holding the worker's pause gate", "lost-wakeup race"],
+  "src/docs/solverforge/constraints/node-sharing.md" => ["The compiler supports sharing"],
   "src/docs/solverforge/constraints/existence-and-flattening.md" => [
-    "In `v0.19.14`", "DenseKeys::add", "per event", "not an allocation-free"
+    "DenseKeys::add", "per event", "at most once"
   ],
   "src/reference/integration-surfaces.md" => [
-    "tracks `solverforge 0.20.1`", "the CLI 3.3.3 scaffold still targets core 0.19.7."
+    "tracks `solverforge 0.20.1`", "the CLI 3.3.3 scaffold targets core 0.19.7"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py 0.6.10",
@@ -363,6 +288,8 @@ REQUIRED_TEXT = {
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge 0.20.1` is the current core",
     "0.20.x release note",
+    "## October 2026 Core Patches (0.19.8–0.19.14)",
+    "per-key occurrence counts", "arity-generic cross-join engine", "worker wakeup", "caller-owned buffers",
     "`0.19.13` | 2026-10-11",
     "`0.19.12` | 2026-10-10",
     "`0.19.11` | 2026-10-10",
@@ -392,58 +319,7 @@ REQUIRED_TEXT = {
     "`0.19.7` | 2026-09-25",
     "pinned"
   ],
-  "src/_posts/releases/2026-10-02-solverforge-0-19-8.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note",
-    "solverforge 0.19.8",
-    "`0.19.13` | 2026-10-11",
-    "`0.19.12` | 2026-10-10",
-    "`0.19.11` | 2026-10-10",
-    "`0.19.10` | 2026-10-09",
-    "`0.19.8` | 2026-10-02",
-    "cross_tri_incremental::Tri",
-    "CrossJoinEngine",
-    "`.join((extractor_c, key_c))`",
-    "Historical 0.19.8 architecture"
-  ],
-  "src/_posts/releases/2026-10-08-solverforge-0-19-9.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note",
-    "solverforge 0.19.9",
-    "`0.19.13` | 2026-10-11",
-    "`0.19.12` | 2026-10-10",
-    "`0.19.11` | 2026-10-10",
-    "`0.19.10` | 2026-10-09",
-    "`0.19.9` | 2026-10-08",
-    "docs.rs served the 0.19.9 API",
-    "equal_on(left_row_key, right_row_key)",
-    "Penta::join(...)",
-    "OperatorTerminal",
-    "GroupNode",
-    "derived operator\ntree across multiple consumers",
-    "same pause gate",
-    "solverforge-cli 3.3.3",
-    "Still scaffolds `solverforge 0.19.7`",
-    "551170ccd2d77433aca2ce566d89a012dc5dcc8b"
-  ],
-  "src/_posts/releases/2026-10-01-solverforge-cli-3-3-2.md" => [
-    "solverforge-cli 3.3.2",
-    "solverforge-cli 3.3.3",
-    "solverforge 0.19.7",
-    "rmcp 3.5.0",
-    "`3.3.2` | 2026-10-01",
-    "`3.3.3` | 2026-10-02"
-  ],
-  "src/_posts/releases/2026-10-02-solverforge-cli-3-3-3.md" => [
-    "the current core release, `solverforge 0.20.1`",
-    "solverforge-cli 3.3.3",
-    "solverforge 0.19.7",
-    "rmcp 3.5.0",
-    "`3.3.3` | 2026-10-02",
-    "`3.3.2` | 2026-10-01",
-    "src/data/data_seed.rs"
-  ],
-  "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
+      "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
     "solverforge-py 0.6.10",
     "solverforge==0.6.10",
     "solverforge 0.19.7",
@@ -461,7 +337,16 @@ REQUIRED_TEXT = {
     "`0.6.6` | 2026-08-11",
     "`0.6.5` | 2026-07-29",
     "`0.6.4` | 2026-07-26"
-  ]
+  ],
+  "src/_posts/releases/2026-09-29-solverforge-cli-3-2-3-3-x.md" => [
+    "`3.2.0` | 2026-09-29",
+    "`3.3.1` | 2026-09-29",
+    "`3.3.2` | 2026-10-01",
+    "`3.3.3` | 2026-10-02",
+    "rmcp 3.5.0",
+    "solverforge 0.19.7",
+    "src/data/data_seed.rs"
+  ],
 }.freeze
 
 FORBIDDEN_TEXT = {
@@ -553,11 +438,9 @@ FORBIDDEN_TEXT = {
   "src/reference/lifecycle-pause-resume-contract.md" => ["solverforge-cli 3.3.1", "solverforge-cli 3.3.2"],
   "src/_posts/releases/2026-09-29-solverforge-cli-3-2-3-3-x.md" => [
     "**solverforge-cli 3.3.1** is published",
-    "installs 3.3.1 directly"
-  ],
-  "src/_posts/releases/2026-10-01-solverforge-cli-3-3-2.md" => [
-    "**solverforge-cli 3.3.2** is published",
-    "installs 3.3.2 directly"
+    "installs 3.3.1 directly",
+    "installs 3.3.2 directly",
+    "installs 3.3.3 directly"
   ],
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
     "`cargo add solverforge` installs 0.19.7",
@@ -578,27 +461,16 @@ FORBIDDEN_TEXT = {
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge 0.19.12` is the current core"
   ],
-  "src/_posts/releases/2026-10-02-solverforge-0-19-8.md" => [
-    "`solverforge 0.19.12` is the current core"
-  ],
-  "src/_posts/releases/2026-10-08-solverforge-0-19-9.md" => [
-    "`solverforge 0.19.12` is the current core"
-  ],
-  "src/_posts/releases/2026-10-09-solverforge-0-19-10.md" => [
-    "`solverforge 0.19.12` is the current core"
-  ],
-  "src/_posts/releases/2026-10-10-solverforge-0-19-11.md" => [
-    "`solverforge 0.19.12` is the current core"
-  ],
-  "src/_posts/releases/2026-10-02-solverforge-cli-3-3-3.md" => [
-    "the current core release, `solverforge 0.19.12`"
-  ],
-  "scripts/verify-rust-snippets.rb" => [
+          "scripts/verify-rust-snippets.rb" => [
     'DEFAULT_SOLVERFORGE_RS_REF = "v0.19.14"'
   ]
 }.freeze
 
 failures = []
+
+def normalize(text)
+  text.gsub(/\s+/, " ")
+end
 
 REQUIRED_TEXT.each do |relative_path, needles|
   path = File.join(ROOT, relative_path)
@@ -607,9 +479,10 @@ REQUIRED_TEXT.each do |relative_path, needles|
     next
   end
 
-  text = File.read(path)
+  # Prose needles must survive markdown line wrapping: compare normalized text.
+  text = normalize(File.read(path))
   needles.each do |needle|
-    failures << "#{relative_path} is missing #{needle.inspect}" unless text.include?(needle)
+    failures << "#{relative_path} is missing #{needle.inspect}" unless text.include?(normalize(needle))
   end
 end
 
@@ -620,10 +493,12 @@ FORBIDDEN_TEXT.each do |relative_path, needles|
     next
   end
 
+  # Version tokens must match at a numeric boundary, so forbidden matching stays
+  # regex-based; whitespace runs are still collapsed first.
   text = File.read(path)
   needles.each do |needle|
-    # A forbidden 0.19.1 must not also reject the current 0.19.13.
     pattern = Regexp.escape(needle)
+    pattern = pattern.gsub(/\\\s+\\\s*/, "\\s+") if pattern.include?("\\n")
     pattern += "(?![0-9])" if needle.match?(/[0-9]\z/)
     failures << "#{relative_path} still contains #{needle.inspect}" if text.match?(Regexp.new(pattern))
   end

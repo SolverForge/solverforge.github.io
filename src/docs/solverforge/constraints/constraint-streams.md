@@ -35,14 +35,13 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 }
 ```
 
-Each constraint builder chain finalizes through `.named()`. Since v0.19.10,
-direct pair scoring, chained joins, existence, flattening, and unary complemented grouping
-use concrete `stream::relational::operator` trees and the generic
-`constraint::relational::OperatorTerminal`, rather than separate retained
-engines for each shape. Unary scoring still has its own fluent terminal.
-Return terminals as a tuple; SolverForge implements `ConstraintSet` for singleton
-incremental constraints and for nested typed constraint sets, with tuple support
-up to 32 members.
+Each constraint builder chain finalizes through `.named()`. Direct pair
+scoring, chained joins, existence, flattening, and unary complemented grouping
+execute over concrete `stream::relational::operator` trees and the generic
+`constraint::relational::OperatorTerminal`; unary scoring keeps its fluent
+terminal. Return terminals as a tuple; SolverForge implements `ConstraintSet`
+for singleton incremental constraints and for nested typed constraint sets,
+with tuple support up to 32 members.
 
 ## Source Operations
 
@@ -247,7 +246,7 @@ using it at a continuation produces a type mismatch (`E0631`). Use `equal_on`
 and choose the prior binding explicitly. These existing signatures are
 clarified in the `0.19.14` source docs.
 
-Since v0.19.12, including v0.19.14, continuing from cross `Penta` discards its authored penta filter.
+Continuing from cross `Penta` drops an authored penta filter; apply the row filter on the returned `Chain`.
 Apply the row filter on the returned `Chain` instead. Same-source
 `PentaConstraintStream` is terminal and has no join continuation.
 
@@ -331,8 +330,8 @@ flattened keyed targets, and complement sources also retain their membership
 contracts. Do not generalize the left-source pushdown to other join dispatches
 or to the cross-Penta continuation limitation described above.
 
-Since `v0.19.13`, the `if_exists`/`if_not_exists` terminal builds the
-count-backed `ExistenceNode`: its right side is the right stream's collection,
+The `if_exists`/`if_not_exists` terminal builds the count-backed
+`ExistenceNode`: its right side is the right stream's collection,
 whose key adapter expands flattened children in place, so flattened existence
 no longer creates child rows. Incremental notifications emit into
 caller-owned buffers. See

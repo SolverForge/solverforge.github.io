@@ -137,9 +137,7 @@ The current release tightens several public contracts:
   shared `Collector<Input>` contract covers unary rows, projected rows, and
   joined cross-join pairs
 - scoring terminals use `penalize(score)`, `reward(score)`, typed dynamic
-  closures, `fixed_weight(...)`, and `hard_weight(...)`; the former
-  `penalize_hard`, `penalize_with`, and `reward_soft` helper family is no
-  longer part of the current stream API
+  closures, `fixed_weight(...)`, and `hard_weight(...)`
 - solver configuration controls such as `SolverConfig`, `PhaseConfig`,
   `MoveSelectorConfig`, `AcceptorConfig`, `ForagerConfig`,
   `SolverConfigOverride`, and related enums are available directly from
@@ -163,21 +161,20 @@ The current release tightens several public contracts:
   whole prior borrowed row on the left and `Leaf<NewEntity>` on the right;
   read entity fields through `.entity`. `equal_bi` with plain entity closures
   belongs to the first join, not a continuation. Each relationship can
-  use a different key type. Since v0.19.12 that cross-Penta
-  continuation drops the authored penta filter; apply the row filter on the
-  returned `Chain`. Same-source `PentaConstraintStream` is terminal
+  use a different key type. That cross-Penta continuation drops the authored
+  penta filter; apply the row filter on the returned `Chain`.
+  Same-source `PentaConstraintStream` is terminal
 - same-collection unique combinations use the arity-generic `SelfJoinNode`
   with filtered rows and the same generic terminal, rather than per-arity
-  incremental scorers. The former cross-bi/cross-tri incremental engines are
-  removed; this does not mean every specialized fluent family has migrated
+  incremental scorers; specialized unary, grouped, and projected stream
+  families retain their own implementations
 - low-level relational operators compose filtered, merged, projected, grouped,
   existence, flattened, and complemented row producers, including derived
   inputs on either side of a join. Owned derived values remain with their
   evaluation or retained-state owner; views borrow them, and provenance keeps
-  upstream bindings. Since `v0.19.13`, incremental notifications emit into
-  caller-owned `Vec<RowHandle>` buffers (the former `RowChanges` return type is
-  gone). These low-level capabilities are not all exposed through
-  every fluent stream family
+  upstream bindings. Incremental notifications emit into caller-owned
+  `Vec<RowHandle>` buffers. These low-level capabilities are not
+  all exposed through every fluent stream family
 - direct cross-join grouped streams can call `complement(...)` against a
   generated fact or entity source, so missing target keys produce explicit
   default rows without a projected-row detour
@@ -251,85 +248,6 @@ The current release tightens several public contracts:
   plus generation and evaluation durations. `moves_generated` counts candidates
   actually yielded, not an unrequested logical tail; `moves/s` is only a display
   metric
-
-## Changes in 0.20.0–0.20.1
-
-Released on October 12, 2026, `0.20.0` and `0.20.1` change how the solver
-spends its work, not what models may declare:
-
-- grouped-scalar default local search forages with `AcceptedCount(256)`, the
-  same policy as list models: a step sweeps until the limit is accepted (or
-  the union drains) and applies the best. Explicitly configured foragers keep
-  their pinned behavior. See [Local Search](/docs/solverforge/solver/local-search/).
-- `0.20.1` pools precedence-route cycle-check scratch over the graph's live
-  successor lists and the grouped-scalar construction feasibility probe
-  buffers, removing per-candidate and per-event allocation. Scores,
-  decisions, and public APIs are unchanged.
-
-The [0.20.0…0.20.1 source comparison](https://github.com/SolverForge/solverforge/compare/v0.20.0...v0.20.1)
-and [exact released source](https://github.com/SolverForge/solverforge/tree/5e5e7f1fd9bb760461abc09e7d44813622fc99d7)
-define this update. CLI scaffold, Python binding, app, and recorded benchmark
-versions are independent; these patches do not change them or add measurements.
-
-## Changes in 0.19.11–0.19.14
-
-`0.19.14` simplified dense existence bookkeeping and clarified the existing
-chained-join key contract:
-
-- `DenseKeys::add` and `take` check table length before growing and inline
-  first-touch marking, removing the separate `touch` helper and its redundant
-  growth check. Each key still enters the touched list only once per event;
-  semi/anti membership settles from the final count. Hash-key storage and
-  public existence authoring are unchanged. See
-  [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
-- every continuation (`Bi::join`, `Tri::join`, `Quad::join`, `Penta::join`,
-  and `Chain::join`) takes keys over borrowed row views, not plain entities.
-  Use `equal_on(left_row_key, right_leaf_key)`; entity-closure `equal_bi`
-  produces a type mismatch (`E0631`) at those boundaries. The first join
-  continues to use entity keys with `equal_bi`. This documents the existing
-  API, rather than changing the join signatures. See
-  [Joiners](/docs/solverforge/constraints/joiners/).
-
-The [0.19.13…0.19.14 source comparison](https://github.com/SolverForge/solverforge/compare/v0.19.13...v0.19.14)
-defines that patch release.
-
-## Changes in 0.19.11–0.19.13
-
-The earlier `0.19.13` release includes the `0.19.11` construction and scoring
-fixes, the `0.19.12` retained-bookkeeping refinement, and the `0.19.13`
-count-backed existence rewrite:
-
-- interrupted Clarke-Wright merge work can commit a complete buffered route set
-  using already verified owner-feasibility evidence, without another feasibility
-  scan or candidate budget. Savings-generation interruption keeps the previously
-  committed complete assignment. See [Construction](/docs/solverforge/solver/construction/).
-- relational existence scratch, link lists, flattened child-handle vectors, and
-  empty hash-bucket vectors are reused across incremental updates. Internal
-  index maps use deterministic fast hashing; ordered and interval reverse
-  side-tables use generation-checked handles. This is not a public ordering or
-  allocation-free scoring guarantee.
-- exact indexed view-equality candidates no longer repeat the same equality key
-  extractors. Composed conditions still check residual predicates. See
-  [Joiners](/docs/solverforge/constraints/joiners/).
-- `0.19.12` keeps occupied hash buckets and surviving existence match lists in
-  place. Old-key retraction, stale-generation rejection, duplicate-notification
-  handling, semi/anti membership, and flattening relationships remain intact.
-- since `0.19.13`, `ExistenceNode` answers semi and anti membership from
-  per-key occurrence counts — dense tables keyed by `usize` planning ids, hash
-  tables otherwise — without materializing right-side child rows or pair links;
-  a threshold-crossing key publishes or retracts its left rows idempotently per
-  event. `JoinerExistenceNode` remains the compiled-plan engine for existence
-  with residual predicates, and complement defaults restore through the plan's
-  retained equality keys. `Operator::retract`/`insert` emit into caller-owned
-  buffers instead of returning the removed `RowChanges` value. See
-  [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/)
-  and [Joiners](/docs/solverforge/constraints/joiners/).
-
-These are runtime implementation changes, not a new CLI scaffold, Python binding,
-app release, or benchmark measurement. Their independently pinned versions above
-remain unchanged. The [0.19.10…0.19.13 source comparison](https://github.com/SolverForge/solverforge/compare/v0.19.10...v0.19.13)
-and [final tagged source](https://github.com/SolverForge/solverforge/tree/d2eb5fb6f4b821ffaef9e69295667365343c8406)
-are the evidence for this update.
 
 ## Minimal Example
 

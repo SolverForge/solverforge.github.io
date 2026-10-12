@@ -178,6 +178,44 @@ solverforge generate variable visit_order \
   --elements visits
 ```
 
+## October 2026 Core Patches (0.19.8–0.19.14)
+
+Each patch kept the Rust `1.95` floor, the planning model, and the CLI 3.3.3
+scaffold (runtime `0.19.7`) unchanged; only the core runtime moved.
+
+- **0.19.8** — Keyed cross streams gain a third join source and a retained
+  cross-tri constraint over one arity-generic cross-join engine; change
+  localization is symmetric across all three sources.
+- **0.19.9** — Joins move onto the common typed operator tree
+  (`JoinNode` + `OperatorTerminal`): each chained relationship compiles its
+  own condition and key type, fluent joins continue past Penta into the
+  arity-free `Chain`, groups can feed joins, and a resume could no longer
+  lose the worker wakeup. The per-arity incremental engines are superseded.
+- **0.19.10** — Optional construction continues past kept-unassigned root
+  decisions without consuming later rows' candidate budget, and unary
+  filters run before keyed equality initialization, so excluded rows never
+  reach a key closure.
+- **0.19.11** — Interrupted Clarke-Wright merges commit the complete buffered
+  route assignment using retained feasibility evidence; relational buffers
+  are reused across incremental updates; exact indexed equality stops
+  re-extracting both keys per candidate.
+- **0.19.12** — Occupied equality buckets and existence link lists update in
+  place; generation checks, old-key retraction, residual predicates, and
+  duplicate suppression keep their semantics.
+- **0.19.13** — The existence engine answers semi/anti joins from per-key
+  occurrence counts (dense for `usize` planning ids, hash otherwise) with no
+  child rows or pair links; complements restore through retained keys, and
+  incremental notifications emit into caller-owned buffers instead of
+  `RowChanges`.
+- **0.19.14** — Dense-key existence bookkeeping keeps its touched list unique
+  inline, and every later chained join's borrowed-row key rule is documented
+  as the existing contract.
+
+Publish, GitHub Release, and CI workflows succeeded for every tag; run
+links live in each patch's upstream release. The current core line and its
+full boundaries are on the
+[0.20.x release note](/blog/releases/2026/10/12/solverforge-0-20-0-1/).
+
 ## Published Version Boundaries
 
 The independently published package versions at the time of the 0.19.0 core
@@ -288,7 +326,7 @@ datasets, or solver policies.
 > incremental constraint. The published `solverforge-cli 3.3.3` package still
 > scaffolds `solverforge 0.19.7`, so fresh scaffolds trail this core line until a
 > CLI release deliberately retargets them. See the
-> [0.19.8 release note](/blog/releases/2026/10/02/solverforge-0-19-8/).
+> [0.19.8 release note]/blog/releases/2026/07/17/solverforge-0-19-x/.
 
 ## Upgrade Checklist
 

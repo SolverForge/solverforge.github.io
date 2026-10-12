@@ -41,11 +41,11 @@ borrowed left row and a right `Leaf` view; read fields through `.entity`.
 Plain entity-closure `equal_bi` is for the first join, not a continuation.
 `Tri`, `Quad`, and `Penta` provide named
 cross-stream arity adapters; cross `Penta::join` continues into `Chain` at
-arbitrary depth. Since v0.19.12, including v0.19.14, that continuation drops an authored penta filter;
-apply the row filter on the returned `Chain`. Same-source
+arbitrary depth. That continuation drops an authored penta filter; apply the row
+filter on the returned `Chain`. Same-source
 `PentaConstraintStream` is terminal.
-Since v0.19.13 direct pair scoring, chained joins, existence, flattening, and unary complemented groups
-execute through concrete `stream::relational::operator` trees and the shared
+Direct pair scoring, chained joins, existence, flattening, and unary complemented
+groups execute through concrete `stream::relational::operator` trees and the shared
 `OperatorTerminal`, not per-shape retained engines.
 Direct cross-join groups can also call
 `complement(...)` against generated target sources. On the first unary keyed

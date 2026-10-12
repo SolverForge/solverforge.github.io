@@ -85,8 +85,7 @@ Construction order keys are construction-only. Local-search scalar selectors
 keep canonical bounded candidate order even when the same variable declares
 construction keys.
 
-In SolverForge 0.19, scalar variables remain direct one-slot assignments.
-The former `chained = true` scalar mode is removed; when planning owns
+Scalar variables remain direct one-slot assignments. When planning owns
 membership or order as well as assignment, use a list variable instead.
 
 ### `#[planning_list_variable]`

@@ -73,8 +73,7 @@ and `Chain::join` — uses `equal_on` with the whole prior borrowed row on the
 left and `&Leaf<'_, NewEntity>` on the right. Select bindings through nested
 `.left` / `.right` and read fields through `.entity`. `equal_bi` with plain
 entity closures belongs to the first unary join and fails at a continuation
-(`E0631`); `0.19.14` clarifies this existing contract in the source docs.
-Since v0.19.12, including v0.19.14, the cross-Penta continuation drops its authored penta filter;
+(`E0631`). The cross-Penta continuation drops its authored penta filter;
 apply the row filter on the returned `Chain`. Same-source
 `PentaConstraintStream` is terminal.
 
@@ -95,13 +94,11 @@ retaining solution references. Group and membership changes can replace rows
 during either retraction or insertion, so consumers process both removed and
 inserted handles from each notification.
 
-Since `v0.19.13`, `Operator::retract` and `Operator::insert` emit into
-caller-owned `&mut Vec<RowHandle>` buffers instead of returning a `RowChanges`
-value; the type is gone from the current API. Nodes pass their reused scratch
+`Operator::retract` and `Operator::insert` emit into caller-owned
+`&mut Vec<RowHandle>` buffers. Nodes pass their reused scratch
 pairs through their children rather than allocating a returned change object
-per hop; buffers can still grow when more handles are needed. Since
-`v0.19.11` relational operators
-reuse retired link, flattened
+per hop; buffers can still grow when more handles are needed. Relational
+operators reuse retired link, flattened
 child-handle, and hash-bucket vectors, and internal index maps use the private
 `stream/relational/hash.rs` deterministic fast hasher while ordered and interval
 side-tables use generation-checked `HandleMap`s; `v0.19.12` kept occupied hash
@@ -118,27 +115,20 @@ composed plans still evaluate residual conditions. See
 [Joiners](/docs/solverforge/constraints/joiners/) and
 [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
 
-In `v0.19.14`, dense existence count updates inline first-touch marking and
-guard table growth with a length check, removing the separate `touch` helper
-and its repeated growth check. The touched list remains unique per event and
-membership still settles from final counts; hash-key storage, residual-predicate
-dispatch, and public authoring methods are unchanged. Larger keys can still
-grow the table, so this is not a blanket allocation-free or speedup claim. In
-`0.20.0`, grouped-scalar default local search forages with `AcceptedCount(256)`
-— the list-model policy — so a step sweeps until the limit is accepted and
-applies the best; `0.20.1` pools precedence-route cycle-check scratch over the
-graph's live successor lists and the grouped-scalar construction feasibility
-probe buffers. Both are work-spending changes; no public API moved.
+Dense existence count updates mark a touched key at most once per event; the
+touched list stays unique and membership settles from final counts. Hash-key
+storage, residual-predicate dispatch, and public authoring methods are
+unchanged. Grouped-scalar default local search forages with
+`AcceptedCount(256)` — the list-model policy — so a step sweeps until the
+limit is accepted and applies the best.
 
-This is not a claim that every fluent family has migrated. Specialized unary,
-grouped, and projected constraint families still exist, including direct cross
-and projected grouped complements. Existence and keyed flattened terminals,
-and unary complemented groups, use the shared `OperatorTerminal`.
-Likewise, reusable grouped-node sharing remains distinct from automatic
+Specialized unary, grouped, and projected constraint families still exist,
+including direct cross and projected grouped complements. Existence and keyed
+flattened terminals, and unary complemented groups, use the shared
+`OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
 [tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.20.1/crates/solverforge-scoring/src)
-when extending internals; the repository's architecture notes retain some
-intermediate-stage descriptions.
+when extending internals.
 
 ## Companion repositories
 

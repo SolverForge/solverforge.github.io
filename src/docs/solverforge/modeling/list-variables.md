@@ -131,8 +131,8 @@ Use `savings_metric_class_fn` when several owners share the same construction
 depot and distance behavior. Clarke-Wright computes savings once per savings
 metric class, while savings feasibility is still checked against the candidate
 owners needed to admit routes and merges. Metric classes share distance behavior,
-not a blanket feasibility policy. Since `v0.19.11`, interruption-time assignment
-of complete buffered merges reuses the already verified class-wide (or all-owner)
+not a blanket feasibility policy. Interruption-time assignment of complete
+buffered merges reuses the already verified class-wide (or all-owner)
 feasibility evidence instead of calling `feasible` again or spending more
 candidate budget. If that evidence cannot place the route set, construction
 keeps its committed complete assignment. See

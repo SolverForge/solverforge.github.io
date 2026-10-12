@@ -215,14 +215,14 @@ SolverForge skills now live.
   `&mut Vec<RowHandle>` buffers and `RowChanges` is gone: one memcpy per hop and
   no heap allocation on this path. These implementation changes do not imply new
   benchmark results or measured performance gains. See the
-  [0.19.11 release note](/blog/releases/2026/10/10/solverforge-0-19-11/),
-  [0.19.12 release note](/blog/releases/2026/10/10/solverforge-0-19-12/), and
-  [0.19.13 release note](/blog/releases/2026/10/11/solverforge-0-19-13/).
+  [0.19.11 release note](/blog/releases/2026/07/17/solverforge-0-19-x/),
+  [0.19.12 release note](/blog/releases/2026/07/17/solverforge-0-19-x/), and
+  [0.19.13 release note](/blog/releases/2026/07/17/solverforge-0-19-x/).
 - **0.19.14 dense-key refinement**: count additions and removals inline the
   touched-key update and grow storage only when the key exceeds its current
   length. Membership semantics stay unchanged. The release also documents the
   borrowed-row key-shape rule at every later chained join. See the
-  [0.19.14 release note](/blog/releases/2026/10/12/solverforge-0-19-14/).
+  [0.19.14 release note](/blog/releases/2026/07/17/solverforge-0-19-x/).
 - **0.20.1 pooled scratch**: precedence-route cycle checks reuse graph-owned
   buffers and the grouped-scalar construction feasibility path pools its probe
   scratch, removing per-candidate and per-event allocation. Scores, decisions,

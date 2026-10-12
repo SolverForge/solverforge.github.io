@@ -1,11 +1,11 @@
 ---
-title: "solverforge-cli 3.2.x and 3.3.x: SolverForge 0.19.7 Scaffolds, rmcp 3.5.0, and a Current Dependency Baseline"
+title: "solverforge-cli 3.2.x and 3.3.x: SolverForge 0.19.7 Scaffolds and rmcp 3.5.0"
 date: 2026-09-29
 draft: false
 description: >
   solverforge-cli 3.2.0 retargets fresh scaffolds to solverforge 0.19.7,
-  3.3.0 moves the MCP shell to rmcp 3.5.0, and 3.3.1 aligns the CLI's own
-  dependency baseline with the current releases.
+  3.3.0 moves the MCP shell to rmcp 3.5.0, 3.3.1 aligns the CLI's own
+  dependency baseline, and 3.3.2/3.3.3 fix generated constraint code.
 ---
 
 **solverforge-cli 3.3.1** was published on crates.io and released on GitHub
@@ -22,10 +22,8 @@ New projects target:
 - `rmcp 3.5.0` for the MCP shell
 
 <%= render Ui::Callout.new(title: "Update, October 2, 2026") do %>
-This note covers the 3.2.0 through 3.3.1 patches and is history.
-`solverforge-cli 3.3.3` is now published and is the current CLI package with
-these same scaffold targets. See the
-[3.3.3 release note](/blog/releases/2026/10/02/solverforge-cli-3-3-3/).
+This note now covers the 3.2.0 through 3.3.3 patches; 3.3.3 is the current
+CLI package with these same scaffold targets.
 <% end %>
 
 ## What Changed
@@ -76,6 +74,8 @@ targets, so a generated project is unaffected.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `3.3.3` | 2026-10-02 | Rewrites every score-bearing surface on `generate score` and re-renders `src/data/data_seed.rs` on `destroy`; no scaffold-target change. |
+| `3.3.2` | 2026-10-01 | Streams generated constraint skeletons from the `#[planning_solution]` accessors and aligns the bundled skill docs; no scaffold-target change. |
 | `3.3.1` | 2026-09-29 | Aligns the CLI dependency baseline with the current releases; no scaffold-target change. |
 | `3.3.0` | 2026-09-29 | Retargets the MCP shell to `rmcp 3.5.0`. |
 | `3.2.0` | 2026-09-29 | Retargets fresh scaffolds to `solverforge 0.19.7`. |

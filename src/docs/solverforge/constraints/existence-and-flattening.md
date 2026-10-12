@@ -37,16 +37,15 @@ the left row's score: an existence filter publishes only accepted left rows.
 
 ## Relational Execution
 
-Since v0.19.10 both operations use `stream::relational::operator::ExistenceNode`,
+Both operations use `stream::relational::operator::ExistenceNode`,
 a semi/anti join over concrete row producers, and finalize onto
 `constraint::relational::OperatorTerminal`, not a separate existence scoring
-engine. Key choice does not select an engine: since `v0.19.13` the node
-dispatches its key storage internally — dense tables for `usize` planning-id
+engine. Key choice does not select an engine: the node dispatches its key
+storage internally — dense tables for `usize` planning-id
 keys, hash tables otherwise — so choose `usize`, optional, string, or compound
 keys for the relationship you need.
 
-Since `v0.19.13`, the node answers membership from per-key occurrence counts
-instead of materializing child rows or pair links. It retains one occurrence
+The node answers membership from per-key occurrence counts instead of materializing child rows or pair links. It retains one occurrence
 count per right-side key, each right row's stored key contribution, and one
 bucket of left rows per key; a key whose count crosses the alive/dead
 threshold publishes or retracts every left row carrying it in one idempotent
@@ -66,10 +65,10 @@ match lists in place rather than removing and reinserting those lists.
 does retain: stored key contributions are recycled and every event reuses its
 notification and key scratch buffers.
 
-In `v0.19.14`, dense `usize` count updates simplify that bookkeeping:
-`DenseKeys::add` and `take` check the table length before calling `grow`, then
-mark a key's first touch inline instead of invoking a separate `touch` helper
-that repeated the growth check. A key enters the touched list at most once
+Dense `usize` count updates keep that bookkeeping inline: `DenseKeys::add`
+and `take` check the table length before calling `grow`, then mark a key's
+first touch directly. A key enters the touched list at most once per event,
+even when several right-side contributions change its count. A key enters the touched list at most once
 per event, even when several right-side contributions change its count.
 Growth is still possible when a key exceeds the current table length; this is
 not an allocation-free update guarantee. Hash-key storage and the public
@@ -127,14 +126,14 @@ matches with two value arguments. Both relationships must hold: the original
 join links the left entity to the parent, and the lookup key matches the
 child's flattened key.
 
-Since v0.19.10 the fluent builder creates a `FlattenNode` over the parent source
+The fluent builder creates a `FlattenNode` over the parent source
 and joins it to the left collection using the compound `(parent key, child
 key)` relationship. It finalizes onto `OperatorTerminal`; there is no separate
 flattened-bi retained scoring engine. The three-argument `flatten_last` API
 remains the keyed `Bi` operation shown above, not a general promise that every
 arbitrary-depth `Chain` supports flattening.
 
-Since `v0.19.11`, the node recycles retired parent-to-child handle vectors and
+The node recycles retired parent-to-child handle vectors and
 reserves space for replacement children. It still retracts every old child and
 creates fresh generational child handles when the parent refreshes. Reusing a
 vector allocation does not retain a stale child, change the compound-key
