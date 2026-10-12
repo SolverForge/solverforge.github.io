@@ -911,6 +911,7 @@ h3 {
   display: block;
   height: 100%;
   width: var(--benchmark-bar-fill, 0%);
+  min-width: 1px;
   border-radius: var(--sf-radius-sm);
   background: var(--benchmark-budget-fill);
 }
