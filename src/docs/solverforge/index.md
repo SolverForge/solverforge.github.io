@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.19.14` crate and current release
+These pages track the `solverforge 0.20.1` crate and current release
 workspace. Generated CLI projects can intentionally target an older scaffold
 runtime; the `solverforge-cli 3.3.3` line scaffolds `solverforge 0.19.7`, while
 apps scaffolded by earlier lines pin `solverforge 0.19.5` (3.1.0) or
@@ -34,7 +34,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.19.14` workspace declares Rust `1.95`.
+The `0.20.1` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -252,10 +252,29 @@ The current release tightens several public contracts:
   actually yielded, not an unrequested logical tail; `moves/s` is only a display
   metric
 
-## Changes in 0.19.14
+## Changes in 0.20.0–0.20.1
 
-Released on October 12, 2026, `0.19.14` simplifies dense existence bookkeeping
-and clarifies the existing chained-join key contract:
+Released on October 12, 2026, `0.20.0` and `0.20.1` change how the solver
+spends its work, not what models may declare:
+
+- grouped-scalar default local search forages with `AcceptedCount(256)`, the
+  same policy as list models: a step sweeps until the limit is accepted (or
+  the union drains) and applies the best. Explicitly configured foragers keep
+  their pinned behavior. See [Local Search](/docs/solverforge/solver/local-search/).
+- `0.20.1` pools precedence-route cycle-check scratch over the graph's live
+  successor lists and the grouped-scalar construction feasibility probe
+  buffers, removing per-candidate and per-event allocation. Scores,
+  decisions, and public APIs are unchanged.
+
+The [0.20.0…0.20.1 source comparison](https://github.com/SolverForge/solverforge/compare/v0.20.0...v0.20.1)
+and [exact released source](https://github.com/SolverForge/solverforge/tree/5e5e7f1fd9bb760461abc09e7d44813622fc99d7)
+define this update. CLI scaffold, Python binding, app, and recorded benchmark
+versions are independent; these patches do not change them or add measurements.
+
+## Changes in 0.19.11–0.19.14
+
+`0.19.14` simplified dense existence bookkeeping and clarified the existing
+chained-join key contract:
 
 - `DenseKeys::add` and `take` check table length before growing and inline
   first-touch marking, removing the separate `touch` helper and its redundant
@@ -272,9 +291,7 @@ and clarifies the existing chained-join key contract:
   [Joiners](/docs/solverforge/constraints/joiners/).
 
 The [0.19.13…0.19.14 source comparison](https://github.com/SolverForge/solverforge/compare/v0.19.13...v0.19.14)
-and [exact released source](https://github.com/SolverForge/solverforge/tree/075aa6285ea266fe192b82949e65f43a6e69e777)
-define this update. CLI scaffold, Python binding, app, and recorded benchmark
-versions are independent; this patch does not change them or add measurements.
+defines that patch release.
 
 ## Changes in 0.19.11–0.19.13
 
@@ -399,9 +416,9 @@ fn main() {
 ## API Reference
 
 Full published API documentation is available on
-[docs.rs/solverforge 0.19.14](https://docs.rs/solverforge/0.19.14/solverforge/).
-The `0.19.14` crate is the registry source of truth. Consult the
-[`v0.19.14` implementation](https://github.com/SolverForge/solverforge/tree/v0.19.14)
+[docs.rs/solverforge 0.20.1](https://docs.rs/solverforge/0.20.1/solverforge/).
+The `0.20.1` crate is the registry source of truth. Consult the
+[`v0.20.1` implementation](https://github.com/SolverForge/solverforge/tree/v0.20.1)
 alongside the repository `crates/*/WIREFRAME.md` API maps.
 
 ## Sections

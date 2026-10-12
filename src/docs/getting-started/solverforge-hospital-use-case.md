@@ -525,6 +525,12 @@ stream shape -> join/filter -> score impact -> why the weight matters
 Constraints do not assign employees. They score the assignments the solver is
 considering.
 
+For a complete grouped rule that mixes joins, a collector, and a medium
+penalty in one worked example — including why the grouping key must be the
+shift or block, not the employee — read
+[Shift-Group Uniformity](/docs/solverforge/constraints/shift-group-uniformity/)
+in the constraint documentation.
+
 ### Required Skill
 
 The required-skill rule is the best first join to read. It matches a shift to

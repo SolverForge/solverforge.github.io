@@ -87,6 +87,13 @@ factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 | `complement` | Fill missing grouped keys from a generated fact or entity source after unary, projected, or direct cross-join grouping |
 | `if_exists` / `if_not_exists` | Keep rows based on matching rows in another collection |
 
+Grouping three or more joined sources — a chain past a pair — has no fluent
+`group_by`; the low-level operator tree composes it. The
+[Shift-Group Uniformity](/docs/solverforge/constraints/shift-group-uniformity/)
+worked example builds one end to end: assignments joined to shifts and
+employees, grouped per shift or per time/location block, scoring mixed shift
+groups with a medium penalty.
+
 ### `filter`
 
 ```rust

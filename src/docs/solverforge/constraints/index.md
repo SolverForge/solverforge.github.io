@@ -75,5 +75,6 @@ the short name.
 - **[Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/)** - `if_exists`, `if_not_exists`, and `flatten_last`
 - **[Joiners](/docs/solverforge/constraints/joiners/)** - Combining multiple entity streams
 - **[Collectors](/docs/solverforge/constraints/collectors/)** - Aggregation functions for `group_by`
+- **[Shift-Group Uniformity](/docs/solverforge/constraints/shift-group-uniformity/)** - A worked grouped-penalty example over operators
 - **[Score Types](/docs/solverforge/constraints/score-types/)** - Available score types and when to use each
 - **[Score Analysis](/docs/solverforge/constraints/score-analysis/)** - Understanding and explaining scores

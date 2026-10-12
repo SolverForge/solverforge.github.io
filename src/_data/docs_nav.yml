@@ -147,6 +147,8 @@ docs:
             href: /docs/solverforge/constraints/existence-and-flattening/
           - title: Joiners
             href: /docs/solverforge/constraints/joiners/
+          - title: Shift-Group Uniformity
+            href: /docs/solverforge/constraints/shift-group-uniformity/
           - title: Collectors
             href: /docs/solverforge/constraints/collectors/
           - title: Score Types

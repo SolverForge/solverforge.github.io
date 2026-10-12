@@ -9,7 +9,7 @@ require "tmpdir"
 
 ROOT = File.expand_path("..", __dir__)
 DEFAULT_SOLVERFORGE_RS_REPO = "/srv/lab/dev/solverforge/solverforge"
-DEFAULT_SOLVERFORGE_RS_REF = "v0.19.14"
+DEFAULT_SOLVERFORGE_RS_REF = "v0.20.1"
 DEFAULT_SOLVERFORGE_MAPS_REPO = "/srv/lab/dev/solverforge/solverforge-maps"
 DEFAULT_SOLVERFORGE_UI_REPO = "/srv/lab/dev/solverforge/solverforge-ui"
 
@@ -415,6 +415,7 @@ class CargoWorkspaceBuilder
 
         [dependencies]
         #{solverforge_dependency}
+        solverforge-scoring = { git = "file://#{repo}", tag = "#{ref}", package = "solverforge-scoring" }
         tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros", "sync"] }
       TOML
     when "solverforge-maps-current"

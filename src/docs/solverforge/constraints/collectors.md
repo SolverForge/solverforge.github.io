@@ -220,4 +220,6 @@ The key function returns `Option<K>` — `None` values (unassigned entities) are
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) - The `group_by` operation
 - [Constraint Factory Methods](/docs/solverforge/constraints/constraint-factory-methods/) - Generated collection sources
+- [Shift-Group Uniformity](/docs/solverforge/constraints/shift-group-uniformity/) - A worked example that
+  collects shift-group values per block and penalizes mixed groups
 - [docs.rs/solverforge](https://docs.rs/solverforge) - Full collector API reference
