@@ -164,6 +164,20 @@ max_ruin_count = 8
 The current runtime skips empty owners during list-ruin sampling, so empty
 routes or sequences do not consume ruin attempts.
 
+## Ownership Transfer and Exact Undo
+
+List mutation kernels transfer values by ownership through remove/insert, swap,
+reverse, sublist, ruin, permutation, and k-opt operations rather than cloning
+list payloads to execute or undo a trial. Permutation undo carries inverse
+permutation indexes and restores through the same gather operation. Relocation
+notifications and undo maintain inverse owner/index supplies as well as the
+canonical owner list. Generic value types may still have `Clone` bounds; those
+bounds do not imply that payloads are cloned on the mutation path.
+
+Compiled list cursors borrow their immutable list declaration instead of cloning
+it into every emitter. Nearby and nearby k-opt pulls read the lent live solution;
+open-time positional/index activation remains an explicit cursor contract.
+
 ## Move Types
 
 | Move type | Selector family |

@@ -140,8 +140,14 @@ SolverForge re-evaluates construction order hooks on the current working
 solution at every construction step. Queue-style and weakest/strongest-fit
 heuristics therefore track live model state instead of a phase-start snapshot.
 
-These hooks are construction-only. Local-search scalar change, pillar-change,
-and ruin/recreate selectors keep canonical bounded candidate order.
+These hooks are construction-only. Ordinary local-search change and swap
+ranking uses dedicated `search_entity_order_key` / `search_value_order_key`
+hooks instead; construction keys do not change local-search order.
+
+Candidate, order, legality, and ownership callbacks may depend on all of the
+solution. Construction scans and placements read the committed live state on
+each pull, so a commit elsewhere can change the next placement. Completion
+markers describe exact construction slots, not a cached phase-start solution.
 
 ## Assignment-Backed ScalarGroup Construction
 

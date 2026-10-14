@@ -127,6 +127,23 @@ work and around phase and terminal hooks. Paused time is removed from the active
 solve and phase timers, so resuming continues the remaining configured budget
 instead of charging the paused interval.
 
+## Extension State and Polling
+
+Lower-level termination implementations use
+`Termination::is_terminated(&mut self, solver_scope)`; optional termination
+adapters likewise use `MaybeTermination::should_terminate(&mut self, ...)`.
+Unimproved and diminished-returns terminations own mutable observation state.
+Repeated checks on the same step do not count as extra unimproved steps.
+
+Control and wall-clock checks are batched within candidate loops and are also
+performed at step, phase, and terminal boundaries. The local-search loop polls
+control every 64 candidate iterations, with evaluation checks on a 64-evaluation
+schedule. Construction also batches scans/pulls and polls around placements.
+These limits are cooperative stopping conditions, not hard real-time deadlines:
+a callback or one expensive candidate can run past the requested time before
+control settles. Phase limits with only step/score criteria use counters
+without reading the wall clock on each control poll.
+
 ## See Also
 
 - [Configuration](/docs/solverforge/solver/configuration/) — TOML configuration format

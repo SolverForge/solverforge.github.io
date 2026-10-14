@@ -47,6 +47,22 @@ type = "swap_move_selector"
 variable_name = "employee_idx"
 ```
 
+## Guided Enumeration and Lazy Rows
+
+`search_entity_order_key` on `#[planning_variable]` ranks ordinary change and
+swap entity traversal; `search_value_order_key` ranks ordinary change values.
+Lower keys are tried first and equal keys retain the seeded candidate order.
+These are model hooks, not extra TOML selector fields, and do not replace a
+leaf's configured `selection_order` or `selection_metric`.
+
+Ordinary change loads a candidate-value row only when traversal reaches that
+entity. Nearby change and swap also load only reached rows for both native and
+dynamic models. Early forager exit therefore need not call the remaining row
+providers. An explicitly supplied empty nearby row remains empty; it is not
+replaced with the full range. Ordinary native swap retains its open-time
+current-value and legal-row snapshot; lending the live solution does not turn
+all activation indexes into per-pull recomputations.
+
 ## Nearby Scalar Selectors
 
 Nearby scalar selectors require model-declared candidate hooks on the matching
@@ -164,6 +180,36 @@ with rematch size clamped to at least 2. They are separate from the configured
 [Assignment Limits](/docs/solverforge/solver/construction/#assignment-limits).
 Construction completion does not remove assigned occupants from required
 augmenting rematches or prevent later local-search assignment adjustments.
+
+### Legality, Enumeration Pressure, and Score
+
+Assignment-backed families enforce structural and declared assignment legality:
+value domains, distinct edit targets, required rows retained in the final
+assignment, capacity keys, and sequence-edge rules. Compound edits are checked
+as one final assignment, so a simultaneous swap can vacate both capacity slots
+without an intermediate false conflict. Trial overlays restore the committed
+assignment index before another candidate is generated.
+
+Enumeration pressure steers which legal candidates are tried first; it is not
+an extra score or a requirement that every move improve a surrogate run/load
+measure. The score director, configured acceptor, and forager decide between
+legal candidates. `require_hard_improvement = true` explicitly adds a strict
+hard-score improvement gate; omit it when the acceptor should be free to accept
+legal equal-score or worsening exploration moves.
+
+Assignment families share the per-step move cap through interleaved family
+pulls rather than allowing one broad family to consume the whole prefix.
+Scarcity guides required assignments; current run/load pressure guides
+reassignment roots and target sequence/load pressure guides candidate values.
+Value-pair and oriented-triple coordinates are lazy, not an eagerly allocated
+Cartesian product. Exact duplicate edit sets are removed independent of edit
+order.
+
+Config `max_moves_per_step` overrides the model limit. With neither specified,
+assignment-backed groups use the entity count multiplied by the effective
+rematch size, clamped to 256–4096; candidate-backed groups use 256. The default
+rematch size is 4 and its minimum is 2. These generation limits are separate
+from the accepted-count forager's horizon.
 
 ## Conflict Repair
 

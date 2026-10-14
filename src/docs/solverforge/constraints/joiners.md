@@ -180,11 +180,12 @@ The key-shape rule applies separately at every continuation:
 The table abbreviates `Leaf<'_, T>` as `Leaf<T>`. All continuation equality
 keys use `equal_on`; select earlier bindings via nested `.left` / `.right`
 and read entity fields via `.entity`. Each relationship compiles fresh and may
-use its own key type. `0.19.14` adds these clarifications to the tagged fluent
-source documentation; it does not change the method signatures.
+use its own key type. These rules describe the tagged fluent source
+documentation and do not change the method signatures.
 
 After a cross join, the stream can score pairs directly, group the joined pairs
-with `.group_by(|left, right| key, collector)`, or project each pair into a
+with `.group_by(|left, right| key, collector)` (higher joined arities take one
+entity argument per binding in their key closure), or project each pair into a
 retained scoring row with `.project(|left, right| row)`.
 
 After a projected stream, `join(equal(|row| key))` creates a symmetric

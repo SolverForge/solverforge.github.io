@@ -80,7 +80,7 @@ should prioritize uncovered required slots, capacity conflicts, bounded
 reassignments, same-sequence run-gap repairs, value-window swaps, optional
 occupant releases, block reassignments, or value rotations from the same group.
 
-`SolverManager` now exposes a retained job lifecycle rather than a fire-and-forget
+`SolverManager` exposes a retained job lifecycle rather than a fire-and-forget
 channel. In addition to `Progress` and `BestSolution`, you can observe
 `PauseRequested`, `Paused`, `Resumed`, `Completed`, `Cancelled`, and `Failed`,
 inspect `SolverStatus`, and fetch or analyze retained snapshots by

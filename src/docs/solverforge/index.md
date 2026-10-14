@@ -17,11 +17,13 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.20.1` crate and current release
-workspace. Generated CLI projects can intentionally target an older scaffold
-runtime; the `solverforge-cli 3.3.3` line scaffolds `solverforge 0.19.7`, while
-apps scaffolded by earlier lines pin `solverforge 0.19.5` (3.1.0) or
-`solverforge 0.19.4` (3.0.0), so check `solverforge --version` when starting
+These pages track the `solverforge 0.21.2` release, and the
+[0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/) records
+the release history. Generated CLI projects can intentionally target an older scaffold
+runtime; the current `solverforge-cli 3.5.1` line scaffolds `solverforge 0.21.2`, while
+apps scaffolded by earlier lines pin older cores (`0.19.7` from 3.3.x,
+`0.19.5` from 3.1.0, `0.19.4` from 3.0.0), so check `solverforge --version`
+when starting
 from a scaffold.
 
 For end-to-end app scaffolding, prefer the standalone
@@ -34,7 +36,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.20.1` workspace declares Rust `1.95`.
+The `0.21.2` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -73,7 +75,7 @@ lifecycle and progress events as local search: the first observed work is
 reported promptly and long-running phases continue at roughly one-second
 intervals when verbose logging is enabled.
 
-The current release tightens several public contracts:
+The runtime exposes these contracts:
 
 - ordered assignments and routes use planning list variables as their single
   canonical representation. List owners store the sequence directly, and
@@ -135,7 +137,7 @@ The current release tightens several public contracts:
   `CollectedVec`, `IndexedPresence`, `Run`, and `Runs` are available from the
   prelude for grouped collection, streak, and ordinal-presence rules; their
   shared `Collector<Input>` contract covers unary rows, projected rows, and
-  joined cross-join pairs
+  joined tuples
 - scoring terminals use `penalize(score)`, `reward(score)`, typed dynamic
   closures, `fixed_weight(...)`, and `hard_weight(...)`
 - solver configuration controls such as `SolverConfig`, `PhaseConfig`,
@@ -200,6 +202,32 @@ The current release tightens several public contracts:
   `construction_entity_order_key` and `construction_value_order_key`; those
   hooks are evaluated against the live working solution at each construction
   step and do not reorder local-search candidates
+- native scalar local search can use `search_entity_order_key` and
+  `search_value_order_key` on `#[planning_variable]`, or the matching
+  `ScalarVariableSlot` builders. Change orders entities and values by ascending
+  key; swap uses the entity key for its left traversal. Equal keys retain seeded
+  ordering, and a missing key sorts last. Construction-order hooks remain
+  construction-only
+- `Tri`, `Quad`, and `Penta` cross-source and same-source streams expose
+  `.group_by(key, collector)`. The key closure takes one entity argument per
+  binding, collector mappers take a borrowed tuple, and grouped weights receive
+  `(&key, &result)`. Authored filters retain their source indexes during full
+  and incremental scoring; collected payloads do not need `Clone`
+- custom move cursors pull with `next_candidate(solution)`; Cartesian discovery
+  uses `next_candidate_with_director(&mut director)` for live left-leg previews.
+  Cursors retain candidate IDs and derived state, not a working-solution borrow
+  across trial evaluation. Placers lend the current director on each
+  `next_placement` call, so model callbacks can observe earlier commits
+- custom moves use a generic affected-entity visitor and can override
+  `is_doable_with_working_preview` for sequential legality. Trial evaluation
+  restores values and score state; selected moves transfer by ownership rather
+  than requiring `Clone`. Custom terminations implement
+  `is_terminated(&mut self, scope)`, and acceptors receive the accepted
+  `MoveTabuSignature` by value in `step_ended`
+- diversified late acceptance accepts a candidate equal to the step score or
+  strictly better than the worst history score and advances its ring per
+  evaluated candidate. It has no tolerance parameter. Plain late acceptance
+  advances per step and resets its history to each new phase-best score
 - nearby scalar neighborhoods are bounded model capabilities through
   `nearby_value_candidates` and `nearby_entity_candidates`; distance meters rank
   or filter those candidates, but do not discover them
@@ -212,8 +240,9 @@ The current release tightens several public contracts:
   when the model declares them
 - assignment-backed grouped scalar search includes bounded value-window swaps,
   longer window swaps, same-sequence run-gap swaps, block reassignments,
-  optional run releases, and value rotations without weakening the assignment
-  hard constraints
+  optional run releases, and value rotations. Model-declared legality, required
+  rows, capacity, and assignment rules constrain final edits; the score,
+  acceptor, and forager decide which legal candidates become steps
 - stock CVRP route lists can now declare
   `#[planning_list_variable(element_collection = "...", domain = "cvrp")]`.
   The profile expands to `solverforge::cvrp::VrpSolution`, the stock CVRP
@@ -333,11 +362,10 @@ fn main() {
 
 ## API Reference
 
-Full published API documentation is available on
-[docs.rs/solverforge 0.20.1](https://docs.rs/solverforge/0.20.1/solverforge/).
-The `0.20.1` crate is the registry source of truth. Consult the
-[`v0.20.1` implementation](https://github.com/SolverForge/solverforge/tree/v0.20.1)
-alongside the repository `crates/*/WIREFRAME.md` API maps.
+Consult the [`v0.21.0` implementation](https://github.com/SolverForge/solverforge/tree/v0.21.0)
+and the repository `crates/*/WIREFRAME.md` API maps for this source line.
+[docs.rs/solverforge](https://docs.rs/solverforge/) serves published crate APIs;
+select the version matching your dependency.
 
 ## Sections
 

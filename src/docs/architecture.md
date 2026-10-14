@@ -9,7 +9,7 @@ weight: 3
 # Architecture
 
 SolverForge is a native Rust constraint solver. It keeps the public facade
-small, compiles one immutable search graph before execution, and preserves
+small, compiles one immutable search plan before execution, and preserves
 concrete types through the native solver pipeline.
 
 ## Workspace Shape
@@ -35,17 +35,20 @@ runtime path.
 
 Every macro-generated Rust model and dynamic bridge model enters the same
 runtime compiler. SolverForge resolves scalar/list slots, stable list-source
-identities, construction stages, recursive selector trees, native or host
+identities, construction stages, indexed selector compositions, native or host
 providers, candidate metrics, defaults, and termination policy before the first
-phase runs. The resulting graph is immutable for that solve; declaration,
+phase runs. The resulting plan is immutable for that solve; declaration,
 compilation, preparation, and execution failures are reported explicitly
-instead of falling through to a second phase-builder path.
+instead of falling through to a second phase-builder path. RNG positions,
+retained candidates, assignment indexes, and scratch buffers belong to each
+solve's mutable stream state, not to the shared declarations.
 
 The native hot path keeps concrete types through scoring, moves, selectors, and
 phases:
 
 - GAT-based cursors expose stable candidate IDs without `Box<dyn Iterator>` in
-  selector hot loops
+  selector hot loops; each pull borrows the live working solution, while
+  Cartesian preview pulls borrow the live score director and restore trial state
 - cursor-owned candidate storage releases losing moves and transfers the chosen
   move by value exactly once
 - score directors, move carriers, selector carriers, and stream constraints are

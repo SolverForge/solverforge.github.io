@@ -8,9 +8,8 @@ description: >
 
 **List variables** model problems where the solver must determine the **order** of elements in a sequence — not just which value is assigned, but what comes before and after. This is essential for vehicle routing (stop ordering), job shop scheduling (operation sequencing), and similar problems.
 
-SolverForge 0.19 uses this owner-held list as the sole planning representation
-for ordered assignments. Scalar variables still model one direct assignment;
-they no longer have a chained predecessor mode.
+SolverForge uses owner-held lists for ordered assignments. Scalar variables
+model one direct assignment and do not have a chained predecessor mode.
 
 ## When to Use List Variables
 

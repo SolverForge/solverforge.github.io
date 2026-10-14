@@ -86,8 +86,10 @@ factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
 | `complement` | Fill missing grouped keys from a generated fact or entity source after unary, projected, or direct cross-join grouping |
 | `if_exists` / `if_not_exists` | Keep rows based on matching rows in another collection |
 
-Grouping three or more joined sources — a chain past a pair — has no fluent
-`group_by`; the low-level operator tree composes it. The
+`Tri`, `Quad`, and `Penta` streams group directly after their joins with
+`.group_by(key, collector)`: the key closure takes one entity argument per
+binding, collector mappers take the borrowed tuple, and grouped terminals
+receive `(&key, &result)`. The
 [Shift-Group Uniformity](/docs/solverforge/constraints/shift-group-uniformity/)
 worked example builds one end to end: assignments joined to shifts and
 employees, grouped per shift or per time/location block, scoring mixed shift
@@ -243,11 +245,11 @@ borrowed quadruple, `Penta::join` the borrowed quintuple, and `Chain::join`
 the whole `O::View<'_>`. Each right key reads `&Leaf<'_, NewEntity>` through
 `.entity`. Plain entity-closure `equal_bi` is only for the first unary join;
 using it at a continuation produces a type mismatch (`E0631`). Use `equal_on`
-and choose the prior binding explicitly. These existing signatures are
-clarified in the `0.19.14` source docs.
+and choose the prior binding explicitly. These signatures describe the tagged
+fluent source documentation.
 
-Continuing from cross `Penta` drops an authored penta filter; apply the row filter on the returned `Chain`.
-Apply the row filter on the returned `Chain` instead. Same-source
+Continuing from cross `Penta` drops an authored penta filter; apply the row
+filter on the returned `Chain` instead. Same-source
 `PentaConstraintStream` is terminal and has no join continuation.
 
 `Tri`, `Quad`, and `Penta` keep value-oriented filter and weight closures with

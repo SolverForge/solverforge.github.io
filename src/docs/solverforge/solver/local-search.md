@@ -50,6 +50,49 @@ The acceptor decides whether a scored candidate can be accepted.
 | `step_counting_hill_climbing` | hold a boundary for a fixed step interval |
 | `diversified_late_acceptance` | late acceptance with diversification pressure |
 
+## Late Acceptance
+
+`late_acceptance` accepts a candidate whose score is at least the current step
+score or at least the score in the current history slot. Its history starts
+filled with the phase's initial score. Each committed step records its score
+and advances the ring; a new phase-best committed score fills the entire ring
+with that score, re-anchoring the acceptance window.
+
+## Diversified Late Acceptance
+
+```toml
+[phases.acceptor]
+type = "diversified_late_acceptance"
+late_acceptance_size = 400
+```
+
+Diversified Late Acceptance Search (DLAS) accepts a candidate if its score equals
+the current step score or is strictly better than the worst score in its
+history. Equality with the worst history score alone is not sufficient. The
+ring starts filled with the phase's initial score and advances for every scored
+candidate checked by the acceptor, including rejected candidates, rather than
+once per committed step.
+
+For a rejection, the current step score is the score used for the ring update;
+for an acceptance, the candidate score is used. A slot is replaced when that
+score is worse than the slot, or when it is better than both the slot and the
+current step score. Exact occurrence counts track the worst history score;
+when its last occurrence disappears the ring is rescanned. DLAS has no
+best-score percentage `tolerance` setting. The lower-level constructor is
+`DiversifiedLateAcceptanceAcceptor::new(late_acceptance_size)`; the default
+history size is 400.
+
+## Tabu Identity
+
+Tabu search tracks scoped entity and destination-value tokens plus exact move
+and reverse-move identities. Descriptor, variable, and source scopes distinguish
+otherwise equal row/value indexes. A committed candidate hands its signature
+to `Acceptor::step_ended` by ownership; rejected trials do not enter the tabu
+memories. Self-undoing moves use `MoveUndoIdentity::SameAsMoveId`, whose
+`undo_id()` resolves to the actual move ID; other moves carry an explicit
+reverse ID. Tabu IDs are opaque implementation tokens, not candidate-trace
+identities or a cross-release interchange format.
+
 ## Score-Level Simulated Annealing
 
 Simulated annealing supports per-score-level temperatures and hard-regression
@@ -155,6 +198,13 @@ prefix of actual pulls with canonical plan/policy/input headers, logical
 operation identities, and disposition transitions. Fetch that large diagnostic
 payload explicitly with `SolverManager::get_telemetry_detail(...)`; routine
 progress events and snapshots intentionally omit it.
+
+Candidate accounting follows the engine boundary: a yielded but not-doable
+candidate is generated, not evaluated. An evaluated candidate can be accepted
+without being selected, and an accepted non-winner is forager-ignored. Preview
+generation and rollback do not count as committed applied moves. Undo journals
+can be reused across trials; that storage reuse does not change score deltas or
+trace disposition order.
 
 ## Variable Neighborhood Descent
 

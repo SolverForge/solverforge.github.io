@@ -81,9 +81,22 @@ capacity hooks, assignment limits, and completion semantics.
 The macro also generates an `.unassigned()` stream helper when the entity has
 exactly one `Option<_>` planning variable.
 
-Construction order keys are construction-only. Local-search scalar selectors
-keep canonical bounded candidate order even when the same variable declares
-construction keys.
+Construction order keys are construction-only. Local-search ranking uses
+separate `search_entity_order_key` and `search_value_order_key` hooks.
+
+### Guided Scalar Search
+
+Declare `search_entity_order_key = "fn_name"` to rank ordinary scalar change
+and swap entities, and `search_value_order_key = "fn_name"` to rank ordinary
+change values. The signatures are `fn(&S, &Entity) -> i64` and
+`fn(&S, &Entity, value: usize) -> i64`. Lower keys are tried first; equal keys
+retain the seeded candidate order. Variables without these hooks retain their
+unguided ordering. These hooks rank enumeration, not acceptance: the score,
+acceptor, and forager still decide which candidate is committed.
+
+Callbacks may read the whole solution. A change to another entity can change
+a candidate domain, order key, legality verdict, or ownership policy; do not
+treat a callback as row-local merely because it receives one entity.
 
 Scalar variables remain direct one-slot assignments. When planning owns
 membership or order as well as assignment, use a list variable instead.

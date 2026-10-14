@@ -209,11 +209,10 @@ completion. Long-running work emits metadata-only phase pulses, paused time is
 excluded from active phase elapsed telemetry, and `pause()`, `cancel()`, or
 config termination unwind without app-side watchdog code.
 
-Resume and cancellation clear the pause request and
-notify the condition variable while holding the worker's pause gate. This fixes
-the lost-wakeup race where a resume between the worker's predicate check and
-its wait could leave it blocked. It does not restart from the best solution or
-change the snapshot-availability gate described above.
+Resume and cancellation clear the pause request and notify the condition
+variable while holding the worker's pause gate. Resume continues the retained
+working solution, RNG, selector, acceptor, forager, phase position, and budget
+state; it does not restart from the best solution.
 
 ## Snapshots and Analysis
 
@@ -270,6 +269,18 @@ let count = MANAGER.active_job_count();
 
 This counts visible retained jobs, including paused and terminal jobs that have
 not been deleted yet.
+
+## Detached Solves and Failure Isolation
+
+`SolverRuntime::detached()` supports synchronous configured solving without a
+retained manager receiver. Its lifecycle slot is reused per solution type per
+thread and reset to pristine state for each solve; telemetry, snapshots,
+terminal status, and pause flags do not carry into the next detached run.
+
+A retained worker panic becomes a `Failed` job with its error and any already
+retained structurally complete snapshot. Other jobs keep independent lifecycle
+state. Delete the failed job to release its slot; analysis availability is not
+evidence of successful completion.
 
 ## The `Solvable` Trait
 

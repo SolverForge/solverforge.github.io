@@ -3,490 +3,354 @@ title: "Shift-Group Uniformity"
 linkTitle: "Shift-Group Uniformity"
 weight: 35
 description: >
-  A worked example that keeps employees on the same shift or work block in
-  one shift group, with a medium penalty for mixed groups.
+  Keep employees on the same shift or exact time/location block in one shift
+  group using fluent joined grouping and a medium penalty.
 ---
 
 # Shift-Group Uniformity
 
-Employees assigned to the same time/location block should belong to the same
-shift group. A block that mixes groups takes a medium penalty — a preference
-the solver trades against other medium constraints, not a hard limit. The
-penalty is the number of **distinct** shift groups minus one, floored at zero:
+Employees assigned to the same shift or time/location block should belong to
+one shift group. Mixing groups takes a **medium penalty**, not a hard violation.
+The penalty magnitude is the number of distinct groups minus one, floored at
+zero; `.penalize(...)` makes its score impact negative.
 
-| Groups in one block | Distinct − 1 | Penalty |
-| ------------------- | ------------ | ------- |
-| `[1, 1]`            | 0            | 0       |
-| `[1, 2]`            | 1            | 1 medium |
-| `[1, 2, 3]`         | 2            | 2 medium |
+| Groups in one bucket | Distinct − 1 | Medium score impact |
+| --- | --- | --- |
+| `[1, 1]` | 0 | 0 |
+| `[1, 2]` | 1 | −1 |
+| `[1, 2, 3]` | 2 | −2 |
+| `[1, 2, 1]` | 1 | −1 |
 
-Counting distinct values is the point: `[1, 2]` and `[3, 4]` are both one
-mixed group, regardless of which group numbers appear.
+Group labels do not determine the penalty: `[1, 2]` and `[3, 4]` both contain
+two distinct groups.
 
-## The model
+## Input → grouped rows → score
 
-```rust
-#[derive(Clone, Debug)]
-struct Shift { index: usize, start: i64, end: i64, location: String }
-
-#[derive(Clone, Debug)]
-struct ShiftAssignment { shift_id: usize, employee_idx: Option<usize> }
-
-#[derive(Clone, Debug)]
-struct Employee { index: usize, shift_group: i32 }
-
-#[derive(Clone, Debug)]
-struct Schedule { shifts: Vec<Shift>, assignments: Vec<ShiftAssignment>, employees: Vec<Employee> }
-
-fn shifts(s: &Schedule) -> &[Shift] { &s.shifts }
-fn assignments(s: &Schedule) -> &[ShiftAssignment] { &s.assignments }
-fn employees(s: &Schedule) -> &[Employee] { &s.employees }
-```
-
-`employee_idx` is `Option<usize>`: unassigned rows must leave the stream
-**before** key extraction, or a `None` assignment panics when a key closure
-reads it. The example filters them out at the collection boundary.
-
-
-## The rule, step by step
-
-**1. Filter unassigned rows before keys run.** `employee_idx` is
-`Option<usize>`, and joining on it unwraps the value. The filter therefore
-sits on the assignment collection, ahead of any join index:
-
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing at the end of this page compiles end to end" -->
-```rust
-let filtered = FilterNode::new(assignments, assigned_only as
-    fn(&Schedule, &Leaf<'_, ShiftAssignment>) -> bool);
-```
-
-A filter placed *after* the join would not protect key extraction.
-
-**2. Bring each assignment the data the rule needs.** An assignment knows its
-shift; the shift knows its block; the employee knows their shift group. Two
-equality joins build that row:
-
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing at the end of this page compiles end to end" -->
-```rust
-// (assignment, shift): assignment.shift_id == shift.index
-JoinNode::new(filtered, shifts, equal_bi(assignment_key, shift_id_key))
-
-// ((assignment, shift), employee): pair.employee_idx == employee.index.
-// The left key is row-aware — it reads the assignment out of the prior row.
-JoinNode::new(pair_tree, employees, equal_on(row_employee_code, employee_key))
-```
-
-The first join uses entity keys (`equal_bi`); every later join uses row-aware
-keys (`equal_on`) whose left closure receives the whole borrowed row so far.
-Leaf views name their entity through `.entity`:
-
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing at the end of this page compiles end to end" -->
-```rust
-fn row_employee_code(row: &Pair<Leaf<'_, ShiftAssignment>, Leaf<'_, Shift>>) -> usize {
-    row.left.entity.employee_idx.unwrap()
-}
-```
-
-**3. Group the joined rows by the bucket they are compared within.**
-`GroupNode` buckets rows by a key and collects a value per row. The two
-cases are the same stream with a different key:
-
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing at the end of this page compiles end to end" -->
-```rust
-// Case 1: the shift's own index.
-fn tri_shift_key(row: &Row<'_>) -> usize { row.left.right.entity.index }
-
-// Case 2: the block — two shifts with different indexes that name the same
-// (start, end, location) land in one bucket.
-fn tri_block_key(row: &Row<'_>) -> (i64, i64, String) {
-    (row.left.right.entity.start, row.left.right.entity.end,
-     row.left.right.entity.location.clone())
-}
-```
-
-**4. Collect each employee's shift-group value.** The collector's closure
-receives the stream's match row — the full `(assignment, shift, employee)`
-row — and reads the one field the rule compares:
-
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing at the end of this page compiles end to end" -->
-```rust
-fn tri_group_of(row: Row<'_>) -> i32 { row.right.entity.shift_group }
-```
-
-**5. Score the grouped result.** The terminal weight closure receives the
-grouped result, not the raw rows: the bucket key and the collected
-`CollectedVec<i32>`. Distinct count minus one, floored at zero:
-
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing at the end of this page compiles end to end" -->
-```rust
-fn shift_weight(_s: &Schedule, g: &ShiftGroupView<'_>) -> HardMediumSoftScore {
-    let distinct = g.with_result(|r| r.iter().collect::<HashSet<_>>().len()) as i64;
-    HardMediumSoftScore::of_medium(distinct.saturating_sub(1))
-}
-```
-
-`with_result` borrows the collector's result; nothing is cloned to score it.
-
-## Why the grouping key cannot be the shift group
-
-Grouping by the employee, or by `shift_group` itself, puts each value in its
-own bucket. Every bucket then holds exactly one distinct group, the score is
-zero everywhere, and a mixed block is never penalized. The key must name the
-bucket employees are compared within — the shift or the block — and the
-collector must read the value being compared — the shift group.
-
-## Input to grouped result
-
-Two shifts that name the same block, each staffed by one employee of one
-group, show the two keys diverging:
+Two shift IDs can name the same block. Choosing the bucket key determines
+whether their employees are compared together:
 
 ```text
 Shifts:      #0 08:00–12:00 North     #1 08:00–12:00 North
 Assignments: a1 → shift #0, employee 0 (group 1)
              a2 → shift #1, employee 1 (group 2)
 
-Group by shift index:        Group by block:
-  0 → [1]                      (8, 12, "North") → [1, 2]
+Group by shift index:           Group by exact block:
+  0 → [1]                        (8, 12, "North") → [1, 2]
   1 → [2]
-Penalty: 0                   Penalty: 1 medium
+Medium score: 0                Medium score: −1
 ```
 
-By shift index the buckets hold one group each, so nothing looks mixed. The
-same block key merges the rows and exposes the mix. Incremental reassignment
-follows the same rule: `on_retract` → mutate → `on_insert` yields the same
-score as a full re-evaluation.
+Use the shift index for **same-shift** uniformity. Use `(start, end, location)`
+for **same-block** uniformity across shift IDs. Exact block equality is not
+interval overlap: a shorter overlapping block, or the same times at a different
+location, stays a separate bucket. See [Joiners](/docs/solverforge/constraints/joiners/)
+for overlap relationships.
 
-Exact block equality is what the rule needs: equal `start`, `end`, and
-`location`. It is **not** interval-overlap detection — an overlapping but
-shorter break block stays a separate bucket here. Overlap conditions exist
-for rules that want them; see [Joiners](/docs/solverforge/constraints/joiners/).
+## The model
 
-## Complete example
+A `ShiftAssignment` stores a shift ID and an optional employee index. `Shift`
+stores the block; `Employee` stores the shift-group value. The complete listing
+uses plain structs so the rule can run independently of a solver configuration.
 
-Both cases share the filter, both joins, the collector, and the weight; the
-`GroupNode` key and the constraint name are the only parts that differ. The
-`check` function pins the expected scores for `[1, 1]`, `[1, 2]`,
-`[1, 2, 3]`, unassigned slots, separate shifts, identical blocks across
-shift IDs, split blocks, an incremental reassignment, and the wrong grouping
-key.
+<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below defines and executes the model" -->
+```rust
+struct ShiftAssignment { shift_id: usize, employee_idx: Option<usize> }
+struct Shift { index: usize, start: i64, end: i64, location: String }
+struct Employee { index: usize, shift_group: i32 }
+```
+
+In a planning solution, use generated sources such as `Schedule::assignments()`.
+The standalone listing supplies `source(...)` metadata explicitly: assignments
+use descriptor 0 for incremental updates; shifts and employees are immutable
+facts. It only needs the `solverforge` dependency.
+
+## The rule, step by step
+
+### 1. Exclude unassigned rows before key extraction
+
+Start from assignments and filter out `None` values before the first equality
+join. Later employee-key extraction can then safely require an assigned index.
+
+<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+```rust
+Streams::new()
+    .for_each(source(assignments as fn(&Schedule) -> &[ShiftAssignment], ChangeSource::Descriptor(0)))
+    .filter(|assignment: &ShiftAssignment| assignment.employee_idx.is_some())
+```
+
+A post-join filter would not protect key extraction. This source-filter
+pushdown applies to the first unary keyed equality cross-join, not every join
+dispatch; see [Constraint Streams](/docs/solverforge/constraints/constraint-streams/).
+
+### 2. Join the shift, then the assigned employee
+
+The first join uses entity keys. The continuation uses `equal_on` over the
+whole borrowed pair and the new employee leaf.
+
+<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+```rust
+.join((
+    source(shifts as fn(&Schedule) -> &[Shift], ChangeSource::Static),
+    equal_bi(|assignment: &ShiftAssignment| assignment.shift_id, |shift: &Shift| shift.index),
+))
+.join((
+    source(employees as fn(&Schedule) -> &[Employee], ChangeSource::Static),
+    equal_on(assigned_employee, employee_index),
+))
+```
+
+`assigned_employee` reads `row.left.entity.employee_idx` from
+`Pair<Leaf<ShiftAssignment>, Leaf<Shift>>`; `employee_index` reads the new
+`Leaf<Employee>` through `.entity`. The result binds `(assignment, shift,
+employee)` in that order.
+
+### 3. Choose the bucket key
+
+Fluent `Tri::group_by` takes a key closure with three separate entity
+arguments. Both rules use the same stream; only the key and name differ.
+
+<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+```rust
+// Same shift:
+|_assignment: &ShiftAssignment, shift: &Shift, _employee: &Employee| shift.index
+
+// Same exact block, even across different shift IDs:
+|_assignment: &ShiftAssignment, shift: &Shift, _employee: &Employee| {
+    (shift.start, shift.end, shift.location.clone())
+}
+```
+
+**Do not group by employee or by `shift_group` itself.** Those keys separate
+values into buckets that each hold one group, hiding a genuinely mixed shift.
+The key identifies where employees are compared; the collected value is what
+is compared. The complete listing tests both wrong-key regressions.
+
+### 4. Collect the shift-group value from each joined tuple
+
+Unlike the key closure, a collector mapper takes **one tuple argument** of
+borrowed entities, not a nested operator row and not three separate arguments.
+
+<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+```rust
+.group_by(
+    key,
+    collect_vec(|(_assignment, _shift, employee): (&ShiftAssignment, &Shift, &Employee)| {
+        employee.shift_group
+    }),
+)
+```
+
+The input is `(&ShiftAssignment, &Shift, &Employee)`. Each mapped `i32` becomes
+an owned collector value, and the result is a `CollectedVec<i32>` for the bucket.
+Duplicates remain in the collection; the score closure counts distinct values.
+
+### 5. Score the grouped key and collector result
+
+Grouping changes the terminal input. The weight closure now receives two
+separate borrowed arguments: `&K` and `&CollectedVec<i32>`, **not** the original
+three-entity tuple.
+
+<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+```rust
+.penalize(|_key: &K, groups: &CollectedVec<i32>| {
+    let distinct = groups.iter().copied().collect::<HashSet<_>>().len();
+    HardMediumSoftScore::of_medium(distinct.saturating_sub(1) as i64)
+})
+.named(name)
+```
+
+Return a nonnegative penalty magnitude. The terminal applies the negative sign,
+so two distinct groups contribute `0hard/-1medium/0soft`. The result is borrowed
+for scoring; the collection itself is not cloned.
+
+## Complete runnable example
+
+Use `solverforge = "=0.21.0"` in the dependencies of a Rust binary crate and
+save this listing as `src/main.rs`. Run it with `cargo run`. `check()` covers
+uniform and mixed groups, duplicate values, unassigned and empty input,
+separate shift IDs, exact shared blocks, different times and locations, overlap,
+wrong keys, and incremental reassignment with membership exit and re-entry.
 
 ```rust
 use std::collections::HashSet;
+use std::hash::Hash;
 
-use solverforge::stream::relational::operator::{
-    CollectionNode, GroupNode, GroupView, JoinNode, Pair,
-};
-use solverforge::stream::relational::Leaf;
+use solverforge::{HardMediumSoftScore, IncrementalConstraint};
+use solverforge::stream::{source, ChangeSource, ConstraintFactory};
+use solverforge::stream::collector::{collect_vec, CollectedVec};
 use solverforge::stream::joiner::{equal_bi, equal_on};
-use solverforge::HardMediumSoftScore;
-use solverforge_scoring::api::constraint_set::IncrementalConstraint;
-use solverforge_scoring::constraint::relational::OperatorTerminal;
-use solverforge_scoring::stream::collection_extract::{source, ChangeSource};
+use solverforge::stream::relational::{operator::Pair, Leaf};
 
 #[derive(Clone, Debug)]
 struct Shift { index: usize, start: i64, end: i64, location: String }
-
 #[derive(Clone, Debug)]
 struct ShiftAssignment { shift_id: usize, employee_idx: Option<usize> }
-
 #[derive(Clone, Debug)]
 struct Employee { index: usize, shift_group: i32 }
-
 #[derive(Clone, Debug)]
-struct Schedule { shifts: Vec<Shift>, assignments: Vec<ShiftAssignment>, employees: Vec<Employee> }
+struct Schedule {
+    shifts: Vec<Shift>,
+    assignments: Vec<ShiftAssignment>,
+    employees: Vec<Employee>,
+}
 
 fn shifts(s: &Schedule) -> &[Shift] { &s.shifts }
 fn assignments(s: &Schedule) -> &[ShiftAssignment] { &s.assignments }
 fn employees(s: &Schedule) -> &[Employee] { &s.employees }
 
-/* Row shapes after each join, in binding order:
-   (assignment, shift)                          = Pair<Leaf<A>, Leaf<Sh>>
-   ((assignment, shift), employee)              = Pair<Pair<Leaf<A>, Leaf<Sh>>, Leaf<E>> */
-fn assignment_key(l: &Leaf<'_, ShiftAssignment>) -> usize { l.entity.shift_id }
-fn shift_id_key(r: &Leaf<'_, Shift>) -> usize { r.entity.index }
-fn employee_key(l: &Leaf<'_, Employee>) -> usize { l.entity.index }
-fn row_employee_code(row: &Pair<Leaf<'_, ShiftAssignment>, Leaf<'_, Shift>>) -> usize {
-    row.left.entity.employee_idx.unwrap()
+// Continuation keys inspect the borrowed pair and the new leaf.
+fn assigned_employee(row: &Pair<Leaf<'_, ShiftAssignment>, Leaf<'_, Shift>>) -> usize {
+    row.left.entity.employee_idx.expect("assigned rows only")
+}
+fn employee_index(row: &Leaf<'_, Employee>) -> usize { row.entity.index }
+
+fn uniformity<K>(
+    key: impl Fn(&ShiftAssignment, &Shift, &Employee) -> K + Send + Sync + 'static,
+    name: &str,
+) -> impl IncrementalConstraint<Schedule, HardMediumSoftScore>
+where K: Eq + Hash + Clone + Send + Sync + 'static,
+{
+    type Streams = ConstraintFactory<Schedule, HardMediumSoftScore>;
+    Streams::new()
+        .for_each(source(assignments as fn(&Schedule) -> &[ShiftAssignment], ChangeSource::Descriptor(0)))
+        .filter(|assignment: &ShiftAssignment| assignment.employee_idx.is_some())
+        .join((
+            source(shifts as fn(&Schedule) -> &[Shift], ChangeSource::Static),
+            equal_bi(|assignment: &ShiftAssignment| assignment.shift_id, |shift: &Shift| shift.index),
+        ))
+        .join((
+            source(employees as fn(&Schedule) -> &[Employee], ChangeSource::Static),
+            equal_on(assigned_employee, employee_index),
+        ))
+        .group_by(
+            key,
+            collect_vec(|(_assignment, _shift, employee): (&ShiftAssignment, &Shift, &Employee)| employee.shift_group),
+        )
+        .penalize(|_key: &K, groups: &CollectedVec<i32>| {
+            let distinct = groups.iter().copied().collect::<HashSet<_>>().len();
+            HardMediumSoftScore::of_medium(distinct.saturating_sub(1) as i64)
+        })
+        .named(name)
 }
 
-fn assigned_only(s: &Schedule, l: &Leaf<'_, ShiftAssignment>) -> bool {
-    let _ = s;
-    l.entity.employee_idx.is_some()
+fn shift_rule() -> impl IncrementalConstraint<Schedule, HardMediumSoftScore> {
+    uniformity(|_assignment, shift, _employee| shift.index, "Same shift keeps one shift group")
 }
-
-fn joined_pair_tree() -> PairTree {
-    let a = CollectionNode::new(source(assignments as fn(&Schedule) -> &[ShiftAssignment], ChangeSource::Descriptor(0)), 0);
-    let filtered = solverforge::stream::relational::operator::FilterNode::new(a, assigned_only as fn(&Schedule, &Leaf<'_, ShiftAssignment>) -> bool);
-    let sh = CollectionNode::new(source(shifts as fn(&Schedule) -> &[Shift], ChangeSource::Descriptor(1)), 1);
-    JoinNode::new(
-        filtered,
-        sh,
-        equal_bi(
-            assignment_key as for<'a, 'b> fn(&'a Leaf<'b, ShiftAssignment>) -> usize,
-            shift_id_key as for<'a, 'b> fn(&'a Leaf<'b, Shift>) -> usize,
-        ),
+fn block_rule() -> impl IncrementalConstraint<Schedule, HardMediumSoftScore> {
+    uniformity(
+        |_assignment, shift, _employee| (shift.start, shift.end, shift.location.clone()),
+        "Same block keeps one shift group",
     )
 }
 
-/* ((assignment, shift), employee): the pair tree joined to the employee
-   collection on the employee index carried by the assignment. */
-type ShiftFilter = solverforge::stream::relational::operator::FilterNode<
-    CollectionNode<Schedule, solverforge_scoring::stream::collection_extract::SourceExtract<fn(&Schedule) -> &[ShiftAssignment]>>,
-    fn(&Schedule, &Leaf<'_, ShiftAssignment>) -> bool,
->;
-type PairTree = JoinNode<
-    Schedule,
-    ShiftFilter,
-    CollectionNode<Schedule, solverforge_scoring::stream::collection_extract::SourceExtract<fn(&Schedule) -> &[Shift]>>,
-    solverforge::stream::joiner::EqualJoiner<
-        for<'a, 'b> fn(&'a Leaf<'b, ShiftAssignment>) -> usize,
-        for<'a, 'b> fn(&'a Leaf<'b, Shift>) -> usize,
-        usize,
-        solverforge::stream::joiner::Directed,
-    >,
->;
-type EmployeeTree = JoinNode<
-    Schedule,
-    PairTree,
-    CollectionNode<Schedule, solverforge_scoring::stream::collection_extract::SourceExtract<fn(&Schedule) -> &[Employee]>>,
-    solverforge::stream::joiner::EqualJoiner<
-        for<'a, 'b> fn(&'a Pair<Leaf<'b, ShiftAssignment>, Leaf<'b, Shift>>) -> usize,
-        for<'a, 'b> fn(&'a Leaf<'b, Employee>) -> usize,
-        usize,
-        solverforge::stream::joiner::Directed,
-    >,
->;
-
-fn employee_tree() -> EmployeeTree {
-    let e = CollectionNode::new(source(employees as fn(&Schedule) -> &[Employee], ChangeSource::Descriptor(2)), 2);
-    JoinNode::new(
-        joined_pair_tree(),
-        e,
-        equal_on(
-            row_employee_code as for<'a, 'b> fn(&'a Pair<Leaf<'b, ShiftAssignment>, Leaf<'b, Shift>>) -> usize,
-            employee_key as for<'a, 'b> fn(&'a Leaf<'b, Employee>) -> usize,
-        ),
-    )
-}
-
-
-type Tri<'a> = Pair<Pair<Leaf<'a, ShiftAssignment>, Leaf<'a, Shift>>, Leaf<'a, Employee>>;
-
-type ShiftGroup = GroupNode<
-    EmployeeTree,
-    for<'a, 'b> fn(&'a Tri<'b>) -> usize,
-    solverforge::stream::collector::CollectVecCollector<i32, for<'a> fn(Tri<'a>) -> i32>,
-    usize,
-    solverforge::stream::collector::CollectVecAccumulator<i32>,
-    i32,
-    solverforge::stream::collector::CollectedVec<i32>,
->;
-
-fn tri_shift_key(row: &Tri<'_>) -> usize { row.left.right.entity.index }
-fn tri_group_of(row: Tri<'_>) -> i32 { row.right.entity.shift_group }
-fn tri_block_key(row: &Tri<'_>) -> (i64, i64, String) {
-    (row.left.right.entity.start, row.left.right.entity.end, row.left.right.entity.location.clone())
-}
-
-fn shift_group() -> ShiftGroup {
-    GroupNode::new(
-        employee_tree(),
-        tri_shift_key,
-        solverforge::stream::collector::collect_vec(tri_group_of),
-    )
-}
-
-fn block_group() -> GroupNode<
-    EmployeeTree,
-    for<'a, 'b> fn(&'a Tri<'b>) -> (i64, i64, String),
-    solverforge::stream::collector::CollectVecCollector<i32, for<'a> fn(Tri<'a>) -> i32>,
-    (i64, i64, String),
-    solverforge::stream::collector::CollectVecAccumulator<i32>,
-    i32,
-    solverforge::stream::collector::CollectedVec<i32>,
-> {
-    GroupNode::new(
-        employee_tree(),
-        tri_block_key,
-        solverforge::stream::collector::collect_vec(tri_group_of),
-    )
-}
-
-type TriView<'a> = GroupView<
-    'a,
-    Schedule,
-    EmployeeTree,
-    usize,
-    solverforge::stream::collector::CollectVecAccumulator<i32>,
-    i32,
-    solverforge::stream::collector::CollectedVec<i32>,
->;
-
-fn medium(mixed_groups: i64) -> HardMediumSoftScore {
-    HardMediumSoftScore::of_medium(mixed_groups.saturating_sub(1))
-}
-
-fn shift_weight(_s: &Schedule, g: &TriView<'_>) -> HardMediumSoftScore {
-    medium(g.with_result(|r| r.iter().collect::<HashSet<_>>().len()) as i64)
-}
-
-type BlockView<'a> = GroupView<
-    'a,
-    Schedule,
-    EmployeeTree,
-    (i64, i64, String),
-    solverforge::stream::collector::CollectVecAccumulator<i32>,
-    i32,
-    solverforge::stream::collector::CollectedVec<i32>,
->;
-
-fn block_weight(_s: &Schedule, g: &BlockView<'_>) -> HardMediumSoftScore {
-    medium(g.with_result(|r| r.iter().collect::<HashSet<_>>().len()) as i64)
-}
-
-fn shift_terminal() -> OperatorTerminal<Schedule, ShiftGroup, fn(&Schedule, &TriView<'_>) -> HardMediumSoftScore, HardMediumSoftScore> {
-    OperatorTerminal::new(
-        solverforge::__internal::ConstraintRef::new("shift-group", "Same shift keeps one shift group"),
-        solverforge::__internal::ImpactType::Penalty,
-        shift_group(),
-        shift_weight as fn(&Schedule, &TriView<'_>) -> HardMediumSoftScore,
-        false,
-    )
-}
-
-pub fn check() {
-
-    /* [1, 1] on one shift -> no penalty */
-    let mut c = shift_terminal();
+fn check() {
+    let shift = shift_rule();
+    let block = block_rule();
     let base = Schedule {
         shifts: vec![Shift { index: 0, start: 8, end: 12, location: "North".into() }],
         assignments: vec![
             ShiftAssignment { shift_id: 0, employee_idx: Some(0) },
             ShiftAssignment { shift_id: 0, employee_idx: Some(1) },
         ],
-        employees: vec![Employee { index: 0, shift_group: 7 }, Employee { index: 1, shift_group: 7 }],
+        employees: vec![Employee { index: 0, shift_group: 1 }, Employee { index: 1, shift_group: 1 }],
     };
-    assert_eq!(c.evaluate(&base), HardMediumSoftScore::ZERO);
+    assert_eq!(shift.evaluate(&base), HardMediumSoftScore::ZERO, "[1, 1]");
+    let mut mixed = base.clone();
+    mixed.employees[1].shift_group = 2;
+    assert_eq!(shift.evaluate(&mixed), HardMediumSoftScore::of_medium(-1), "[1, 2]");
+    let mut renamed = mixed.clone();
+    renamed.employees[0].shift_group = 3;
+    renamed.employees[1].shift_group = 4;
+    assert_eq!(shift.evaluate(&renamed), HardMediumSoftScore::of_medium(-1), "labels do not affect penalty");
+    let mut three = mixed.clone();
+    three.employees.push(Employee { index: 2, shift_group: 3 });
+    three.assignments.push(ShiftAssignment { shift_id: 0, employee_idx: Some(2) });
+    assert_eq!(shift.evaluate(&three), HardMediumSoftScore::of_medium(-2), "[1, 2, 3]");
+    let mut duplicate = mixed.clone();
+    duplicate.assignments.push(duplicate.assignments[0].clone());
+    assert_eq!(shift.evaluate(&duplicate), HardMediumSoftScore::of_medium(-1), "[1, 2, 1] counts distinct groups");
 
-    /* [1, 2] -> one medium penalty */
-    let mixed = Schedule { employees: vec![Employee { index: 0, shift_group: 7 }, Employee { index: 1, shift_group: 8 }], ..base.clone() };
-    assert_eq!(c.evaluate(&mixed), -HardMediumSoftScore::ONE_MEDIUM, "two distinct groups");
+    let mut unassigned = mixed.clone();
+    unassigned.assignments.push(ShiftAssignment { shift_id: 0, employee_idx: None });
+    assert_eq!(shift.evaluate(&unassigned), HardMediumSoftScore::of_medium(-1), "unassigned excluded");
+    unassigned.assignments = vec![ShiftAssignment { shift_id: 0, employee_idx: None }];
+    assert_eq!(shift.evaluate(&unassigned), HardMediumSoftScore::ZERO, "only unassigned");
+    unassigned.assignments.clear();
+    assert_eq!(shift.evaluate(&unassigned), HardMediumSoftScore::ZERO, "empty input");
 
-    /* [1, 2, 3] -> two medium penalties */
-    let three = Schedule {
-        assignments: vec![
-            ShiftAssignment { shift_id: 0, employee_idx: Some(0) },
-            ShiftAssignment { shift_id: 0, employee_idx: Some(1) },
-            ShiftAssignment { shift_id: 0, employee_idx: Some(2) },
-        ],
-        employees: vec![
-            Employee { index: 0, shift_group: 7 },
-            Employee { index: 1, shift_group: 8 },
-            Employee { index: 2, shift_group: 9 },
-        ],
-        ..base.clone()
-    };
-    assert_eq!(c.evaluate(&three), HardMediumSoftScore::of_medium(-2), "three distinct groups");
+    let mut same_block = mixed.clone();
+    same_block.shifts.push(Shift { index: 1, ..same_block.shifts[0].clone() });
+    same_block.assignments[1].shift_id = 1;
+    assert_eq!(shift.evaluate(&same_block), HardMediumSoftScore::ZERO, "separate shift IDs");
+    assert_eq!(block.evaluate(&same_block), HardMediumSoftScore::of_medium(-1), "identical blocks across shift IDs");
+    let mut uniform_block = same_block.clone();
+    uniform_block.employees[1].shift_group = 1;
+    assert_eq!(block.evaluate(&uniform_block), HardMediumSoftScore::ZERO, "uniform shared block");
+    let mut different_time = same_block.clone();
+    different_time.shifts[1].start = 13;
+    different_time.shifts[1].end = 17;
+    assert_eq!(block.evaluate(&different_time), HardMediumSoftScore::ZERO, "different times split blocks");
+    let mut different_location = same_block.clone();
+    different_location.shifts[1].location = "South".into();
+    assert_eq!(block.evaluate(&different_location), HardMediumSoftScore::ZERO, "different locations split blocks");
+    let mut overlapping = same_block.clone();
+    overlapping.shifts[1].start = 9;
+    overlapping.shifts[1].end = 11;
+    assert_eq!(block.evaluate(&overlapping), HardMediumSoftScore::ZERO, "overlap is not exact block equality");
+    let mut split = three.clone();
+    split.shifts.push(Shift { index: 1, start: 13, end: 17, location: "North".into() });
+    split.assignments[2].shift_id = 1;
+    assert_eq!(block.evaluate(&split), HardMediumSoftScore::of_medium(-1), "mixed morning, uniform afternoon");
 
-    /* Unassigned slots are excluded before key extraction. */
-    let unassigned = Schedule { assignments: vec![ShiftAssignment { shift_id: 0, employee_idx: None }], ..base.clone() };
-    assert_eq!(c.evaluate(&unassigned), HardMediumSoftScore::ZERO, "unassigned only");
+    let wrong_employee = uniformity(|_assignment, _shift, employee| employee.index, "Wrong employee key");
+    let wrong_group = uniformity(|_assignment, _shift, employee| employee.shift_group, "Wrong shift-group key");
+    assert_eq!(wrong_employee.evaluate(&mixed), HardMediumSoftScore::ZERO, "employee key hides mix");
+    assert_eq!(wrong_group.evaluate(&mixed), HardMediumSoftScore::ZERO, "group key hides mix");
+    assert_eq!(shift.evaluate(&mixed), HardMediumSoftScore::of_medium(-1), "correct key exposes mix");
 
-    /* Same block across different shift IDs — group by the block, not the shift. */
-    let b = OperatorTerminal::new(
-        solverforge::__internal::ConstraintRef::new("shift-group", "Same block keeps one shift group"),
-        solverforge::__internal::ImpactType::Penalty,
-        block_group(),
-        block_weight,
-        false,
-    );
-    let two_shifts = Schedule {
-        shifts: vec![
-            Shift { index: 0, start: 8, end: 12, location: "North".into() },
-            Shift { index: 1, start: 8, end: 12, location: "North".into() },
-        ],
-        assignments: vec![
-            ShiftAssignment { shift_id: 0, employee_idx: Some(0) },
-            ShiftAssignment { shift_id: 1, employee_idx: Some(1) },
-        ],
-        employees: vec![Employee { index: 0, shift_group: 7 }, Employee { index: 1, shift_group: 7 }],
-        ..base.clone()
-    };
-    assert_eq!(b.evaluate(&two_shifts), HardMediumSoftScore::ZERO, "identical blocks across shift ids");
+    // Descriptor 0 is the assignment source; retract before editing, insert after.
+    let mut retained = shift_rule();
+    let mut live = mixed.clone();
+    let mut score = retained.initialize(&live);
+    assert_eq!(score, HardMediumSoftScore::of_medium(-1));
+    score = score + retained.on_retract(&live, 1, 0);
+    live.assignments[1].employee_idx = Some(0);
+    score = score + retained.on_insert(&live, 1, 0);
+    assert_eq!(score, HardMediumSoftScore::ZERO, "reassignment removes mix");
+    assert_eq!(score, retained.evaluate(&live), "incremental equals full");
+    score = score + retained.on_retract(&live, 1, 0);
+    live.assignments[1].employee_idx = None;
+    score = score + retained.on_insert(&live, 1, 0);
+    assert_eq!(score, retained.evaluate(&live), "exit assigned membership");
+    score = score + retained.on_retract(&live, 1, 0);
+    live.assignments[1].employee_idx = Some(1);
+    score = score + retained.on_insert(&live, 1, 0);
+    assert_eq!(score, HardMediumSoftScore::of_medium(-1), "re-enter assigned membership");
+    assert_eq!(score, retained.evaluate(&live));
+    retained.reset();
+    assert_eq!(retained.initialize(&live), score, "reset and reinitialize");
+}
 
-    /* Different times -> separate blocks -> mixed groups -> one penalty each. */
-    /* Different times split blocks: two employees with different groups share
-       the morning block (one penalty); the afternoon block is single-group. */
-    let apart = Schedule {
-        shifts: vec![
-            Shift { index: 0, start: 8, end: 12, location: "North".into() },
-            Shift { index: 1, start: 13, end: 17, location: "North".into() },
-        ],
-        assignments: vec![
-            ShiftAssignment { shift_id: 0, employee_idx: Some(0) },
-            ShiftAssignment { shift_id: 0, employee_idx: Some(1) },
-            ShiftAssignment { shift_id: 1, employee_idx: Some(2) },
-        ],
-        employees: vec![
-            Employee { index: 0, shift_group: 7 },
-            Employee { index: 1, shift_group: 8 },
-            Employee { index: 2, shift_group: 9 },
-        ],
-    };
-    assert_eq!(b.evaluate(&apart), -HardMediumSoftScore::ONE_MEDIUM, "different times split blocks");
-
-    /* Incremental reassignment agrees with full evaluation. */
-    let mut m = mixed.clone();
-    let full_before = c.evaluate(&m);
-    let init = c.initialize(&m);
-    assert_eq!(init, full_before);
-    /* Reassign employee 1's assignment to employee 0: mutate the entity field,
-       applying the incremental protocol around the edit. */
-    let d_retract = c.on_retract(&m, 1, 0);
-    m.assignments[1].employee_idx = Some(0);
-    let d_insert = c.on_insert(&m, 1, 0);
-    let incremental = init + d_retract + d_insert;
-    assert_eq!(incremental, c.evaluate(&m), "incremental matches full re-evaluation");
-    let _ = full_before;
-
-    /* Wrong grouping key regression: grouping by employee index instead of the
-       shift yields a distinct-group count of 1 per bucket -> zero penalty even
-       for a genuinely mixed shift. */
-    /* Grouping by the WRONG key: the employee index separates every row into
-       its own bucket, so no bucket ever holds two groups and the same mixed
-       shift scores zero. The correct shift key scores -1 medium. This is why
-       grouping by the employee (or by the shift_group itself) is wrong. */
-    let wrong_group = GroupNode::new(
-        employee_tree(),
-        |row: &Tri<'_>| row.right.entity.index,
-        solverforge::stream::collector::collect_vec(tri_group_of),
-    );
-    let wrong = OperatorTerminal::new(
-        solverforge::__internal::ConstraintRef::new("shift-group", "wrong grouping key"),
-        solverforge::__internal::ImpactType::Penalty,
-        wrong_group,
-        shift_weight,
-        false,
-    );
-    assert_eq!(wrong.evaluate(&mixed), HardMediumSoftScore::ZERO, "wrong key hides the mix");
-    assert_eq!(c.evaluate(&mixed), -HardMediumSoftScore::ONE_MEDIUM);
+fn main() {
+    check();
+    println!("Shift-group uniformity: all behavioral checks passed.");
 }
 ```
 
-## Authoring surface
+## Authoring boundaries
 
-A rule over three joined sources grouped per bucket needs the low-level
-operator tree: unary `.group_by(...)` groups a single collection, cross-bi
-`.group_by(...)` groups joined pairs, and a `Tri` stream has no fluent
-`group_by`. The composition used here is the same
-`FilterNode` → `JoinNode` → `GroupNode` → `OperatorTerminal` the
-[tagged scoring guide](https://github.com/SolverForge/solverforge/blob/v0.20.1/docs/extend-scoring.md)
-and [Extend the Domain](/reference/extend-domain/) record; it adds a direct
-`solverforge-scoring` dependency.
+Named joined arities `Tri`, `Quad`, and `Penta`, and their same-source
+counterparts, expose fluent `group_by(key, collector)`. Key closures take three,
+four, or five entity arguments; collector mappers take the corresponding tuple
+of references. Authored filters remain binding during full and incremental
+grouped evaluation. Grouped terminals take only the key and collected result.
 
-Where a generated application carries these entities as planning entities,
-the same rule ships as scaffolded constraint code; see
-[Constraint Streams](/docs/solverforge/constraints/constraint-streams/) for
-the fluent surface and its boundaries, and
-[Collectors](/docs/solverforge/constraints/collectors/) for the built-in
-collectors this example composes.
+These joined groups finalize through `GroupNode` and `OperatorTerminal` without
+application code constructing either type. The arbitrary-depth `Chain` does
+not expose fluent grouping; custom operator composition remains useful there.
+The joined tri/quad/penta grouped builder exposes `penalize` and `reward`, not
+`complement`; do not assume the pair-group complement surface extends to it.
+
+- [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — fluent operations and boundaries
+- [Collectors](/docs/solverforge/constraints/collectors/) — collector input and result shapes
+- [Tagged joined-group implementation](https://github.com/SolverForge/solverforge/blob/v0.21.0/crates/solverforge-scoring/src/stream/group_by_tri.rs)

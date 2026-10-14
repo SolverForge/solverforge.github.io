@@ -5,20 +5,20 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note"
+    "`solverforge 0.21.0` is the current core",
+    "0.21.x release note"
   ],
   "src/_posts/releases/2026-06-12-solverforge-0-16-x.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note"
+    "`solverforge 0.21.0` is the current core",
+    "0.21.x release note"
   ],
   "src/_posts/releases/2026-06-15-solverforge-0-17-x.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note"
+    "`solverforge 0.21.0` is the current core",
+    "0.21.x release note"
   ],
   "src/_posts/releases/2026-07-13-solverforge-0-18-x.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note"
+    "`solverforge 0.21.0` is the current core",
+    "0.21.x release note"
   ],
 
   "src/docs/solverforge/solver/phases.md" => [
@@ -63,52 +63,64 @@ REQUIRED_TEXT = {
     "before keys and pairs"
   ],
 
-          "src/_posts/releases/2026-10-12-solverforge-0-20-0-1.md" => [
-    "**solverforge 0.20.0 and 0.20.1** are published", "(2026-10-12)",
-    "`cargo add solverforge`\ninstalls 0.20.1",
-    "docs.rs serves the 0.20.1 API",
-    "5e5e7f1fd9bb760461abc09e7d44813622fc99d7",
-    "2f55b83f410605846c330ebde129b9d27ab03291",
-    "forages by accepted count", "`AcceptedCount(256)`",
-    "Previous core runtime | `solverforge 0.20.0`",
-    "Still scaffolds `solverforge 0.19.7`",
-    "Still embeds runtime `0.19.7`", "Eight released apps",
-    "compare/v0.20.0...v0.20.1", "compare/v0.19.14...v0.20.1"
+          "src/_posts/releases/2026-10-12-solverforge-0-20-x.md" => [
+    "**solverforge 0.20.x** follows `solverforge 0.19.14`", "(2026-10-12 through 2026-10-13)",
+    "patches through `0.20.4`",
+    "`AcceptedCount(256)`",
+    "FirstLastStepScoreImproving", "`DiversifiedLateAcceptanceAcceptor::new(size)`",
+    "search_entity_order_key", "search_value_order_key",
+    "`search_entity_order_key` / `search_value_order_key`", "score-authoritative",
+    "`0.20.4` | 2026-10-13", "`0.20.3` | 2026-10-12", "`0.20.2` | 2026-10-12",
+    "`0.20.1` | 2026-10-12", "`0.20.0` | 2026-10-12",
+    "Historical core line | `solverforge 0.20.0`–`0.20.4`",
+    "compare/v0.19.14...v0.20.4"
+  ],
+  "src/_posts/releases/2026-10-14-solverforge-0-21-x.md" => [
+    "**solverforge 0.21.x** follows `solverforge 0.20.4`", "published on
+crates.io across 2026-10-14",
+    "`cargo add solverforge`\ninstalls 0.21.2",
+    "docs.rs serves the 0.21.2 API",
+    "70aa9f71ab305265cfe7d83753af2f86fb06acf9", "cb916a73d86c46c25b0e4182626f9adc2c9aa5ad",
+    "(#74)", "is_doable_with_working_preview", "`&mut self`",
+    "each compiled selector node lowers exactly once", "no artifact carries",
+    "Previous core runtime | `solverforge 0.21.0`",
+    "[0.20.x note](/blog/releases/2026/10/12/solverforge-0-20-x/)",
+    "`0.21.2` | 2026-10-14", "`0.21.0` | 2026-10-14",
+    "compare/v0.20.4...v0.21.2", "compare/v0.20.1...v0.21.0"
   ],
   "src/docs/solverforge/constraints/shift-group-uniformity.md" => [
-    "**distinct** shift groups minus one",
-    "puts each value in its own bucket", "never penalized",
-    "FilterNode", "OperatorTerminal", "collect_vec",
-    "tri_shift_key", "tri_block_key",
-    "start, end, location", "medium penalty",
+    "number of distinct groups minus one",
+    "same-block", "medium penalty",
+    "group_by", "collect_vec", "equal_on",
+    "shift.index", "start, end, location",
     "/docs/solverforge/constraints/constraint-streams/",
     "/docs/solverforge/constraints/joiners/",
     "/docs/solverforge/constraints/collectors/"
   ],
     "scripts/verify-rust-snippets.rb" => [
-    'DEFAULT_SOLVERFORGE_RS_REF = "v0.20.1"'
+    'DEFAULT_SOLVERFORGE_RS_REF = "v0.21.2"'
   ],
 
   "src/docs/solverforge/index.md" => [
-    "These pages track the `solverforge 0.20.1` crate",
-    "The `0.20.1` workspace declares Rust `1.95`.",
-    "docs.rs/solverforge/0.20.1/solverforge/",
-    "solverforge-cli 3.3.3",
-    "solverforge 0.19.4"
+    "These pages track the `solverforge 0.21.2` release",
+    "The `0.21.2` workspace declares Rust `1.95`.",
+    "/blog/releases/2026/10/14/solverforge-0-21-x/",
+    "solverforge-cli 3.5.1",
+    "apps scaffolded by earlier lines pin older cores"
   ],
 
-  "src/docs/solverforge/solver/solver-manager.md" => ["notify the condition variable while holding the worker's pause gate", "lost-wakeup race"],
+  "src/docs/solverforge/solver/solver-manager.md" => ["holding the worker's pause gate", "does not restart from the best solution"],
   "src/docs/solverforge/constraints/node-sharing.md" => ["The compiler supports sharing"],
   "src/docs/solverforge/constraints/existence-and-flattening.md" => [
     "DenseKeys::add", "per event", "at most once"
   ],
   "src/reference/integration-surfaces.md" => [
-    "tracks `solverforge 0.20.1`", "the CLI 3.3.3 scaffold targets core 0.19.7"
+    "tracks `solverforge 0.21.2`", "the current CLI 3.5.1 line scaffolds core 0.21.2"
   ],
   "src/docs/solverforge-python/index.md" => [
-    "solverforge-py 0.6.10",
-    "solverforge==0.6.10",
-    "solverforge 0.19.7",
+    "solverforge-py 0.6.12",
+    "solverforge==0.6.12",
+    "solverforge 0.21.2",
     "solverforge-ui 0.9.0"
   ],
   "src/docs/solverforge-python/modeling.md" => [
@@ -116,14 +128,14 @@ REQUIRED_TEXT = {
     "`same_value_conflict_field`"
   ],
   "src/docs/solverforge-cli/index.md" => [
-    "solverforge-cli 3.3.3",
+    "solverforge-cli 3.5.1",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 3.3.3",
-    "CLI version: 3.3.3",
-    "SolverForge crate target 0.19.7",
-    "Scaffold MCP target: rmcp 3.5.0",
+    "solverforge-cli 3.5.1",
+    "CLI version: 3.5.1",
+    "SolverForge crate target 0.21.2",
+    "Scaffold MCP target: rmcp 3.5.1",
     "solverforge connect"
   ],
   "src/docs/solverforge-cli/generator-commands.md" => [
@@ -135,7 +147,8 @@ REQUIRED_TEXT = {
     "re-renders\n`src/data/data_seed.rs`"
   ],
   "src/docs/solverforge-cli/configuration.md" => [
-    "cli_version = \"3.3.3\""
+    "cli_version = \"3.5.1\"",
+    "target = \"solverforge 0.21.2\""
   ],
   "src/docs/solverforge-cli/getting-started.md" => [
     "cannot localize entity indexes"
@@ -146,19 +159,19 @@ REQUIRED_TEXT = {
     "cargo run -- demo-data"
   ],
   "src/docs/solverforge/solver/configuration.md" => [
-    "SolverForge 0.20.1",
+    "SolverForge 0.21.2",
     "effective parsed limit", "construction-only",
     "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
   "src/docs/solverforge-maps/index.md" => [
     "solverforge-maps 2.1.4",
-    "solverforge-cli 3.3.3"
+    "solverforge-cli 3.5.1"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
-    "SolverForge 0.19.7"
+    "SolverForge 0.21.2"
   ],
   "src/docs/solverforge-python/solving-and-runtime.md" => [
-    "0.19.7 runtime graph"
+    "0.21.2 runtime graph"
   ],
   "src/docs/solverforge-cli/mcp-shell.md" => [
     "get_candidate_trace",
@@ -176,7 +189,7 @@ REQUIRED_TEXT = {
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.3.3",
+    "solverforge-cli 3.5.1",
     "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
@@ -209,15 +222,15 @@ REQUIRED_TEXT = {
     "/docs/solverforge/constraints/shift-group-uniformity/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.20.1",
+    "solverforge 0.21.2",
     "AcceptedCount(256)",
-    "solverforge 0.6.10",
-    "solverforge-py v0.6.10"
+    "solverforge 0.6.12",
+    "solverforge-py v0.6.12"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.20.1",
+    "solverforge 0.21.2",
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.3.3"
+    "solverforge-cli 3.5.1"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
     "`3.1.0` | 2026-09-16",
@@ -243,51 +256,53 @@ REQUIRED_TEXT = {
     "solverforge-modeling"
   ],
   "src/docs/status-and-roadmap.md" => [
-    "5e5e7f1fd9bb760461abc09e7d44813622fc99d7",
-    "38279188565", "38279188186", "38279188118",
     "BENCH_TOLERANCE_PERCENT", "default 5%", "equal-length staging paths",
-    "documentation tracks the `solverforge 0.20.1` tag",
-    "The `v0.20.1` tag, workspace, and crates.io package are the",
-    "published on 2026-10-12, and docs.rs serves the 0.20.1 API.",
-    "Native Rust constraint solver published as `solverforge 0.20.1`",
-    "The independently published CLI line is `solverforge-cli 3.3.3`",
-    "- **0.20.x runtime line**: `v0.20.1` and the crates.io `solverforge 0.20.1`",
+    "documentation tracks the `solverforge 0.21.2` release",
+    "`cargo add solverforge` installs 0.21.2",
+    "docs.rs serves the 0.21.2 API",
+    "cb916a73d86c46c25b0e4182626f9adc2c9aa5ad",
+    "38598708211", "38598906107", "38598906248",
+    "Native Rust constraint solver published as `solverforge 0.21.2`",
+    "The independently published CLI line is `solverforge-cli 3.5.1`",
+    "- **Core runtime line**", "- **Joined-tuple grouping**", "- **Guided native scalar search**",
+    "- **Score-authoritative grouped search**", "- **Late acceptance**",
+    "- **Lending extensions**", "- **Owned runtime state**",
     "**0.19.13 existence-engine rewrite**",
     "**0.19.11 construction and scoring fixes**",
     "**0.19.12 retained bookkeeping**",
     "occurrence count per right-side key", "idempotently per event",
     "**Grouped-scalar foraging**", "AcceptedCount(256)",
-    "**0.20.1 pooled scratch**", "0-20-0-1",
+    "**0.20.1 pooled scratch**", "0-20-x",
     "retained `KeyOf` keys", "caller-owned", "`RowChanges` is gone",
     "lists are updated in place", "residual predicates", "duplicate",
     "benchmark results or measured performance gains",
-    "solverforge-py 0.6.10",
-    "solverforge-cli 3.3.3",
+    "solverforge-py 0.6.12",
+    "solverforge-cli 3.5.1",
     "solverforge-ui 0.9.0",
-    "solverforge-hospital@2.0.8",
-    "solverforge-lessons@2.0.10",
-    "solverforge-deliveries@2.0.9",
-    "solverforge-fsr@2.0.10"
+    "solverforge-hospital@2.0.9",
+    "solverforge-lessons@2.0.11",
+    "solverforge-deliveries@2.0.10",
+    "solverforge-fsr@2.0.11"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@2.0.8",
-    "solverforge 0.19.7"
+    "solverforge-hospital@2.0.9",
+    "solverforge 0.21.2"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
-    "solverforge-lessons@2.0.10",
-    "solverforge 0.19.7"
+    "solverforge-lessons@2.0.11",
+    "solverforge 0.21.2"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@2.0.9",
-    "solverforge 0.19.7"
+    "solverforge-deliveries@2.0.10",
+    "solverforge 0.21.2"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@2.0.10",
-    "solverforge 0.19.7"
+    "solverforge-fsr@2.0.11",
+    "solverforge 0.21.2"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
-    "`solverforge 0.20.1` is the current core",
-    "0.20.x release note",
+    "`solverforge 0.21.0` is the current core",
+    "0.21.x release note",
     "## October 2026 Core Patches (0.19.8–0.19.14)",
     "per-key occurrence counts", "arity-generic cross-join engine", "worker wakeup", "caller-owned buffers",
     "`0.19.13` | 2026-10-11",
@@ -305,7 +320,7 @@ REQUIRED_TEXT = {
     "solverforge-hospital@2.0.7"
   ],
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
-    "`solverforge 0.20.1` is the current core",
+    "`solverforge 0.21.0` is the current core",
     "`0.19.13` | 2026-10-11",
     "`0.19.12` | 2026-10-10",
     "`0.19.11` | 2026-10-10",
@@ -313,16 +328,17 @@ REQUIRED_TEXT = {
     "solverforge 0.19.6",
     "solverforge 0.19.7",
     "`0.19.9` | 2026-10-08",
-    "0.20.x release note",
+    "0.21.x release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",
     "pinned"
   ],
       "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
-    "solverforge-py 0.6.10",
-    "solverforge==0.6.10",
-    "solverforge 0.19.7",
+    "solverforge-py 0.6.12",
+    "solverforge==0.6.12",
+    "solverforge 0.21.2",
+    "Pins the six SolverForge Rust dependencies to the published `0.21.0` registry base", "Current published package on the `solverforge 0.21.2` registry base",
     "solverforge-ui 0.9.0"
   ],
   "src/_posts/releases/2026-09-27-solverforge-usecases-repository-apps.md" => [
@@ -343,14 +359,20 @@ REQUIRED_TEXT = {
     "`3.3.1` | 2026-09-29",
     "`3.3.2` | 2026-10-01",
     "`3.3.3` | 2026-10-02",
+    "`3.4.0` | 2026-10-14", "`3.5.0` | 2026-10-14", "`3.5.1` | 2026-10-14",
     "rmcp 3.5.0",
     "solverforge 0.19.7",
+    "csemver",
+    "`solverforge 0.21.2`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`",
     "src/data/data_seed.rs"
   ],
 }.freeze
 
 FORBIDDEN_TEXT = {
   "src/docs/solverforge/index.md" => [
+    "These pages track the `solverforge 0.20.1` crate",
+    "The `0.20.1` workspace declares Rust `1.95`.",
+    "docs.rs/solverforge/0.20.1/",
     "These pages track the `solverforge 0.19.14` crate",
     "The `0.19.14` workspace declares Rust `1.95`.",
     "docs.rs/solverforge/0.19.14/solverforge/",
@@ -364,7 +386,7 @@ FORBIDDEN_TEXT = {
   ],
   "src/docs/solverforge-ui/index.md" => ["solverforge-ui 0.8.0", "sf.0.8.0", "solverforge-cli 3.2.0"],
   "src/docs/solverforge-ui/integration-assets.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
-  "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.3", "solverforge==0.6.3"],
+  "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.3", "solverforge==0.6.3", "solverforge-py 0.6.10", "solverforge==0.6.10"],
   "src/docs/solverforge-cli/index.md" => [
     "solverforge-cli 3.0.0",
     "solverforge-cli 3.3.1",
@@ -372,6 +394,8 @@ FORBIDDEN_TEXT = {
     "--only"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
+    "CLI version: 3.3.3",
+    "SolverForge crate target 0.19.7",
     "solverforge-cli 3.0.0",
     "solverforge-cli 3.3.1",
     "solverforge-cli 3.3.2",
@@ -383,6 +407,7 @@ FORBIDDEN_TEXT = {
     "Scaffold UI target: solverforge-ui 0.8.0"
   ],
   "src/docs/solverforge-cli/configuration.md" => [
+    "cli_version = \"3.3.3\"",
     "cli_version = \"3.0.0\"",
     "cli_version = \"3.3.2\"",
     "target = \"solverforge 0.19.4\"",
@@ -410,6 +435,10 @@ FORBIDDEN_TEXT = {
     "The `v0.19.14` tag, workspace, and crates.io package are the",
     "- **0.19.14 runtime line**:",
     "Native Rust constraint solver published as `solverforge 0.19.14`",
+    "documentation tracks the `solverforge 0.20.1` tag",
+    "The `v0.20.1` tag, workspace, and crates.io package are the",
+    "Native Rust constraint solver published as `solverforge 0.20.1`",
+    "- **0.20.x runtime line**: `v0.20.1` and the crates.io `solverforge 0.20.1`",
     "documentation tracks the `solverforge 0.19.8` tag",
     "documentation tracks the `solverforge 0.19.9` tag",
     "documentation tracks the `solverforge 0.19.10` tag",

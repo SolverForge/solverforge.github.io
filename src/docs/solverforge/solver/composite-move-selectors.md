@@ -18,6 +18,25 @@ the concrete APIs and composite storage that need it; it is not the universal
 runtime owner for every selector step. This keeps cartesian and union execution
 preview-safe without cloning large move payloads.
 
+### Lending Cursor Contract
+
+A public `MoveCursor<S, M>` pulls with `next_candidate(solution: &S)`.
+`next_candidate_with_control`, `next_owned_candidate`,
+`next_owned_candidate_matching`, and `next_owned_candidate_inspected` likewise
+receive the caller's solution. The cursor retains declaration/state and move
+ownership, not a solution borrow across evaluation. `candidate(id)` lends a
+`MoveCandidateRef`; `take_candidate(id)` transfers that candidate exactly once,
+and `release_candidate(id)` drops a loser promptly. Dropping a cursor does not
+require exhausting its unrequested tail. `CandidateStore::reset()` drops live
+candidates while retaining its backing capacities.
+
+The hidden resource-aware runtime boundary lends the mutable score director:
+`next_candidate_with_resources(director: &mut D, resources: &mut Resources)`.
+The public director-aware pull `next_candidate_with_director(&mut D)` defaults
+to the ordinary solution pull; preview-aware cursors and decorators forward it.
+Do not retain the lent solution/director between pulls or leave speculative
+writes behind when returning a candidate.
+
 ## `union_move_selector`
 
 `union_move_selector` combines multiple selectors and yields candidates from
@@ -70,6 +89,26 @@ variable_name = "room_idx"
 Use cartesian composition only when the real move is "do A and B together". Do
 not use it as a substitute for grouped scalar search; grouped scalar carries
 model-owned coupled-decision semantics.
+
+### Compiled Cartesian Preview
+
+Configured Limited/Union/Cartesian declarations form an immutable indexed arena
+with stable node IDs. Retained leaf state moves into the cursor and returns to
+the solve-owned state on drop. Union nodes share the canonical scheduler;
+flat extensions remain concrete generic types rather than boxed erased leaves.
+
+A Cartesian right child opens only after the left candidate is applied on the
+live director. Every right pull reinstates that row's left preview, generates
+and checks the right candidate, then undoes the preview and restores the
+snapshotted score state before returning. Nested Cartesian rows compose the
+same transaction. Compiled Cartesian discovery does not clone a preview
+solution. The ordinary public Cartesian selector uses its separately owned
+preview director; it is not the compiled implementation.
+
+Sequential candidate evaluation uses
+`Move::is_doable_with_working_preview(&mut D)`, so later legs see earlier legs'
+effects. A rejected preview leaves the working solution and committed score
+state unchanged.
 
 ## `limited_neighborhood`
 
