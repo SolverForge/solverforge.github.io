@@ -194,8 +194,15 @@ python -c 'import solverforge; print(solverforge.__version__)'
 
 The command prints `0.6.6`.
 
+<%= render Ui::Callout.new(title: "Current boundaries") do %>
+The table below describes the 0.6.6-era boundaries of this note's release day.
+Today the Python source line is `solverforge-py 0.6.12` on PyPI with runtime
+base `solverforge 0.21.2` and `solverforge-ui 0.9.0`; see the
+[0.6.x line note](/blog/releases/2026/09/29/solverforge-python-0-6-10-x/).
+<% end %>
+
 Do not infer the Python package version from the Rust crate, CLI, or UI release
-line. Their current boundaries are:
+line. At the 0.6.6 release these were:
 
 | Surface | Current line |
 | ------- | ------------ |
@@ -232,7 +239,7 @@ line. Their current boundaries are:
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
-| `0.6.10` | 2026-09-29 | Current published package on the `solverforge 0.19.7` base with `solverforge-ui 0.9.0` assets. |
+| `0.6.10` | 2026-09-29 | Published package on the `solverforge 0.19.7` base with `solverforge-ui 0.9.0` assets. |
 | `0.6.9` | 2026-09-29 | Aligns the exact SolverForge Rust crate set with 0.19.7 and embeds the `solverforge-ui 0.9.0` assets. |
 | `0.6.8` | 2026-09-29 | Moves the binding onto the SolverForge 0.19.7 runtime line. |
 | `0.6.7` | 2026-09-29 | Picks up the 0.19.7 construction and telemetry behavior for Python-authored models. |

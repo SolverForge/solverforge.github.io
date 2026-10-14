@@ -117,9 +117,45 @@ instead of loading arbitrary runtime classes. Partitioned search similarly
 requires a typed `SolutionPartitioner`, not a partition count guessed from the
 outside.
 
+## Committed Mutation and Extension Contracts
+
+Every committed working-solution change clears the cached current score and
+advances the working-solution revision exactly once. This includes accepted
+construction/local-search moves, configuration-list commits, partition merges,
+and direct apply closures. Trial evaluation applies, scores, undoes with typed
+undo data, and restores the snapshotted committed score state without advancing
+that revision. `replace_working_solution_and_reinitialize(solution)` resets the
+director, forces recalculation, resets the revision, and invalidates
+descriptor-driven construction completion markers. The working revision is
+internal mutation state, not a retained snapshot's `snapshot_revision`.
+
+Public `MoveCursor` pulls lend `&S`; the runtime's hidden resource cursor pulls
+lend `&mut D` and solve-owned resources. Implementors must restore preview
+writes and score state before returning. Sequential moves override
+`is_doable_with_working_preview(&mut D)` to check later legs after earlier legs.
+`for_each_affected_entity<V: FnMut(MoveAffectedEntity<'_>)>(&self, &mut V)` uses a
+concrete visitor and must report the complete mutated scope. Pillar swaps
+report both pillars even though their primary `entity_indices()` slice is the
+left pillar. Pin checks consume that complete visitor.
+
+Heap-owning compound, pillar, ruin, list-union, and descriptor-union move
+families do not provide a universal `Clone` contract. Keep candidates owned by
+stable cursor IDs, evaluate by reference, and transfer the winner.
+`Acceptor::step_ended` takes `Option<MoveTabuSignature>` by value.
+`Termination::is_terminated` and `MaybeTermination::should_terminate` take
+`&mut self`; stateful terminations own their counters rather than using shared
+interior mutation.
+
+Lower-level `Placement` exposes `candidates()` / `candidates_mut()` for its
+cursor and `take_move(candidate_id)` for ownership transfer. Its
+`keep_current_legal()` distinguishes a legal unchanged baseline from a mandatory
+assignment. `EntityPlacerCursor::next_placement` receives the current director,
+a completion predicate, and a stop predicate; app models normally stay on the
+configured construction path rather than implementing a second placer engine.
+
 ## Telemetry and lifecycle expectations
 
-Retained jobs now expose exact counts and durations through structured events.
+Retained jobs expose exact counts and durations through structured events.
 That means:
 
 - generated, evaluated, and accepted move counts belong to runtime telemetry

@@ -38,7 +38,7 @@ derived helpers that describe the planning problem you actually need to solve.
 Use mixed models when the problem really has both assignment and sequencing.
 The current runtime builds one `RuntimeModel` per planning model, and the stock
 construction heuristics already understand mixed scalar-plus-list problems.
-Since SolverForge 0.19, list variables are the only planning primitive for an
+List variables are the planning primitive for an
 owned sequence; do not encode ordered work as a chained scalar predecessor.
 
 ## A practical growth path
@@ -105,6 +105,21 @@ join targets implement `CollectionExtract`; arbitrary compatible derived
 producers instead feed low-level `JoinNode` inputs. See
 [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) for
 examples and the cross-Penta continuation filter limitation.
+
+## Guided Local Search Hooks
+
+Use `search_entity_order_key = "fn_name"` to rank ordinary scalar change/swap
+entities and `search_value_order_key = "fn_name"` to rank ordinary change
+values. Their signatures mirror construction keys: `fn(&S, &Entity) -> i64`
+and `fn(&S, &Entity, value: usize) -> i64`. Lower keys come first; ties preserve
+the seeded enumeration order. Variables without the hooks retain their unguided
+walk. Construction-order keys remain construction-only, while nearby hooks
+shape bounded neighborhoods and candidate metrics order complete leaf streams.
+
+Candidate, ordering, legality, and ownership callbacks may read all of `S`.
+Their entity arguments do not establish row-local dependencies. A committed
+change elsewhere may change their outputs; keep callback behavior deterministic
+for the same input state and seed.
 
 ## Suggested module layout
 

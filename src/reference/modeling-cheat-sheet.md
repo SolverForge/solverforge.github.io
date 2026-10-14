@@ -31,7 +31,7 @@ right SolverForge annotation or structure.
 | list variable   | order or insertion position matters | a vehicle route or task sequence       |
 | model with both | both assignment and ordering matter | route planning with assigned operators |
 
-In SolverForge 0.19, an ordered sequence is always a list variable. Scalar
+An ordered sequence is always a list variable. Scalar
 variables are direct one-slot assignments and do not have a chained mode.
 
 The current runtime resolves one `RuntimeModel` per planning model, then
@@ -99,6 +99,10 @@ solver configuration targets canonical descriptor names such as `Task.worker`.
 Nearby scalar distance meters rank or filter bounded candidates; they are not
 candidate-discovery hooks. Construction order keys are evaluated against the
 live working solution during construction and do not change local-search order.
+Use `search_entity_order_key` for ordinary change/swap entity ranking and
+`search_value_order_key` for ordinary change value ranking. Lower keys come
+first, with seeded candidate order retained on ties. All these callbacks may
+read the whole solution; their signatures do not imply row-local dependencies.
 
 ## Minimal shape
 
