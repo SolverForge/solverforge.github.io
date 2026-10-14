@@ -9,13 +9,15 @@ description: >
   move-level runtime telemetry.
 ---
 
-<%= render Ui::Callout.new(title: "Update, October 12, 2026") do %>
-This is a historical release note. `solverforge 0.20.1` is the current core
-runtime line. See the [0.20.x release note](/blog/releases/2026/10/12/solverforge-0-20-0-1/)
-for the existence-engine rewrite: per-key occurrence counts answering semi/anti
-joins from retained keys, following the buffered Clarke-Wright interruption and
-in-place relationship bookkeeping in 0.19.11 and 0.19.12.
-CLI 3.3.3 still scaffolds core 0.19.7; Python and worked-app runtime bases are unchanged.
+<%= render Ui::Callout.new(title: "Update, October 14, 2026") do %>
+This is a historical release note. `solverforge 0.21.0` is the current core
+runtime line; its note is the [0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/).
+For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
+answering semi/anti joins from retained keys, after the buffered Clarke-Wright
+interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
+is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
+The `solverforge-cli 3.4.0` line scaffolds core `0.20.4` and `3.5.0` scaffolds
+core `0.21.0`; Python and worked-app runtime bases are unchanged.
 <% end %>
 
 **SolverForge 0.15.2** was the core runtime patch recorded for the 0.15 line. It is
