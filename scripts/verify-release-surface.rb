@@ -5,19 +5,19 @@ ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
-    "`solverforge 0.21.0` is the current core",
+    "`solverforge 0.21.2` is the current core",
     "0.21.x release note"
   ],
   "src/_posts/releases/2026-06-12-solverforge-0-16-x.md" => [
-    "`solverforge 0.21.0` is the current core",
+    "`solverforge 0.21.2` is the current core",
     "0.21.x release note"
   ],
   "src/_posts/releases/2026-06-15-solverforge-0-17-x.md" => [
-    "`solverforge 0.21.0` is the current core",
+    "`solverforge 0.21.2` is the current core",
     "0.21.x release note"
   ],
   "src/_posts/releases/2026-07-13-solverforge-0-18-x.md" => [
-    "`solverforge 0.21.0` is the current core",
+    "`solverforge 0.21.2` is the current core",
     "0.21.x release note"
   ],
 
@@ -301,7 +301,7 @@ crates.io across 2026-10-14",
     "solverforge 0.21.2"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
-    "`solverforge 0.21.0` is the current core",
+    "`solverforge 0.21.2` is the current core",
     "0.21.x release note",
     "## October 2026 Core Patches (0.19.8–0.19.14)",
     "per-key occurrence counts", "arity-generic cross-join engine", "worker wakeup", "caller-owned buffers",
@@ -320,7 +320,7 @@ crates.io across 2026-10-14",
     "solverforge-hospital@2.0.7"
   ],
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
-    "`solverforge 0.21.0` is the current core",
+    "`solverforge 0.21.2` is the current core",
     "`0.19.13` | 2026-10-11",
     "`0.19.12` | 2026-10-10",
     "`0.19.11` | 2026-10-10",

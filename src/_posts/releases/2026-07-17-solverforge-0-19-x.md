@@ -18,14 +18,15 @@ The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
 same version line.
 
 <%= render Ui::Callout.new(title: "Update, October 14, 2026") do %>
-This is a historical release note. `solverforge 0.21.0` is the current core
-runtime line; its note is the [0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/).
+This is a historical release note. `solverforge 0.21.2` is the current core
+release; its line note is the [0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/).
 For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
 is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
-The `solverforge-cli 3.4.0` line scaffolds core `0.20.4` and `3.5.0` scaffolds
-core `0.21.0`; Python and worked-app runtime bases are unchanged.
+The `solverforge-cli 3.5.1` line scaffolds core `0.21.2` (3.4.0 targeted
+`0.20.4` and 3.5.0 targeted `0.21.0`); Python 0.6.12 and the released apps
+moved onto core 0.21.2 in the coordinated releases.
 <% end %>
 
 > **Update, 2026-09-15:** SolverForge 0.19.5 retains the complete solution when
