@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the checked-in SolverForge 0.19.7 use-case dependency shape
+- keep the checked-in SolverForge 0.21.2 use-case dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -118,12 +118,12 @@ surface, Docker build, and validation commands.
 
 ### Keep the Published Dependency Shape
 
-The tagged `solverforge-lessons@2.0.10` use-case source targets the published
-SolverForge 0.19.7 line:
+The tagged `solverforge-lessons@2.0.11` use-case source targets the published
+SolverForge 0.21.2 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.19.7", features = [
+solverforge = { version = "0.21.2", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -148,8 +148,8 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.3.3` scaffolds `solverforge 0.19.7`; the finished Lessons app
-records an app-owned `solverforge 0.19.7` runtime target while retaining
+`solverforge-cli 3.5.1` scaffolds `solverforge 0.21.2`; the finished Lessons app
+records an app-owned `solverforge 0.21.2` runtime target while retaining
 its original `2.2.2` scaffold provenance:
 
 ```toml
@@ -160,8 +160,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.19.7"
-runtime_source = "crates.io: solverforge 0.19.7"
+target = "solverforge 0.21.2"
+runtime_source = "crates.io: solverforge 0.21.2"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -594,7 +594,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@2.0.10` |
+| Tagged app release | `solverforge-lessons@2.0.11` |
 | Local run | `make run-release` |
 | Standard validation | `make test` |
 | Full local validation | `make ci-local` |
