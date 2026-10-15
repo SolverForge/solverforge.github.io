@@ -216,6 +216,25 @@ Display consumers should read `benchmark_result_facts`,
 `latest_benchmark_runs`, or `latest_benchmark_result_facts` instead of
 reconstructing the run/result join.
 
+## Published Results
+
+The [results page](/benchmarks/) contains the latest publishable full canonical
+nightly for each problem, with the complete [downloadable evidence](/benchmarks/results.json).
+The current cohort completed on October 14–15, 2026 (UTC), from benchmark
+commit `cfa0f28673a2af25089071e4fdde645d52043ebe`:
+
+| Problem | Instances | Recorded results | Run |
+| --- | --- | --- | --- |
+| CVRP | 100 | 2,100 | `7305a51d-4b95-4a47-a183-222b2cd724f4` |
+| Employee scheduling | 37 | 555 | `6c17e66f-fdb6-446e-bdf5-43f7e9d81274` |
+| Job-shop scheduling | 162 | 2,430 | `c7b67a4f-18f7-4199-8aa9-c16d3c9f29ea` |
+
+These runs tested native SolverForge **0.21.2** and Python **0.6.10**, not the
+newer package releases. Competitors were Timefold **2.7.0**, OR-Tools
+**9.15.6755**, and HiGHS **1.15.1**; CVRP additionally tested PyVRP **0.14.0**
+and PyHygese **0.1.0**. Each matrix covers the 1, 10, and 60 second budgets.
+Official references cover every selected instance in all three problems.
+
 ## Official References
 
 A gap is only meaningful against a stated reference, so every problem resolves

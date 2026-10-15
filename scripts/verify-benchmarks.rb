@@ -195,7 +195,10 @@ class BenchmarkSnapshotTest
 
   def test_numeric_drift_beyond_tolerance_is_rejected
     changed = copy(@summary)
-    changed.fetch("problems").first.fetch("summaries").first["gap_percent"] += 1e-4
+    row = changed.fetch("problems").flat_map { |problem| problem.fetch("summaries") }
+      .find { |summary| summary["gap_percent"].is_a?(Numeric) }
+    assert(!row.nil?, "expected a measured reference gap in the snapshot")
+    row["gap_percent"] += 1e-4
     assert_raises(RuntimeError) { equivalent(BenchmarkImport.summarize(@snapshot), changed) }
   end
 
