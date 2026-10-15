@@ -27,7 +27,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 
 Use `solverforge-cli` to bootstrap the project, then move quickly into ordinary
 application modules and `solverforge` runtime code. Current core documentation
-tracks `solverforge 0.21.2`; the current CLI 3.5.1 line scaffolds core 0.21.2, so
+tracks `solverforge 0.21.3`; the current CLI 3.5.1 line scaffolds core 0.21.2, so
 check `solverforge --version` on the binary you install.
 
 ### Runtime truth
@@ -48,8 +48,8 @@ Use `solverforge-py` when the product needs Python model authoring. Python
 classes, decorators, explicit scalar/list metadata, and callbacks describe the
 problem; Rust still owns the indexed working state, compiled search graph,
 cursor execution, safe native score specializations, snapshots, retained jobs,
-candidate traces, and embedded shared UI asset bytes. The Python 0.6.12 line
-and its repository apps use core 0.21.2, matching the current core release.
+candidate traces, and embedded shared UI asset bytes. The Python 0.6.14 line
+and its repository apps use core 0.21.3, matching the current core release.
 
 ### UI as presentation and orchestration
 
@@ -67,7 +67,7 @@ network structure are real business inputs, not as a default dependency.
 | Product shape | Typical composition |
 |---|---|
 | backend planner service | `solverforge-cli` scaffold + `solverforge` |
-| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.6.12` source tag |
+| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.6.14` source tag |
 | browser-based planning app | `solverforge-cli` + `solverforge` + `solverforge-ui` |
 | fleet or dispatch optimizer | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | custom research harness | direct `solverforge` plus selected lower-level crates |

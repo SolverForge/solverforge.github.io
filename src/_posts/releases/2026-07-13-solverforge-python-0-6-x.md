@@ -196,8 +196,8 @@ The command prints `0.6.6`.
 
 <%= render Ui::Callout.new(title: "Current boundaries") do %>
 The table below describes the 0.6.6-era boundaries of this note's release day.
-Today the Python source line is `solverforge-py 0.6.12` on PyPI with runtime
-base `solverforge 0.21.2` and `solverforge-ui 0.9.0`; see the
+Today the Python source line is `solverforge-py 0.6.14` on PyPI with runtime
+base `solverforge 0.21.3` and `solverforge-ui 0.9.0`; see the
 [0.6.x line note](/blog/releases/2026/09/29/solverforge-python-0-6-10-x/).
 <% end %>
 

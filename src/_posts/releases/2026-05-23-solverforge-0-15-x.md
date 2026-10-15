@@ -10,7 +10,7 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Update, October 14, 2026") do %>
-This is a historical release note. `solverforge 0.21.2` is the current core
+This is a historical release note. `solverforge 0.21.3` is the current core
 release; its line note is the [0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/).
 For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright

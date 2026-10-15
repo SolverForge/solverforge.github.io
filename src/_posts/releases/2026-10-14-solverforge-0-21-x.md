@@ -5,12 +5,13 @@ draft: false
 description: >
   The 0.21.x line adds fluent group_by on Tri, Quad, and Penta joins, lends
   the live working solution through custom cursor pulls, moves search state
-  to single ownership, and fixes selector-subgraph merging in 0.21.2.
+  to single ownership, fixes selector-subgraph merging, and preserves net
+  route deltas through deferred precedence retractions in 0.21.3.
 ---
 
 **solverforge 0.21.x** follows `solverforge 0.20.4`; the line was published on
-crates.io across 2026-10-14. `cargo add solverforge` installs 0.21.2 and
-docs.rs serves the 0.21.2 API. The Rust `1.95` floor remains. The 0.20.x
+crates.io on 2026-10-14. `cargo add solverforge` installs 0.21.3 and
+docs.rs serves the 0.21.3 API. The Rust `1.95` floor remains. The 0.20.x
 line's guided scalar search keys, score-authoritative grouped neighborhoods,
 and corrected late acceptance carry into this line unchanged.
 
@@ -89,6 +90,17 @@ with the panic message, and other jobs keep their own lifecycle state.
 Duplicate scalar group names are rejected at model resolution instead of
 failing deep in compilation.
 
+### Net route deltas through deferred retractions (0.21.3)
+
+List-precedence scoring keeps the paired owner baseline across a deferred
+retraction, so an insert/undo pair during construction diffs only the changed
+adjacency edges instead of re-deriving the whole route. Unmatched owner
+retractions flush before an insert scores, preserving interleaved notification
+semantics, and deferred-seed generations advance monotonically with stamps
+cleared only on wrap. On the native stock JSSP subset all four instances
+reached feasibility at the 1-second budget, including `ta01` (1.011 s wall),
+which left construction incomplete on the registry baseline.
+
 ### Selector subgraph merging (0.21.2)
 
 `rebase_graph` shifted only the returned root id when merging a compiled
@@ -117,25 +129,27 @@ configured surface. Model APIs and scores are unaffected.
 
 | Surface | Version | Notes |
 | ------- | ------- | ----- |
-| Core runtime | `solverforge 0.21.2` | Rust `1.95`; docs.rs serves the 0.21.2 API |
-| Previous core runtime | `solverforge 0.21.0` | Registry and release artifacts remain available; see the [0.20.x note](/blog/releases/2026/10/12/solverforge-0-20-x/) |
+| Core runtime | `solverforge 0.21.3` | Rust `1.95`; docs.rs serves the 0.21.3 API |
+| Previous core runtime | `solverforge 0.21.2` | Registry and release artifacts remain available |
 | Python | `solverforge-py 0.6.10` / PyPI `solverforge 0.6.10` | Runtime `0.19.7` and UI `0.9.0` are unchanged |
 | Worked use cases | Eight released apps | Runtime `0.19.7` and UI `0.9.0` boundaries are unchanged |
 
 The 0.21.0 tag is `v0.21.0`, commit
 `70aa9f71ab305265cfe7d83753af2f86fb06acf9`; the 0.21.2 tag is `v0.21.2`,
-commit `cb916a73d86c46c25b0e4182626f9adc2c9aa5ad`. Registry publication, the
-GitHub Releases, and CI runs completed successfully for both tags, and no
-artifact carries the retired `0.21.1` number. Independent CLI, Python, and app
+commit `cb916a73d86c46c25b0e4182626f9adc2c9aa5ad`; and the 0.21.3 tag is
+`v0.21.3`, commit `1000a7d471aafe4aa10e900ad075230b9df51ca8`. Registry
+publication, the GitHub Releases, and CI runs completed successfully for each
+tag, and no artifact carries the retired `0.21.1` number. Independent CLI, Python, and app
 lines move only through their own releases: CLI 3.5.0 scaffolded core 0.21.0,
 Python 0.6.10 and the worked apps keep their `0.19.7` runtime bases until
-deliberately upgraded, and the CLI 3.5.1 line retargets scaffolds to core
-0.21.2.
+deliberately upgraded, and the CLI 3.5.1 line retargets scaffolds to newer
+cores through 0.21.2.
 
 ## Patch History
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.21.3` | 2026-10-14 | List-precedence scoring keeps the paired owner baseline across deferred retractions; net adjacency diffs, monotonic deferred-seed generations; JSSP `ta01` feasible at 1 s. |
 | `0.21.2` | 2026-10-14 | `rebase_graph` shifts every structural edge when merging selector sub-graphs; fixes nested-composite selector unions (benchmark CVRP union shape). `0.21.1` failed publication and was retired — no artifact carries it. |
 | `0.21.0` | 2026-10-14 | Fluent grouping on joined arities (#74); live-solution lending across selectors and placements; single-ownership search state and extension-surface signatures; release tooling migrated to csemver. |
 | `0.20.4` | 2026-10-13 | Score-authoritative grouped-scalar neighborhoods, steered family budgets, sparse final-edit validation, corrected DLAS and best-anchored late acceptance. |
@@ -147,7 +161,7 @@ deliberately upgraded, and the CLI 3.5.1 line retargets scaffolds to core
 
 ## Upgrade Checklist
 
-- Update direct Rust dependencies and confirm `Cargo.lock` resolves `0.21.2`.
+- Update direct Rust dependencies and confirm `Cargo.lock` resolves `0.21.3`.
 - Custom `Move` implementations: replace `Clone` requirements where present
   with owner-stable candidates and value transfer, and implement the
   monomorphized affected-entity visitor; composite moves should use

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="627" viewBox="0 0 1200 627" role="img" aria-labelledby="title desc">
+  <title id="title">From prompt to controlled solve with SolverForge</title>
+  <desc id="desc">LinkedIn graphic showing the end-to-end SolverForge agent workflow: install the modeling and UI skills, scaffold an application, run the solver, then connect and operate it through MCP.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#031f1a"/>
+      <stop offset="0.58" stop-color="#062f28"/>
+      <stop offset="1" stop-color="#0b4a3f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6ee7b7"/>
+      <stop offset="0.55" stop-color="#34d399"/>
+      <stop offset="1" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0e4b3f" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#082e27" stop-opacity="0.96"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#6ee7b7" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#001b16" flood-opacity="0.44"/>
+    </filter>
+    <filter id="glow" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .display { font-family: Poppins, "DejaVu Sans", sans-serif; }
+      .body { font-family: "Adwaita Sans", "DejaVu Sans", sans-serif; }
+      .mono { font-family: "Adwaita Mono", "DejaVu Sans Mono", monospace; }
+      .connector { fill: none; stroke: #6ee7b7; stroke-opacity: .32; stroke-width: 1.5; }
+      .node { fill: #0b3d34; stroke: #6ee7b7; stroke-opacity: .24; }
+      .node-label { fill: #d1fae5; font-size: 12px; font-weight: 600; letter-spacing: .06em; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="627" fill="url(#background)"/>
+  <rect width="1200" height="627" fill="url(#grid)"/>
+  <circle cx="104" cy="581" r="240" fill="#10b981" opacity="0.055"/>
+  <circle cx="1094" cy="8" r="270" fill="#34d399" opacity="0.05"/>
+  <path d="M0 526C232 484 427 532 671 489S984 411 1200 446V627H0Z" fill="#001d18" opacity="0.23"/>
+
+  <!-- Existing SolverForge brand asset. -->
+  <image href="brand/solverforge-header-dark-clean.svg" x="58" y="42" width="248" height="50"/>
+
+  <g class="mono" transform="translate(64 132)">
+    <rect width="243" height="30" rx="3" fill="#10b981" fill-opacity="0.13" stroke="#6ee7b7" stroke-opacity="0.22"/>
+    <circle cx="16" cy="15" r="4" fill="#34d399"/>
+    <text x="29" y="20" fill="#a7f3d0" font-size="12" font-weight="700" letter-spacing="1.25">RECENT RELEASES · 2026</text>
+  </g>
+
+  <g class="display" transform="translate(60 204)">
+    <text x="0" y="0" fill="#ecfdf5" font-size="61" font-weight="600" letter-spacing="-2.5">
+      <tspan x="0" dy="0">From prompt</tspan>
+      <tspan x="0" dy="67">to controlled</tspan>
+      <tspan x="0" dy="67" fill="url(#accent)">solve.</tspan>
+    </text>
+  </g>
+
+  <text class="body" x="64" y="433" fill="#a7c9bf" font-size="21" font-weight="400">
+    <tspan x="64" dy="0">Two skills + CLI + MCP form one complete,</tspan>
+    <tspan x="64" dy="30">observable agent workflow.</tspan>
+  </text>
+
+  <g class="mono" transform="translate(64 519)">
+    <g>
+      <rect width="147" height="48" rx="4" fill="#ecfdf5" fill-opacity="0.055" stroke="#6ee7b7" stroke-opacity="0.19"/>
+      <text x="14" y="19" fill="#78a99b" font-size="10" font-weight="700" letter-spacing="1.15">CORE</text>
+      <text x="14" y="37" fill="#ecfdf5" font-size="15" font-weight="700">0.19.5</text>
+    </g>
+    <g transform="translate(159)">
+      <rect width="147" height="48" rx="4" fill="#ecfdf5" fill-opacity="0.055" stroke="#6ee7b7" stroke-opacity="0.19"/>
+      <text x="14" y="19" fill="#78a99b" font-size="10" font-weight="700" letter-spacing="1.15">CLI</text>
+      <text x="14" y="37" fill="#ecfdf5" font-size="15" font-weight="700">3.1.0</text>
+    </g>
+    <g transform="translate(318)">
+      <rect width="147" height="48" rx="4" fill="#ecfdf5" fill-opacity="0.055" stroke="#6ee7b7" stroke-opacity="0.19"/>
+      <text x="14" y="19" fill="#78a99b" font-size="10" font-weight="700" letter-spacing="1.15">UI</text>
+      <text x="14" y="37" fill="#ecfdf5" font-size="15" font-weight="700">0.9.0</text>
+    </g>
+  </g>
+
+  <!-- Technical stack schematic. -->
+  <g transform="translate(714 48)" filter="url(#shadow)">
+    <rect width="430" height="531" rx="8" fill="url(#panel)" stroke="#6ee7b7" stroke-opacity="0.2"/>
+    <path d="M1 74H429" stroke="#6ee7b7" stroke-opacity="0.12"/>
+    <text class="mono" x="28" y="33" fill="#7bb6a6" font-size="10" font-weight="700" letter-spacing="1.4">END-TO-END AGENT WORKFLOW</text>
+    <circle cx="378" cy="29" r="4" fill="#34d399" filter="url(#glow)"/>
+    <text class="mono" x="389" y="33" fill="#a7f3d0" font-size="10" font-weight="700">LIVE</text>
+
+    <!-- Agent skills -->
+    <g class="mono" transform="translate(28 94)">
+      <text x="0" y="0" fill="#719d91" font-size="9" font-weight="700" letter-spacing="1.2">01 · INSTALL THE SKILLS</text>
+      <g transform="translate(0 15)">
+        <rect class="node" width="112" height="34" rx="3"/>
+        <text class="node-label" x="56" y="22" text-anchor="middle">MODELING</text>
+      </g>
+      <g transform="translate(121 15)">
+        <rect class="node" width="112" height="34" rx="3"/>
+        <text class="node-label" x="56" y="22" text-anchor="middle">UI</text>
+      </g>
+      <g transform="translate(242 15)">
+        <rect class="node" width="112" height="34" rx="3"/>
+        <text class="node-label" x="56" y="22" text-anchor="middle">VERIFY</text>
+      </g>
+      <path class="connector" d="M56 49V67H298V49M177 49V67"/>
+      <circle cx="177" cy="67" r="3" fill="#34d399"/>
+    </g>
+
+    <!-- Shells -->
+    <g transform="translate(28 186)">
+      <text class="mono" x="0" y="0" fill="#719d91" font-size="9" font-weight="700" letter-spacing="1.2">02 · SCAFFOLD THE DELIVERY SURFACE</text>
+      <g class="mono" transform="translate(0 15)">
+        <rect width="354" height="46" rx="4" fill="#052d26" stroke="#6ee7b7" stroke-opacity="0.2"/>
+        <path d="M88.5 0V46M177 0V46M265.5 0V46" stroke="#6ee7b7" stroke-opacity="0.13"/>
+        <text x="44" y="29" text-anchor="middle" fill="#d1fae5" font-size="12" font-weight="700">WEB</text>
+        <text x="133" y="29" text-anchor="middle" fill="#d1fae5" font-size="12" font-weight="700">API</text>
+        <text x="221" y="29" text-anchor="middle" fill="#d1fae5" font-size="12" font-weight="700">CLI</text>
+        <rect x="268" y="4" width="82" height="38" rx="3" fill="#10b981" fill-opacity="0.18"/>
+        <text x="309" y="29" text-anchor="middle" fill="#6ee7b7" font-size="12" font-weight="700">MCP</text>
+      </g>
+      <path class="connector" d="M177 61V83"/>
+      <circle cx="177" cy="83" r="3" fill="#34d399"/>
+    </g>
+
+    <!-- Core -->
+    <g transform="translate(28 284)">
+      <rect width="354" height="111" rx="5" fill="#071f1b" stroke="#34d399" stroke-opacity="0.48" stroke-width="1.5"/>
+      <image href="brand/logo.svg" x="22" y="20" width="70" height="70"/>
+      <text class="mono" x="109" y="24" fill="#719d91" font-size="9" font-weight="700" letter-spacing="1.1">03 · RUN THE MODEL</text>
+      <text class="display" x="109" y="49" fill="#ecfdf5" font-size="18" font-weight="600">SolverForge Core</text>
+      <text class="mono" x="109" y="71" fill="#6ee7b7" font-size="14" font-weight="700">0.19.5</text>
+      <text class="body" x="109" y="92" fill="#7fac9f" font-size="12">one search graph · retained jobs</text>
+    </g>
+
+    <!-- MCP operation -->
+    <g class="mono" transform="translate(28 430)">
+      <path class="connector" d="M177 -35V-16M83 -16H271M83 -16V0M271 -16V0"/>
+      <text x="0" y="0" fill="#719d91" font-size="9" font-weight="700" letter-spacing="1.2">04 · CONNECT + OPERATE THROUGH MCP</text>
+      <g transform="translate(0 15)">
+        <rect class="node" width="171" height="55" rx="4"/>
+        <circle cx="19" cy="27" r="6" fill="#34d399" fill-opacity="0.25" stroke="#6ee7b7"/>
+        <text x="36" y="24" fill="#ecfdf5" font-size="11" font-weight="700">MCP CLIENTS</text>
+        <text x="36" y="41" fill="#7fac9f" font-size="9">opencode · Claude · Cursor</text>
+      </g>
+      <g transform="translate(183 15)">
+        <rect class="node" width="171" height="55" rx="4"/>
+        <circle cx="19" cy="27" r="6" fill="#eab308" fill-opacity="0.21" stroke="#fde047" stroke-opacity="0.75"/>
+        <text x="36" y="24" fill="#ecfdf5" font-size="11" font-weight="700">12 TYPED TOOLS</text>
+        <text x="36" y="41" fill="#7fac9f" font-size="9">solve · inspect · control</text>
+      </g>
+    </g>
+  </g>
+
+  <text class="mono" x="64" y="600" fill="#629185" font-size="11" font-weight="600" letter-spacing="0.7">SOLVERFORGE.ORG  ·  OPEN SOURCE CONSTRAINT OPTIMIZATION</text>
+</svg>

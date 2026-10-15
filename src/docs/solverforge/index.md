@@ -17,7 +17,7 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.21.2` release, and the
+These pages track the `solverforge 0.21.3` release, and the
 [0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/) records
 the release history. Generated CLI projects can intentionally target an older scaffold
 runtime; the current `solverforge-cli 3.5.1` line scaffolds `solverforge 0.21.2`, while
@@ -36,7 +36,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.21.2` workspace declares Rust `1.95`.
+The `0.21.3` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
