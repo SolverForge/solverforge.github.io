@@ -184,6 +184,12 @@ Useful flags:
 - `--precedence-duration-fn` / `--precedence-successors-fn` - precedence hooks
 - `--solution-trait` - additional solution trait required by the list metadata
 
+Precedence hooks name application-owned functions for element durations and
+successors; the CLI writes metadata, not the scheduling rule implementation.
+The runtime list-precedence constraint maintains route ordering incrementally
+through trial moves and undo. Test complete scores as well as the generated
+metadata when introducing these hooks.
+
 ## Models With Both Variable Families
 
 There is no separate third variable kind. A mixed application is simply a

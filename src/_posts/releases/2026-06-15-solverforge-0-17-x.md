@@ -14,7 +14,7 @@ For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
 is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
-The `solverforge-cli 3.5.1` line scaffolds core `0.21.2` (3.4.0 targeted
+The `solverforge-cli 3.5.2` line scaffolds core `0.21.3` (3.4.0 targeted
 `0.20.4` and 3.5.0 targeted `0.21.0`); Python 0.6.12 and the released apps
 moved onto core 0.21.2 in the coordinated releases.
 <% end %>

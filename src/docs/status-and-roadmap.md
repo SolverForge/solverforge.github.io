@@ -30,8 +30,8 @@ and `v0.21.3` to `1000a7d471aafe4aa10e900ad075230b9df51ca8`
 all nine runs completed for their tag commits. Rust `1.95` remains the
 workspace floor.
 
-The independently published CLI line is `solverforge-cli 3.5.1`. Fresh
-scaffolds target `solverforge 0.21.2`, with `solverforge-ui 0.9.0` and
+The independently published CLI line is `solverforge-cli 3.5.2`. Fresh
+scaffolds target `solverforge 0.21.3`, with `solverforge-ui 0.9.0` and
 `solverforge-maps 2.1.4` for the web shell and `rmcp 3.5.1` for the MCP shell.
 The 3.3.x line added the `mcp` shell, `solverforge connect`, the
 `solverforge-modeling` and `solverforge-ui` agent skills with an agent-centric
@@ -46,13 +46,13 @@ scaffolded by earlier lines pin `solverforge 0.19.7` (3.3.x),
 line only when deliberately upgraded and validated.
 
 The worked-use-case bundle ships eight apps on one `solverforge 0.21.3` line:
-`solverforge-hospital@2.0.9`, `solverforge-lessons@2.0.11`,
-`solverforge-deliveries@2.0.10`, `solverforge-fsr@2.0.11`,
-`solverforge-furnace@2.0.3`, `solverforge-orders@0.1.3`,
-`solverforge-fleet@0.1.6`, and `solverforge-flightcrew@0.1.3`, all on
+`solverforge-hospital@2.0.10`, `solverforge-lessons@2.0.12`,
+`solverforge-deliveries@2.0.11`, `solverforge-fsr@2.0.12`,
+`solverforge-furnace@2.0.4`, `solverforge-orders@0.1.4`,
+`solverforge-fleet@0.1.7`, and `solverforge-flightcrew@0.1.4`, all on
 `solverforge-ui 0.9.0`; the four Space-backed apps' tag sync workflows pass and
-the other four apps are repository-only. The bundle's main-branch CI run is
-currently red on one timing-sensitive lifecycle test. SolverForge Python has a
+the other four apps are repository-only. The bundle's latest main-branch
+[CI run passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/38723058914). SolverForge Python has a
 tagged `solverforge-py 0.6.14` source line for CPython 3.14, compiled onto the
 `solverforge 0.21.3` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
 serves `solverforge 0.6.14`. The current UI line is `solverforge-ui 0.9.0`, which
@@ -65,10 +65,10 @@ SolverForge skills now live.
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.21.3`: fluent joined-tuple grouping, live-solution lending for selectors and placements, owned mutable termination state, ownership-transfer moves, and correct selector-subgraph merging; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.5.1` targets `solverforge 0.21.3`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.5.2` targets `solverforge 0.21.3`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.14` compiles dynamic CPython 3.14 models into the `solverforge 0.21.3` runtime; PyPI publishes `solverforge 0.6.14` |
-| **Worked Use Cases** | Released; tag Space syncs passed, bundle main CI has a failing lifecycle test | `solverforge-hospital@2.0.9`, `solverforge-lessons@2.0.11`, `solverforge-deliveries@2.0.10`, `solverforge-fsr@2.0.11`, plus the repository-only `solverforge-furnace@2.0.3`, `solverforge-orders@0.1.3`, `solverforge-fleet@0.1.6`, and `solverforge-flightcrew@0.1.3`; all eight target `solverforge 0.21.3` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.5.1` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
+| **Worked Use Cases** | Released; tag Space syncs and latest bundle CI passed | `solverforge-hospital@2.0.10`, `solverforge-lessons@2.0.12`, `solverforge-deliveries@2.0.11`, `solverforge-fsr@2.0.12`, plus the repository-only `solverforge-furnace@2.0.4`, `solverforge-orders@0.1.4`, `solverforge-fleet@0.1.7`, and `solverforge-flightcrew@0.1.4`; all eight target `solverforge 0.21.3` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.5.2` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -83,10 +83,10 @@ SolverForge skills now live.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital 2.0.9, Lessons 2.0.11, Deliveries 2.0.10, and
-  FSR 2.0.11 contracts on `solverforge 0.21.3`, while keeping their recorded
+  document the released Hospital 2.0.10, Lessons 2.0.12, Deliveries 2.0.11, and
+  FSR 2.0.12 contracts on `solverforge 0.21.3`, while keeping their recorded
   `solverforge-cli 2.2.2` scaffold provenance separate from the current
-  `solverforge-cli 3.5.1` scaffold target.
+  `solverforge-cli 3.5.2` scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -167,7 +167,7 @@ SolverForge skills now live.
 
 - **Core runtime line**: these manuals describe `solverforge 0.21.3`, with
   Rust `1.95`. The
-  published `solverforge-cli 3.5.1` package targets `solverforge 0.21.2` for
+  published `solverforge-cli 3.5.2` package targets `solverforge 0.21.3` for
   fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.19.7`
   from 3.3.x, `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), and an app should
   move to a newer core line only when that app is deliberately upgraded and

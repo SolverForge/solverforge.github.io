@@ -20,7 +20,7 @@ cargo add solverforge
 These pages track the `solverforge 0.21.3` release, and the
 [0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/) records
 the release history. Generated CLI projects can intentionally target an older scaffold
-runtime; the current `solverforge-cli 3.5.1` line scaffolds `solverforge 0.21.2`, while
+runtime; the current `solverforge-cli 3.5.2` line scaffolds `solverforge 0.21.3`, while
 apps scaffolded by earlier lines pin older cores (`0.19.7` from 3.3.x,
 `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), so check `solverforge --version`
 when starting
@@ -362,7 +362,7 @@ fn main() {
 
 ## API Reference
 
-Consult the [`v0.21.0` implementation](https://github.com/SolverForge/solverforge/tree/v0.21.0)
+Consult the [`v0.21.3` implementation](https://github.com/SolverForge/solverforge/tree/v0.21.3)
 and the repository `crates/*/WIREFRAME.md` API maps for this source line.
 [docs.rs/solverforge](https://docs.rs/solverforge/) serves published crate APIs;
 select the version matching your dependency.

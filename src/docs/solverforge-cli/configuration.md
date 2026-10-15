@@ -38,6 +38,11 @@ seconds_spent_limit = 30
 ```
 
 This is the user-owned search layer. Edit it directly or use the CLI helpers.
+The list template uses `list_cheapest_insertion` instead of `first_fit`; both
+templates keep late acceptance, an accepted-count forager, and the 30-second
+termination limit shown above. The neutral scaffold does not declare an explicit
+move selector, so the runtime resolves the applicable neighborhoods from the
+model. Adding a list variable does not rewrite an app-owned search policy.
 
 `solver.toml` should answer operational search questions:
 
@@ -87,11 +92,11 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "3.5.1"
+cli_version = "3.5.2"
 
 [runtime]
-target = "solverforge 0.21.2"
-runtime_source = "crates.io: solverforge 0.21.2"
+target = "solverforge 0.21.3"
+runtime_source = "crates.io: solverforge 0.21.3"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -103,8 +108,8 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 3.5.1` web scaffold target. Fresh
-web generated apps target `solverforge 0.21.2`, take the CLI's
+This example reflects the `solverforge-cli 3.5.2` web scaffold target. Fresh
+web generated apps target `solverforge 0.21.3`, take the CLI's
 `solverforge-ui 0.9.0` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.
 

@@ -44,12 +44,17 @@ solved = Solver.solve(
 ## Score Analysis
 
 ```python
-analyzed = Solver.analyze(schedule)
-print(analyzed.score)
+score = Solver.analyze(schedule)
+print(score)
 ```
 
-`Solver.analyze(...)` evaluates callback constraints for the current solution
-state and writes the calculated score back to the Python solution.
+`Solver.analyze(...)` returns the calculated score and writes it to
+`schedule.score`. It evaluates the named constraints for the current solution
+state. Eligible
+rules, including list precedence/makespan, use their native evaluators; rules
+that need Python callbacks keep that path. Analysis does not run search or
+change the planning assignments. See
+[Compiled Evaluation Boundary](/docs/solverforge-python/constraints/#compiled-evaluation-boundary).
 
 ## Config Loading
 

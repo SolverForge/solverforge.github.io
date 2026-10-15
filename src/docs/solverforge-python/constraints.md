@@ -188,6 +188,20 @@ penalties.
 factory.list_precedence_makespan(Machine, "operations").named("job shop makespan")
 ```
 
+This is a dedicated terminal builder: finish it with `.named(...)`, rather than
+adding stream filters or `.penalize(...)`. With `HardSoftScore`, the hard score
+penalizes missing, duplicate, invalid, or wrong-owner assignments and invalid
+fixed successor IDs. The soft score is negative makespan over the combined
+fixed-successor and owner-list adjacency graph. A cycle adds a hard penalty
+for the whole element set and contributes zero makespan; a zero soft score
+therefore does not establish feasibility.
+
+List edits compare old and new adjacency edges, preserving unchanged edges and
+refreshing affected downstream timings. The paired retract/insert update carries
+its precedence score delta on insertion; an undone trial restores the original
+score. This scorer composes with ordinary unary, joined, grouped, balance, and
+unassigned-list rules in the same provider.
+
 ## Weights
 
 Weights may be score objects, integers, score-level sequences, or callbacks.
@@ -215,14 +229,28 @@ solution score family:
 
 ## Compiled Evaluation Boundary
 
-Python callbacks remain the constraint authoring surface, but the 0.6 line
-compiles a native evaluator when schema evidence proves it has identical
-semantics. Safe specializations include:
+Python callbacks remain the constraint authoring surface. The binding compiles
+a native evaluator when schema evidence proves it has identical semantics.
+Safe specializations include:
 
 - simple fixed-weight unary constraints
 - unassigned-list scoring
 - list precedence/makespan metadata
 - proven stable string-key equality joins
+
+Dispatch is per constraint plan, not all-or-nothing for the provider. A callback
+rule in a mixed constraint set does not force native unary, eligible equality
+join, or precedence plans through the generic Python-row evaluator. Only plans
+that need Python rows materialize them. List precedence has its own compiled
+plan variant for full evaluation and incremental updates; it does not decode
+generic stream filters or weights. Metadata callbacks can still run inside that
+specialized scorer, so native dispatch does not mean callback-free execution.
+
+Incremental precedence state is separate for each rule, even when multiple
+precedence rules target the same owner type. The scorer retains each plan's
+metadata access and graph state across route edits and clears that state on
+reset. Mixed grouped, unassigned-list, and precedence rules keep their own
+caches and contribute once each to the total score.
 
 Callback filters, callback-computed weights, computed properties, unsupported
 key values, and stateful callables remain on the Python callback path. Closures,

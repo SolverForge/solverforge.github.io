@@ -127,7 +127,7 @@ including direct cross and projected grouped complements. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.21.0/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.21.3/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Companion repositories

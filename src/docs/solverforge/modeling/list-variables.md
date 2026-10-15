@@ -166,6 +166,27 @@ hooks expose element durations and fixed successor arcs to the stock
 `ListPrecedenceMakespanConstraint` and `list_precedence_move_selector`; they do
 not introduce a benchmark-specific adapter or a new public selector trait.
 
+### Precedence Makespan Scoring
+
+`ListPrecedenceMakespanConstraint` combines fixed successor arcs with the
+adjacency arcs implied by each owner's list. On an acyclic graph, each element
+starts after all its predecessors finish; the soft score is the negative of the
+largest finish time. For example, operations with durations 2 and 3 linked by a
+fixed successor arc have makespan 5 even when they occupy different owner lists.
+
+The hard score penalizes missing or duplicate assignments, invalid list entries
+or fixed successor IDs, and assignments that violate the optional expected-owner
+relation. A cycle adds a hard penalty equal to the total element count and sets
+the makespan contribution to zero; zero soft penalty alone does not mean the
+schedule is valid. Construction-source validation still rejects malformed
+sources before search; scoring invalid trial states is a separate concern.
+
+During a list edit, the scorer compares the owner's old and new adjacency edges
+and refreshes affected downstream timings. Unchanged edges remain in the graph,
+so a trial and its undo do not require removing and rebuilding the entire route.
+Use the director's paired before/after notifications for custom mutations; see
+[Extension Contracts](/reference/extend-solver/#precedence-score-notifications).
+
 ## Stable Element Source Identity
 
 Generated `usize` list models bind declared elements by a stable source key.

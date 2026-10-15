@@ -134,15 +134,15 @@ delivery-routing code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then keep the finished
-app's recorded release contract explicit. `solverforge-cli 3.5.1` scaffolds
-`solverforge 0.21.2` with `solverforge-ui 0.9.0`; the tagged
-`solverforge-deliveries@2.0.10` reference app records an app-owned
-`solverforge 0.21.2` runtime on the
+app's recorded release contract explicit. `solverforge-cli 3.5.2` scaffolds
+`solverforge 0.21.3` with `solverforge-ui 0.9.0`; the tagged
+`solverforge-deliveries@2.0.11` reference app records an app-owned
+`solverforge 0.21.3` runtime on the
 `solverforge-ui 0.9.0` and `solverforge-maps 2.1.4` companion lines:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.21.2", features = [
+solverforge = { version = "0.21.3", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -181,8 +181,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.21.2"
-runtime_source = "crates.io: solverforge 0.21.2"
+target = "solverforge 0.21.3"
+runtime_source = "crates.io: solverforge 0.21.3"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -410,7 +410,7 @@ pub struct Vehicle {
 }
 ```
 
-The CVRP domain profile is stock SolverForge 0.21.2. It expands to the
+The CVRP domain profile is stock SolverForge 0.21.3. It expands to the
 `VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
 assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
 metric class. The delivery app now keeps city-level routing preparation in the
@@ -772,7 +772,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@2.0.10`      |
+| Tagged app release               | `solverforge-deliveries@2.0.11`      |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |

@@ -97,7 +97,39 @@ excluded from the Hugging Face sync workflow. They are published from this
 repository only, and an app joins the sync matrix only once its Space target
 exists.
 
+## October Runtime Updates
+
+The October 14 releases moved all eight apps to `solverforge 0.21.2`. The
+October 15 releases move them to `solverforge 0.21.3`, carrying the corrected
+net-adjacency updates for list-precedence scoring. UI assets remain at `0.9.0`;
+map-backed apps retain `solverforge-maps 2.1.4`. These are runtime dependency
+updates: the domain models, constraints, and demo datasets are unchanged.
+
+| App | October 14 release (core 0.21.2) | October 15 release (core 0.21.3) |
+| --- | --- | --- |
+| Hospital | `2.0.9` | `2.0.10` |
+| Lessons | `2.0.11` | `2.0.12` |
+| Deliveries | `2.0.10` | `2.0.11` |
+| Field service | `2.0.11` | `2.0.12` |
+| Furnace | `2.0.3` | `2.0.4` |
+| Orders | `0.1.3` | `0.1.4` |
+| Fleet | `0.1.6` | `0.1.7` |
+| Flight crew | `0.1.3` | `0.1.4` |
+
+The four hosted apps' release-tag sync workflows completed:
+[Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717387329),
+[Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717392646),
+[Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717355641),
+and [Field service](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717375396).
+The later bundle [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/38723058914)
+passed at `c5a30f6113d3b4e60ea2e9b6b7f22c5eb6bdc8c3`; earlier failed
+main-branch runs do not describe this head. The release command now rejects a
+detached HEAD before creating a release.
+
 ## Published Version Boundaries
+
+The table below records the original September release. The October releases
+above supersede these versions without changing which apps have hosted Spaces.
 
 | App | Version | Space |
 | --- | ------- | ----- |

@@ -131,8 +131,9 @@ configured surface. Model APIs and scores are unaffected.
 | ------- | ------- | ----- |
 | Core runtime | `solverforge 0.21.3` | Rust `1.95`; docs.rs serves the 0.21.3 API |
 | Previous core runtime | `solverforge 0.21.2` | Registry and release artifacts remain available |
-| Python | `solverforge-py 0.6.10` / PyPI `solverforge 0.6.10` | Runtime `0.19.7` and UI `0.9.0` are unchanged |
-| Worked use cases | Eight released apps | Runtime `0.19.7` and UI `0.9.0` boundaries are unchanged |
+| Python | `solverforge-py 0.6.14` / PyPI `solverforge 0.6.14` | Runtime `0.21.3`, UI `0.9.0` |
+| CLI | `solverforge-cli 3.5.2` | Fresh scaffolds target runtime `0.21.3`; UI `0.9.0`, maps `2.1.4`, MCP `rmcp 3.5.1` |
+| Worked use cases | Eight released apps | Runtime `0.21.3`, UI `0.9.0`; see the [app release table](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/) |
 
 The 0.21.0 tag is `v0.21.0`, commit
 `70aa9f71ab305265cfe7d83753af2f86fb06acf9`; the 0.21.2 tag is `v0.21.2`,
@@ -141,9 +142,9 @@ commit `cb916a73d86c46c25b0e4182626f9adc2c9aa5ad`; and the 0.21.3 tag is
 publication, the GitHub Releases, and CI runs completed successfully for each
 tag, and no artifact carries the retired `0.21.1` number. Independent CLI, Python, and app
 lines move only through their own releases: CLI 3.5.0 scaffolded core 0.21.0,
-Python 0.6.10 and the worked apps keep their `0.19.7` runtime bases until
-deliberately upgraded, and the CLI 3.5.1 line retargets scaffolds to newer
-cores through 0.21.2.
+CLI 3.5.1 scaffolded core 0.21.2, and CLI 3.5.2 targets core 0.21.3.
+Python 0.6.13/0.6.14 and the October 15 app releases also target core 0.21.3.
+Existing applications retain their own dependency pins until deliberately upgraded.
 
 ## Patch History
 
@@ -174,8 +175,8 @@ cores through 0.21.2.
   `step_ended`.
 - Use `.group_by(key, collector)` directly on `Tri`/`Quad`/`Penta` streams;
   custom operator-tree grouping remains valid on `Chain`.
-- Upgrade CLI-generated apps deliberately: fresh scaffolds from CLI 3.5.0
-  target core 0.21.0, while existing apps keep their recorded pins until an
+- Upgrade CLI-generated apps deliberately: fresh scaffolds from CLI 3.5.2
+  target core 0.21.3, while existing apps keep their recorded pins until an
   explicit upgrade.
 - Scores and decisions are unchanged; re-running your regression suite is
   sufficient for behavior parity beyond the signatures above.
@@ -188,6 +189,6 @@ for owned termination state, [Extend Solver](/reference/extend-solver/) for
 extension signatures, and
 [Shift-Group Uniformity](/docs/solverforge/constraints/shift-group-uniformity/)
 for the joined grouping example. The
-[final tag diff](https://github.com/SolverForge/solverforge/compare/v0.20.4...v0.21.2)
+[final tag diff](https://github.com/SolverForge/solverforge/compare/v0.20.4...v0.21.3)
 and the [full range from 0.20.1](https://github.com/SolverForge/solverforge/compare/v0.20.1...v0.21.0)
 record the exact code changes.

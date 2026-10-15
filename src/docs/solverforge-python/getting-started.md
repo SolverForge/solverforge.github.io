@@ -105,12 +105,13 @@ use a separate search engine.
 ## Analyze A Solution
 
 Use `Solver.analyze(...)` when you want to calculate the score for an existing
-solution without running a search.
+solution without running a search. The return value is the score itself, also
+written to `schedule.score`, not a solution or an analysis wrapper.
 
 ```python
 schedule = Schedule([Shift(nurse=None)], [0])
-analyzed = Solver.analyze(schedule)
-print(analyzed.score)
+score = Solver.analyze(schedule)
+print(score)
 ```
 
 ## Pass Runtime Config

@@ -86,7 +86,7 @@ crates.io on 2026-10-14",
     "each compiled selector node lowers exactly once", "no artifact carries",
     "Previous core runtime | `solverforge 0.21.2` | Registry and release artifacts remain available",
     "`0.21.3` | 2026-10-14", "`0.21.2` | 2026-10-14", "`0.21.0` | 2026-10-14",
-    "compare/v0.20.4...v0.21.2", "compare/v0.20.1...v0.21.0"
+    "compare/v0.20.4...v0.21.3", "compare/v0.20.1...v0.21.0"
   ],
   "src/docs/solverforge/constraints/shift-group-uniformity.md" => [
     "number of distinct groups minus one",
@@ -105,7 +105,7 @@ crates.io on 2026-10-14",
     "These pages track the `solverforge 0.21.3` release",
     "The `0.21.3` workspace declares Rust `1.95`.",
     "/blog/releases/2026/10/14/solverforge-0-21-x/",
-    "solverforge-cli 3.5.1",
+    "solverforge-cli 3.5.2",
     "apps scaffolded by earlier lines pin older cores"
   ],
 
@@ -115,7 +115,7 @@ crates.io on 2026-10-14",
     "DenseKeys::add", "per event", "at most once"
   ],
   "src/reference/integration-surfaces.md" => [
-    "tracks `solverforge 0.21.3`", "the current CLI 3.5.1 line scaffolds core 0.21.2"
+    "tracks `solverforge 0.21.3`", "the current CLI 3.5.2 line scaffolds core 0.21.3"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py 0.6.14",
@@ -128,13 +128,13 @@ crates.io on 2026-10-14",
     "`same_value_conflict_field`"
   ],
   "src/docs/solverforge-cli/index.md" => [
-    "solverforge-cli 3.5.1",
+    "solverforge-cli 3.5.2",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 3.5.1",
-    "CLI version: 3.5.1",
-    "SolverForge crate target 0.21.2",
+    "solverforge-cli 3.5.2",
+    "CLI version: 3.5.2",
+    "SolverForge crate target 0.21.3",
     "Scaffold MCP target: rmcp 3.5.1",
     "solverforge connect"
   ],
@@ -147,8 +147,8 @@ crates.io on 2026-10-14",
     "re-renders\n`src/data/data_seed.rs`"
   ],
   "src/docs/solverforge-cli/configuration.md" => [
-    "cli_version = \"3.5.1\"",
-    "target = \"solverforge 0.21.2\""
+    "cli_version = \"3.5.2\"",
+    "target = \"solverforge 0.21.3\""
   ],
   "src/docs/solverforge-cli/getting-started.md" => [
     "cannot localize entity indexes"
@@ -165,7 +165,7 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-maps/index.md" => [
     "solverforge-maps 2.1.4",
-    "solverforge-cli 3.5.1"
+    "solverforge-cli 3.5.2"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
     "SolverForge 0.21.3"
@@ -189,7 +189,7 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.5.1",
+    "solverforge-cli 3.5.2",
     "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
@@ -230,7 +230,7 @@ crates.io on 2026-10-14",
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge 0.21.3",
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.5.1"
+    "solverforge-cli 3.5.2"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
     "`3.1.0` | 2026-09-16",
@@ -264,7 +264,11 @@ crates.io on 2026-10-14",
     "38640704980", "38640708258", "38640708277",
     "38598708211", "38598906107", "38598906248",
     "Native Rust constraint solver published as `solverforge 0.21.3`",
-    "The independently published CLI line is `solverforge-cli 3.5.1`",
+    "The independently published CLI line is `solverforge-cli 3.5.2`",
+    "Fresh scaffolds target `solverforge 0.21.3`",
+    "solverforge-furnace@2.0.4", "solverforge-orders@0.1.4",
+    "solverforge-fleet@0.1.7", "solverforge-flightcrew@0.1.4",
+    "38723058914",
     "- **Core runtime line**", "- **Joined-tuple grouping**", "- **Guided native scalar search**",
     "- **Score-authoritative grouped search**", "- **Late acceptance**",
     "- **Lending extensions**", "- **Owned runtime state**",
@@ -278,28 +282,28 @@ crates.io on 2026-10-14",
     "lists are updated in place", "residual predicates", "duplicate",
     "benchmark results or measured performance gains",
     "solverforge-py 0.6.14",
-    "solverforge-cli 3.5.1",
+    "solverforge-cli 3.5.2",
     "solverforge-ui 0.9.0",
-    "solverforge-hospital@2.0.9",
-    "solverforge-lessons@2.0.11",
-    "solverforge-deliveries@2.0.10",
-    "solverforge-fsr@2.0.11"
+    "solverforge-hospital@2.0.10",
+    "solverforge-lessons@2.0.12",
+    "solverforge-deliveries@2.0.11",
+    "solverforge-fsr@2.0.12"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@2.0.9",
-    "solverforge 0.21.2"
+    "solverforge-hospital@2.0.10",
+    "solverforge 0.21.3"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
-    "solverforge-lessons@2.0.11",
-    "solverforge 0.21.2"
+    "solverforge-lessons@2.0.12",
+    "solverforge 0.21.3"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@2.0.10",
-    "solverforge 0.21.2"
+    "solverforge-deliveries@2.0.11",
+    "solverforge 0.21.3"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@2.0.11",
-    "solverforge 0.21.2"
+    "solverforge-fsr@2.0.12",
+    "solverforge 0.21.3"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge 0.21.3` is the current core",
@@ -347,6 +351,16 @@ crates.io on 2026-10-14",
     "solverforge-orders 0.1.2",
     "solverforge-fleet 0.1.5",
     "solverforge-flightcrew 0.1.2",
+    "## October Runtime Updates",
+    "| Hospital | `2.0.9` | `2.0.10` |",
+    "| Lessons | `2.0.11` | `2.0.12` |",
+    "| Deliveries | `2.0.10` | `2.0.11` |",
+    "| Field service | `2.0.11` | `2.0.12` |",
+    "| Furnace | `2.0.3` | `2.0.4` |",
+    "| Orders | `0.1.3` | `0.1.4` |",
+    "| Fleet | `0.1.6` | `0.1.7` |",
+    "| Flight crew | `0.1.3` | `0.1.4` |",
+    "38723058914",
     "repository-only"
   ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [

@@ -153,6 +153,29 @@ assignment. `EntityPlacerCursor::next_placement` receives the current director,
 a completion predicate, and a stop predicate; app models normally stay on the
 configured construction path rather than implementing a second placer engine.
 
+### Precedence Score Notifications
+
+Custom list mutations must call `before_variable_changed(descriptor_index,
+entity_index)` before editing an owner list and `after_variable_changed(...)`
+afterwards, including when undoing a trial. Report every changed owner with the
+correct list descriptor.
+
+The stock precedence scorer defers its score delta until insertion. Retraction
+returns zero and retains the matching owner's old route as the baseline for a
+net adjacency-edge diff. If several owners retract before one inserts, the
+insertion first removes the other pending owners from its cached graph, then
+scores the inserted owner's new route. Those other owners remain absent until
+their own insertions; unchanged owners remain present. Do not treat the
+intermediate score after a bare retraction as a freshly scored solution with
+that owner removed.
+
+After each complete edit or undo, compare incremental scoring with a fresh
+score when testing a custom move. Include multi-owner interleaving, duplicate or
+missing elements, and a cycle-forming trial: restoring the list must restore
+both its hard penalties and its makespan. See
+[List Variables](/docs/solverforge/modeling/list-variables/#precedence-makespan-scoring)
+for the scoring model.
+
 ## Telemetry and lifecycle expectations
 
 Retained jobs expose exact counts and durations through structured events.
