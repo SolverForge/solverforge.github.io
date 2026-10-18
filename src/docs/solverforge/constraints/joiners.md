@@ -239,8 +239,9 @@ Existence relationships do not scan derived candidate rows:
 incremental path reads only relationship keys and the touched keys' left rows.
 The compiled per-pair path remains where a relationship needs it —
 `JoinerExistenceNode` for residual-predicate existence, and the complement node
-for scored defaults — together with the `JoinNode`, `SelfJoinNode`, and grouped
-families, which retain their pair-row engines. Dense `usize`
+for scored defaults — together with the `JoinNode` and `SelfJoinNode`, which
+retain their pair rows; grouped streams run on the common `GroupNode`
+accumulator. Dense `usize`
 count updates check table length before growth and inline touched-key marking;
 the per-event membership pass still processes each changed key once from its
 final count. This is internal bookkeeping, not a new indexing API or a

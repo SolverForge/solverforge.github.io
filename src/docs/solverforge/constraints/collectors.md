@@ -170,8 +170,10 @@ for targets with no matching result; its default restoration reads the plan's
 retained equality keys, so a target whose last result row is
 retracted regains its default even after the target retracted and re-inserted
 earlier in the same event. The public `complement(source, key,
-default)` authoring shape is unchanged. Direct cross-join and projected
-complemented groups still use their respective grouped terminal families.
+default)` authoring shape is unchanged. Every complemented group — unary,
+direct cross-join, or projected — finalizes into the relational
+`ComplementNode` under the shared `OperatorTerminal`; there is one grouping
+execution path and no per-shape grouped terminal families.
 
 Projected grouped streams can also use `complement(...)` after grouping when
 the source rows were created by `project(...)`.

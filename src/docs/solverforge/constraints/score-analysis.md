@@ -62,8 +62,11 @@ constraints, each terminal still contributes its own constraint metadata,
 score, match count, and detailed explanation. The shared node only removes
 duplicate retained update work.
 
-Direct pair, chained-join, existence, flattened, and unary complemented terminals
-use `OperatorTerminal`. It retains signed scores by row handle and borrows the
+Direct pair, chained-join, existence, flattened, unary complemented, and grouped
+terminals use `OperatorTerminal`; a `#[solverforge_constraints]` chain of
+grouped terminals finalizes them onto one shared operator owner through
+`SharedOperatorTerminal`, keeping each named terminal's score, metadata, and
+explanation independent. It retains signed scores by row handle and borrows the
 complete operator row for scoring and explanation; it does not retain borrowed
 entities or solution references. This execution change does not merge terminal
 identities or change the summarized `solution.analyze()` API.

@@ -126,8 +126,9 @@ unchanged. Grouped-scalar default local search forages with
 `AcceptedCount(256)` — the list-model policy — so a step sweeps until the
 limit is accepted and applies the best.
 
-Specialized unary, grouped, and projected constraint families still exist,
-including direct cross and projected grouped complements. Existence and keyed
+Specialized unary and projected pair families remain, while grouped shapes —
+including direct cross and projected grouped complements — run on the shared
+kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
