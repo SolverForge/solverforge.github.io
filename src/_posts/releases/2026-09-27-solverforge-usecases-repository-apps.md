@@ -99,32 +99,40 @@ exists.
 
 ## October Runtime Updates
 
-The October 14 releases moved all eight apps to `solverforge 0.21.2`. The
-October 15 releases move them to `solverforge 0.21.3`, carrying the corrected
-net-adjacency updates for list-precedence scoring. UI assets remain at `0.9.0`;
+The October 14 releases moved all eight apps to `solverforge 0.21.2`; the
+October 15 releases moved them to `solverforge 0.21.3`, carrying the corrected
+net-adjacency updates for list-precedence scoring. The October 18 releases
+move all eight to `solverforge 0.22.0`, carrying the shared grouping-accumulator
+kernel and position-based membership updates. UI assets remain at `0.9.0`;
 map-backed apps retain `solverforge-maps 2.1.4`. These are runtime dependency
 updates: the domain models, constraints, and demo datasets are unchanged.
 
-| App | October 14 release (core 0.21.2) | October 15 release (core 0.21.3) |
-| --- | --- | --- |
-| Hospital | `2.0.9` | `2.0.10` |
-| Lessons | `2.0.11` | `2.0.12` |
-| Deliveries | `2.0.10` | `2.0.11` |
-| Field service | `2.0.11` | `2.0.12` |
-| Furnace | `2.0.3` | `2.0.4` |
-| Orders | `0.1.3` | `0.1.4` |
-| Fleet | `0.1.6` | `0.1.7` |
-| Flight crew | `0.1.3` | `0.1.4` |
+| App | October 14 (core 0.21.2) | October 15 (core 0.21.3) | October 18 (core 0.22.0) |
+| --- | --- | --- | --- |
+| Hospital | `2.0.9` | `2.0.10` | `2.0.11` |
+| Lessons | `2.0.11` | `2.0.12` | `2.0.13` |
+| Deliveries | `2.0.10` | `2.0.11` | `2.0.12` |
+| Field service | `2.0.11` | `2.0.12` | `2.0.13` |
+| Furnace | `2.0.3` | `2.0.4` | `2.0.5` |
+| Orders | `0.1.3` | `0.1.4` | `0.1.5` |
+| Fleet | `0.1.6` | `0.1.7` | `0.1.8` |
+| Flight crew | `0.1.3` | `0.1.4` | `0.1.5` |
 
-The four hosted apps' release-tag sync workflows completed:
+The October 15 hosted apps' release-tag sync workflows completed:
 [Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717387329),
 [Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717392646),
 [Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717355641),
 and [Field service](https://github.com/SolverForge/solverforge-usecases/actions/runs/38717375396).
-The later bundle [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/38723058914)
-passed at `c5a30f6113d3b4e60ea2e9b6b7f22c5eb6bdc8c3`; earlier failed
-main-branch runs do not describe this head. The release command now rejects a
-detached HEAD before creating a release.
+The October 15 bundle [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/38723058914)
+passed at `c5a30f6113d3b4e60ea2e9b6b7f22c5eb6bdc8c3`, and the October 18 bundle
+[CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113224930)
+passed at `abc4905537bc38d7e0fbeeea9576084d27db274c`. The October 18 hosted
+apps' release-tag sync workflows also completed:
+[Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113251530),
+[Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113256126),
+[Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113229026),
+and [Field service](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113242845).
+The release command rejects a detached HEAD before creating a release.
 
 ## Published Version Boundaries
 
