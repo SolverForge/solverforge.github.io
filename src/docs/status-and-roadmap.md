@@ -10,12 +10,14 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.21.3` release and keeps core,
+documentation tracks the `solverforge 0.22.0` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.21.3, and docs.rs serves the 0.21.3 API.
-The 0.21.x line adds joined-tuple grouping, live-solution cursor lending,
+`cargo add solverforge` installs 0.22.0, and docs.rs serves the 0.22.0 API.
+The 0.21.x line added joined-tuple grouping, live-solution cursor lending,
 owned search state, correct selector-subgraph merging, and net-route-delta
-precedence scoring; the `0.21.1` number failed publication and was retired. The `v0.21.0` tag points to
+precedence scoring. The 0.22.0 release routes every grouped stream through one
+accumulator kernel, retracts group and hash memberships by position, and owns
+each grouping key once; the `0.21.1` number failed publication and was retired. The `v0.21.0` tag points to
 `70aa9f71ab305265cfe7d83753af2f86fb06acf9` ([CI](https://github.com/SolverForge/solverforge/actions/runs/38598708211),
 [publish](https://github.com/SolverForge/solverforge/actions/runs/38598906107),
 [release](https://github.com/SolverForge/solverforge/actions/runs/38598906248)),
@@ -27,11 +29,14 @@ and `v0.21.3` to `1000a7d471aafe4aa10e900ad075230b9df51ca8`
 ([CI](https://github.com/SolverForge/solverforge/actions/runs/38640704980),
 [publish](https://github.com/SolverForge/solverforge/actions/runs/38640708258),
 [release](https://github.com/SolverForge/solverforge/actions/runs/38640708277));
-all nine runs completed for their tag commits. Rust `1.95` remains the
+`v0.22.0` points to `df1ce37b4a69a61fe249e71852ea694de94b4493`
+([publish](https://github.com/SolverForge/solverforge/actions/runs/39109402359),
+[release](https://github.com/SolverForge/solverforge/actions/runs/39109402581));
+all eleven runs completed for their tag commits. Rust `1.95` remains the
 workspace floor.
 
-The independently published CLI line is `solverforge-cli 3.5.2`. Fresh
-scaffolds target `solverforge 0.21.3`, with `solverforge-ui 0.9.0` and
+The independently published CLI line is `solverforge-cli 3.6.0`. Fresh
+scaffolds target `solverforge 0.22.0`, with `solverforge-ui 0.9.0` and
 `solverforge-maps 2.1.4` for the web shell and `rmcp 3.5.1` for the MCP shell.
 The 3.3.x line added the `mcp` shell, `solverforge connect`, the
 `solverforge-modeling` and `solverforge-ui` agent skills with an agent-centric
@@ -45,17 +50,21 @@ scaffolded by earlier lines pin `solverforge 0.19.7` (3.3.x),
 `solverforge-ui 0.7.0` with `rmcp 3.3.0`), and an app moves to a newer core
 line only when deliberately upgraded and validated.
 
-The worked-use-case bundle ships eight apps on one `solverforge 0.21.3` line:
-`solverforge-hospital@2.0.10`, `solverforge-lessons@2.0.12`,
-`solverforge-deliveries@2.0.11`, `solverforge-fsr@2.0.12`,
-`solverforge-furnace@2.0.4`, `solverforge-orders@0.1.4`,
-`solverforge-fleet@0.1.7`, and `solverforge-flightcrew@0.1.4`, all on
-`solverforge-ui 0.9.0`; the four Space-backed apps' tag sync workflows pass and
-the other four apps are repository-only. The bundle's latest main-branch
-[CI run passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/38723058914). SolverForge Python has a
-tagged `solverforge-py 0.6.14` source line for CPython 3.14, compiled onto the
-`solverforge 0.21.3` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
-serves `solverforge 0.6.14`. The current UI line is `solverforge-ui 0.9.0`, which
+The worked-use-case bundle ships eight apps on one `solverforge 0.22.0` line:
+`solverforge-hospital@2.0.11`, `solverforge-lessons@2.0.13`,
+`solverforge-deliveries@2.0.12`, `solverforge-fsr@2.0.13`,
+`solverforge-furnace@2.0.5`, `solverforge-orders@0.1.5`,
+`solverforge-fleet@0.1.8`, and `solverforge-flightcrew@0.1.5`, all on
+`solverforge-ui 0.9.0`; all four Space-backed apps' release-tag sync workflows
+completed ([Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113251530),
+[Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113256126),
+[Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113229026),
+[FSR](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113242845)),
+the bundle main-branch [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113224930)
+passed on the release head, and the other four apps are repository-only. SolverForge Python has a
+tagged `solverforge-py 0.6.15` source line for CPython 3.14, compiled onto the
+`solverforge 0.22.0` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
+serves `solverforge 0.6.15`. The current UI line is `solverforge-ui 0.9.0`, which
 moved the bundled agent skill into the `solverforge-cli` repository, where both
 SolverForge skills now live.
 <% end %>
@@ -64,11 +73,11 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.21.3`: fluent joined-tuple grouping, live-solution lending for selectors and placements, owned mutable termination state, ownership-transfer moves, and correct selector-subgraph merging; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.5.2` targets `solverforge 0.21.3`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.6.14` compiles dynamic CPython 3.14 models into the `solverforge 0.21.3` runtime; PyPI publishes `solverforge 0.6.14` |
-| **Worked Use Cases** | Released; tag Space syncs and latest bundle CI passed | `solverforge-hospital@2.0.10`, `solverforge-lessons@2.0.12`, `solverforge-deliveries@2.0.11`, `solverforge-fsr@2.0.12`, plus the repository-only `solverforge-furnace@2.0.4`, `solverforge-orders@0.1.4`, `solverforge-fleet@0.1.7`, and `solverforge-flightcrew@0.1.4`; all eight target `solverforge 0.21.3` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.5.2` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.22.0`: fluent joined-tuple grouping, live-solution lending for selectors and placements, owned mutable termination state, ownership-transfer moves, and correct selector-subgraph merging; Rust `1.95` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.6.0` targets `solverforge 0.22.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
+| **Python** | Published; CI and release passed | `solverforge-py 0.6.15` compiles dynamic CPython 3.14 models into the `solverforge 0.22.0` runtime; PyPI publishes `solverforge 0.6.15` |
+| **Worked Use Cases** | Released; tag Space syncs and bundle CI passed | `solverforge-hospital@2.0.11`, `solverforge-lessons@2.0.13`, `solverforge-deliveries@2.0.12`, `solverforge-fsr@2.0.13`, plus the repository-only `solverforge-furnace@2.0.5`, `solverforge-orders@0.1.5`, `solverforge-fleet@0.1.8`, and `solverforge-flightcrew@0.1.5`; all eight target `solverforge 0.22.0` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.6.0` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -83,10 +92,10 @@ SolverForge skills now live.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital 2.0.10, Lessons 2.0.12, Deliveries 2.0.11, and
-  FSR 2.0.12 contracts on `solverforge 0.21.3`, while keeping their recorded
+  document the released Hospital 2.0.11, Lessons 2.0.13, Deliveries 2.0.12, and
+  FSR 2.0.13 contracts on `solverforge 0.22.0`, while keeping their recorded
   `solverforge-cli 2.2.2` scaffold provenance separate from the current
-  `solverforge-cli 3.5.2` scaffold target.
+  `solverforge-cli 3.6.0` scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -135,14 +144,14 @@ SolverForge skills now live.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.6.14"`; use the
-  matching `solverforge-py` `v0.6.14` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.6.15"`; use the
+  matching `solverforge-py` `v0.6.15` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
   metrics, hard per-row scalar candidate domains, native static same-value
   conflict fields, and callback constraints.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
-  `SolverManager(config=None)` over one compiled SolverForge 0.21.3 runtime graph.
+  `SolverManager(config=None)` over one compiled SolverForge 0.22.0 runtime graph.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
   joins, grouped counts, balance scoring, fixed or callback-computed weights,
   unassigned-list scoring, list precedence/makespan scoring, indexed-presence
@@ -165,9 +174,9 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.21.3`, with
+- **Core runtime line**: these manuals describe `solverforge 0.22.0`, with
   Rust `1.95`. The
-  published `solverforge-cli 3.5.2` package targets `solverforge 0.21.3` for
+  published `solverforge-cli 3.6.0` package targets `solverforge 0.22.0` for
   fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.19.7`
   from 3.3.x, `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), and an app should
   move to a newer core line only when that app is deliberately upgraded and
@@ -455,9 +464,9 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.6.14` is the current tagged SolverForge Python source line for
+`solverforge-py 0.6.15` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
-`solverforge 0.21.3` runtime, removes the wrapper-owned search path, specializes
+`solverforge 0.22.0` runtime, removes the wrapper-owned search path, specializes
 safe native constraint plans, adds qualified retained candidate diagnostics,
 and keeps shared `solverforge-ui 0.9.0` assets. The automatic release workflow
 publishes the source distribution and CPython 3.14 wheels to PyPI for every
@@ -465,8 +474,8 @@ tagged patch. `0.6.6` (2026-08-11) enforces each row's imported candidate set
 as the hard domain for every native scalar mutation and adds
 `same_value_conflict_field` for static assignment conflict graphs; the
 0.6.7–0.6.10 patches carry the SolverForge `0.19.7` construction and telemetry
-behavior, and the 0.6.11–0.6.14 patches retarget to the `0.21.0` and `0.21.3`
-registry bases. Its source archive
+behavior, and the 0.6.11–0.6.15 patches retarget to the `0.21.0`, `0.21.3`, and
+`0.22.0` registry bases. Its source archive
 contains only the package metadata and Python/Rust build inputs; repository
 tests, examples, guidance, and tooling remain source-checkout assets.
 

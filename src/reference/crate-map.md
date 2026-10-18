@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.21.3` crate and current
+This map is aligned with the published `solverforge 0.22.0` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -61,6 +61,10 @@ Fluent cross joins and same-collection unique combinations score through
 same-collection combinations use `SelfJoinNode` with an identity-preserving
 filter. The old `cross_bi_incremental`, `cross_tri_incremental`, and per-arity
 self-join incremental constraint modules are no longer the implementation.
+Every grouped stream — unary, cross-join, projected, and complemented — lowers
+onto the one `stream::relational::operator::GroupNode` accumulator; chained
+terminals over a shared group share that operator owner through
+`constraint::relational::shared_terminal`, scored and explained per terminal.
 
 Named cross `Bi`/`Tri`/`Quad`/`Penta` streams adapt the common tree. Cross
 `Penta::join` returns `stream::chain::Chain`; subsequent `Chain::join` calls
@@ -127,7 +131,7 @@ including direct cross and projected grouped complements. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.21.3/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.22.0/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Companion repositories
@@ -135,7 +139,7 @@ when extending internals.
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
-| `solverforge-py`   | the tagged `v0.6.14` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
+| `solverforge-py`   | the tagged `v0.6.15` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
@@ -144,8 +148,8 @@ when extending internals.
 - Start with `solverforge-cli` to scaffold the app shell.
 - Start with the PyPI `solverforge` package when the application surface is
   Python and you do not need a generated Rust web/API/CLI shell. PyPI publishes
-  `solverforge 0.6.14`; use the matching `solverforge-py v0.6.14` tag for source
-  and example development on SolverForge 0.21.3.
+  `solverforge 0.6.15`; use the matching `solverforge-py v0.6.15` tag for source
+  and example development on SolverForge 0.22.0.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
 - Keep scalar/list model declarations in the `planning_model!` manifest and
@@ -174,7 +178,7 @@ when extending internals.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
-| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.14` source tag |
+| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.15` source tag |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |

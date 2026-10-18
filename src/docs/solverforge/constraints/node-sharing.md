@@ -62,8 +62,9 @@ The compiler supports sharing these grouped families:
 
 Same-binding reuse shares directly. Separate fluent chains share only when the
 macro can prove the grouped expression is identical from syntax inside the same
-annotated function. Opaque helper calls, unsupported direct complemented forms,
-or mixed tuple shapes that cannot be proven stay on the normal Rust path.
+annotated function. A `group_by(...)` anywhere in the chain qualifies a
+complemented grouped source for sharing. Opaque helper calls or mixed tuple
+shapes that cannot be proven stay on the normal Rust path.
 
 ## What Does Not Change
 

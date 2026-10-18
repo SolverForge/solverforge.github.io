@@ -11,10 +11,10 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-This section documents the tagged `solverforge-py 0.6.14` source line for
+This section documents the tagged `solverforge-py 0.6.15` source line for
 CPython 3.14. The automatic release workflow completed and the public PyPI
-package is `solverforge 0.6.14`. The source compiles Python models into the
-`solverforge 0.21.3` Rust runtime and embeds `solverforge-ui 0.9.0` assets for
+package is `solverforge 0.6.15`. The source compiles Python models into the
+`solverforge 0.22.0` Rust runtime and embeds `solverforge-ui 0.9.0` assets for
 Python-hosted examples. GitHub CI and the final-tag release workflow completed
 successfully.
 <% end %>
@@ -31,7 +31,7 @@ selector or move engine.
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.6.14"
+python3.14 -m pip install "solverforge==0.6.15"
 ```
 
 Use the tagged source checkout when developing the repository examples or
@@ -40,7 +40,7 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.14
+git checkout v0.6.15
 make develop
 . .venv/bin/activate
 ```
@@ -75,10 +75,10 @@ make develop
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.6.14` |
-| Published PyPI version | `0.6.14` |
+| Documented source line | `0.6.15` |
+| Published PyPI version | `0.6.15` |
 | Python requirement | `>=3.14` |
-| Runtime base | `solverforge 0.21.3` |
+| Runtime base | `solverforge 0.22.0` |
 | Embedded UI base | `solverforge-ui 0.9.0` |
 | Repository | [SolverForge/solverforge-py](https://github.com/SolverForge/solverforge-py) |
 
@@ -103,5 +103,5 @@ make develop
 ## Links
 
 - [SolverForge Python 0.6.x release notes](/blog/releases/2026/07/13/solverforge-python-0-6-x/)
-- [PyPI package 0.6.14](https://pypi.org/project/solverforge/0.6.14/)
-- [Python v0.6.14 source](https://github.com/SolverForge/solverforge-py/tree/v0.6.14)
+- [PyPI package 0.6.15](https://pypi.org/project/solverforge/0.6.15/)
+- [Python v0.6.15 source](https://github.com/SolverForge/solverforge-py/tree/v0.6.15)

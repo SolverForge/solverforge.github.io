@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete FSR Space
   repository
-- keep the checked-in SolverForge 0.21.3 use-case dependency shape
+- keep the checked-in SolverForge 0.22.0 use-case dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -123,17 +123,17 @@ score analysis surface, route tables, Docker build, and tests.
 
 ### Keep the Published Dependency Shape
 
-The tagged `solverforge-fsr@2.0.12` use-case source targets the published
-SolverForge 0.21.3 line:
+The tagged `solverforge-fsr@2.0.13` use-case source targets the published
+SolverForge 0.22.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.21.3", features = [
+solverforge = { version = "0.22.0", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-core = "0.21.3"
+solverforge-core = "0.22.0"
 solverforge-ui = { version = "0.9.0" }
 solverforge-maps = { version = "2.1.4" }
 
@@ -160,8 +160,8 @@ and route shadow values; most generated applications only need the top-level
 `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.5.2` scaffolds `solverforge 0.21.3`; the finished FSR app
-records an app-owned `solverforge 0.21.3` runtime target while retaining
+`solverforge-cli 3.6.0` scaffolds `solverforge 0.22.0`; the finished FSR app
+records an app-owned `solverforge 0.22.0` runtime target while retaining
 its original `2.2.2` scaffold provenance:
 
 ```toml
@@ -172,8 +172,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.21.3"
-runtime_source = "crates.io: solverforge 0.21.3"
+target = "solverforge 0.22.0"
+runtime_source = "crates.io: solverforge 0.22.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -699,7 +699,7 @@ curl http://localhost:7860/demo-data
 
 | Topic | File |
 | ----- | ---- |
-| Tagged app release | `solverforge-fsr@2.0.12` |
+| Tagged app release | `solverforge-fsr@2.0.13` |
 | App contract | `solverforge.app.toml` |
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |
