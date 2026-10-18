@@ -220,14 +220,14 @@ reconstructing the run/result join.
 
 The [results page](/benchmarks/) contains the latest publishable full canonical
 nightly for each problem, with the complete [downloadable evidence](/benchmarks/results.json).
-The current cohort completed on October 15–16, 2026 (UTC), from benchmark
+The current cohort completed on October 16–17, 2026 (UTC), from benchmark
 commit `3f3e76ea40afe030b4b77e374b92df8bce528013`:
 
 | Problem | Instances | Recorded results | Run |
 | --- | --- | --- | --- |
-| CVRP | 100 | 2,100 | `7f010d2a-fb76-4a5b-a9c1-11b43e5141cd` |
-| Employee scheduling | 37 | 555 | `288ccb8f-5628-48d9-b7b0-1809c104b280` |
-| Job-shop scheduling | 162 | 2,430 | `81fae1ea-a134-4047-afa7-62f98793d25f` |
+| CVRP | 100 | 2,100 | `5ab07b3d-887d-411c-815f-a69ac520d04b` |
+| Employee scheduling | 37 | 555 | `37cb1c55-aeb2-44a3-ae5b-8f4a6c498b5d` |
+| Job-shop scheduling | 162 | 2,430 | `882a92d3-1323-4da6-b023-eab895f27ef9` |
 
 These runs tested native SolverForge **0.21.3** and Python **0.6.14**, not the
 newer package releases. Competitors were Timefold **2.7.0**, OR-Tools
