@@ -220,18 +220,18 @@ reconstructing the run/result join.
 
 The [results page](/benchmarks/) contains the latest publishable full canonical
 nightly for each problem, with the complete [downloadable evidence](/benchmarks/results.json).
-The current cohort completed on October 16–17, 2026 (UTC), from benchmark
-commit `3f3e76ea40afe030b4b77e374b92df8bce528013`:
+The current cohort completed on October 18–19, 2026 (UTC), from benchmark
+commit `2f71da41a82308c5f0da2f2c1cea8969991861a1`:
 
 | Problem | Instances | Recorded results | Run |
 | --- | --- | --- | --- |
-| CVRP | 100 | 2,100 | `5ab07b3d-887d-411c-815f-a69ac520d04b` |
-| Employee scheduling | 37 | 555 | `37cb1c55-aeb2-44a3-ae5b-8f4a6c498b5d` |
-| Job-shop scheduling | 162 | 2,430 | `882a92d3-1323-4da6-b023-eab895f27ef9` |
+| CVRP | 100 | 2,100 | `03ef371a-a0a2-42ff-af47-87d73d5963a7` |
+| Employee scheduling | 37 | 555 | `f3c914f9-9695-446c-aab3-1241b7249021` |
+| Job-shop scheduling | 162 | 2,430 | `e9e294de-0d5c-4db2-a1eb-c77f23171734` |
 
-These runs tested native SolverForge **0.21.3** and Python **0.6.14**, not the
-newer package releases. Competitors were Timefold **2.7.0**, OR-Tools
-**9.15.6755**, and HiGHS **1.15.1**; CVRP additionally tested PyVRP **0.14.0**
+These runs tested native SolverForge **0.22.0** and Python **0.6.15**.
+Competitors were Timefold **2.7.1**, OR-Tools
+**9.15.6755**, and HiGHS **1.15.1**; CVRP additionally tested PyVRP **0.14.1**
 and PyHygese **0.1.0**. Each matrix covers the 1, 10, and 60 second budgets.
 Official references cover every selected instance in all three problems.
 
