@@ -38,6 +38,7 @@ Validates:
 | entity modules in `src/domain/mod.rs` exist          | Errors for missing files |
 | constraint modules in `src/constraints/mod.rs` exist | Errors for missing files |
 | `solver.toml` exists                                 | Warns if missing |
+| `move_thread_count` and candidate-trace settings      | Errors for invalid runtime forms or trace capacity |
 | entities have solvable fields                        | Warns for entities with no scalar or list variable |
 | scalar-group and conflict-repair references          | Errors when generated model-resource refs are stale |
 
@@ -125,7 +126,12 @@ Subcommands:
 | `set`      | `solverforge config set <KEY> <VALUE>` | Set a dotted TOML key path in `solver.toml` |
 
 `config set` parses values as integer, float, boolean (`true` or `false`), then
-string. Intermediate TOML tables are created when needed.
+string. Intermediate TOML tables are created when needed. `check` and
+`config set` reject invalid `move_thread_count` forms: use `"auto"`, `"none"`,
+or a table with one non-negative integer `count`, not a bare integer. Invalid
+settings are rejected before `config set` writes the file. See
+[parallel evaluation](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
+for the default, pool caps, and rebuild requirement.
 
 Examples:
 
@@ -133,6 +139,7 @@ Examples:
 solverforge config show
 solverforge config set termination.seconds_spent_limit 60
 solverforge config set environment_mode reproducible
+solverforge config set move_thread_count.count 4
 ```
 
 ### `config show`

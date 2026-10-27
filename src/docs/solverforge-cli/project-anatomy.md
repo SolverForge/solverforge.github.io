@@ -139,6 +139,15 @@ endpoints for:
 Those routes live in `src/api/` and are part of the generated app shell, not an
 optional add-on.
 
+### Telemetry Contract
+
+`src/api/telemetry.rs` projects the runtime's compact telemetry for status,
+snapshots, and typed SSE. The `phases` array contains every started phase in
+execution order; it is not a single current-phase object. Run totals and each
+phase expose `movesSpeculative`. Detailed candidate traces remain separate and
+label discarded ahead-of-decision work as `discarded_speculative`. Selector
+and move breakdowns do not invent their own speculative counters.
+
 ## `src/data/mod.rs` vs `src/data/data_seed.rs`
 
 The scaffold intentionally splits demo-data ownership:

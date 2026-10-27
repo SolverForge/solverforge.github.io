@@ -21,8 +21,7 @@ These pages track the `solverforge 0.23.0` release, and the
 [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/) records
 the current line while the
 [0.22.x release note](/blog/releases/2026/10/18/solverforge-0-22-x/) keeps the
-previous one. Generated CLI projects can intentionally target an older scaffold
-runtime; the current `solverforge-cli 3.6.0` line scaffolds `solverforge 0.22.0`, while
+previous one. The current `solverforge-cli 3.7.1` line scaffolds `solverforge 0.23.0`, while
 apps scaffolded by earlier lines pin older cores (`0.19.7` from 3.3.x,
 `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), so check `solverforge --version`
 when starting

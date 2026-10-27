@@ -3,10 +3,10 @@
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_RUNTIME_VERSION = "0.22.0"
+EXPECTED_RUNTIME_VERSION = "0.23.0"
 EXPECTED_UI_VERSION = "0.9.0"
 EXPECTED_CLI_VERSION = "2.2.2"
-EXPECTED_APP_VERSION = "2.0.13"
+EXPECTED_APP_VERSION = "2.0.14"
 
 def log(message)
   puts "[verify-lessons-tutorial] #{message}"
@@ -66,6 +66,8 @@ search_surface = File.join(SITE_ROOT, "src/_components/shared/search_surface.rb"
 
 log "Checking public copy and tutorial anchors"
 assert_file_contains(doc_page, "SolverForge Lessons Use Case")
+assert_file_contains(doc_page, "Browser test servers honor `CARGO_TARGET_DIR`")
+assert_file_contains(doc_page, "`solverforge-cli 3.7.1` scaffolds `solverforge 0.23.0`")
 assert_file_contains(doc_page, "https://huggingface.co/spaces/SolverForge/solverforge-lessons")
 assert_file_contains(doc_page, "solverforge #{EXPECTED_RUNTIME_VERSION}")
 assert_file_contains(doc_page, "solverforge-ui #{EXPECTED_UI_VERSION}")
@@ -98,6 +100,8 @@ usecases_repo = discover_repo("SOLVERFORGE_USECASES_REPO", [
 if usecases_repo
   log "Using use-case bundle repo: #{usecases_repo}"
   lessons_root = File.join(usecases_repo, "uc-lessons")
+  assert_file_contains(File.join(lessons_root, "Makefile"), "CARGO_TARGET_DIR")
+  assert_file_contains(File.join(lessons_root, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}\"")
   assert_file_contains(File.join(lessons_root, "Cargo.toml"), "version = \"#{EXPECTED_APP_VERSION}\"")
   assert_file_contains(File.join(lessons_root, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\"")
   assert_file_contains(File.join(lessons_root, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_UI_VERSION}\"")

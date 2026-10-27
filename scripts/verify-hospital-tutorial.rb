@@ -12,14 +12,14 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "3.6.0"
-EXPECTED_CLI_RUNTIME_VERSION = "0.22.0"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.22.0"
+EXPECTED_CLI_VERSION = "3.7.1"
+EXPECTED_CLI_RUNTIME_VERSION = "0.23.0"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.23.0"
 EXPECTED_CLI_UI_VERSION = "0.9.0"
 EXPECTED_TUTORIAL_UI_VERSION = "0.9.0"
 EXPECTED_MAPS_VERSION = "2.1.4"
 EXPECTED_HOSPITAL_APP_CLI_VERSION = "2.2.2"
-EXPECTED_HOSPITAL_APP_VERSION = "2.0.11"
+EXPECTED_HOSPITAL_APP_VERSION = "2.0.12"
 
 def log(message)
   puts "[verify-hospital-tutorial] #{message}"
@@ -274,6 +274,8 @@ begin
   assert_file_contains(search_surface, "See a concrete hospital scheduling application from scaffold to solver-driven UI.")
 
   assert_file_contains(doc_page, "cargo install solverforge-cli --force")
+  assert_file_contains(doc_page, "Browser test servers honor `CARGO_TARGET_DIR`")
+  assert_file_contains(doc_page, "`solverforge-cli 3.7.1` scaffolds")
   assert_file_contains(doc_page, "solverforge --version")
   assert_file_contains(doc_page, "solverforge new solverforge-hospital --quiet")
   assert_file_contains(doc_page, "cd solverforge-hospital")
@@ -323,6 +325,8 @@ begin
 
   if usecases_repo
     hospital_bundle = File.join(usecases_repo, "uc-hospital")
+    assert_file_contains(File.join(hospital_bundle, "tests/e2e/playwright.config.js"), "CARGO_TARGET_DIR")
+    assert_file_contains(File.join(hospital_bundle, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_HOSPITAL_APP_CLI_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "version = \"#{EXPECTED_HOSPITAL_APP_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(hospital_bundle, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")

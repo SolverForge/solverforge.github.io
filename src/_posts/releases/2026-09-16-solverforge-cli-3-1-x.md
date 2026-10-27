@@ -9,6 +9,14 @@ description: >
   with ownership receipts.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note") do %>
+For the current CLI line, read the
+[3.7.x release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/)
+and the [CLI manual](/docs/solverforge-cli/). The versions below record this
+release's scaffold targets, not today's install defaults.
+<% end %>
+
+
 **solverforge-cli 3.1.0** is published on crates.io and released on GitHub
 (2026-09-16), at publication `cargo install solverforge-cli` installed 3.1.0 directly. The
 previous package, `solverforge-cli 3.0.0`, scaffolded `solverforge 0.19.4`,

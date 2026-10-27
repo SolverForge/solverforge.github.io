@@ -12,14 +12,14 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "3.6.0"
-EXPECTED_CLI_RUNTIME_VERSION = "0.22.0"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.22.0"
+EXPECTED_CLI_VERSION = "3.7.1"
+EXPECTED_CLI_RUNTIME_VERSION = "0.23.0"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.23.0"
 EXPECTED_DELIVERIES_APP_CLI_VERSION = "2.2.2"
 EXPECTED_CLI_UI_VERSION = "0.9.0"
 EXPECTED_TUTORIAL_UI_VERSION = "0.9.0"
 EXPECTED_MAPS_VERSION = "2.1.4"
-EXPECTED_DELIVERIES_APP_VERSION = "2.0.12"
+EXPECTED_DELIVERIES_APP_VERSION = "2.0.13"
 
 def log(message)
   puts "[verify-deliveries-tutorial] #{message}"
@@ -300,6 +300,8 @@ begin
   assert_file_contains(hub_page, "SolverForge Deliveries Use Case")
   assert_file_contains(search_surface, "Study list-variable vehicle routing")
   assert_file_contains(doc_page, "cargo install solverforge-cli --force")
+  assert_file_contains(doc_page, "Browser test servers honor `CARGO_TARGET_DIR`")
+  assert_file_contains(doc_page, "`solverforge-cli 3.7.1` scaffolds")
   assert_file_contains(doc_page, "solverforge --version")
   assert_file_contains(doc_page, "solverforge new solverforge-deliveries --quiet")
   assert_file_contains(doc_page, "cd solverforge-deliveries")
@@ -354,6 +356,9 @@ begin
 
   if usecases_repo
     deliveries_bundle = File.join(usecases_repo, "uc-deliveries")
+    assert_file_contains(File.join(deliveries_bundle, "tests/e2e/playwright.config.js"), "CARGO_TARGET_DIR")
+    assert_file_contains(File.join(deliveries_bundle, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_DELIVERIES_APP_CLI_VERSION}\"")
+    assert_file_contains(File.join(deliveries_bundle, "src/domain/plan.rs"), "(|_: &Self| crate::constraints::create_constraints()) as fn(&Self) -> _")
     assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "version = \"#{EXPECTED_DELIVERIES_APP_VERSION}\"")
     assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(deliveries_bundle, "Cargo.toml"), "solverforge-ui = \"#{EXPECTED_TUTORIAL_UI_VERSION}\"")

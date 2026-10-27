@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and scaffold a neutral SolverForge app
 - know when to switch from the learning scaffold to the complete Lessons Space
   repository
-- keep the checked-in SolverForge 0.22.0 use-case dependency shape
+- keep the checked-in SolverForge 0.23.0 use-case dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -118,12 +118,12 @@ surface, Docker build, and validation commands.
 
 ### Keep the Published Dependency Shape
 
-The tagged `solverforge-lessons@2.0.13` use-case source targets the published
-SolverForge 0.22.0 line:
+The tagged `solverforge-lessons@2.0.14` use-case source targets the published
+SolverForge 0.23.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.22.0", features = [
+solverforge = { version = "0.23.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -148,8 +148,8 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.6.0` scaffolds `solverforge 0.22.0`; the finished Lessons app
-records an app-owned `solverforge 0.22.0` runtime target while retaining
+`solverforge-cli 3.7.1` scaffolds `solverforge 0.23.0`; the finished Lessons app
+records an app-owned `solverforge 0.23.0` runtime target while retaining
 its original `2.2.2` scaffold provenance:
 
 ```toml
@@ -160,8 +160,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.22.0"
-runtime_source = "crates.io: solverforge 0.22.0"
+target = "solverforge 0.23.0"
+runtime_source = "crates.io: solverforge 0.23.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -558,6 +558,10 @@ The public API includes:
 
 ## Testing and Validation
 
+Browser test servers honor `CARGO_TARGET_DIR`, so a shared Cargo build
+location works as well as the app-local `target` directory.
+
+
 Standard validation:
 
 ```bash
@@ -594,7 +598,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@2.0.13` |
+| Tagged app release | `solverforge-lessons@2.0.14` |
 | Local run | `make run-release` |
 | Standard validation | `make test` |
 | Full local validation | `make ci-local` |

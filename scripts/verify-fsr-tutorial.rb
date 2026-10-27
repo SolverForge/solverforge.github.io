@@ -12,14 +12,14 @@ require "uri"
 
 SCRIPT_DIR = File.expand_path(__dir__)
 SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_CLI_VERSION = "3.6.0"
-EXPECTED_CLI_RUNTIME_VERSION = "0.22.0"
+EXPECTED_CLI_VERSION = "3.7.1"
+EXPECTED_CLI_RUNTIME_VERSION = "0.23.0"
 EXPECTED_CLI_UI_VERSION = "0.9.0"
 EXPECTED_FSR_APP_CLI_VERSION = "2.2.2"
-EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.22.0"
+EXPECTED_TUTORIAL_RUNTIME_VERSION = "0.23.0"
 EXPECTED_TUTORIAL_UI_VERSION = "0.9.0"
 EXPECTED_MAPS_VERSION = "2.1.4"
-EXPECTED_FSR_APP_VERSION = "2.0.13"
+EXPECTED_FSR_APP_VERSION = "2.0.14"
 
 def log(message)
   puts "[verify-fsr-tutorial] #{message}"
@@ -283,6 +283,8 @@ begin
   assert_file_contains(hub_page, "SolverForge FSR Use Case")
   assert_file_contains(search_surface, "Trace field-service routing with technicians, skills, shifts, road-network travel, and route geometry.")
   assert_file_contains(doc_page, "cargo install solverforge-cli --force")
+  assert_file_contains(doc_page, "Browser test servers honor `CARGO_TARGET_DIR`")
+  assert_file_contains(doc_page, "`solverforge-cli 3.7.1` scaffolds")
   assert_file_contains(doc_page, "solverforge --version")
   assert_file_contains(doc_page, "solverforge new solverforge-fsr --quiet")
   assert_file_contains(doc_page, "cd solverforge-fsr")
@@ -352,6 +354,7 @@ begin
 
   if usecases_repo
     fsr_bundle = File.join(usecases_repo, "uc-fsr")
+    assert_file_contains(File.join(fsr_bundle, "tests/e2e/playwright.config.js"), "CARGO_TARGET_DIR")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "version = \"#{EXPECTED_FSR_APP_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")
     assert_file_contains(File.join(fsr_bundle, "Cargo.toml"), "solverforge-core = \"#{EXPECTED_TUTORIAL_RUNTIME_VERSION}\"")

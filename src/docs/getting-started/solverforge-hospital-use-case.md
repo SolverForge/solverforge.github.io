@@ -123,15 +123,15 @@ CLI scaffold plus manual hospital scheduling code.
 ### Keep the Published Dependency Shape
 
 Start from the CLI's current published scaffold line, then keep the finished
-app's recorded release contract explicit. `solverforge-cli 3.6.0` scaffolds
-`solverforge 0.22.0` with `solverforge-ui 0.9.0`; the tagged
-`solverforge-hospital@2.0.11` reference app records an app-owned
-`solverforge 0.22.0` runtime on the
+app's recorded release contract explicit. `solverforge-cli 3.7.1` scaffolds
+`solverforge 0.23.0` with `solverforge-ui 0.9.0`; the tagged
+`solverforge-hospital@2.0.12` reference app records an app-owned
+`solverforge 0.23.0` runtime on the
 `solverforge-ui 0.9.0` web-shell assets:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.22.0", features = [
+solverforge = { version = "0.23.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -166,8 +166,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.22.0"
-runtime_source = "crates.io: solverforge 0.22.0"
+target = "solverforge 0.23.0"
+runtime_source = "crates.io: solverforge 0.23.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -675,6 +675,10 @@ constraint addition.
 
 ## Testing and Validation
 
+Browser test servers honor `CARGO_TARGET_DIR`, so a shared Cargo build
+location works as well as the app-local `target` directory.
+
+
 After you have cloned the finished example, or after your manual build-out
 matches it, run the baseline checks from the app root:
 
@@ -716,7 +720,7 @@ make test-slow
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
-| Tagged app release               | `solverforge-hospital@2.0.11`               |
+| Tagged app release               | `solverforge-hospital@2.0.12`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |

@@ -67,6 +67,15 @@ installer reports it and asks you to choose two, or to accept duplicates with
 `--layout per-harness --force`. Restart the agent after installing so it
 rescans skill directories.
 
+## Parallel Evaluation Guidance
+
+The modeling skill documents opt-in parallel local-search evaluation through
+`solverforge config set move_thread_count.count 4`. It keeps the neutral
+scaffold sequential, explains the shared Rayon pool and 32-evaluator cap, and
+uses fixed-work parity rather than promising better scores or speedups from a
+larger count. See [Configuration](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
+for the app-wide build-time setting.
+
 ## Solve Smoke Test
 
 The modeling skill's `scripts/solve-smoke-test.sh <app-dir>` verifies a

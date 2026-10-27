@@ -85,8 +85,8 @@ the native worker.
 | Python source | `solverforge-py v0.7.0` | Core dependencies exactly `=0.23.0`; UI exactly `=0.9.0` |
 | Previous Python package | `solverforge 0.6.15` | Core `0.22.0`; single-phase telemetry shape |
 | Rust core | `solverforge 0.23.0` | Separate registry release and platform validation |
-| CLI | `solverforge-cli 3.6.0` | Still scaffolds core `0.22.0` |
-| Rust use-case bundle | October 18 app tags | Still declares core `0.22.0`, UI `0.9.0` |
+| CLI | `solverforge-cli 3.7.1` | Fresh scaffolds target core `0.23.0`; see the [CLI release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/) |
+| Rust use-case bundle | October 27 app tags | All eight declare core `0.23.0`, UI `0.9.0`; see the [app release matrix](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/#october-runtime-updates) |
 
 The `v0.7.0` source tag is commit
 `0f739eb5d427a8a7748b21009ca70bbfa4697750`. PyPI provides CPython 3.14

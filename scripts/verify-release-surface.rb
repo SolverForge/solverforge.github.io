@@ -4,6 +4,27 @@
 ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
+  ".github/workflows/site.yml" => ['ref: "solverforge-furnace@2.0.7"'],
+  "scripts/verify-cli-release.rb" => [
+    'EXPECTED_CLI_VERSION = "3.7.1"', 'EXPECTED_RUNTIME_VERSION = "0.23.0"',
+    'EXPECTED_MCP_VERSION = "3.8.0"',
+    "fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca",
+    "ba476ea2862d6e0a6e2f0a9a434428d2887f8863abdd1e932b6ef87598d7d538",
+    "pub phases: Vec<PhaseTelemetryDto>", "pub moves_speculative: u64"
+  ],
+  "src/_posts/releases/2026-10-27-solverforge-cli-3-7-x.md" => [
+    "`3.7.1` | 2026-10-27", "`3.7.0` | 2026-10-27", "`3.6.0` | 2026-10-18",
+    "fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca",
+    "ba476ea2862d6e0a6e2f0a9a434428d2887f8863abdd1e932b6ef87598d7d538",
+    "ServerConfig", "rmcp 3.8.0", "40546507692", "40546507680", "40546499568",
+    "ab79f437bf7694bbb166d1247cde30c5c5a00e42",
+    "41e70042260d7ed88e7f310822f3c0f583dea2d5dd28fa92e48820919d72841e",
+    "40525393646", "40525393731", "40525390383",
+    "Windows failed", "test_new_creates_neutral_project_files",
+    "Integration Tests job were skipped", "move_thread_count.count 4",
+    "`phases` array", "movesSpeculative", "discarded_speculative",
+    "RAYON_NUM_THREADS", "32"
+  ],
   "src/_posts/releases/2026-06-02-solverforge-python-0-4-x.md" => [
     "The current binding is `solverforge 0.7.0` on core `0.23.0`",
     "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
@@ -21,7 +42,7 @@ REQUIRED_TEXT = {
     "258dc6279865d67b2503eae775cc03114cc6db71d8bd96276ae5ba27c830be6c",
     "releases the GIL", "Stateful ruin selectors", "discarded_speculative",
     "replace the single `phase` dictionary with\n`phases`",
-    "pinned exactly to `=0.23.0`", "Still scaffolds core `0.22.0`"
+    "pinned exactly to `=0.23.0`", "Fresh scaffolds target core `0.23.0`"
   ],
   "src/docs/solverforge/modeling/planning-entities.md" => [
     "per-entity legal domain", "search hint, not a legal-domain restriction",
@@ -51,7 +72,7 @@ REQUIRED_TEXT = {
     "SolverTelemetry.phase", "phases: Vec<PhaseTelemetry>",
     "Cow<'_, MoveTabuSignature>", "list_shadow_elements",
     "active_dynamic_score_family", "not a new swap restriction",
-    "Fresh scaffolds target core `0.22.0`, not `0.23.0`"
+    "fresh scaffolds target core `0.23.0`"
   ],
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
     "`solverforge 0.23.0` is the current core",
@@ -168,7 +189,7 @@ crates.io on 2026-10-14",
     "The `0.23.0` workspace declares Rust `1.95`.",
     "/blog/releases/2026/10/27/solverforge-0-23-x/",
     "/blog/releases/2026/10/18/solverforge-0-22-x/",
-    "solverforge-cli 3.6.0",
+    "solverforge-cli 3.7.1",
     "apps scaffolded by earlier lines pin older cores"
   ],
 
@@ -178,7 +199,7 @@ crates.io on 2026-10-14",
     "DenseKeys::add", "per event", "at most once"
   ],
   "src/reference/integration-surfaces.md" => [
-    "tracks `solverforge 0.23.0`", "the current CLI 3.6.0 line scaffolds core 0.22.0"
+    "tracks `solverforge 0.23.0`", "the current CLI 3.7.1 line scaffolds core 0.23.0"
   ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py v0.7.0",
@@ -188,19 +209,22 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-python/modeling.md" => [
     "`candidate_values` is also the native hard domain",
-    "`same_value_conflict_field`"
+    "`same_value_conflict_field`", "## Entity Pinning", "`planning_pin()`",
+    "`planning_variable(pinning=True)` is not supported",
+    "assert [shift.employee_idx for shift in solved.shifts] == [0, 1]",
+    "mandatory planning work incomplete", "actual `bool`"
   ],
   "src/docs/solverforge-cli/index.md" => [
-    "solverforge-cli 3.6.0",
-    "This release scaffolds `solverforge 0.22.0`",
-    "describes `solverforge 0.23.0`",
+    "solverforge-cli 3.7.1",
+    "Fresh scaffolds target `solverforge 0.23.0`",
+    "the default `auto` setting stays sequential",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
-    "solverforge-cli 3.6.0",
-    "CLI version: 3.6.0",
-    "SolverForge crate target 0.22.0",
-    "Scaffold MCP target: rmcp 3.5.1",
+    "solverforge-cli 3.7.1",
+    "CLI version: 3.7.1",
+    "SolverForge crate target 0.23.0",
+    "Scaffold MCP target: rmcp 3.8.0",
     "solverforge connect"
   ],
   "src/docs/solverforge-cli/generator-commands.md" => [
@@ -212,8 +236,10 @@ crates.io on 2026-10-14",
     "re-renders\n`src/data/data_seed.rs`"
   ],
   "src/docs/solverforge-cli/configuration.md" => [
-    "cli_version = \"3.6.0\"",
-    "target = \"solverforge 0.22.0\""
+    "cli_version = \"3.7.1\"",
+    "target = \"solverforge 0.23.0\"",
+    "move_thread_count.count 4", "RAYON_NUM_THREADS", "32",
+    "`\"auto\"`", "`\"none\"`", "non-negative integer"
   ],
   "src/docs/solverforge-cli/getting-started.md" => [
     "cannot localize entity indexes"
@@ -230,7 +256,7 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-maps/index.md" => [
     "solverforge-maps 2.1.4",
-    "solverforge-cli 3.6.0"
+    "solverforge-cli 3.7.1"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
     "SolverForge 0.23.0", "`cp314` ABI, not `cp314t`"
@@ -256,7 +282,7 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.6.0",
+    "solverforge-cli 3.7.1",
     "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
@@ -297,7 +323,7 @@ crates.io on 2026-10-14",
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge 0.23.0",
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.6.0"
+    "solverforge-cli 3.7.1"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
     "`3.1.0` | 2026-09-16",
@@ -331,11 +357,15 @@ crates.io on 2026-10-14",
     "38640704980", "38640708258", "38640708277",
     "38598708211", "38598906107", "38598906248",
     "Native Rust constraint solver published as `solverforge 0.23.0`",
-    "The independently published CLI line is `solverforge-cli 3.6.0`",
-    "Fresh scaffolds target `solverforge 0.22.0`",
-    "solverforge-furnace@2.0.5", "solverforge-orders@0.1.5",
-    "solverforge-fleet@0.1.8", "solverforge-flightcrew@0.1.5",
-    "39113251530", "39113256126", "39113229026", "39113242845", "39113224930",
+    "The independently published CLI line is `solverforge-cli 3.7.1`",
+    "Fresh scaffolds target `solverforge 0.23.0`",
+    "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0",
+    "solverforge-fleet@0.1.9", "solverforge-flightcrew@0.2.0",
+    "40524550543", "40524558093", "40524507822", "40524530701", "40537219778",
+    "2da90f5e8d3994e8f91186bd268fc301472f9dfb",
+    "40525390383", "40525393646", "40525393731",
+    "40546499568", "40546507692", "40546507680",
+    "fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca", "ServerConfig", "rmcp 3.8.0",
     "tag Space syncs and bundle CI passed",
     "40473570696", "40473570732", "40473567305",
     "Linux/Windows CI passed, macOS CI failed",
@@ -356,28 +386,28 @@ crates.io on 2026-10-14",
     "40499986297", "40499989425",
     "over one compiled SolverForge 0.23.0 runtime graph",
     "`moves_speculative`, `discarded_speculative`",
-    "solverforge-cli 3.6.0",
+    "solverforge-cli 3.7.1",
     "solverforge-ui 0.9.0",
-    "solverforge-hospital@2.0.11",
-    "solverforge-lessons@2.0.13",
-    "solverforge-deliveries@2.0.12",
-    "solverforge-fsr@2.0.13"
+    "solverforge-hospital@2.0.12",
+    "solverforge-lessons@2.0.14",
+    "solverforge-deliveries@2.0.13",
+    "solverforge-fsr@2.0.14"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@2.0.11",
-    "solverforge 0.22.0"
+    "solverforge-hospital@2.0.12",
+    "solverforge 0.23.0"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
-    "solverforge-lessons@2.0.13",
-    "solverforge 0.22.0"
+    "solverforge-lessons@2.0.14",
+    "solverforge 0.23.0"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@2.0.12",
-    "solverforge 0.22.0"
+    "solverforge-deliveries@2.0.13",
+    "solverforge 0.23.0"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@2.0.13",
-    "solverforge 0.22.0"
+    "solverforge-fsr@2.0.14",
+    "solverforge 0.23.0"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge 0.23.0` is the current core",
@@ -437,6 +467,18 @@ crates.io on 2026-10-14",
     "| Fleet | `0.1.6` | `0.1.7` | `0.1.8` |",
     "| Flight crew | `0.1.3` | `0.1.4` | `0.1.5` |",
     "38723058914", "39113251530", "39113256126", "39113229026", "39113242845", "39113224930",
+    "October 27 (core 0.23.0)",
+    "| Hospital | `2.0.9` | `2.0.10` | `2.0.11` | `2.0.12` |",
+    "| Lessons | `2.0.11` | `2.0.12` | `2.0.13` | `2.0.14` |",
+    "| Deliveries | `2.0.10` | `2.0.11` | `2.0.12` | `2.0.13` |",
+    "| Field service | `2.0.11` | `2.0.12` | `2.0.13` | `2.0.14` |",
+    "| Furnace | `2.0.3` | `2.0.4` | `2.0.5` | `2.0.6`, then `2.0.7` |",
+    "| Orders | `0.1.3` | `0.1.4` | `0.1.5` | `0.2.0` |",
+    "| Fleet | `0.1.6` | `0.1.7` | `0.1.8` | `0.1.9` |",
+    "| Flight crew | `0.1.3` | `0.1.4` | `0.1.5` | `0.2.0` |",
+    "40524550543", "40524558093", "40524507822", "40524530701",
+    "40537219778", "2da90f5e8d3994e8f91186bd268fc301472f9dfb",
+    "movesSpeculative", "discarded_speculative", "does not make that pull interruptible",
     "repository-only"
   ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [

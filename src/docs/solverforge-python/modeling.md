@@ -57,11 +57,13 @@ and moves remain specific to each solve.
 | Field | Meaning |
 | ----- | ------- |
 | `planning_id()` | stable identity field |
+| `planning_pin()` | boolean field that preserves the whole entity's input planning state |
 | `planning_variable(value_range_provider=...)` | scalar value chosen from a solution collection |
 | `planning_list_variable(element_collection=...)` | ordered list variable whose elements come from a solution collection |
 
-Scalar variables can allow `None` with `allows_unassigned=True`. They can also
-be declared pinned with `pinning=True` when a model needs fixed assignments.
+Scalar variables can allow `None` with `allows_unassigned=True`. For fixed
+input assignments, [pin the whole entity](#entity-pinning) with `planning_pin()`;
+`planning_variable(pinning=True)` is not supported.
 
 ```python
 @planning_entity
@@ -145,6 +147,59 @@ An assignment-owned variable has one mutation path: its declared group handles
 grouped construction and `grouped_scalar_move_selector`. Raw scalar, nearby,
 ruin, and conflict-repair selectors targeting that variable are rejected rather
 than creating a second ownership path.
+
+## Entity Pinning
+
+`planning_pin()` marks one boolean field on a planning entity. Initialize it to
+an actual `bool` on every instance. A true value preserves all of that entity's
+input planning state: scalar assignments and, for a list owner, its input list.
+Unpinned entities in the same solution are still constructed and searched.
+Pinning is per entity, not per variable, and is not an `is_pinned()` callback.
+
+This complete example keeps the pinned shift on employee 0 even though the
+soft rule prefers employee 1; the free shift receives employee 1:
+
+```python
+from solverforge import (
+    ConstraintFactory, HardSoftScore, SoftScore, Solver, constraint_provider,
+    planning_entity, planning_pin, planning_solution, planning_variable,
+)
+
+@planning_entity
+class PinnedShift:
+    pinned = planning_pin()
+    employee_idx = planning_variable(value_range_provider="employees")
+
+    def __init__(self, pinned: bool, employee_idx: int | None = None):
+        self.pinned = pinned
+        self.employee_idx = employee_idx
+
+@constraint_provider
+def pinned_shift_constraints(factory: ConstraintFactory):
+    return [
+        factory.for_each(PinnedShift)
+        .filter(lambda shift: shift.employee_idx == 0)
+        .penalize(SoftScore.of(1))
+        .named("prefer employee 1"),
+    ]
+
+@planning_solution(score=HardSoftScore, constraints=pinned_shift_constraints)
+class PinnedSchedule:
+    shifts: list[PinnedShift]
+
+    def __init__(self):
+        self.employees = [0, 1]
+        self.shifts = [PinnedShift(True, 0), PinnedShift(False)]
+        self.score = None
+
+solved = Solver.solve(PinnedSchedule(), {"termination": {"step_count_limit": 20}})
+assert [shift.employee_idx for shift in solved.shifts] == [0, 1]
+```
+
+An unset, unreadable, or non-boolean pin fails model import. Pinning does not
+bypass mandatory completion: a pinned required scalar with input `None` fails
+with `mandatory planning work incomplete`. An optional scalar may stay `None`
+when its entity is pinned; its constraints still contribute to the score.
 
 ## Candidate Metrics
 

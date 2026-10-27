@@ -8,12 +8,13 @@ description: >
   for the retained lifecycle workflow.
 ---
 
-<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
-This post records the `solverforge-cli` 1.1.x release line. For current behavior,
-use the [solverforge-cli manual](/docs/solverforge-cli/) and run
-`solverforge --version` for the scaffold targets baked into your installed
-binary.
+<%= render Ui::Callout.new(title: "Historical release note") do %>
+For the current CLI line, read the
+[3.7.x release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/)
+and the [CLI manual](/docs/solverforge-cli/). The versions below record this
+release's scaffold targets, not today's install defaults.
 <% end %>
+
 
 **solverforge-cli 1.1.x** is the stabilization line
 following the CLI/runtime convergence work in SolverForge 0.8.x.

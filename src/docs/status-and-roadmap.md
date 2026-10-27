@@ -49,9 +49,27 @@ passed on Linux and Windows but failed the macOS
 was skipped. See the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/)
 for the published API boundaries and upgrade checklist.
 
-The independently published CLI line is `solverforge-cli 3.6.0`. Fresh
-scaffolds target `solverforge 0.22.0`, with `solverforge-ui 0.9.0` and
-`solverforge-maps 2.1.4` for the web shell and `rmcp 3.5.1` for the MCP shell.
+The independently published CLI line is `solverforge-cli 3.7.1`. Fresh
+scaffolds target `solverforge 0.23.0`, with `solverforge-ui 0.9.0` and
+`solverforge-maps 2.1.4` for the web shell and `rmcp 3.8.0` for the MCP shell.
+`check` and `config set` validate `move_thread_count` as `"auto"`, `"none"`,
+or a non-negative `{ count = N }` table. Generated telemetry exposes ordered
+`phases`, run/per-phase `movesSpeculative`, and `discarded_speculative` trace
+outcomes. The MCP scaffold uses `ServerConfig` instead of the deprecated
+`ServerInfo` alias. The 3.7.1 patch also matches the thread-count template
+comment lines independently of LF/CRLF line endings. Its exact-commit
+[CI](https://github.com/SolverForge/solverforge-cli/actions/runs/40546499568),
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/40546507692),
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/40546507680)
+all passed at `fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca`.
+
+The preceding 3.7.0 tag's [Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/40525393646)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/40525393731)
+workflows passed. [CI](https://github.com/SolverForge/solverforge-cli/actions/runs/40525390383)
+passed on Linux and macOS, but Windows failed
+`test_new_creates_neutral_project_files` on the opt-in solver-config comment
+assertion; integration tests were skipped. See the
+[3.7.x CLI release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/).
 The 3.3.x line added the `mcp` shell, `solverforge connect`, the
 `solverforge-modeling` and `solverforge-ui` agent skills with an agent-centric
 installer, and multi-client MCP config writing; 3.3.2 moved generated
@@ -64,18 +82,26 @@ scaffolded by earlier lines pin `solverforge 0.19.7` (3.3.x),
 `solverforge-ui 0.7.0` with `rmcp 3.3.0`), and an app moves to a newer core
 line only when deliberately upgraded and validated.
 
-The worked-use-case bundle ships eight apps on one `solverforge 0.22.0` line:
-`solverforge-hospital@2.0.11`, `solverforge-lessons@2.0.13`,
-`solverforge-deliveries@2.0.12`, `solverforge-fsr@2.0.13`,
-`solverforge-furnace@2.0.5`, `solverforge-orders@0.1.5`,
-`solverforge-fleet@0.1.8`, and `solverforge-flightcrew@0.1.5`, all on
+The worked-use-case bundle ships eight apps on one `solverforge 0.23.0` line:
+`solverforge-hospital@2.0.12`, `solverforge-lessons@2.0.14`,
+`solverforge-deliveries@2.0.13`, `solverforge-fsr@2.0.14`,
+`solverforge-furnace@2.0.7`, `solverforge-orders@0.2.0`,
+`solverforge-fleet@0.1.9`, and `solverforge-flightcrew@0.2.0`, all on
 `solverforge-ui 0.9.0`; all four Space-backed apps' release-tag sync workflows
-completed ([Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113251530),
-[Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113256126),
-[Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113229026),
-[FSR](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113242845)),
-the bundle main-branch [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/39113224930)
-passed on the release head, and the other four apps are repository-only. SolverForge Python has a
+completed ([Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524550543),
+[Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524558093),
+[Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524507822),
+[FSR](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524530701)),
+the bundle main-branch [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/40537219778)
+passed at the final `solverforge-furnace@2.0.7` bundle commit
+`2da90f5e8d3994e8f91186bd268fc301472f9dfb`; this supersedes the earlier
+failed run at the Orders release commit. Orders and Flight Crew expose the
+full `phases` array and `movesSpeculative`; the other six apps keep their
+narrower app-owned telemetry summaries. Furnace 2.0.7 reduces task-provider
+work before cancellation or a time limit can take effect; a candidate pull
+is not interruptible. The other four apps are repository-only.
+See the [app release matrix](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/#october-runtime-updates).
+SolverForge Python has a
 tagged `solverforge-py 0.7.0` source line for CPython 3.14, compiled onto the
 `solverforge 0.23.0` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
 serves `solverforge 0.7.0`. Python's exact-tag
@@ -93,10 +119,10 @@ SolverForge skills now live.
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; Linux/Windows CI passed, macOS CI failed | Native Rust constraint solver published as `solverforge 0.23.0`: opt-in parallel acceptor-forager move evaluation, ordered per-phase telemetry, speculative-work diagnostics, and incremental scoring of list-shadow writes; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.6.0` targets `solverforge 0.22.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.7.1` targets `solverforge 0.23.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.8.0`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.0` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.0`; opt-in parallel evaluation and ordered per-phase telemetry |
-| **Worked Use Cases** | Released; tag Space syncs and bundle CI passed | `solverforge-hospital@2.0.11`, `solverforge-lessons@2.0.13`, `solverforge-deliveries@2.0.12`, `solverforge-fsr@2.0.13`, plus the repository-only `solverforge-furnace@2.0.5`, `solverforge-orders@0.1.5`, `solverforge-fleet@0.1.8`, and `solverforge-flightcrew@0.1.5`; all eight target `solverforge 0.22.0` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.6.0` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
+| **Worked Use Cases** | Released; tag Space syncs and bundle CI passed | `solverforge-hospital@2.0.12`, `solverforge-lessons@2.0.14`, `solverforge-deliveries@2.0.13`, `solverforge-fsr@2.0.14`, plus the repository-only `solverforge-furnace@2.0.7`, `solverforge-orders@0.2.0`, `solverforge-fleet@0.1.9`, and `solverforge-flightcrew@0.2.0`; all eight target `solverforge 0.23.0` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.7.1` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -111,10 +137,10 @@ SolverForge skills now live.
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
   [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital 2.0.11, Lessons 2.0.13, Deliveries 2.0.12, and
-  FSR 2.0.13 contracts on `solverforge 0.22.0`, while keeping their recorded
+  document the released Hospital 2.0.12, Lessons 2.0.14, Deliveries 2.0.13, and
+  FSR 2.0.14 contracts on `solverforge 0.23.0`, while keeping their recorded
   `solverforge-cli 2.2.2` scaffold provenance separate from the current
-  `solverforge-cli 3.6.0` scaffold target.
+  `solverforge-cli 3.7.1` scaffold target.
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -202,7 +228,7 @@ SolverForge skills now live.
 
 - **Core runtime line**: these manuals describe `solverforge 0.23.0`, with
   Rust `1.95`. The
-  published `solverforge-cli 3.6.0` package targets `solverforge 0.22.0` for
+  published `solverforge-cli 3.7.1` package targets `solverforge 0.23.0` for
   fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.19.7`
   from 3.3.x, `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), and an app should
   move to a newer core line only when that app is deliberately upgraded and

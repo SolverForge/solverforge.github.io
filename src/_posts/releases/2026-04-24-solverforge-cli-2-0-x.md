@@ -8,9 +8,17 @@ description: >
   CLI-owned runtime, UI, and maps targets.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note") do %>
+For the current CLI line, read the
+[3.7.x release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/)
+and the [CLI manual](/docs/solverforge-cli/). The versions below record this
+release's scaffold targets, not today's install defaults.
+<% end %>
+
+
 **solverforge-cli 2.0.x** was the CLI line that introduced the neutral
-generated app shell and explicit scaffold target reporting. It is now
-superseded by [solverforge-cli 2.2.x](/blog/releases/2026/05/31/solverforge-cli-2-2-x/).
+generated app shell and explicit scaffold target reporting. The historical
+[2.2.x line](/blog/releases/2026/05/31/solverforge-cli-2-2-x/) followed it.
 The last 2.0.x patch scaffolds new projects on `solverforge 0.11.1`,
 `solverforge-ui 0.6.5`, and `solverforge-maps 2.1.4`.
 

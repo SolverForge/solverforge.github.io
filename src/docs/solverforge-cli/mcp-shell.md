@@ -13,6 +13,12 @@ surface is a Model Context Protocol server. It shares the same generated core
 (`domain/`, `constraints/`, `solver/`, `data/`, and the DTO contract) as the
 web, API, and CLI shells, so generator commands mutate it identically.
 
+The generated MCP server uses `rmcp 3.8.0` and names its server metadata
+`ServerConfig`. Its stateless HTTP transport does not use legacy sessions,
+and the generated server makes no sampling, elicitation, or roots requests
+to clients. Task-capable and legacy clients use the same retained solver
+lifecycle through the tools below.
+
 ## Scaffold And Run
 
 ```bash
@@ -103,13 +109,26 @@ solverforge connect --write vscode
 solverforge connect --port 8080
 ```
 
+## Parallel Evaluation
+
+The MCP shell uses the same app-wide `solver.toml` as the other shells. Run
+`solverforge config set move_thread_count.count 4`, then rebuild the app to
+opt in. Construction stays sequential and every job shares the process's
+Rayon pool. See [Configuration](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
+for accepted forms and evaluator caps. Parallel workers do not change the
+stdio transport contract: stdout is reserved for JSON-RPC.
+
 ## Diagnostics And Qualified Jobs
 
 Generated MCP, web, and API apps expose every compact `SolverTelemetry`
 aggregate, including applied, not-doable, and rejected moves, hard-score
-direction counts, conflict-repair counters, construction counters, current
-phase detail, per-selector and per-move breakdowns, and the bounded applied-move
-trace. Candidate-pull traces are not copied into ordinary control-plane
+direction counts, conflict-repair counters, construction counters, one record
+per started phase in execution order (`phases`), per-selector and per-move
+breakdowns, and the bounded applied-move trace. Run totals and each phase carry
+`movesSpeculative`; discarded speculative candidate pulls use the
+`discarded_speculative` disposition. `movesGenerated` includes speculative
+work, so compare `movesEvaluated` when checking logical work across evaluator
+counts. Candidate-pull traces are not copied into ordinary control-plane
 payloads; enable `[candidate_trace]` and then fetch the retained diagnostic
 publication through `get_candidate_trace` (MCP) or
 `GET /jobs/{id}/telemetry` (web/API).

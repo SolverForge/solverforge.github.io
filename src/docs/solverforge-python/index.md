@@ -60,6 +60,7 @@ make develop
 | --- | --- |
 | Model classes | `@planning_solution`, `@planning_entity`, `@problem_fact` |
 | Planning fields | `planning_id`, `planning_variable`, `planning_list_variable` |
+| Fixed input state | [`planning_pin()`](/docs/solverforge-python/modeling/#entity-pinning) on the whole entity |
 | Constraints | `@constraint_provider`, `ConstraintFactory`, `joiner` |
 | Grouped scalar repair | `scalar_assignment_group`, `ScalarGroupLimits`, `@scalar_group`, `@conflict_repair` |
 | Candidate ordering | `@candidate_metric`, `selection_order`, `selection_metric` |

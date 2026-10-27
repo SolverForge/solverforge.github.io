@@ -27,7 +27,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 
 Use `solverforge-cli` to bootstrap the project, then move quickly into ordinary
 application modules and `solverforge` runtime code. Current core documentation
-tracks `solverforge 0.23.0`; the current CLI 3.6.0 line scaffolds core 0.22.0, so
+tracks `solverforge 0.23.0`; the current CLI 3.7.1 line scaffolds core 0.23.0, so
 check `solverforge --version` on the binary you install.
 
 ### Runtime truth
@@ -69,7 +69,10 @@ enables upstream acceptor-forager evaluator replicas; `auto` stays sequential.
 `Solver.solve` releases the GIL while workers attach to execute callbacks.
 Retained payloads expose an ordered `phases` list and `moves_speculative`, not a
 single `phase` dictionary. The independently released Rust use-case bundle
-still targets core 0.22.0.
+also targets core 0.23.0. Orders and Flight Crew project telemetry through
+app-owned camelCase fields such as `movesSpeculative`; Python exposes
+snake_case payloads. The other six Rust apps keep narrower, app-owned
+telemetry summaries rather than exposing every runtime field.
 
 ### UI as presentation and orchestration
 

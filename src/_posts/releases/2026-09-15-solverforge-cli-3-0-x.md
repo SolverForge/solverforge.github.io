@@ -9,6 +9,14 @@ description: >
   solverforge 0.19.4.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note") do %>
+For the current CLI line, read the
+[3.7.x release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/)
+and the [CLI manual](/docs/solverforge-cli/). The versions below record this
+release's scaffold targets, not today's install defaults.
+<% end %>
+
+
 **solverforge-cli 3.0.0** is published on crates.io and released on GitHub
 (2026-09-15), at publication `cargo install solverforge-cli` installed 3.0.0 directly. The
 previous crates.io package, `solverforge-cli 2.2.3`, scaffolded
@@ -16,8 +24,8 @@ previous crates.io package, `solverforge-cli 2.2.3`, scaffolded
 `solverforge --version` to confirm exactly what an installed binary carries.
 
 <%= render Ui::Callout.new(title: "Update, September 16, 2026") do %>
-`solverforge-cli 3.1.0` is published and is now what `cargo install
-solverforge-cli` installs. It retargets fresh scaffolds to `solverforge 0.19.5`,
+`solverforge-cli 3.1.0` was published and was then what `cargo install
+solverforge-cli` installed. It retargets fresh scaffolds to `solverforge 0.19.5`,
 `solverforge-ui 0.9.0`, and `rmcp 3.4.0`, extends `connect --write` to opencode,
 Claude Code, and Cursor, and makes the skill installer agent-centric
 (`--agent opencode|claude|codex`; `--only` and the implicit `~/.agents` default

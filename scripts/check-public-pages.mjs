@@ -1268,15 +1268,27 @@ async function checkReleaseDocs(origin) {
   const page = await browser.newPage();
   const failures = [];
   const checks = [
-    { path: "/docs/solverforge/", required: ["These pages track the solverforge 0.23.0 release", "solverforge-cli 3.6.0 line scaffolds solverforge 0.22.0"] },
+    { path: "/docs/solverforge/", required: ["These pages track the solverforge 0.23.0 release", "solverforge-cli 3.7.1 line scaffolds solverforge 0.23.0"] },
     { path: "/docs/solverforge/solver/configuration/", required: ["Sequential (default)", "min(count, rayon::current_num_threads(), 32)"] },
     { path: "/docs/solverforge/solver/local-search/", required: ["DiscardedSpeculative", "trajectory can depend on evaluator count"] },
     { path: "/docs/solverforge/solver/phases/", required: ["SolverTelemetry::phases", "every started phase in execution order"] },
-    { path: "/docs/solverforge-cli/", required: ["This release scaffolds solverforge 0.22.0", "describes solverforge 0.23.0"] },
+    { path: "/docs/solverforge-cli/", required: ["solverforge-cli 3.7.1 interface", "Fresh scaffolds target solverforge 0.23.0", "the default auto setting stays sequential"] },
     { path: "/docs/solverforge-python/", required: ["solverforge 0.7.0", "solverforge-py v0.7.0", "solverforge 0.23.0", "parallel move evaluation"] },
+    { path: "/docs/solverforge-python/modeling/", required: ["Entity Pinning", "planning_pin()", "planning_variable(pinning=True) is not supported", "mandatory planning work incomplete"] },
     { path: "/docs/solverforge-python/solving-and-runtime/", required: ["moves_speculative", "discarded_speculative", "phases", "GIL"] },
     { path: "/blog/releases/2026/10/27/solverforge-python-0-7-x/", required: ["SolverForge Python 0.7.x follows solverforge 0.6.15", "32 evaluators", "releases the GIL", "phases", "discarded_speculative"] },
-    { path: "/docs/status-and-roadmap/", required: ["documentation tracks the solverforge 0.23.0 release", "Linux/Windows CI passed, macOS CI failed"] },
+    { path: "/docs/status-and-roadmap/", required: ["documentation tracks the solverforge 0.23.0 release", "Linux/Windows CI passed, macOS CI failed", "solverforge-cli 3.7.1", "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0", "solverforge-flightcrew@0.2.0"] },
+    { path: "/docs/solverforge-cli/configuration/", required: ["move_thread_count.count 4", "RAYON_NUM_THREADS", "32", "auto", "none"] },
+    { path: "/docs/solverforge-cli/project-anatomy/", required: ["phases", "movesSpeculative", "discarded_speculative"] },
+    { path: "/blog/releases/2026/10/27/solverforge-cli-3-7-x/", required: ["solverforge-cli 3.7.1", "solverforge 0.23.0", "phases", "movesSpeculative", "Windows failed", "test_new_creates_neutral_project_files"] },
+    { path: "/blog/releases/2026/09/27/solverforge-usecases-repository-apps/", required: ["October 27 (core 0.23.0)", "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0", "solverforge-flightcrew@0.2.0", "movesSpeculative", "discarded_speculative", "does not make that pull interruptible"] },
+    ...[
+      ["hospital", "2.0.12"], ["lessons", "2.0.14"],
+      ["deliveries", "2.0.13"], ["fsr", "2.0.14"],
+    ].map(([app, version]) => ({
+      path: `/docs/getting-started/solverforge-${app}-use-case/`,
+      required: [`solverforge-${app}@${version}`, "solverforge 0.23.0"],
+    })),
     { path: "/blog/releases/2026/10/27/solverforge-0-23-x/", required: ["solverforge 0.23.x follows solverforge 0.22.0", "32 evaluators", "macOS failed", "integration tests were skipped"] },
   ];
   try {

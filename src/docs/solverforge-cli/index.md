@@ -11,13 +11,12 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual documents the `solverforge-cli 3.6.0` interface. Fresh projects use
+This manual documents the `solverforge-cli 3.7.1` interface. Fresh projects use
 the scaffold targets baked into the binary you have installed; run
 `solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
-This release scaffolds `solverforge 0.22.0`; the current
-[core manual](/docs/solverforge/) describes `solverforge 0.23.0`.
-Upgrade an application's runtime deliberately before using the newer parallel
-evaluation and telemetry APIs.
+Fresh scaffolds target `solverforge 0.23.0`, matching the
+[core manual](/docs/solverforge/). Parallel local-search evaluation is opt-in;
+the default `auto` setting stays sequential.
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It

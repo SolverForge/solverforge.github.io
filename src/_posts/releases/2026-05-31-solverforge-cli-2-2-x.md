@@ -4,9 +4,17 @@ date: 2026-05-31
 draft: false
 description: >
   solverforge-cli 2.2.x provides neutral web, API, and CLI scaffolds; the
-  current 2.2.3 package targets solverforge 0.19.3, solverforge-ui 0.7.0, and
+  historical 2.2.3 package targets solverforge 0.19.3, solverforge-ui 0.7.0, and
   solverforge-maps 2.1.4.
 ---
+
+<%= render Ui::Callout.new(title: "Historical release note") do %>
+For the current CLI line, read the
+[3.7.x release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/)
+and the [CLI manual](/docs/solverforge-cli/). The versions below record this
+release's scaffold targets, not today's install defaults.
+<% end %>
+
 
 At the time of this post, **solverforge-cli 2.2.1** was the current GitHub
 source line for generated SolverForge apps. It passed GitHub CI on 2026-06-10
@@ -24,7 +32,7 @@ confirm the exact scaffold target with `solverforge --version`.
 <% end %>
 
 <%= render Ui::Callout.new(title: "Update, August 11, 2026") do %>
-The current package is `solverforge-cli 2.2.3`. Its released binary scaffolds
+The package at that update was `solverforge-cli 2.2.3`. Its released binary scaffolds
 `solverforge 0.19.3`, `solverforge-ui 0.7.0`, and `solverforge-maps 2.1.4`.
 The original 2.2.1 narrative and version output below remain as the dated
 release record; use the current command reference for live output.

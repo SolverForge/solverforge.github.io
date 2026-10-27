@@ -81,10 +81,41 @@ solverforge config set environment_mode reproducible
 
 That makes it convenient for simple changes, but it does not replace learning
 the runtime `solver.toml` model. Use the SolverForge runtime docs when you need
-deeper phase and move configuration detail. Those pages track the current core,
-not the CLI's older scaffold target. Parallel `move_thread_count` evaluation
-requires upgrading the app to core `0.23.0`; the scaffolded `0.22.0` runtime
-does not enable it.
+deeper phase and move configuration detail.
+
+### Parallel Local-Search Evaluation
+
+Enable several evaluators with:
+
+```bash
+solverforge config set move_thread_count.count 4
+solverforge check
+```
+
+The equivalent top-level TOML table is:
+
+```toml
+[move_thread_count]
+count = 4
+```
+
+`check` and `config set` accept only `"auto"`, `"none"`, or a table containing
+one non-negative integer `count`. Omission and `"auto"` stay sequential;
+`"none"`, count 0, and count 1 also select sequential evaluation. A bare
+`move_thread_count = 4` is invalid. To return a table-valued setting to a string
+mode, edit the top-level entry directly.
+
+Only local search evaluates candidates in parallel; construction remains
+sequential. One coordinator preserves sequential acceptance order, so seeded,
+step-bounded runs can be compared at fixed work. Time-bounded runs need not do
+the same work, and a higher evaluator count does not promise a better score.
+The effective evaluator count is capped by the Rayon pool and by 32. All jobs
+in one server process share the pool; set `RAYON_NUM_THREADS` before starting
+the app to control its size. Small models can be slower with more evaluators.
+
+The app embeds `solver.toml` at build time and parses it when solving. Rebuild
+and restart a running app after changing this setting. It is app-wide, not a
+per-job request override, and is not duplicated into `solverforge.app.toml`.
 
 ## `solverforge.app.toml`: Scaffold Metadata and UI Contract
 
@@ -95,11 +126,11 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "3.6.0"
+cli_version = "3.7.1"
 
 [runtime]
-target = "solverforge 0.22.0"
-runtime_source = "crates.io: solverforge 0.22.0"
+target = "solverforge 0.23.0"
+runtime_source = "crates.io: solverforge 0.23.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -111,8 +142,8 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 3.6.0` web scaffold target. Fresh
-web generated apps target `solverforge 0.22.0`, take the CLI's
+This example reflects the `solverforge-cli 3.7.1` web scaffold target. Fresh
+web generated apps target `solverforge 0.23.0`, take the CLI's
 `solverforge-ui 0.9.0` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.
 
