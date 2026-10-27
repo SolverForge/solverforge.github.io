@@ -32,7 +32,7 @@ scalar candidates, assignment-backed scalar groups, or conflict repair
 providers, the model must expose those capabilities through the generated model
 support layer.
 
-SolverForge 0.22.0 compiles the complete resolved policy before solving. A bad
+SolverForge compiles the complete resolved policy before solving. A bad
 target, missing operation bundle, unknown provider or metric, invalid selector
 composition, or inconsistent construction source is a build error at its config
 path; the runtime does not defer schema discovery until a hot candidate loop.
@@ -127,7 +127,7 @@ Controls reproducibility and assertion levels.
 
 | Mode               | Description                                                         |
 | ------------------ | ------------------------------------------------------------------- |
-| `reproducible`     | Deterministic — same input always produces the same output. Slower. |
+| `reproducible`     | Repeatable at fixed input, seed, evaluator count, and deterministic work limits; wall-clock budgets can change the result. |
 | `non_reproducible` | Non-deterministic — fastest mode for production use                 |
 | `fast_assert`      | Enables light assertions for debugging                              |
 | `full_assert`      | Enables all assertions — slowest, for development only              |
@@ -138,13 +138,28 @@ environment_mode = "non_reproducible"
 
 ### Move Thread Count
 
-Controls multi-threaded move evaluation.
+Controls candidate evaluation in the compiled runtime's acceptor-forager local
+search, independently of partitioned search's `thread_count`.
 
 ```toml
-move_thread_count = { count = 4 }  # Fixed thread count
-move_thread_count = "auto"         # Use available cores (default)
-move_thread_count = "none"         # Single-threaded
+move_thread_count = { count = 4 }  # Request up to four evaluators
+move_thread_count = "auto"         # Sequential (default)
+move_thread_count = "none"         # Sequential
 ```
+
+These are alternative values for one setting, not three simultaneous keys.
+`auto`, `none`, and explicit counts 0 or 1 use the sequential loop. A count of
+at least 2 resolves to `min(count, rayon::current_num_threads(), 32)` evaluators,
+including the main score director; the others are persistent replicas. The
+automatic policy stays sequential. A solve running in a one-thread Rayon pool
+therefore stays sequential even with a larger explicit count.
+
+Only compiled acceptor-forager local search uses this setting. Lower-level
+`LocalSearchPhase`, VND, construction, exhaustive search, and partitioned child
+solves evaluate sequentially. Candidate generation and acceptance stay ordered;
+parallel trials can pull candidates beyond the eventual decision point. See
+[Parallel Candidate Evaluation](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
+for reproducibility, speculative work, and budget semantics.
 
 ### Random Seed
 

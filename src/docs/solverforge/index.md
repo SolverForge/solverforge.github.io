@@ -17,10 +17,10 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 cargo add solverforge
 ```
 
-These pages track the `solverforge 0.22.0` release, and the
-[0.22.x release note](/blog/releases/2026/10/18/solverforge-0-22-x/) records
+These pages track the `solverforge 0.23.0` release, and the
+[0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/) records
 the current line while the
-[0.21.x release note](/blog/releases/2026/10/14/solverforge-0-21-x/) keeps the
+[0.22.x release note](/blog/releases/2026/10/18/solverforge-0-22-x/) keeps the
 previous one. Generated CLI projects can intentionally target an older scaffold
 runtime; the current `solverforge-cli 3.6.0` line scaffolds `solverforge 0.22.0`, while
 apps scaffolded by earlier lines pin older cores (`0.19.7` from 3.3.x,
@@ -38,7 +38,7 @@ cd my-scheduler
 solverforge server
 ```
 
-The `0.22.0` workspace declares Rust `1.95`.
+The `0.23.0` workspace declares Rust `1.95`.
 
 The generated runtime resolves one value-owned `RuntimeModel` for each planning
 model, then compiles construction stages, selector trees, providers, stable
@@ -70,12 +70,22 @@ score-only termination stays construction-only. VND is never added implicitly.
 
 Startup telemetry is shape-aware: scalar solves report average `candidates`,
 list solves report element counts, and console output labels those solve shapes
-as `candidates` or `elements`. Retained telemetry also identifies the active
-phase and keeps its local elapsed/work counters separate from whole-solve totals.
+as `candidates` or `elements`. Retained telemetry keeps an ordered `phases`
+vector with one indexed elapsed/work record per started phase, including the
+running phase in progress snapshots. Whole-solve totals also include work
+outside phases, such as initial scoring.
 Generic and specialized construction now publish the same engine-owned
 lifecycle and progress events as local search: the first observed work is
 reported promptly and long-running phases continue at roughly one-second
 intervals when verbose logging is enabled.
+
+Compiled acceptor-forager local search can score ordered candidate windows on
+persistent evaluator replicas. Set top-level `move_thread_count = { count = 4 }`
+to request four evaluators, capped by the solve's Rayon pool and by 32. The
+default `auto` stays sequential. Speculative trials discarded after the decision
+point are counted separately from consumed work; see
+[Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
+for trajectory and budget boundaries.
 
 The runtime exposes these contracts:
 
@@ -275,7 +285,7 @@ The runtime exposes these contracts:
   instead of loading arbitrary runtime classes
 - retained telemetry preserves exact generated, evaluated, accepted,
   not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-  construction-slot, active-phase, move-label, and bounded applied-move counters
+  construction-slot, per-phase, speculative-work, move-label, and bounded applied-move counters
   plus generation and evaluation durations. `moves_generated` counts candidates
   actually yielded, not an unrequested logical tail; `moves/s` is only a display
   metric
@@ -364,7 +374,7 @@ fn main() {
 
 ## API Reference
 
-Consult the [`v0.22.0` implementation](https://github.com/SolverForge/solverforge/tree/v0.22.0)
+Consult the [`v0.23.0` implementation](https://github.com/SolverForge/solverforge/tree/v0.23.0)
 and the repository `crates/*/WIREFRAME.md` API maps for this source line.
 [docs.rs/solverforge](https://docs.rs/solverforge/) serves published crate APIs;
 select the version matching your dependency.

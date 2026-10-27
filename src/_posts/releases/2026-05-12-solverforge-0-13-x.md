@@ -8,6 +8,12 @@ description: >
   grouping, and the explicit scoring terminal surface.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **SolverForge 0.13.x** was the previous core runtime line. It starts with
 [0.13.0](https://crates.io/crates/solverforge/0.13.0), published on
 2026-05-12, with API docs on

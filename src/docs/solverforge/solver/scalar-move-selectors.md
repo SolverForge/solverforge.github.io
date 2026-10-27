@@ -19,6 +19,12 @@ Every concrete leaf can preserve `original` order, use seeded `random` or
 `shuffled` order, or use a registered named candidate metric for `sorted` /
 `probabilistic` order. Omitted stock leaves use seeded random order.
 
+`value_range_provider` defines the legal domain, including per-entity
+`Vec<usize>` domains. `candidate_values` only bounds and orders construction,
+change, pillar-change, and ruin-recreate candidates. Swap, nearby-swap, and
+pillar-swap families exchange current values and check the receiving domains,
+not `candidate_values`. See [Planning Entities](/docs/solverforge/modeling/planning-entities/).
+
 ## Baseline Selectors
 
 ### `change_move_selector`
@@ -57,11 +63,13 @@ leaf's configured `selection_order` or `selection_metric`.
 
 Ordinary change loads a candidate-value row only when traversal reaches that
 entity. Nearby change and swap also load only reached rows for both native and
-dynamic models. Early forager exit therefore need not call the remaining row
+dynamic models. Sequential early forager exit therefore need not call the remaining row
 providers. An explicitly supplied empty nearby row remains empty; it is not
 replaced with the full range. Ordinary native swap retains its open-time
 current-value and legal-row snapshot; lending the live solution does not turn
-all activation indexes into per-pull recomputations.
+that into a per-pull rebuild. Parallel evaluation can speculatively reach
+providers beyond the eventual forager decision; see
+[Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation).
 
 ## Nearby Scalar Selectors
 

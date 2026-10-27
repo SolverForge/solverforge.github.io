@@ -8,6 +8,12 @@ description: >
   annealing, and coordinate-stable projected scoring rows.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **SolverForge 0.10.x** is the grouped-scalar runtime line. It starts with
 `0.10.0`, available on [crates.io](https://crates.io/crates/solverforge/0.10.0)
 with API docs on [docs.rs](https://docs.rs/solverforge/0.10.0), and tagged in the

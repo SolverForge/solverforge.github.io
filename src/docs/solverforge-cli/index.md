@@ -14,6 +14,10 @@ description: >
 This manual documents the `solverforge-cli 3.6.0` interface. Fresh projects use
 the scaffold targets baked into the binary you have installed; run
 `solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
+This release scaffolds `solverforge 0.22.0`; the current
+[core manual](/docs/solverforge/) describes `solverforge 0.23.0`.
+Upgrade an application's runtime deliberately before using the newer parallel
+evaluation and telemetry APIs.
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It

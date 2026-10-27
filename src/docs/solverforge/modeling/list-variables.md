@@ -218,6 +218,24 @@ pointers, or per-route aggregates. When you do configure them, the canonical
 `ScoreDirector` invokes
 those solution hooks automatically.
 
+Element streams can read those maintained shadows directly. Generated sources
+for shadow-bearing `#[problem_fact_collection]` and
+`#[planning_list_element_collection]` rows carry a change source rather than
+remaining static. Before an owner edit, the director retracts its element rows
+with their old shadows; after the edit it refreshes shadows and reinserts the
+owner and its current elements. Elements that leave all lists have their
+configured inverse, index, previous, and next fields cleared and are reinserted
+as unassigned. Full shadow refresh clears those fields on every element before
+visiting owners, so an unassigned element cannot retain stale topology.
+
+`planning_model!` and `#[planning_solution]` generate the
+`PlanningSolution::list_shadow_elements`, `clear_list_shadows`, and
+`list_shadow_source` hooks for configured element-shadow writes, including
+cascading updates. Hand-written solution implementations must supply the same
+reporting contract when their owner updates write element rows. Custom moves
+must pair before/after owner notifications for both edits and undo; changing
+shadow fields behind the director bypasses incremental stream maintenance.
+
 ## Generated Runtime Surface
 
 Generated public list mutation helpers such as `list_len_static()`,

@@ -51,14 +51,16 @@ pub priority_bucket: Option<usize>,
 
 Common parameters:
 
-- `value_range_provider = "employees"`: references a field on the planning
-  solution that supplies possible values
+- `value_range_provider = "employees"`: references a solution collection for a
+  shared legal index range, or a `Vec<usize>` field on the entity for a
+  per-entity legal domain
 - `allows_unassigned = true`: permits `None` for `Option<T>` variables
 - `countable_range = "0..10"`: declares a half-open integer range of candidate
   values directly on the field. The field remains `Option<usize>` and stores the
   chosen candidate index, like every other scalar planning variable
 - `candidate_values = "fn_name"`: supplies an ordered bounded scalar value
-  neighborhood for construction, change, pillar-change, and ruin-recreate
+  neighborhood for construction, change, pillar-change, and ruin-recreate.
+  It is a search hint, not a legal-domain restriction; swap families ignore it
 - `nearby_value_candidates = "fn_name"` and
   `nearby_entity_candidates = "fn_name"`: supply bounded candidates for nearby
   scalar local-search selectors
@@ -68,6 +70,26 @@ Common parameters:
 - `construction_entity_order_key = "fn_name"` and
   `construction_value_order_key = "fn_name"`: provide live construction-order
   keys for scalar-only construction heuristics
+
+For a per-entity domain, store legal indexes on the entity and name that field:
+
+```rust
+use solverforge::prelude::*;
+
+#[planning_entity]
+pub struct Shift {
+    #[planning_id]
+    pub id: usize,
+    pub allowed_employees: Vec<usize>,
+    #[planning_variable(value_range_provider = "allowed_employees", allows_unassigned = true)]
+    pub employee_idx: Option<usize>,
+}
+```
+
+Construction and all scalar move families, including swap, nearby swap, and
+pillar swap, enforce the receiving entity's legal domain. A swap can receive a
+value outside `candidate_values` if it is inside that domain. Use
+`#[planning_pin]`, not a one-value domain, to preserve an input assignment.
 
 Nullability is not the same as required coverage. An assignment-backed
 `ScalarGroup::assignment(...)` can mark nullable rows required with

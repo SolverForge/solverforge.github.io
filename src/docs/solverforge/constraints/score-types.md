@@ -99,6 +99,22 @@ let b = HardSoftScore::of(0, -3);
 let sum = a + b;           // (-1, -8)
 ```
 
+## Dynamic Binding Scores
+
+`solverforge-bridge::DynamicScore` is the binding-facing three-level value
+`{ hard: i64, medium: i64, soft: i64 }`. It has no family field. Equality,
+ordering, hashing, zero, and arithmetic compare or operate on levels only,
+independently of the thread computing the score. Keep unused levels zero;
+decimal hard/soft levels store values scaled by 100,000.
+
+Construct it with `DynamicScore::of(hard, medium, soft)`, `soft(soft)`, or
+`hard_soft(hard, soft)`. Select host-facing levels with `family_levels(family)`.
+`scoped_dynamic_score_family(family, callback)` controls thread-local display
+and `ParseableScore::parse` units, not score values; the active family can be
+read with `active_dynamic_score_family()`. Under `HardSoftDecimal`, whole-number
+parts scale too, so parsing inverts display. Parallel scoring workers need no
+family scope. These bridge contracts do not change native score-type APIs.
+
 ## Choosing a Score Type
 
 1. **Start with `HardSoftScore`** — it covers most problems

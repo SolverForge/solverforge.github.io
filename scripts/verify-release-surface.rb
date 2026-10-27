@@ -4,29 +4,63 @@
 ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
+  "src/docs/solverforge/modeling/planning-entities.md" => [
+    "per-entity legal domain", "search hint, not a legal-domain restriction",
+    "swap families ignore it", "pub allowed_employees: Vec<usize>"
+  ],
+  "src/docs/solverforge/modeling/list-variables.md" => [
+    "list_shadow_elements", "clear_list_shadows", "list_shadow_source"
+  ],
+  "src/docs/solverforge/constraints/score-types.md" => [
+    "It has no family field", "active_dynamic_score_family()"
+  ],
+  "src/docs/solverforge/solver/termination.md" => [
+    "Parallel Evaluation Budgets", "not\nadded to `moves_evaluated` or `score_calculations`"
+  ],
+  "src/reference/extend-solver.md" => [
+    "Cow<'_, MoveTabuSignature>", "fn(&S) -> C", "DiscardedSpeculative",
+    "list_shadow_elements", "not mutable aggregate fields"
+  ],
+  "src/_posts/releases/2026-10-27-solverforge-0-23-x.md" => [
+    "**solverforge 0.23.x** follows `solverforge 0.22.0`",
+    "`0.23.0` | 2026-10-27",
+    "1f8c86c2a087fa16102100ba0e2f4eb80b501904853e9baf701533df1b19a063",
+    "e835624a7c04a8ecd2a2ac9a1bcbd92cbc6aca89",
+    "40473570696", "40473570732", "40473567305",
+    "macOS failed", "integration tests were skipped",
+    "32 evaluators", "given evaluator count", "DiscardedSpeculative",
+    "SolverTelemetry.phase", "phases: Vec<PhaseTelemetry>",
+    "Cow<'_, MoveTabuSignature>", "list_shadow_elements",
+    "active_dynamic_score_family", "not a new swap restriction",
+    "Fresh scaffolds target core `0.22.0`, not `0.23.0`"
+  ],
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
-    "`solverforge 0.22.0` is the current core",
-    "0.22.x release note"
+    "`solverforge 0.23.0` is the current core",
+    "0.23.x release note"
   ],
   "src/_posts/releases/2026-06-12-solverforge-0-16-x.md" => [
-    "`solverforge 0.22.0` is the current core",
-    "0.22.x release note"
+    "`solverforge 0.23.0` is the current core",
+    "0.23.x release note"
   ],
   "src/_posts/releases/2026-06-15-solverforge-0-17-x.md" => [
-    "`solverforge 0.22.0` is the current core",
-    "0.22.x release note"
+    "`solverforge 0.23.0` is the current core",
+    "0.23.x release note"
   ],
   "src/_posts/releases/2026-07-13-solverforge-0-18-x.md" => [
-    "`solverforge 0.22.0` is the current core",
-    "0.22.x release note"
+    "`solverforge 0.23.0` is the current core",
+    "0.23.x release note"
   ],
 
   "src/docs/solverforge/solver/phases.md" => [
+    "`SolverTelemetry::phases` retains every started phase in execution order",
     "effective parsed limit",
     "empty termination object",
     "construction-only"
   ],
   "src/docs/solverforge/solver/local-search.md" => [
+    "Parallel Candidate Evaluation", "DiscardedSpeculative",
+    "trajectory can depend on evaluator count",
+    "Cow<'_, MoveTabuSignature>",
     "effective parsed limit",
     "empty termination object",
     "construction-only"
@@ -77,7 +111,7 @@ REQUIRED_TEXT = {
   ],
   "src/_posts/releases/2026-10-18-solverforge-0-22-x.md" => [
     "**solverforge 0.22.x** follows `solverforge 0.21.3`", "published on\ncrates.io on 2026-10-18",
-    "`cargo add solverforge`\ninstalls 0.22.0", "docs.rs serves the 0.22.0 API",
+    "At publication, `cargo add solverforge` installed\n0.22.0", "docs.rs served the 0.22.0 API",
     "5c882fc55b59e28632a276df4e8f820ec0a3b52ecaf5d4a7afe69139c954db6b",
     "df1ce37b4a69a61fe249e71852ea694de94b4493",
     "`0.22.0` | 2026-10-18", "compare/v0.21.3...v0.22.0"
@@ -95,7 +129,7 @@ crates.io on 2026-10-14",
     "see the [0.22.x line note](/blog/releases/2026/10/18/solverforge-0-22-x/)",
     "`0.21.3` | 2026-10-14", "`0.21.2` | 2026-10-14", "`0.21.0` | 2026-10-14",
     "compare/v0.20.4...v0.21.3", "compare/v0.20.1...v0.21.0",
-    "This line is closed: `solverforge 0.22.0` is the current core"
+    "The current core release is\n`solverforge 0.23.0`"
   ],
   "src/docs/solverforge/constraints/shift-group-uniformity.md" => [
     "number of distinct groups minus one",
@@ -107,13 +141,13 @@ crates.io on 2026-10-14",
     "/docs/solverforge/constraints/collectors/"
   ],
     "scripts/verify-rust-snippets.rb" => [
-    'DEFAULT_SOLVERFORGE_RS_REF = "v0.22.0"'
+    'DEFAULT_SOLVERFORGE_RS_REF = "v0.23.0"'
   ],
 
   "src/docs/solverforge/index.md" => [
-    "These pages track the `solverforge 0.22.0` release",
-    "The `0.22.0` workspace declares Rust `1.95`.",
-    "/blog/releases/2026/10/14/solverforge-0-21-x/",
+    "These pages track the `solverforge 0.23.0` release",
+    "The `0.23.0` workspace declares Rust `1.95`.",
+    "/blog/releases/2026/10/27/solverforge-0-23-x/",
     "/blog/releases/2026/10/18/solverforge-0-22-x/",
     "solverforge-cli 3.6.0",
     "apps scaffolded by earlier lines pin older cores"
@@ -125,9 +159,11 @@ crates.io on 2026-10-14",
     "DenseKeys::add", "per event", "at most once"
   ],
   "src/reference/integration-surfaces.md" => [
-    "tracks `solverforge 0.22.0`", "the current CLI 3.6.0 line scaffolds core 0.22.0"
+    "tracks `solverforge 0.23.0`", "the current CLI 3.6.0 line scaffolds core 0.22.0"
   ],
   "src/docs/solverforge-python/index.md" => [
+    "published binding remains on core `0.22.0`",
+    "retarget these wheels or add parallel move evaluation",
     "solverforge-py 0.6.15",
     "solverforge==0.6.15",
     "solverforge 0.22.0",
@@ -139,6 +175,8 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-cli/index.md" => [
     "solverforge-cli 3.6.0",
+    "This release scaffolds `solverforge 0.22.0`",
+    "describes `solverforge 0.23.0`",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
@@ -169,7 +207,7 @@ crates.io on 2026-10-14",
     "cargo run -- demo-data"
   ],
   "src/docs/solverforge/solver/configuration.md" => [
-    "SolverForge 0.22.0",
+    "Move Thread Count", "`min(count, rayon::current_num_threads(), 32)` evaluators",
     "effective parsed limit", "construction-only",
     "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
@@ -232,13 +270,13 @@ crates.io on 2026-10-14",
     "/docs/solverforge/constraints/shift-group-uniformity/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.22.0",
+    "solverforge 0.23.0",
     "AcceptedCount(256)",
     "solverforge 0.6.15",
     "solverforge-py v0.6.15"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.22.0",
+    "solverforge 0.23.0",
     "solverforge-ui 0.9.0",
     "solverforge-cli 3.6.0"
   ],
@@ -267,19 +305,22 @@ crates.io on 2026-10-14",
   ],
   "src/docs/status-and-roadmap.md" => [
     "BENCH_TOLERANCE_PERCENT", "default 5%", "equal-length staging paths",
-    "documentation tracks the `solverforge 0.22.0` release",
-    "`cargo add solverforge` installs 0.22.0",
-    "docs.rs serves the 0.22.0 API",
+    "documentation tracks the `solverforge 0.23.0` release",
+    "`cargo add solverforge` installs 0.23.0",
+    "docs.rs serves the 0.23.0 API",
     "cb916a73d86c46c25b0e4182626f9adc2c9aa5ad",
     "38640704980", "38640708258", "38640708277",
     "38598708211", "38598906107", "38598906248",
-    "Native Rust constraint solver published as `solverforge 0.22.0`",
+    "Native Rust constraint solver published as `solverforge 0.23.0`",
     "The independently published CLI line is `solverforge-cli 3.6.0`",
     "Fresh scaffolds target `solverforge 0.22.0`",
     "solverforge-furnace@2.0.5", "solverforge-orders@0.1.5",
     "solverforge-fleet@0.1.8", "solverforge-flightcrew@0.1.5",
     "39113251530", "39113256126", "39113229026", "39113242845", "39113224930",
     "tag Space syncs and bundle CI passed",
+    "40473570696", "40473570732", "40473567305",
+    "Linux/Windows CI passed, macOS CI failed",
+    "- **Parallel local search**", "- **Per-phase telemetry**", "- **List-shadow scoring**",
     "- **Core runtime line**", "- **Joined-tuple grouping**", "- **Guided native scalar search**",
     "- **Score-authoritative grouped search**", "- **Late acceptance**",
     "- **Lending extensions**", "- **Owned runtime state**",
@@ -317,8 +358,8 @@ crates.io on 2026-10-14",
     "solverforge 0.22.0"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
-    "`solverforge 0.22.0` is the current core",
-    "0.22.x release note",
+    "`solverforge 0.23.0` is the current core",
+    "0.23.x release note",
     "## October 2026 Core Patches (0.19.8–0.19.14)",
     "per-key occurrence counts", "arity-generic cross-join engine", "worker wakeup", "caller-owned buffers",
     "`0.19.13` | 2026-10-11",
@@ -336,7 +377,7 @@ crates.io on 2026-10-14",
     "solverforge-hospital@2.0.7"
   ],
   "src/_posts/releases/2026-09-25-solverforge-0-19-6-7-x.md" => [
-    "`solverforge 0.22.0` is the current core",
+    "`solverforge 0.23.0` is the current core",
     "`0.19.13` | 2026-10-11",
     "`0.19.12` | 2026-10-10",
     "`0.19.11` | 2026-10-10",
@@ -344,7 +385,7 @@ crates.io on 2026-10-14",
     "solverforge 0.19.6",
     "solverforge 0.19.7",
     "`0.19.9` | 2026-10-08",
-    "0.22.x release note",
+    "0.23.x release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",

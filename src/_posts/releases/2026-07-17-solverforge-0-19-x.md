@@ -17,9 +17,9 @@ on 2026-07-17. At the September 15 update, the core release was
 The workspace keeps its Rust `1.95` floor and publishes all nine crates on the
 same version line.
 
-<%= render Ui::Callout.new(title: "Update, October 14, 2026") do %>
-This is a historical release note. `solverforge 0.22.0` is the current core
-release; its line note is the [0.22.x release note](/blog/releases/2026/10/18/solverforge-0-22-x/).
+<%= render Ui::Callout.new(title: "Update, October 27, 2026") do %>
+This is a historical release note. `solverforge 0.23.0` is the current core
+release; its line note is the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
 For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)

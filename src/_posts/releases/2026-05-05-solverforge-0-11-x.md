@@ -8,6 +8,12 @@ description: >
   exports while keeping generated CLI scaffold targets explicit.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **SolverForge 0.11.x** is the previous projected-scoring runtime line. The line starts with
 clone-free projected scoring in
 [0.11.0](https://crates.io/crates/solverforge/0.11.0) and ends at

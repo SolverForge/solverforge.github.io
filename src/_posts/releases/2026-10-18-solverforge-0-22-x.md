@@ -8,9 +8,15 @@ description: >
   and drops stale key Clone bounds in complement weights.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **solverforge 0.22.x** follows `solverforge 0.21.3`; the line was published on
-crates.io on 2026-10-18. `cargo add solverforge` installs 0.22.0 and
-docs.rs serves the 0.22.0 API. The Rust `1.95` floor remains. The 0.21.x
+crates.io on 2026-10-18. At publication, `cargo add solverforge` installed
+0.22.0 and docs.rs served the 0.22.0 API. The Rust `1.95` floor remains. The 0.21.x
 line's joined-tuple grouping, live-solution lending, owned search state, and
 net-route-delta precedence scoring carry into this line unchanged.
 

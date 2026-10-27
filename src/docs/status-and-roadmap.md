@@ -10,9 +10,14 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.22.0` release and keeps core,
+documentation tracks the `solverforge 0.23.0` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.22.0, and docs.rs serves the 0.22.0 API.
+`cargo add solverforge` installs 0.23.0, and docs.rs serves the 0.23.0 API.
+Acceptor-forager local search supports parallel move evaluation with an explicit
+`move_thread_count = { count = 4 }`; `"auto"` remains sequential. Evaluation is
+capped by the current Rayon pool and 32 evaluators, including the main director.
+Telemetry retains every started phase in execution order and reports discarded
+speculative work separately from logical move counts.
 The 0.21.x line added joined-tuple grouping, live-solution cursor lending,
 owned search state, correct selector-subgraph merging, and net-route-delta
 precedence scoring. The 0.22.0 release routes every grouped stream through one
@@ -34,6 +39,15 @@ and `v0.21.3` to `1000a7d471aafe4aa10e900ad075230b9df51ca8`
 [release](https://github.com/SolverForge/solverforge/actions/runs/39109402581));
 all eleven runs completed for their tag commits. Rust `1.95` remains the
 workspace floor.
+
+`v0.23.0` points to `e835624a7c04a8ecd2a2ac9a1bcbd92cbc6aca89`.
+Its [publish](https://github.com/SolverForge/solverforge/actions/runs/40473570696)
+and [release](https://github.com/SolverForge/solverforge/actions/runs/40473570732)
+workflows passed. The tag's [CI run](https://github.com/SolverForge/solverforge/actions/runs/40473567305)
+passed on Linux and Windows but failed the macOS
+`dynamic_nearby_swap_uses_the_finite_all_entity_row_fallback` test; integration
+was skipped. See the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/)
+for the published API boundaries and upgrade checklist.
 
 The independently published CLI line is `solverforge-cli 3.6.0`. Fresh
 scaffolds target `solverforge 0.22.0`, with `solverforge-ui 0.9.0` and
@@ -73,7 +87,7 @@ SolverForge skills now live.
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.22.0`: fluent joined-tuple grouping, live-solution lending for selectors and placements, owned mutable termination state, ownership-transfer moves, and correct selector-subgraph merging; Rust `1.95` |
+| **Rust Core** | Published; Linux/Windows CI passed, macOS CI failed | Native Rust constraint solver published as `solverforge 0.23.0`: opt-in parallel acceptor-forager move evaluation, ordered per-phase telemetry, speculative-work diagnostics, and incremental scoring of list-shadow writes; Rust `1.95` |
 | **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.6.0` targets `solverforge 0.22.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.5.1`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.6.15` compiles dynamic CPython 3.14 models into the `solverforge 0.22.0` runtime; PyPI publishes `solverforge 0.6.15` |
 | **Worked Use Cases** | Released; tag Space syncs and bundle CI passed | `solverforge-hospital@2.0.11`, `solverforge-lessons@2.0.13`, `solverforge-deliveries@2.0.12`, `solverforge-fsr@2.0.13`, plus the repository-only `solverforge-furnace@2.0.5`, `solverforge-orders@0.1.5`, `solverforge-fleet@0.1.8`, and `solverforge-flightcrew@0.1.5`; all eight target `solverforge 0.22.0` and `solverforge-ui 0.9.0` |
@@ -135,11 +149,11 @@ SolverForge skills now live.
   execution errors
 - **SolverManager API**: retained job lifecycle with progress, structurally
   complete best-solution publication, pause/resume, completion, cancellation,
-  failure, snapshots, snapshot-bound analysis, active-phase telemetry, and
+  failure, snapshots, snapshot-bound analysis, ordered per-phase telemetry, and
   explicit candidate-trace detail retrieval
 - **Configuration**: stock `solver.toml`, TOML/YAML parsing helpers, bounded
   scalar candidates, grouped scalar selectors, per-leaf ordering and metrics,
-  weighted unions, seeded score ties, candidate tracing, level-aware simulated
+  weighted unions, seeded score ties, parallel move evaluation, candidate tracing, level-aware simulated
   annealing, and per-solution config overlays
 
 ## Python Package
@@ -174,13 +188,29 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.22.0`, with
+- **Core runtime line**: these manuals describe `solverforge 0.23.0`, with
   Rust `1.95`. The
   published `solverforge-cli 3.6.0` package targets `solverforge 0.22.0` for
   fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.19.7`
   from 3.3.x, `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), and an app should
   move to a newer core line only when that app is deliberately upgraded and
   validated.
+- **Parallel local search**: an explicit `move_thread_count` of two or more
+  enables acceptor-forager evaluation windows on independent score directors.
+  Candidate generation and acceptor/forager decisions remain serial and ordered.
+  Each additional evaluator owns a solution copy and independent incremental
+  scoring state. `Auto`, `None`, zero, and one remain sequential; construction
+  and VND are not parallelized by this setting. Fixed-work scalar/list selectors
+  without cross-step stream state preserve the sequential trajectory; ruin
+  selectors and lazy providers remain reproducible at a fixed evaluator count.
+  Time-limited runs are not a cross-count trajectory guarantee.
+- **Per-phase telemetry**: `SolverTelemetry.phases` retains every started phase
+  in execution order. Run totals sum phase records plus between-phase work.
+  `moves_speculative` and `DiscardedSpeculative` distinguish discarded trials
+  from consumed candidates. `SolverStats` counters are accessor methods.
+- **List-shadow scoring**: inverse, index, previous, and next shadow writes
+  retract and reinsert element rows, including clearing elements that leave all
+  lists. Constraints over those rows observe the updated shadows.
 - **Grouped-scalar foraging**: grouped-scalar default local search uses
   `AcceptedCount(256)`, the same policy as list models —
   a step sweeps until the limit is accepted (or the union drains) and applies
@@ -312,7 +342,9 @@ SolverForge skills now live.
 - **Cursor-owned candidate execution**: shared scalar/list kernels expose stable
   candidate IDs, let foragers short-circuit without draining a neighborhood,
   and transfer only the selected winner by value. Generated counts represent
-  actual cursor yields rather than an unrequested logical tail.
+  actual cursor yields, including speculative parallel pulls, rather than an
+  unrequested logical tail. Speculative trials discarded after a decision point
+  are counted separately from consumed evaluations.
 - **Construction control and progress**: generic and specialized construction
   share one lifecycle and phase-telemetry path, publish first work promptly,
   continue roughly once per second under verbose logging, poll control during
@@ -445,7 +477,7 @@ SolverForge skills now live.
   assignment-owned scalar slots remain exclusively on their grouped path.
 - **Exact retained telemetry**: generated, evaluated, accepted, not-doable,
   acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-  construction-slot, active-phase, move-label, and bounded applied-move counters
+  construction-slot, per-phase, speculative-work, move-label, and bounded applied-move counters
   are retained as authoritative counters; bounded candidate-pull detail is
   retained separately on explicit request.
 

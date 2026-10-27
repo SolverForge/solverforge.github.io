@@ -9,6 +9,7 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+The current core release is `solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
 This post describes the 0.8.x release line. Current projects should use the
 [solverforge-cli manual](/docs/solverforge-cli/) and the
 [current architecture article](/blog/technical/2026/04/23/current-solverforge-architecture-cli-first-rust-native/).

@@ -9,6 +9,12 @@ description: >
   route deltas through deferred precedence retractions in 0.21.3.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **solverforge 0.21.x** follows `solverforge 0.20.4`; the line was published on
 crates.io on 2026-10-14. `cargo add solverforge` installs 0.21.3 and
 docs.rs serves the 0.21.3 API. The Rust `1.95` floor remains. The 0.20.x
@@ -141,8 +147,8 @@ commit `cb916a73d86c46c25b0e4182626f9adc2c9aa5ad`; the 0.21.3 tag is
 `v0.21.3`, commit `1000a7d471aafe4aa10e900ad075230b9df51ca8`; and the 0.21.3
 tag is `v0.21.3`, commit `1000a7d471aafe4aa10e900ad075230b9df51ca8`. Registry
 publication, the GitHub Releases, and CI runs completed successfully for each
-tag, and no artifact carries the retired `0.21.1` number. This line is closed:
-`solverforge 0.22.0` is the current core (commit
+tag, and no artifact carries the retired `0.21.1` number. This line is closed.
+The next core release was `solverforge 0.22.0` (commit
 `df1ce37b4a69a61fe249e71852ea694de94b4493`, publish
 [39109402359](https://github.com/SolverForge/solverforge/actions/runs/39109402359)
 and release

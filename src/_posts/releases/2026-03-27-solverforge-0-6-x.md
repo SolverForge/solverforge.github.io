@@ -7,6 +7,12 @@ description: >
   generated domain accessors for cleaner constraint code.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 We're excited to announce **SolverForge 0.6.x**, the release line that
 introduced first-class scaffolding and code generation.
 

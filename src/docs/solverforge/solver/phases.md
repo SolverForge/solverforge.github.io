@@ -92,11 +92,20 @@ known. With console output enabled, the phase-start line includes that score,
 making it clear what construction handed to local search before the first move
 is evaluated.
 
-`PhaseTelemetry` carries the active phase's local elapsed time, steps, generated,
-evaluated, accepted, applied, improving, score-calculation, generation-time, and
-evaluation-time counters. Long phases publish metadata-only pulses. Pause and
+`SolverTelemetry::phases` retains every started phase in execution order, with
+`phase_index` and `phase_type`. Each `PhaseTelemetry` carries active elapsed
+time, steps, generated, evaluated, speculative, accepted, applied, improving,
+score-calculation, generation-time, and evaluation-time counters. A progress
+snapshot's last entry is the running phase; terminal telemetry keeps completed
+entries. Run totals also include work outside phases, such as initial scoring.
+Long phases publish metadata-only pulses. Pause and
 cancel settle both inside large candidate work and around phase/terminal hooks;
 paused time is excluded from active phase elapsed time.
+
+Compiled acceptor-forager local search supports ordered parallel evaluation
+through top-level `move_thread_count`; VND and other phase families remain
+sequential. See [Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
+for evaluator ceilings, speculative work, and reproducibility boundaries.
 
 ### Acceptors
 

@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.22.0` crate and current
+This map is aligned with the published `solverforge 0.23.0` crate and current
 release workspace.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
@@ -132,8 +132,32 @@ kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.22.0/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.23.0/crates/solverforge-scoring/src)
 when extending internals.
+
+## Parallel Evaluation and Dynamic Scores
+
+The compiled runtime evaluates acceptor-forager local-search windows on the
+main score director plus persistent replicas when `move_thread_count` requests
+at least two evaluators. The count is capped by the solve's Rayon pool and by
+32; `auto` remains sequential. The scoring crate exports `DirectorDescriptor`
+and `ReplicaDescriptor` for a borrowed descriptor plus `fn(&S) -> C`
+constraint-set constructor. `ScoreDirector<S, C, Desc = SolutionDescriptor>`
+forks initialized evaluators through `Director::fork_replica()` only when using
+that replica descriptor. Configured native and bridge entry points accept the
+constructor and share the same runtime path. See
+[Extend the Solver](/reference/extend-solver/#evaluator-replicas-and-solve-entry-points).
+
+`solverforge-bridge::DynamicScore` is a plain `{ hard, medium, soft }` value.
+Equality, ordering, hashing, zero, and arithmetic depend only on those three
+levels. Unused levels stay zero; decimal hard/soft levels use a scale of
+100,000. `DynamicScore::of`, `soft`, and `hard_soft` construct values;
+`family_levels(family)` chooses a host-facing level vector. Family is not a
+score field or constructor argument. `scoped_dynamic_score_family` and
+`active_dynamic_score_family` govern thread-local display and parsing only,
+including whole-number scaling under `HardSoftDecimal`; worker scoring needs
+no family scope. Bindings that hold a host global lock must release it on the
+calling thread during a parallel solve so worker callbacks can acquire it.
 
 ## Companion repositories
 

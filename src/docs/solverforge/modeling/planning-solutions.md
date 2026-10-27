@@ -54,7 +54,9 @@ pub shifts: Vec<Shift>,
 
 ### `#[problem_fact_collection]`
 
-Marks a `Vec<T>` field containing immutable problem facts. Used by constraints but never modified by the solver.
+Marks a `Vec<T>` field containing problem facts. Input data is immutable during
+solving; configured list-shadow fields on elements are derived state maintained
+by the director, and their generated stream sources react to those updates.
 
 ```rust
 #[problem_fact_collection]
@@ -96,7 +98,8 @@ for the full method contract and the lower-level `for_each(...)` escape hatch.
 
 For advanced list-shadow workflows, the struct can also carry
 `#[shadow_variable_updates(...)]`. When present, the macro generates
-`PlanningSolution::update_entity_shadows(...)` and `update_all_shadows()`
+`PlanningSolution::update_entity_shadows(...)`, `update_all_shadows()`,
+`list_shadow_elements(...)`, `clear_list_shadows(...)`, and `list_shadow_source(...)`
 overrides directly on the solution type, and the stock `ScoreDirector` calls
 those hooks automatically during solving and score analysis. The update
 configuration can maintain `inverse_field`, `index_field`, `previous_field`,

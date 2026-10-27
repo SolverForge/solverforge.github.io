@@ -96,6 +96,16 @@ committed step scores at the same boundary. Mandatory omitted construction does
 not install a phase-local overlay, so required completion remains governed by
 the retained lifecycle rather than an accidental internal cutoff.
 
+## Parallel Evaluation Budgets
+
+In compiled acceptor-forager local search, move-count and score-calculation
+limits count candidates consumed in canonical order. Parallel windows are
+capped by the remaining in-phase evaluation budget. Trials evaluated ahead of
+the decision point and discarded are reported as `moves_speculative`, not
+added to `moves_evaluated` or `score_calculations`. A fixed work budget therefore
+does not measure all physical speculative scoring work. See
+[Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation).
+
 ## Programmatic Termination
 
 Use `SolverManager::cancel(job_id)` to stop a retained job from code:

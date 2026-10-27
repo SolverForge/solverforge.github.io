@@ -36,6 +36,38 @@ termination leaves the solve construction-only. Omitted selector/acceptor/forage
 defaults inside an explicit local-search phase are a separate policy. VND must
 be selected explicitly; it is never inserted before default local search.
 
+## Parallel Candidate Evaluation
+
+Set top-level `move_thread_count = { count = 4 }` to request four evaluators
+for compiled acceptor-forager local search. The effective count includes the
+main score director and is capped by the solve's Rayon pool and by 32.
+`auto` (the default), `none`, and counts 0 or 1 stay sequential.
+
+The coordinator generates candidates serially in canonical order, evaluates a
+window on the main director and persistent replicas, then consumes results in
+that same order through the acceptor and forager. Windows target the previous
+step's consumed-candidate count, in batches of at most 32; after that target,
+they continue one candidate per evaluator. Each replica owns a working-solution
+clone and independent constraint state, sharing the borrowed descriptor. The
+selected move advances every replica to the committed score. External writes
+to the working solution cause replicas to be rebuilt before further trials.
+
+At fixed work and seed, selectors with no cross-step stream state follow the
+sequential trajectory across evaluator counts. Ruin selectors with cross-step
+RNG streams and lazily activated providers observe speculative pulls, so their
+trajectory can depend on evaluator count; it is reproducible for a fixed count.
+A wall-clock-limited run need not return the same result across counts.
+
+`moves_evaluated`, `score_calculations`, and their termination limits count
+consumed candidates only. Windows respect the remaining in-phase move and
+score-calculation budgets. Trials evaluated ahead of the decision point but not
+consumed are recorded separately as `moves_speculative`, with candidate-trace
+disposition `DiscardedSpeculative`; they do not inflate consumed-work counters.
+
+This parallel path belongs to the compiled runtime, not the lower-level
+`LocalSearchPhase`. That phase, VND, construction, exhaustive search, and
+partitioned child solves evaluate sequentially.
+
 ## Acceptor
 
 The acceptor decides whether a scored candidate can be accepted.
@@ -92,6 +124,11 @@ memories. Self-undoing moves use `MoveUndoIdentity::SameAsMoveId`, whose
 `undo_id()` resolves to the actual move ID; other moves carry an explicit
 reverse ID. Tabu IDs are opaque implementation tokens, not candidate-trace
 identities or a cross-release interchange format.
+
+Custom `Move` implementations return `Cow<'_, MoveTabuSignature>` from
+`tabu_signature(&director)`: lend a stored signature with `Cow::Borrowed`, or
+return a computed signature with `Cow::Owned`. Wrappers preserve that borrowing;
+there is no separate `borrowed_tabu_signature` hook.
 
 ## Score-Level Simulated Annealing
 
@@ -182,8 +219,8 @@ require_hard_improvement = true
 
 Retained status and events preserve exact generated, evaluated, accepted,
 not-doable, acceptor-rejected, forager-ignored, hard-delta, conflict-repair,
-construction-slot, and active-phase counters plus generation and evaluation
-durations. `moves_generated` counts candidates actually yielded to the engine;
+construction-slot, speculative-work, and per-phase counters plus generation and
+evaluation durations. `moves_generated` counts candidates actually yielded to the engine;
 it does not claim the unrequested tail of a short-circuited cursor.
 Per-move-label telemetry reports generated, evaluated, accepted, applied,
 not-doable, acceptor-rejected, forager-ignored, score-improving, score-equal,

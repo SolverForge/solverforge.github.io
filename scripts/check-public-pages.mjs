@@ -1263,6 +1263,37 @@ async function checkBenchmarksDocs(origin) {
   return failures;
 }
 
+async function checkReleaseDocs(origin) {
+  const browser = await chromium.launch(chromiumOptions());
+  const page = await browser.newPage();
+  const failures = [];
+  const checks = [
+    { path: "/docs/solverforge/", required: ["These pages track the solverforge 0.23.0 release", "solverforge-cli 3.6.0 line scaffolds solverforge 0.22.0"] },
+    { path: "/docs/solverforge/solver/configuration/", required: ["Sequential (default)", "min(count, rayon::current_num_threads(), 32)"] },
+    { path: "/docs/solverforge/solver/local-search/", required: ["DiscardedSpeculative", "trajectory can depend on evaluator count"] },
+    { path: "/docs/solverforge/solver/phases/", required: ["SolverTelemetry::phases", "every started phase in execution order"] },
+    { path: "/docs/solverforge-cli/", required: ["This release scaffolds solverforge 0.22.0", "describes solverforge 0.23.0"] },
+    { path: "/docs/solverforge-python/", required: ["published binding remains on core 0.22.0", "does not retarget these wheels or add parallel move evaluation"] },
+    { path: "/docs/status-and-roadmap/", required: ["documentation tracks the solverforge 0.23.0 release", "Linux/Windows CI passed, macOS CI failed"] },
+    { path: "/blog/releases/2026/10/27/solverforge-0-23-x/", required: ["solverforge 0.23.x follows solverforge 0.22.0", "32 evaluators", "macOS failed", "integration tests were skipped"] },
+  ];
+  try {
+    for (const { path, required } of checks) {
+      const response = await page.goto(`${origin}${path}`, { waitUntil: "load" });
+      if (response?.status() !== 200) {
+        failures.push({ path, issue: "release documentation not served", status: response?.status() });
+      }
+      const text = (await page.locator("body").innerText()).replace(/\s+/g, " ");
+      for (const sentence of required) {
+        if (!text.includes(sentence)) failures.push({ path, issue: "release contract missing", expected: sentence });
+      }
+    }
+  } finally {
+    await browser.close();
+  }
+  return failures;
+}
+
 async function checkDocsSidebarActive(origin) {
   const browser = await chromium.launch({
     ...chromiumOptions(),
@@ -1323,6 +1354,7 @@ let useCaseShowcase = [];
 let useCasePages = [];
 let benchmarksPage = [];
 let benchmarksDocs = [];
+let releaseDocs = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
@@ -1331,6 +1363,7 @@ try {
   useCasePages = await checkUseCasePages(origin);
   benchmarksPage = await checkBenchmarksPage(origin);
   benchmarksDocs = await checkBenchmarksDocs(origin);
+  releaseDocs = await checkReleaseDocs(origin);
 } finally {
   server.close();
 }
@@ -1346,6 +1379,7 @@ const summary = {
   useCasePages,
   benchmarksPage,
   benchmarksDocs,
+  releaseDocs,
   layoutFailures,
 };
 
@@ -1360,6 +1394,7 @@ if (
   useCasePages.length ||
   benchmarksPage.length ||
   benchmarksDocs.length ||
+  releaseDocs.length ||
   layoutFailures.length
 ) {
   process.exit(1);

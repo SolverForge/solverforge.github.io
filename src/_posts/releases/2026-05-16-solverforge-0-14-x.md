@@ -8,6 +8,12 @@ description: >
   route metric classes for Clarke-Wright construction.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **SolverForge 0.14.x** was the previous core runtime line. It starts with
 [v0.14.0](https://github.com/SolverForge/solverforge/releases/tag/v0.14.0),
 tagged at `27329bd` and published on 2026-05-16. The final patch is

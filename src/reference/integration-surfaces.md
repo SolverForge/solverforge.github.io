@@ -27,7 +27,7 @@ behavior in your app, and optional helpers limited to the problems they solve.
 
 Use `solverforge-cli` to bootstrap the project, then move quickly into ordinary
 application modules and `solverforge` runtime code. Current core documentation
-tracks `solverforge 0.22.0`; the current CLI 3.6.0 line scaffolds core 0.22.0, so
+tracks `solverforge 0.23.0`; the current CLI 3.6.0 line scaffolds core 0.22.0, so
 check `solverforge --version` on the binary you install.
 
 ### Runtime truth
@@ -42,6 +42,21 @@ search graph before candidate work starts. Binding layers should surface a
 declaration, compilation, preparation, or execution error rather than install a
 parallel phase builder or fallback runner.
 
+The configured native entry point and
+`try_run_dynamic_solver_with_config_parts` take a constraint-set constructor
+`fn(&S) -> C`, called for the working solution and every evaluator replica.
+Parallel candidate scoring uses independent constraint state while preserving
+coordinator acceptance order. A binding with a host global lock must release
+it on the calling thread for the duration of the solve, or worker callbacks
+cannot acquire it.
+
+Bridge `DynamicScore` stores only `hard`, `medium`, and `soft`; family belongs
+to presentation/parsing scope, not value equality, hashing, zero, or arithmetic.
+Decimal hard/soft values are scaled by 100,000. Enter
+`scoped_dynamic_score_family` for display and configured score-limit parsing;
+parallel score workers need no scope. Native score types keep their existing
+contracts.
+
 ### Python as a binding
 
 Use `solverforge-py` when the product needs Python model authoring. Python
@@ -49,7 +64,8 @@ classes, decorators, explicit scalar/list metadata, and callbacks describe the
 problem; Rust still owns the indexed working state, compiled search graph,
 cursor execution, safe native score specializations, snapshots, retained jobs,
 candidate traces, and embedded shared UI asset bytes. The Python 0.6.15 line
-and its repository apps use core 0.22.0, matching the current core release.
+and its repository apps use core 0.22.0. That binding runtime pin is independent
+of the current Rust core release.
 
 ### UI as presentation and orchestration
 

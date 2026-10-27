@@ -66,6 +66,27 @@ owned sequence; do not encode ordered work as a chained scalar predecessor.
 | richer scoring context             | add immutable facts or derived helper methods instead of shoving logic into constraints              |
 | validation or import normalization | add app-side builders or conversion layers before solving                                            |
 
+## Legal Domains Versus Search Hints
+
+`value_range_provider` names a solution collection for a shared legal range or
+an entity `Vec<usize>` field for that entity's allowed indexes. Construction and
+every scalar move family, including swap, nearby swap, and pillar swap, enforce
+the receiving entity's domain. Use `#[planning_pin]` to preserve an input value;
+a one-value domain is not a pin.
+
+`candidate_values` supplies an ordered bounded neighborhood for construction,
+change, pillar change, and ruin-recreate. It does not narrow legality: swap
+families exchange current values and can receive a value outside this hint.
+Express forbidden assignments in the legal domain, not in `candidate_values`.
+See [Planning Entities](/docs/solverforge/modeling/planning-entities/) for a
+per-entity domain declaration.
+
+Configured list-element shadows are derived mutations, even when elements live
+in a fact collection. Generated sources retain their change metadata so rules
+reading owner, index, previous, next, or cascading state score incrementally.
+Keep custom edits on the director's paired notification path; see
+[List Shadows](/docs/solverforge/modeling/list-variables/#shadow-updates).
+
 ## Assignment-Backed Scalar Groups
 
 Register a model-owned `Vec<ScalarGroup<Schedule>>` provider with

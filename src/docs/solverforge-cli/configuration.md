@@ -81,7 +81,10 @@ solverforge config set environment_mode reproducible
 
 That makes it convenient for simple changes, but it does not replace learning
 the runtime `solver.toml` model. Use the SolverForge runtime docs when you need
-deeper phase and move configuration detail.
+deeper phase and move configuration detail. Those pages track the current core,
+not the CLI's older scaffold target. Parallel `move_thread_count` evaluation
+requires upgrading the app to core `0.23.0`; the scaffolded `0.22.0` runtime
+does not enable it.
 
 ## `solverforge.app.toml`: Scaffold Metadata and UI Contract
 

@@ -16,7 +16,9 @@ CPython 3.14. The automatic release workflow completed and the public PyPI
 package is `solverforge 0.6.15`. The source compiles Python models into the
 `solverforge 0.22.0` Rust runtime and embeds `solverforge-ui 0.9.0` assets for
 Python-hosted examples. GitHub CI and the final-tag release workflow completed
-successfully.
+successfully. The published binding remains on core `0.22.0`; the
+[0.23.x core release](/blog/releases/2026/10/27/solverforge-0-23-x/) does not
+retarget these wheels or add parallel move evaluation to this Python package.
 <% end %>
 
 SolverForge Python lets Python users define planning models with ordinary

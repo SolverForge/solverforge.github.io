@@ -167,11 +167,15 @@ Generated collection source methods preserve the source of each collection:
 | Solution field annotation | Generated source kind | Incremental meaning |
 | ------------------------- | --------------------- | ------------------- |
 | `#[planning_entity_collection]` | Descriptor source | The stream owns localized updates for that entity descriptor |
-| `#[problem_fact_collection]` | Static source | The stream reads immutable facts and does not react to entity moves |
+| `#[problem_fact_collection]` | Static source, or list-shadow change source | Input facts stay static unless the configured list-shadow update writes their element rows |
+| `#[planning_list_element_collection]` | Static source, or list-shadow change source | Shadow-bearing elements react to their owner's list edits |
 
 That metadata matters for localized incremental scoring. Entity-source streams
-can react only to the descriptor that changed; fact-source streams remain
-stable. This is important for generated sources used with operations such as
+can react only to the descriptor that changed; ordinary fact-source streams
+remain stable. Generated shadow-bearing element sources use
+`PlanningSolution::list_shadow_source(...)` so the director can retract old
+element rows before rewriting their shadows and insert the refreshed rows.
+This is important for generated sources used with operations such as
 `join`, `if_exists`, `if_not_exists`, `project`, `flatten_last`, `balance`, and
 `unassigned`.
 

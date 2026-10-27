@@ -3,12 +3,18 @@ title: "Problem Facts"
 linkTitle: "Problem Facts"
 weight: 30
 description: >
-  Immutable input data that constraints reference but the solver doesn't modify.
+  Immutable input data and derived list-element shadow state used by constraints.
 ---
 
-A **problem fact** is immutable input data. The solver reads problem facts when
-evaluating constraints but never modifies them. Examples include employees,
+A **problem fact** supplies immutable input data. The solver reads those inputs
+when evaluating constraints. Examples include employees,
 rooms, timeslots, and vehicle visits.
+
+List elements may also carry configured derived shadows such as owner, index,
+previous, or next. Those fields are maintained by the score director, not
+independent planning decisions. Generated sources for such collections receive
+incremental element notifications when owner lists change; ordinary fact
+collections remain static. See [List Variables](/docs/solverforge/modeling/list-variables/#shadow-updates).
 
 ## The `#[problem_fact]` Macro
 

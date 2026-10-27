@@ -8,6 +8,12 @@ description: >
   descriptor-addressed, and the patch line tightens scoring and local search.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+Versions, installation commands, and API descriptions below are historical.
+<% end %>
+
 **SolverForge 0.9.x** is the runtime line where the model contract becomes
 manifest-owned and scalar/list terminology becomes explicit. The line starts at
 [0.9.0](https://crates.io/crates/solverforge/0.9.0) and includes the

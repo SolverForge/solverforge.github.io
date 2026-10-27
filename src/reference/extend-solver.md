@@ -142,6 +142,10 @@ Heap-owning compound, pillar, ruin, list-union, and descriptor-union move
 families do not provide a universal `Clone` contract. Keep candidates owned by
 stable cursor IDs, evaluate by reference, and transfer the winner.
 `Acceptor::step_ended` takes `Option<MoveTabuSignature>` by value.
+`Move::tabu_signature<D: Director<S>>(&self, &D)` returns
+`Cow<'_, MoveTabuSignature>`: lend a prebuilt signature or own one derived from
+the working solution. Wrappers forward that value without forcing a clone;
+there is no separate borrowed-signature hook.
 `Termination::is_terminated` and `MaybeTermination::should_terminate` take
 `&mut self`; stateful terminations own their counters rather than using shared
 interior mutation.
@@ -176,6 +180,39 @@ both its hard penalties and its makespan. See
 [List Variables](/docs/solverforge/modeling/list-variables/#precedence-makespan-scoring)
 for the scoring model.
 
+### Evaluator Replicas and Solve Entry Points
+
+Compiled acceptor-forager local search uses top-level `move_thread_count` for
+ordered parallel trials. `auto`, `none`, and counts 0 or 1 stay sequential;
+larger counts are capped by the solve's Rayon pool and one 32-candidate window.
+The main director counts as one evaluator. VND, lower-level `LocalSearchPhase`,
+construction, exhaustive search, and partitioned children remain sequential.
+See [Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
+before making cross-count reproducibility assumptions about ruin or lazy sources.
+
+The configured `try_run_solver_with_config_and_search` entry point and bridge
+runner accept a constraint-set constructor `fn(&S) -> C`, not an already-built
+set. Each replica clones the working solution and constructs independent
+constraint state from it. Macro-generated solves supply that constructor.
+
+For lower-level scoring, `ScoreDirector<S, C, Desc = SolutionDescriptor>` accepts
+an owned descriptor or a `ReplicaDescriptor::new(&descriptor, constraints)` via
+`with_descriptor`. `Director::fork_replica()` returns an initialized independent
+replica only for the borrowed replica descriptor; owned-descriptor directors
+return `None`. `DirectorDescriptor` and `ReplicaDescriptor` are exported by
+`solverforge-scoring`; they are not a second configured solve path.
+
+### List-Shadow Notifications
+
+An owner shadow update is also an element mutation. Before/after owner
+notifications retract element rows with old shadows, rewrite derived state,
+then reinsert refreshed owner and element rows. Elements left outside all lists
+have configured inverse/index/previous/next fields cleared. Hand-written
+`PlanningSolution` implementations must report these writes through
+`list_shadow_elements`, `clear_list_shadows`, and `list_shadow_source`;
+generated models provide the hooks. Test incremental-versus-fresh scoring after
+edits and undo, including transfers between two owners and unassignment.
+
 ## Telemetry and lifecycle expectations
 
 Retained jobs expose exact counts and durations through structured events.
@@ -186,8 +223,14 @@ That means:
   and construction-slot counters belong there too
 - selector telemetry carries stable selector indexes and labels for
   local-search and VND diagnosis
-- active-phase telemetry carries its own elapsed, step, move, score-calculation,
-  generation, and evaluation counters
+- `SolverTelemetry::phases` retains one indexed record per started phase in
+  execution order, including the running phase in progress snapshots
+- phase telemetry carries active elapsed, step, move, score-calculation,
+  generation, and evaluation counters; run totals include phase sums and
+  solve-level work such as initial scoring
+- `moves_speculative` counts evaluated parallel trials discarded after the
+  decision point, separately from consumed `moves_evaluated` and
+  `score_calculations`; candidate traces mark them `DiscardedSpeculative`
 - generation and evaluation durations stay exact in the event stream
 - move-label telemetry and the bounded applied-move trace belong to runtime
   diagnostics, not benchmark-only instrumentation
@@ -202,6 +245,17 @@ That means:
   snapshot; check optional snapshot metadata before fetching or analyzing it
 - pause, resume, snapshot fetch, and analysis should use the retained
   `SolverManager` contract rather than ad-hoc channels
+
+For custom instrumentation, `SolverStats` records counters once in its running
+`PhaseStats`; `begin_phase` opens a record and `end_phase` freezes it.
+`PhaseScope` owns that lifecycle through creation/drop and borrows the record
+through `stats()` / `stats_mut()`. Read aggregate counters through methods such
+as `step_count()`, `moves_evaluated()`, `moves_speculative()`, and
+`score_calculations()`, not mutable aggregate fields. `phase()` / `phase_mut()`
+and `phase_elapsed()` address the running phase. The solve's pause-aware clock
+belongs to `SolverStats` (`start`, `pause`, `resume`, `elapsed`, `active_elapsed`,
+`started_at`, `is_paused`); do not maintain a second competing timer or count
+the same work at both scope levels.
 
 ## Practical checklist
 

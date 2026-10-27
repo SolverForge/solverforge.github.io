@@ -13,6 +13,7 @@ This is a native Rust constraint solver built from the ground up with zero-erasu
 <% end %>
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+The current core release is `solverforge 0.23.0`; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
 This post records the 0.5.0 release. Current projects should start from
 `solverforge-cli`, which scaffolds one neutral application shell. Run
 `solverforge --version` to see the exact scaffold targets in your installed

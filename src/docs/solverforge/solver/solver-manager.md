@@ -47,8 +47,15 @@ moves, score delta, and hard feasibility before and after the move. Any
 displayed `moves/s` value is derived at the edge rather than stored as the
 canonical runtime metric.
 
-`PhaseTelemetry` identifies the active phase and its local elapsed, step, move,
-score-calculation, generation-time, and evaluation-time counters. A generated
+`SolverTelemetry::phases` contains one `PhaseTelemetry` for every phase started,
+in execution order. Each entry carries `phase_index`, `phase_type`, active
+elapsed time, step, move, score-calculation, generation-time, and evaluation-time
+counters; the last entry of a progress snapshot is the running phase. Completed
+phase entries remain in terminal telemetry. Run totals include the phase sum
+plus work outside phases, such as the initial score calculation.
+`moves_speculative` appears at run and phase level for parallel trials discarded
+after the step's decision point; it is zero for sequential evaluation and is
+separate from `moves_evaluated` and `score_calculations`. A generated
 count means a candidate was actually yielded to the engine; it does not include
 an unrequested logical tail after a cursor or forager short-circuits.
 Construction and local search publish that same phase telemetry. With verbose

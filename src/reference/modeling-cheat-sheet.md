@@ -16,7 +16,7 @@ right SolverForge annotation or structure.
 | `#[planning_entity]`            | solver-mutated records             | tasks, shifts, visits, jobs                                           |
 | `#[problem_fact]`               | immutable input data               | workers, depots, skills, rooms                                        |
 | `#[planning_id]`                | stable identity                    | put on facts and entities that need identity                          |
-| `#[planning_variable(...)]`     | scalar assignment decision         | references a value range by solution-field name                       |
+| `#[planning_variable(...)]`     | scalar assignment decision         | legal range from a solution collection or entity `Vec<usize>` field    |
 | `#[planning_list_variable(...)]` | ordered assignment decision       | owner stores element indexes in canonical sequence order              |
 | `#[problem_fact_collection]`    | fact collections on the solution   | usually `Vec<T>`                                                      |
 | `#[planning_entity_collection]` | entity collections on the solution | the main search space                                                 |
@@ -49,10 +49,12 @@ empty object, or invalid score-only termination stays construction-only.
 - facts are immutable reference data
 - entities are the records the solver changes
 - the score lives on the solution, not on each entity
-- `value_range_provider = "field_name"` points at a solution collection
+- `value_range_provider = "field_name"` points at a solution collection or an
+  entity `Vec<usize>` legal-domain field; all scalar move families enforce it
 - use `allows_unassigned = true` when `None` is a legitimate state
 - use `candidate_values` or `value_candidate_limit` when scalar value
-  neighborhoods must be bounded
+  neighborhoods must be bounded; these are search hints, not domain restrictions,
+  and swap families ignore `candidate_values`
 - use `nearby_value_candidates` or `nearby_entity_candidates` before configuring
   nearby scalar selectors
 - use `construction_entity_order_key` and `construction_value_order_key` only
