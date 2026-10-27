@@ -2,7 +2,8 @@
 title: "Python Solving & Runtime"
 description: >
   Run synchronous solves, score analysis, compiled solver.toml config, retained
-  jobs, candidate diagnostics, snapshots, and dynamic move selectors.
+  jobs, parallel move evaluation, per-phase telemetry, candidate diagnostics,
+  snapshots, and dynamic move selectors.
 ---
 
 # Python Solving & Runtime
@@ -14,7 +15,7 @@ SolverForge Python has two runtime entry points:
   resume, cancel, and delete
 
 Both paths compile the authored Python schema into one immutable SolverForge
-0.22.0 runtime graph. The binding supplies dynamic state, callbacks, slot
+0.23.0 runtime graph. The binding supplies dynamic state, callbacks, slot
 capabilities, assignment groups, providers, and candidate metrics; the core owns
 phase construction, cursor execution, foraging, lifecycle control, and
 telemetry. There is no wrapper-owned fallback runner.
@@ -91,6 +92,79 @@ type = "local_search"
 move_selector = { type = "change_move_selector" }
 ```
 
+## Parallel Move Evaluation
+
+Acceptor-forager local search, including default local search, can evaluate
+candidate moves concurrently within one solve. Candidate generation and
+acceptance decisions remain ordered on one coordinator; workers score trials
+on separate working-state replicas. Each evaluator constructs its own constraint
+set from the same compiled schema and callbacks.
+
+| `move_thread_count` | Behavior |
+| --- | --- |
+| `"auto"` | default; currently sequential |
+| `"none"` | disable parallel move evaluation |
+| `{"count": 4}` | request four evaluators, including the main director |
+
+The effective count is bounded by the solve's Rayon thread count and the
+32-candidate evaluation-window ceiling. Counts of zero or one stay sequential.
+Construction and variable neighborhood descent remain sequential. The binding
+passes this config to the core; it does not create a Python thread pool.
+
+With the `Schedule` class from [Getting Started](/docs/solverforge-python/getting-started/#a-minimal-model),
+run a fixed-step solve as follows:
+
+```python
+from solverforge import Solver, SolverConfig
+
+config = SolverConfig.from_dict({
+    "random_seed": 7,
+    "move_thread_count": {"count": 4},
+    "phases": [
+        {"type": "construction_heuristic"},
+        {"type": "local_search", "termination": {"step_count_limit": 60}},
+    ],
+})
+solved = Solver.solve(Schedule([Shift() for _ in range(30)], [0, 1, 2]), config)
+assert solved.score["family"] == "hard_soft"
+assert solved.score["levels"][0] == 0
+assert all(shift.nurse in (0, 1, 2) for shift in solved.shifts)
+```
+
+`move_thread_count` is not a direct `SolverConfig(...)` constructor keyword.
+Use `from_dict`, `from_toml`, or `extra={"move_thread_count": {"count": 4}}`.
+The equivalent TOML, loadable with `SolverConfig.from_toml(text)` or from
+`solver.toml`, is:
+
+```toml
+random_seed = 7
+move_thread_count = { count = 4 }
+
+[[phases]]
+type = "construction_heuristic"
+
+[[phases]]
+type = "local_search"
+termination = { step_count_limit = 60 }
+```
+
+### Reproducibility Limits
+
+Use the same seed, input, configuration, and fixed work budget when comparing
+runs. Deterministic stateless neighborhoods can preserve assignments and score
+across evaluator counts. This is not a universal cross-count guarantee:
+stateful ruin/recreate selectors and custom candidate providers can advance
+differently when a parallel window pulls candidates ahead of the decision
+point. For those paths, parity is only at a fixed evaluator count. Keep that
+count unchanged when reproducing a result. Time limits can stop at different
+points regardless of the seed or environment mode.
+
+`Solver.solve(...)` releases the GIL for the native solve so evaluator workers
+can attach to Python. A GIL-enabled CPython build still serializes Python
+callbacks; use free-threaded CPython 3.14 for concurrent callback execution.
+Parallel execution is not a promise of faster solves: replica upkeep, callback
+cost, and discarded speculative work affect throughput.
+
 ## Retained Jobs
 
 Use `SolverManager` when the application needs lifecycle state, progress,
@@ -124,9 +198,29 @@ The manager exposes:
 | `cancel(job_id)` | request cancellation |
 | `delete(job_id)` | remove retained job state |
 
-Treat snapshots as point-in-time Python objects. Status telemetry includes the
-active phase type, phase index, phase-local counters, and generation/evaluation
-time when a phase is active.
+Treat snapshots as point-in-time Python objects. Status and event telemetry
+contain run totals and a `phases` list, with one record per phase started so
+far in execution order. Before a phase starts the list can be empty. Each entry
+includes `phase_index`, `phase_type`, `elapsed_ms`, step/move/score counters,
+`moves_speculative`, `generation_ms`, and `evaluation_ms`. In a progress event,
+the last entry is the running phase; after termination it is the last phase
+that started, not an assertion that the job is still running.
+
+Read per-phase state from `phases`, not a singular `phase` dictionary:
+
+```python
+telemetry = status["telemetry"]
+phases = telemetry["phases"]
+last_phase = phases[-1] if phases else None
+for phase in phases:
+    print(phase["phase_index"], phase["phase_type"], phase["moves_speculative"])
+print("discarded look-ahead trials:", telemetry["moves_speculative"])
+```
+
+`moves_evaluated` counts trials consumed by the decision loop.
+`moves_speculative` separately counts evaluated look-ahead trials discarded
+after an early decision or interruption; it is not accepted or applied work.
+Both run totals and phase records expose it. Sequential phases report zero.
 
 Construction and local search publish the same engine-owned phase lifecycle and
 progress telemetry. The first observed construction work is reported promptly,
@@ -169,6 +263,15 @@ configured input, execution policy, resolved phase-plan provenance, candidate
 identities and dispositions, prefix digests, explicit completeness state, and
 truncation. The total pull count continues after the bounded identity prefix is
 full.
+
+Discarded look-ahead window suffixes carry the `discarded_speculative`
+disposition. An interrupted decision-point candidate can instead carry
+`interrupted_before_evaluation` even if its speculative trial already ran.
+Do not classify this work as acceptor rejections or applied moves.
+Pull counts and trace prefixes can differ across evaluator
+counts even when the final plan agrees. Compare global `ordinal` plus
+`identity`; `candidate_index_scope` is `source_local_only`, so a leaf-local
+`candidate_index` is not a cross-runtime identity.
 
 Ordinary `get_status(...)`, `events(...)`, and `snapshot(...)` payloads do not
 clone the trace. `Solver.solve(...)` rejects `candidate_trace` because the
@@ -314,9 +417,13 @@ keep only app-specific browser modules under their own `static/` directories.
 ## Callback Threading
 
 Python callbacks must be deterministic for the same solution state. The native
-extension may invoke callbacks repeatedly during scoring and search. On
-free-threaded CPython 3.14, callback code and third-party extension modules used
-inside callbacks need to be safe for the concurrency they participate in.
+extension may invoke callbacks repeatedly during scoring and search, including
+from Rayon evaluator workers. Filters, join keys, grouped collectors, weights,
+and metadata callbacks must not depend on invocation order or mutate shared
+Python state. Keep solution-level lookup context immutable throughout a solve.
+On free-threaded CPython 3.14, callback code and third-party extension modules
+used inside callbacks need to be safe for concurrent execution. Releasing the
+GIL in the calling thread does not make an unsafe callback safe.
 
 The native working solution stores scalar, list, and candidate values by
 compiled descriptor index and shares immutable metadata across clones. Callback
@@ -324,5 +431,7 @@ views project entity and fact collections from that Rust-owned state, so working
 preview, and best-solution clones do not share mutable Python row objects. After
 the first full callback-view sync, only changed rows are synchronized.
 
-Callback exceptions surface as SolverForge Python exceptions with Python
-traceback context.
+Synchronous solve and analysis re-raise the original Python callback exception
+with its traceback, including failures originating in parallel evaluation.
+Retained jobs enter `FAILED` and expose the formatted Python callback traceback
+in the failed event's `error` field.

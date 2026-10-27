@@ -8,6 +8,13 @@ description: >
   construction, embeds shared UI assets, and adds the deliveries FastAPI demo.
 ---
 
+<%= render Ui::Callout.new(title: "Historical Python release", variant: "warning") do %>
+The current binding is `solverforge 0.7.0` on core `0.23.0`; see the
+[0.7.x release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
+The versions, install commands, and publication status below describe this
+historical release, not the current PyPI package.
+<% end %>
+
 **SolverForge Python 0.5.0** is the tagged source line for the `solverforge`
 Python package. It targets CPython 3.14, carries the Rust dependency base
 forward to `solverforge 0.17.2`, and embeds `solverforge-ui 0.7.0` assets

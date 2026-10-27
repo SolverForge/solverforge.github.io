@@ -26,6 +26,14 @@ def constraints(factory: ConstraintFactory):
 Use small callback functions or lambdas for the business rule itself. Keep data
 loading, validation, and reporting outside the constraint provider.
 
+Filters, join keys, grouped collectors, and callback weights must be
+deterministic for the same solution state and safe for concurrent invocation.
+Parallel local search scores separate solution replicas with separate
+constraint sets on Rayon workers; a shared callable or module namespace is not
+copied into isolated Python state. Do not mutate globals, callback-owned
+counters, or lookup context while scoring. See
+[Callback Threading](/docs/solverforge-python/solving-and-runtime/#callback-threading).
+
 ## Supported Stream Shapes
 
 | Shape | Pattern |
@@ -261,6 +269,11 @@ Only capture-free functions with canonical module provenance and no defaults or
 function-owned metadata can share a schema/runtime plan. Mutable values in that
 module namespace remain live, and callbacks from different module namespaces do
 not share a plan merely because their code objects match.
+
+Compiling a stateful callable per invocation is a plan-caching rule, not a
+thread-safety guarantee. Every parallel evaluator constructs its own constraint
+set from the same compiled plan; referenced Python callback state must still be
+immutable during the solve.
 
 ## Python Stream API
 

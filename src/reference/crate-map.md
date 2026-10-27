@@ -158,13 +158,17 @@ score field or constructor argument. `scoped_dynamic_score_family` and
 including whole-number scaling under `HardSoftDecimal`; worker scoring needs
 no family scope. Bindings that hold a host global lock must release it on the
 calling thread during a parallel solve so worker callbacks can acquire it.
+The Python binding releases the GIL with `py.detach`, builds an independent
+constraint set per evaluator, and exposes run/per-phase `moves_speculative`
+with ordered `phases` records. GIL-enabled Python serializes callbacks;
+free-threaded callbacks must not mutate shared state.
 
 ## Companion repositories
 
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
-| `solverforge-py`   | the tagged `v0.6.15` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
+| `solverforge-py`   | the tagged `v0.7.0` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
@@ -173,8 +177,8 @@ calling thread during a parallel solve so worker callbacks can acquire it.
 - Start with `solverforge-cli` to scaffold the app shell.
 - Start with the PyPI `solverforge` package when the application surface is
   Python and you do not need a generated Rust web/API/CLI shell. PyPI publishes
-  `solverforge 0.6.15`; use the matching `solverforge-py v0.6.15` tag for source
-  and example development on SolverForge 0.22.0.
+  `solverforge 0.7.0`; use the matching `solverforge-py v0.7.0` tag for source
+  and example development on SolverForge 0.23.0.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
 - Keep scalar/list model declarations in the `planning_model!` manifest and
@@ -203,7 +207,7 @@ calling thread during a parallel solve so worker callbacks can acquire it.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
-| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.6.15` source tag |
+| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.7.0` source tag |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |

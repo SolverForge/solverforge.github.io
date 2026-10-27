@@ -11,14 +11,12 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-This section documents the tagged `solverforge-py 0.6.15` source line for
-CPython 3.14. The automatic release workflow completed and the public PyPI
-package is `solverforge 0.6.15`. The source compiles Python models into the
-`solverforge 0.22.0` Rust runtime and embeds `solverforge-ui 0.9.0` assets for
-Python-hosted examples. GitHub CI and the final-tag release workflow completed
-successfully. The published binding remains on core `0.22.0`; the
-[0.23.x core release](/blog/releases/2026/10/27/solverforge-0-23-x/) does not
-retarget these wheels or add parallel move evaluation to this Python package.
+The current public PyPI package is `solverforge 0.7.0`, from the tagged
+`solverforge-py v0.7.0` source for CPython 3.14. It pins the six SolverForge Rust
+dependencies to exactly `0.23.0` and embeds `solverforge-ui 0.9.0` assets for
+Python-hosted examples. Acceptor-forager local search supports opt-in
+[parallel move evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation).
+Use free-threaded CPython for concurrent Python callback execution.
 <% end %>
 
 SolverForge Python lets Python users define planning models with ordinary
@@ -33,7 +31,7 @@ selector or move engine.
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.6.15"
+python3.14 -m pip install "solverforge==0.7.0"
 ```
 
 Use the tagged source checkout when developing the repository examples or
@@ -42,7 +40,7 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.15
+git checkout v0.7.0
 make develop
 . .venv/bin/activate
 ```
@@ -69,7 +67,7 @@ make develop
 | Scores | `SoftScore`, `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore` |
 | Direct solve | `Solver.solve(...)`, `Solver.analyze(...)` |
 | Retained jobs | `SolverManager`, `telemetry_detail(...)`, `QualifiedCandidateTraceProvenance` |
-| Runtime config | `SolverConfig`, dictionaries, or `solver.toml` |
+| Runtime config | `SolverConfig`, dictionaries, or `solver.toml`; `move_thread_count` controls evaluators |
 | Embedded UI assets | `solverforge.ui.asset(...)`, `solverforge.ui.asset_paths()` |
 
 ## Package Details
@@ -77,10 +75,10 @@ make develop
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.6.15` |
-| Published PyPI version | `0.6.15` |
+| Documented source line | `0.7.0` |
+| Published PyPI version | `0.7.0` |
 | Python requirement | `>=3.14` |
-| Runtime base | `solverforge 0.22.0` |
+| Runtime base | `solverforge 0.23.0` |
 | Embedded UI base | `solverforge-ui 0.9.0` |
 | Repository | [SolverForge/solverforge-py](https://github.com/SolverForge/solverforge-py) |
 
@@ -95,7 +93,8 @@ make develop
   shapes, joins, grouping, balance scoring, and unsupported top-level methods
 - **[Solving & Runtime](/docs/solverforge-python/solving-and-runtime/)** -
   synchronous solves, score analysis, compiled runtime config, retained jobs,
-  candidate traces, qualified provenance, and dynamic move support
+  parallel evaluation, per-phase telemetry, candidate traces, qualified
+  provenance, and dynamic move support
 - **[Hospital Example](/docs/solverforge-python/hospital-example/)** - the
   FastAPI example, retained lifecycle endpoints, and public dataset shape
 - **[Deliveries Example](/docs/solverforge-python/deliveries-example/)** -
@@ -104,6 +103,6 @@ make develop
 
 ## Links
 
-- [SolverForge Python 0.6.x release notes](/blog/releases/2026/07/13/solverforge-python-0-6-x/)
-- [PyPI package 0.6.15](https://pypi.org/project/solverforge/0.6.15/)
-- [Python v0.6.15 source](https://github.com/SolverForge/solverforge-py/tree/v0.6.15)
+- [SolverForge Python 0.7.x release notes](/blog/releases/2026/10/27/solverforge-python-0-7-x/)
+- [PyPI package 0.7.0](https://pypi.org/project/solverforge/0.7.0/)
+- [Python v0.7.0 source](https://github.com/SolverForge/solverforge-py/tree/v0.7.0)

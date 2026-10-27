@@ -132,7 +132,8 @@ a correction to the documented contract, not a new swap restriction.
 | Core runtime | `solverforge 0.23.0` | Rust `1.95`; opt-in parallel evaluation and breaking extension/telemetry APIs |
 | Previous core runtime | `solverforge 0.22.0` | Canonical grouping kernel; existing applications keep their pins |
 | CLI | `solverforge-cli 3.6.0` | Fresh scaffolds target core `0.22.0`, not `0.23.0` |
-| Python | `solverforge-py 0.6.15` / PyPI `solverforge 0.6.15` | Published binding targets core `0.22.0`, UI `0.9.0`; core publication alone does not upgrade it |
+| Python | `solverforge-py 0.7.0` / PyPI `solverforge 0.7.0` | Independently released on October 27; core `0.23.0`, UI `0.9.0`; see the [Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/) |
+| Previous Python | `solverforge-py 0.6.15` / PyPI `solverforge 0.6.15` | Core `0.22.0`; upgrading the Rust core alone does not retarget these wheels |
 | Worked use cases | October 18 released apps | Retain core `0.22.0` and UI `0.9.0` until their own releases |
 
 The registry records the non-yanked facade crate's publication at

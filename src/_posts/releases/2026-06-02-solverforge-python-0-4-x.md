@@ -8,6 +8,13 @@ description: >
   solves, retained jobs, and the hospital FastAPI example.
 ---
 
+<%= render Ui::Callout.new(title: "Historical Python release", variant: "warning") do %>
+The current binding is `solverforge 0.7.0` on core `0.23.0`; see the
+[0.7.x release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
+The versions, install commands, and publication status below describe this
+historical release, not the current PyPI package.
+<% end %>
+
 **SolverForge Python 0.4.0** is available on
 [PyPI](https://pypi.org/project/solverforge/0.4.0/) as `solverforge` and
 targets CPython 3.14.

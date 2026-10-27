@@ -16,7 +16,9 @@ interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
 is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
 The `solverforge-cli 3.6.0` line scaffolds core `0.22.0` (3.4.0 targeted
 `0.20.4`, 3.5.0 targeted `0.21.0`, 3.5.1 targeted `0.21.2`, and 3.5.2 targeted
-`0.21.3`); Python 0.6.15 and the October 18 released apps target core 0.22.0.
+`0.21.3`); Python 0.7.0 targets core 0.23.0 (see the
+[Python line note](/blog/releases/2026/10/27/solverforge-python-0-7-x/)); the
+October 18 released Rust apps retain core 0.22.0.
 <% end %>
 
 **SolverForge 0.17.x** started with

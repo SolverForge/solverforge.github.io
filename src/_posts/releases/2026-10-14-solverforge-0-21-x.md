@@ -153,8 +153,8 @@ The next core release was `solverforge 0.22.0` (commit
 [39109402359](https://github.com/SolverForge/solverforge/actions/runs/39109402359)
 and release
 [39109402581](https://github.com/SolverForge/solverforge/actions/runs/39109402581)
-successful on the tag); Python 0.6.15 targets it, and the October 18 app train
-retargets all eight apps to it.
+successful on the tag); Python 0.6.15 targeted it, and the October 18 app train
+retargeted all eight apps to it.
 Existing applications retain their own dependency pins until deliberately upgraded.
 
 ## Patch History

@@ -4,6 +4,25 @@
 ROOT = File.expand_path("..", __dir__)
 
 REQUIRED_TEXT = {
+  "src/_posts/releases/2026-06-02-solverforge-python-0-4-x.md" => [
+    "The current binding is `solverforge 0.7.0` on core `0.23.0`",
+    "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
+  ],
+  "src/_posts/releases/2026-07-03-solverforge-python-0-5-x.md" => [
+    "The current binding is `solverforge 0.7.0` on core `0.23.0`",
+    "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
+  ],
+  "src/_posts/releases/2026-10-27-solverforge-python-0-7-x.md" => [
+    "**SolverForge Python 0.7.x** follows `solverforge 0.6.15`",
+    "solverforge==0.7.0", "`0.7.0` | 2026-10-27",
+    "0f739eb5d427a8a7748b21009ca70bbfa4697750",
+    "40499986297", "40499989425", "32 evaluators",
+    "db040cc537d5f281822ac438b123cc281966c344eab23cbf6b80ac7f1125872c",
+    "258dc6279865d67b2503eae775cc03114cc6db71d8bd96276ae5ba27c830be6c",
+    "releases the GIL", "Stateful ruin selectors", "discarded_speculative",
+    "replace the single `phase` dictionary with\n`phases`",
+    "pinned exactly to `=0.23.0`", "Still scaffolds core `0.22.0`"
+  ],
   "src/docs/solverforge/modeling/planning-entities.md" => [
     "per-entity legal domain", "search hint, not a legal-domain restriction",
     "swap families ignore it", "pub allowed_employees: Vec<usize>"
@@ -162,11 +181,9 @@ crates.io on 2026-10-14",
     "tracks `solverforge 0.23.0`", "the current CLI 3.6.0 line scaffolds core 0.22.0"
   ],
   "src/docs/solverforge-python/index.md" => [
-    "published binding remains on core `0.22.0`",
-    "retarget these wheels or add parallel move evaluation",
-    "solverforge-py 0.6.15",
-    "solverforge==0.6.15",
-    "solverforge 0.22.0",
+    "solverforge-py v0.7.0",
+    "solverforge==0.7.0",
+    "solverforge 0.23.0",
     "solverforge-ui 0.9.0"
   ],
   "src/docs/solverforge-python/modeling.md" => [
@@ -216,10 +233,12 @@ crates.io on 2026-10-14",
     "solverforge-cli 3.6.0"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
-    "SolverForge 0.22.0"
+    "SolverForge 0.23.0", "`cp314` ABI, not `cp314t`"
   ],
   "src/docs/solverforge-python/solving-and-runtime.md" => [
-    "0.22.0 runtime graph"
+    "0.23.0 runtime graph", "moves_speculative", "discarded_speculative",
+    "phases = telemetry[\"phases\"]", "releases the GIL",
+    "not a universal cross-count guarantee"
   ],
   "src/docs/solverforge-cli/mcp-shell.md" => [
     "get_candidate_trace",
@@ -272,8 +291,8 @@ crates.io on 2026-10-14",
   "src/reference/crate-map.md" => [
     "solverforge 0.23.0",
     "AcceptedCount(256)",
-    "solverforge 0.6.15",
-    "solverforge-py v0.6.15"
+    "solverforge 0.7.0",
+    "solverforge-py v0.7.0"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge 0.23.0",
@@ -333,7 +352,10 @@ crates.io on 2026-10-14",
     "retained `KeyOf` keys", "caller-owned", "`RowChanges` is gone",
     "lists are updated in place", "residual predicates", "duplicate",
     "benchmark results or measured performance gains",
-    "solverforge-py 0.6.15",
+    "solverforge-py 0.7.0",
+    "40499986297", "40499989425",
+    "over one compiled SolverForge 0.23.0 runtime graph",
+    "`moves_speculative`, `discarded_speculative`",
     "solverforge-cli 3.6.0",
     "solverforge-ui 0.9.0",
     "solverforge-hospital@2.0.11",
@@ -392,6 +414,8 @@ crates.io on 2026-10-14",
     "pinned"
   ],
       "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
+    "The current binding is `solverforge 0.7.0` on core `0.23.0`",
+    "/blog/releases/2026/10/27/solverforge-python-0-7-x/",
     "solverforge-py 0.6.15",
     "solverforge==0.6.15",
     "solverforge 0.22.0",
@@ -416,6 +440,8 @@ crates.io on 2026-10-14",
     "repository-only"
   ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [
+    "The current Python source line is `solverforge-py 0.7.0`",
+    "/blog/releases/2026/10/27/solverforge-python-0-7-x/",
     "`0.6.10` | 2026-09-29",
     "`0.6.6` | 2026-08-11",
     "`0.6.5` | 2026-07-29",
@@ -436,6 +462,8 @@ crates.io on 2026-10-14",
 }.freeze
 
 FORBIDDEN_TEXT = {
+  "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
+  "src/docs/solverforge-python/solving-and-runtime.md" => ["0.22.0 runtime graph"],
   "src/docs/solverforge/index.md" => [
     "These pages track the `solverforge 0.20.1` crate",
     "The `0.20.1` workspace declares Rust `1.95`.",
@@ -453,7 +481,7 @@ FORBIDDEN_TEXT = {
   ],
   "src/docs/solverforge-ui/index.md" => ["solverforge-ui 0.8.0", "sf.0.8.0", "solverforge-cli 3.2.0"],
   "src/docs/solverforge-ui/integration-assets.md" => ["solverforge-ui 0.8.0", "sf.0.8.0"],
-  "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.3", "solverforge==0.6.3", "solverforge-py 0.6.10", "solverforge==0.6.10"],
+  "src/docs/solverforge-python/index.md" => ["solverforge-py 0.6.15", "solverforge==0.6.15", "published binding remains on core `0.22.0`", "solverforge-py 0.6.3", "solverforge==0.6.3", "solverforge-py 0.6.10", "solverforge==0.6.10"],
   "src/docs/solverforge-cli/index.md" => [
     "solverforge-cli 3.0.0",
     "solverforge-cli 3.3.1",

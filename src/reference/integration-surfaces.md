@@ -63,9 +63,13 @@ Use `solverforge-py` when the product needs Python model authoring. Python
 classes, decorators, explicit scalar/list metadata, and callbacks describe the
 problem; Rust still owns the indexed working state, compiled search graph,
 cursor execution, safe native score specializations, snapshots, retained jobs,
-candidate traces, and embedded shared UI asset bytes. The Python 0.6.15 line
-and its repository apps use core 0.22.0. That binding runtime pin is independent
-of the current Rust core release.
+candidate traces, and embedded shared UI asset bytes. The Python 0.7.0 line
+and its repository examples use core 0.23.0. An explicit `move_thread_count`
+enables upstream acceptor-forager evaluator replicas; `auto` stays sequential.
+`Solver.solve` releases the GIL while workers attach to execute callbacks.
+Retained payloads expose an ordered `phases` list and `moves_speculative`, not a
+single `phase` dictionary. The independently released Rust use-case bundle
+still targets core 0.22.0.
 
 ### UI as presentation and orchestration
 
@@ -83,7 +87,7 @@ network structure are real business inputs, not as a default dependency.
 | Product shape | Typical composition |
 |---|---|
 | backend planner service | `solverforge-cli` scaffold + `solverforge` |
-| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.6.15` source tag |
+| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.7.0` source tag |
 | browser-based planning app | `solverforge-cli` + `solverforge` + `solverforge-ui` |
 | fleet or dispatch optimizer | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | custom research harness | direct `solverforge` plus selected lower-level crates |

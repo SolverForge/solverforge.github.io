@@ -15,13 +15,19 @@ solves it, and shows the equivalent config forms.
 - CPython 3.14
 - Rust 1.95.0 only if pip needs to build from source
 
-Install the published `solverforge 0.6.15` package:
+`Solver.solve(...)` releases the GIL while the native solver runs. On a normal
+GIL-enabled interpreter, Python callbacks still serialize when they attach to
+Python. Concurrent Python callback execution requires free-threaded CPython 3.14.
+The published wheels use the GIL-enabled `cp314` ABI, not `cp314t`; a
+free-threaded installation needs a source build with its matching interpreter.
+
+Install the published `solverforge 0.7.0` package:
 
 ```bash
 python3.14 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install "solverforge==0.6.15"
+python -m pip install "solverforge==0.7.0"
 ```
 
 Use the matching tagged source checkout when developing the repository examples
@@ -30,7 +36,7 @@ or inspecting the binding implementation:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.6.15
+git checkout v0.7.0
 make develop
 . .venv/bin/activate
 python - <<'PY'
@@ -39,7 +45,7 @@ print(solverforge.__version__)
 PY
 ```
 
-The version printed for either installation path should be `0.6.15`.
+The version printed for either installation path should be `0.7.0`.
 
 ## A Minimal Model
 
@@ -99,7 +105,7 @@ print([shift.nurse for shift in solved.shifts])
 
 `Solver.solve(...)` reads the Python object graph, runs SolverForge, then writes
 the solved variables and score back to a Python solution object. The schema is
-compiled into the SolverForge 0.22.0 runtime graph; Python-authored models do not
+compiled into the SolverForge 0.23.0 runtime graph; Python-authored models do not
 use a separate search engine.
 
 ## Analyze A Solution
@@ -149,6 +155,12 @@ seconds_spent_limit = 2
 
 When the `config` argument is `None`, `Solver.solve(...)` and `SolverManager`
 load `solver.toml` from the current directory if it exists.
+
+To enable parallel candidate evaluation, pass `"move_thread_count": {"count": 4}`
+in the dictionary or set `move_thread_count = { count = 4 }` at the top level of
+the TOML. The default `"auto"` remains sequential. See
+[Parallel Move Evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation)
+for a fixed-step example, callback safety, and reproducibility limits.
 
 ## Next Steps
 

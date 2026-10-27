@@ -48,7 +48,7 @@ feature that requires them.
 
 The decorator data is not late-bound search behavior. SolverForge Python
 validates it into one immutable runtime plan containing the schema, solution
-descriptor, and SolverForge 0.22.0 runtime model. Direct solves, retained jobs,
+descriptor, and SolverForge 0.23.0 runtime model. Direct solves, retained jobs,
 snapshots, and resumes reuse that plan; instance rows, callback views, seeds,
 and moves remain specific to each solve.
 
@@ -207,6 +207,13 @@ Choose the family on `@planning_solution(score=...)`. Constraint weights should
 use the same family when a constraint contributes hard, medium, soft, or scaled
 decimal levels.
 
+The native runtime stores a plain three-level `(hard, medium, soft)` value;
+scoring does not read a thread-local family. The declared Python family still
+controls the exported score dictionary's `family` and `levels`. For example,
+`HardSoftDecimalScore` exports `family = "hard_soft_decimal"` and two scaled
+integer levels, not a floating-point score or a new native score type. Continue
+using the public Python score classes for weights and decimal scaling.
+
 ```python
 @planning_solution(score=HardSoftDecimalScore, constraints=constraints)
 class HospitalPlan:
@@ -318,6 +325,10 @@ class DeliveryPlan:
   solution object.
 - Match route, precedence, shadow-update, and scalar-group callback names to
   real functions that are deterministic for the same solution state.
+- Keep callback lookup context immutable during a solve. Parallel local search
+  gives each evaluator its own working-state replica and constraint set, but
+  does not isolate mutable globals or closure-owned objects. See
+  [Callback Threading](/docs/solverforge-python/solving-and-runtime/#callback-threading).
 - Scope nested list metadata explicitly with row, solution, entity-callback, or
   solution-callback wrappers.
 - Register every configured candidate metric on the solution and return finite

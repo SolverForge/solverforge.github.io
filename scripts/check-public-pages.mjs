@@ -1273,7 +1273,9 @@ async function checkReleaseDocs(origin) {
     { path: "/docs/solverforge/solver/local-search/", required: ["DiscardedSpeculative", "trajectory can depend on evaluator count"] },
     { path: "/docs/solverforge/solver/phases/", required: ["SolverTelemetry::phases", "every started phase in execution order"] },
     { path: "/docs/solverforge-cli/", required: ["This release scaffolds solverforge 0.22.0", "describes solverforge 0.23.0"] },
-    { path: "/docs/solverforge-python/", required: ["published binding remains on core 0.22.0", "does not retarget these wheels or add parallel move evaluation"] },
+    { path: "/docs/solverforge-python/", required: ["solverforge 0.7.0", "solverforge-py v0.7.0", "solverforge 0.23.0", "parallel move evaluation"] },
+    { path: "/docs/solverforge-python/solving-and-runtime/", required: ["moves_speculative", "discarded_speculative", "phases", "GIL"] },
+    { path: "/blog/releases/2026/10/27/solverforge-python-0-7-x/", required: ["SolverForge Python 0.7.x follows solverforge 0.6.15", "32 evaluators", "releases the GIL", "phases", "discarded_speculative"] },
     { path: "/docs/status-and-roadmap/", required: ["documentation tracks the solverforge 0.23.0 release", "Linux/Windows CI passed, macOS CI failed"] },
     { path: "/blog/releases/2026/10/27/solverforge-0-23-x/", required: ["solverforge 0.23.x follows solverforge 0.22.0", "32 evaluators", "macOS failed", "integration tests were skipped"] },
   ];

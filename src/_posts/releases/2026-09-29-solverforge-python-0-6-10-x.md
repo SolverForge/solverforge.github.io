@@ -8,9 +8,15 @@ description: >
   0.21.3, and 0.22.0 — keeping the 0.6 Python authoring surface unchanged.
 ---
 
-**solverforge-py 0.6.15** is tagged on GitHub and published to PyPI
-(2026-10-18), so `python3.14 -m pip install "solverforge==0.6.15"` installs the
-current binding. The previous published package, `solverforge 0.6.6`, compiled
+<%= render Ui::Callout.new(title: "Historical Python release", variant: "warning") do %>
+The current binding is `solverforge 0.7.0` on core `0.23.0`; see the
+[0.7.x release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
+This article records the 0.6.x runtime bases and their historical API shape.
+<% end %>
+
+**solverforge-py 0.6.15** was tagged on GitHub and published to PyPI
+on 2026-10-18. The command `python3.14 -m pip install "solverforge==0.6.15"`
+installs that historical binding. The previous published package, `solverforge 0.6.6`, compiled
 onto the `solverforge 0.19.4` runtime with `solverforge-ui 0.7.0` assets.
 
 The package targets CPython 3.14 and Rust `1.95.0`, and its six SolverForge
