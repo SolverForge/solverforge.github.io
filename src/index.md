@@ -7,9 +7,8 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
 
 <section class="home-shell">
   <section class="home-hero">
-    <p class="page-shell__eyebrow">Planning software in Rust</p>
+    <p class="page-shell__eyebrow">Open source planning software in Rust</p>
     <h1>Describe your problem → a&nbsp;running solver, today.</h1>
-    <p class="home-hero__tagline">Open source, no sales call.</p>
     <p class="home-hero__summary">
       Tell your coding agent what has to be decided, what makes a plan invalid, and what makes it good. The <code>solverforge-modeling</code> skill turns that description into a SolverForge app with its domain model, hard and soft constraints, demo data, and an API, web, CLI, or MCP shell, and solves it before handing it back. The model stays in ordinary Rust you can read and change.
     </p>
@@ -127,7 +126,7 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
         </li>
         <li>
           <strong>Self-serve</strong>
-          <span><code>cargo install solverforge-cli</code> from <a href="https://crates.io/crates/solverforge-cli" target="_blank" rel="noopener">crates.io</a>, then the <a href="<%= relative_url '/docs/solverforge-cli/agent-skill/' %>">agent skill</a> from the CLI repository. No account, licence key, or contact form.</span>
+          <span><code>cargo install solverforge-cli</code> from <a href="https://crates.io/crates/solverforge-cli" target="_blank" rel="noopener">crates.io</a>, then the <a href="<%= relative_url '/docs/solverforge-cli/agent-skill/' %>">agent skill</a> from the CLI repository. No account or licence key.</span>
         </li>
         <li>
           <strong>Your problem shape</strong>
