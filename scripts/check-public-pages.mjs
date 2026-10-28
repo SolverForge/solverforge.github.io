@@ -733,6 +733,23 @@ async function checkUseCasePages(origin) {
     const homeLinks = await page.evaluate(() =>
       [...document.querySelectorAll(".home-section a")].map((link) => link.getAttribute("href")).filter((href) => /^\/use-cases\/[a-z-]+\/$/.test(href || "")));
     if (homeLinks.length !== 8) failures.push({ path: "/", issue: "home page does not link all 8 case pages", found: homeLinks.length });
+
+    // The hero's first action is the agent skill, and it has to be reachable
+    // without scrolling; the evaluation list states four facts with sources.
+    const hero = await page.evaluate(() => {
+      const cta = document.querySelector(".home-hero [data-home-primary-cta]");
+      const box = cta?.getBoundingClientRect();
+      const items = [...document.querySelectorAll("[data-home-evaluate] li")];
+      return {
+        href: cta?.getAttribute("href") || "",
+        aboveFold: Boolean(box && box.width > 0 && box.bottom <= window.innerHeight),
+        evaluateItems: items.length,
+        unsourcedItems: items.filter((item) => !item.querySelector("a[href]")).length,
+      };
+    });
+    if (hero.href !== "/docs/solverforge-cli/agent-skill/") failures.push({ path: "/", issue: "hero primary action does not open the agent skill", href: hero.href });
+    if (!hero.aboveFold) failures.push({ path: "/", issue: "hero primary action is below the first viewport" });
+    if (hero.evaluateItems !== 4 || hero.unsourcedItems !== 0) failures.push({ path: "/", issue: "evaluation list must hold four linked facts", ...hero });
   } catch (error) {
     failures.push({ path: "/use-cases/<id>/", issue: "case page check threw", error: String(error) });
   }

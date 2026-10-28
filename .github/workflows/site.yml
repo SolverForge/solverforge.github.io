@@ -59,6 +59,26 @@ jobs:
           rustup toolchain install 1.95.0 --profile minimal
           rustup default 1.95.0
 
+      # The maintenance walkthrough replays its commands with the published
+      # CLI and solves the result, so CI needs the exact release it documents.
+      - name: Cache the walkthrough toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cargo/bin/solverforge
+            ~/.cache/walkthrough-target
+          key: walkthrough-solverforge-cli-3.7.1-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
+          restore-keys: walkthrough-solverforge-cli-3.7.1-
+
+      - name: Install solverforge-cli 3.7.1
+        run: |
+          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.7.1'; then
+            cargo install solverforge-cli --version 3.7.1 --locked --force
+          fi
+          solverforge --version
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4
@@ -81,7 +101,7 @@ jobs:
           SOLVERFORGE_MAPS_REPO: ${{ github.workspace }}/.ci/solverforge-maps
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
           SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
-        run: make ci-local
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" make ci-local
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'

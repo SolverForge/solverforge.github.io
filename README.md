@@ -68,6 +68,16 @@ implementation detail behind that target.
 snippets, then adds source-level and live app checks when
 `SOLVERFORGE_DELIVERIES_REPO` points to the app checkout.
 
+`make verify-maintenance-walkthrough` holds the agent-skill walkthrough to
+what it teaches and never skips. It replays the page's command block with the
+installed `solverforge` (or `SOLVERFORGE_BIN`), overlays the hand-written files
+from `scripts/fixtures/maintenance-walkthrough/`, runs the app's tests, boots
+the API shell, solves, and compares the result with the page's analysis table
+and an independent feasibility check. Every Rust excerpt on the page must be
+verbatim in a fixture file. `make test` runs the static half
+(`--static`); `make ci-local` runs the whole contract, so a host without
+`solverforge-cli 3.7.1` and cargo fails it.
+
 `make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
 linting, a full Bridgetown build, the public-page copy/link/nav/layout checks,
 and the portable tutorial verifiers.
