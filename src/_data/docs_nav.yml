@@ -18,6 +18,11 @@ docs:
   - title: Getting Started
     href: /docs/getting-started/
     children:
+      - title: Install the Agent Skill
+        href: /docs/solverforge-cli/agent-skill/
+        active: false
+      - title: Maintenance Planning Walkthrough
+        href: /docs/getting-started/maintenance-planning-with-the-agent-skill/
       - title: Start with solverforge-cli
         href: /docs/solverforge-cli/getting-started/
         active: false

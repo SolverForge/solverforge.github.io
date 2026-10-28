@@ -8,24 +8,25 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
 <section class="home-shell">
   <section class="home-hero">
     <p class="page-shell__eyebrow">Planning software in Rust</p>
-    <h1>Build planning systems your team can inspect, control, and run.</h1>
+    <h1>Describe your problem → a&nbsp;running solver, today.</h1>
+    <p class="home-hero__tagline">Open source, no sales call.</p>
     <p class="home-hero__summary">
-      SolverForge helps teams turn scheduling, routing, allocation, and dispatch rules into production software. Domain models, constraints, and runtime control stay in ordinary Rust code, so the behavior remains explicit from the first prototype to the running system.
+      Tell your coding agent what has to be decided, what makes a plan invalid, and what makes it good. The <code>solverforge-modeling</code> skill turns that description into a SolverForge app with its domain model, hard and soft constraints, demo data, and an API, web, CLI, or MCP shell, and solves it before handing it back. The model stays in ordinary Rust you can read and change.
     </p>
 
     <div class="home-actions">
-      <a class="button button--primary" href="<%= relative_url '/docs/solverforge-cli/getting-started/' %>">
-        Start with solverforge-cli <i class="fa-solid fa-arrow-right"></i>
+      <a class="button button--primary" href="<%= relative_url '/docs/solverforge-cli/agent-skill/' %>" data-home-primary-cta>
+        Install the modeling skill <i class="fa-solid fa-arrow-right"></i>
       </a>
-      <a class="button button--secondary" href="<%= relative_url '/use-cases/' %>">
-        Browse the Use Cases <i class="fa-solid fa-book-open"></i>
+      <a class="button button--secondary" href="<%= relative_url '/docs/getting-started/maintenance-planning-with-the-agent-skill/' %>">
+        Follow a maintenance walkthrough <i class="fa-solid fa-screwdriver-wrench"></i>
       </a>
     </div>
 
     <div class="home-proof">
-      <span>Runnable app scaffold</span>
-      <span>Readable domain constraints</span>
-      <span>Hospital, lessons, delivery, and FSR examples</span>
+      <span>Apache-2.0, no account or licence key</span>
+      <span>Scalar and list planning variables</span>
+      <span>Eight worked planning apps</span>
     </div>
   </section>
 
@@ -117,11 +118,26 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
 
   <section class="home-section home-section--split">
     <div>
-      <p class="page-shell__eyebrow">Proof before a call</p>
-      <h2>Review the docs, code, releases, and examples before trusting the work.</h2>
-      <p>
-        The documentation shows the operating model, the source shows implementation quality, the examples show behavior, and the release notes show active maintenance. You do not have to wait for a sales conversation to understand how SolverForge works.
-      </p>
+      <p class="page-shell__eyebrow">Evaluate SolverForge</p>
+      <h2>Everything you need to decide is public.</h2>
+      <ul class="home-evaluate" data-home-evaluate>
+        <li>
+          <strong>Licence</strong>
+          <span>The solver and the CLI are Apache-2.0: read the <a href="https://github.com/SolverForge/solverforge/blob/main/LICENSE" target="_blank" rel="noopener">solver licence</a> and the <a href="https://github.com/SolverForge/solverforge-cli/blob/main/LICENSE" target="_blank" rel="noopener">CLI licence</a>.</span>
+        </li>
+        <li>
+          <strong>Self-serve</strong>
+          <span><code>cargo install solverforge-cli</code> from <a href="https://crates.io/crates/solverforge-cli" target="_blank" rel="noopener">crates.io</a>, then the <a href="<%= relative_url '/docs/solverforge-cli/agent-skill/' %>">agent skill</a> from the CLI repository. No account, licence key, or contact form.</span>
+        </li>
+        <li>
+          <strong>Your problem shape</strong>
+          <span>Facts, entities, scalar and list planning variables, and hard and soft constraints you write yourself, delivered as an API, web, CLI, or MCP app. See <a href="<%= relative_url '/docs/solverforge-cli/modeling-and-generation/' %>">Modeling &amp; Generation</a> and the <a href="<%= relative_url '/docs/getting-started/maintenance-planning-with-the-agent-skill/' %>">maintenance walkthrough</a>.</span>
+        </li>
+        <li>
+          <strong>Track record</strong>
+          <span>Eight worked <a href="<%= relative_url '/use-cases/' %>">use cases</a>, the <a href="<%= relative_url '/blog/' %>">release notes</a> for every line, and the full source on GitHub.</span>
+        </li>
+      </ul>
       <div class="button-row">
         <a class="button button--primary" href="<%= relative_url '/docs/overview/' %>">
           Project overview <i class="fa-solid fa-arrow-right"></i>

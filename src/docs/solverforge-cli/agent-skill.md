@@ -9,6 +9,54 @@ weight: 10
 
 # Agent Skill
 
+The `solverforge-modeling` skill lets a coding agent turn a planning problem
+described in plain language into a running SolverForge app. You describe what
+has to be decided and what makes a plan valid and good; the agent scaffolds the
+app with this CLI, writes the model and its constraints in Rust, generates demo
+data, and solves it before handing it back.
+
+## Quick Start
+
+1. Install the CLI and check its scaffold targets:
+
+   ```bash
+   cargo install solverforge-cli
+   solverforge --version
+   ```
+
+2. Install the skills from the CLI repository into your agent:
+
+   ```bash
+   git clone https://github.com/SolverForge/solverforge-cli
+   cd solverforge-cli
+   ./scripts/install-skill --agent claude     # or: --agent codex, --agent opencode
+   ```
+
+3. Restart the agent so it rescans its skill directories.
+
+4. Describe the problem. The skill opens with the same four questions every
+   time, so answering them up front lets the agent go straight to building:
+
+   ```text
+   Use the solverforge-modeling skill to build this planning problem.
+
+   Problem: <what is decided, for whom or what, over which horizon>
+   Output shell: api            (or web, cli, mcp)
+   Hard constraints: <rules a valid plan must never break>
+   Soft constraints: <what a better plan has more or less of>
+   Score type: HardSoftScore
+   Demo data: <the size and shape of a realistic instance>
+   ```
+
+5. The agent restates the problem as facts, entities, planning variables, and
+   constraints, builds the app, and finishes with a real solve that reports a
+   score.
+
+The [maintenance planning walkthrough](/docs/getting-started/maintenance-planning-with-the-agent-skill/)
+follows one complete run from a paragraph to a solved plan.
+
+## What Ships
+
 `solverforge-cli` ships portable agent skills in the
 [solverforge-cli repository](https://github.com/SolverForge/solverforge-cli):
 
@@ -43,6 +91,10 @@ installer treats it as foreign and leaves it untouched.
 ./scripts/install-skill --agent opencode --list     # show install state
 ./scripts/install-skill --agent opencode --uninstall
 ```
+
+Run the installer from the root of a `solverforge-cli` checkout. `--project`
+takes a directory that already exists; the installer creates the harness's
+skills folder inside it.
 
 `--agent` is repeatable and accepts `--agent opencode|claude|codex`; when
 omitted on a TTY the installer prompts. `--skill

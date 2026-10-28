@@ -12,15 +12,23 @@ weight: 2
 <h1>Getting Started</h1>
 
 <%= render Ui::Callout.new(title: "Current onboarding path") do %>
-Start with **`solverforge-cli`** for the generic project shell. Then continue
-with the **SolverForge Hospital Use Case**, **SolverForge Lessons Use Case**,
-**SolverForge Deliveries Use Case**, or **SolverForge FSR Use Case** if you
-want one concrete worked example that goes further.
+Install **`solverforge-cli`** and the **`solverforge-modeling` agent skill**,
+then describe your planning problem to your coding agent. Follow the
+**maintenance planning walkthrough** to see one run end to end, or build the
+shell by hand with the CLI quickstart and the four worked use cases.
 <% end %>
 
 ## Start Here
 
 <div class="card-grid">
+    <%= render Ui::Card.new(title: "1. Install the Agent Skill", href: relative_url('/docs/solverforge-cli/agent-skill/'), icon: "fa-solid fa-wand-magic-sparkles") do %>
+Install the CLI and the `solverforge-modeling` skill, then describe your
+problem to Claude Code, Codex, or opencode.
+  <% end %>
+  <%= render Ui::Card.new(title: "Maintenance Planning Walkthrough", href: relative_url('/docs/getting-started/maintenance-planning-with-the-agent-skill/'), icon: "fa-solid fa-screwdriver-wrench") do %>
+Follow one agent run from a plain-language depot maintenance problem to a
+solved plan served by an API shell.
+  <% end %>
   <%= render Ui::Card.new(title: "CLI Quickstart", href: relative_url('/docs/solverforge-cli/getting-started/'), icon: "fa-solid fa-terminal") do %>
 Install `solverforge-cli`, scaffold a new project, run the server, and extend the domain incrementally.
   <% end %>
@@ -50,6 +58,21 @@ road-network travel, retained jobs, and route geometry.
 
 ## Fastest Path to a Running App
 
+With a coding agent:
+
+```bash
+cargo install solverforge-cli
+git clone https://github.com/SolverForge/solverforge-cli
+cd solverforge-cli
+./scripts/install-skill --agent claude     # or: --agent codex, --agent opencode
+```
+
+Restart the agent and describe your problem; the
+[Agent Skill](/docs/solverforge-cli/agent-skill/#quick-start) page has a prompt
+template.
+
+By hand:
+
 ```bash
 cargo install solverforge-cli
 solverforge new my-scheduler
@@ -74,7 +97,9 @@ generation and `solverforge.app.toml` after scaffolding.
 
 ## Where to Read More
 
-- [Use cases showcase](/use-cases/): narrated walkthroughs and annotated screenshots of all four apps
+- [Agent Skill](/docs/solverforge-cli/agent-skill/)
+- [Maintenance planning walkthrough](/docs/getting-started/maintenance-planning-with-the-agent-skill/)
+- [Use cases showcase](/use-cases/): narrated walkthroughs and annotated screenshots of eight planning apps
 - [CLI onboarding guide](/docs/solverforge-cli/getting-started/)
 - [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/)
 - [SolverForge Lessons Use Case](/docs/getting-started/solverforge-lessons-use-case/)

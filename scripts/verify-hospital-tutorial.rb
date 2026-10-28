@@ -267,10 +267,9 @@ begin
   search_surface = File.join(SITE_ROOT, "src/_components/shared/search_surface.rb")
 
   log "Checking public copy and tutorial snippets"
-  assert_file_contains(home_page, "Start with solverforge-cli")
-  assert_file_contains(home_page, "Browse the Use Cases")
-  assert_file_contains(hub_page, "Start with **`solverforge-cli`** for the generic project shell.")
-  assert_file_contains(hub_page, "one concrete worked")
+  assert_file_contains(home_page, "Compare every use case")
+  assert_file_contains(hub_page, "shell by hand with the CLI quickstart and the four worked use cases.")
+  assert_file_contains(hub_page, "title: \"SolverForge Hospital Use Case\"")
   assert_file_contains(search_surface, "See a concrete hospital scheduling application from scaffold to solver-driven UI.")
 
   assert_file_contains(doc_page, "cargo install solverforge-cli --force")

@@ -8,7 +8,13 @@ weight: 1
 
 # Getting Started with solverforge-cli
 
-This guide walks the default CLI-first onboarding path:
+Working with a coding agent? Install the CLI, then the
+[`solverforge-modeling` agent skill](/docs/solverforge-cli/agent-skill/#quick-start),
+and describe your problem: the agent runs the steps below for you. The
+[maintenance planning walkthrough](/docs/getting-started/maintenance-planning-with-the-agent-skill/)
+shows one complete run.
+
+This guide walks the same path by hand:
 
 1. install the CLI
 2. verify the scaffold targets baked into your binary
