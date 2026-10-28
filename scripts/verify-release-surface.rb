@@ -26,16 +26,21 @@ REQUIRED_TEXT = {
     "RAYON_NUM_THREADS", "32"
   ],
   "src/_posts/releases/2026-06-02-solverforge-python-0-4-x.md" => [
-    "The current binding is `solverforge 0.7.0` on core `0.23.0`",
+    "The current binding is `solverforge 0.7.2` on core `0.23.0`",
     "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
   ],
   "src/_posts/releases/2026-07-03-solverforge-python-0-5-x.md" => [
-    "The current binding is `solverforge 0.7.0` on core `0.23.0`",
+    "The current binding is `solverforge 0.7.2` on core `0.23.0`",
     "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
   ],
   "src/_posts/releases/2026-10-27-solverforge-python-0-7-x.md" => [
     "**SolverForge Python 0.7.x** follows `solverforge 0.6.15`",
-    "solverforge==0.7.0", "`0.7.0` | 2026-10-27",
+    "solverforge==0.7.2", "`0.7.2` | 2026-10-28", "`0.7.1` | 2026-10-28", "`0.7.0` | 2026-10-27",
+    "22833923229c008a70c385e05c76072a5d87c75f",
+    "40672018229", "40672022045", "40665034987", "40665037880",
+    "3f9bac5b0196c33dbe8906aa7e7c3293873cfd3488331a390ce426db0fe7e218",
+    "c2945fad91e450cd6dbf691090ea91753adcde45e513805d6bc8df01a7810288",
+    "KeyboardInterrupt", "SolverPanicPayload", "previous hook",
     "0f739eb5d427a8a7748b21009ca70bbfa4697750",
     "40499986297", "40499989425", "32 evaluators",
     "db040cc537d5f281822ac438b123cc281966c344eab23cbf6b80ac7f1125872c",
@@ -202,8 +207,8 @@ crates.io on 2026-10-14",
     "tracks `solverforge 0.23.0`", "the current CLI 3.7.1 line scaffolds core 0.23.0"
   ],
   "src/docs/solverforge-python/index.md" => [
-    "solverforge-py v0.7.0",
-    "solverforge==0.7.0",
+    "solverforge-py v0.7.2",
+    "solverforge==0.7.2",
     "solverforge 0.23.0",
     "solverforge-ui 0.9.0"
   ],
@@ -264,7 +269,10 @@ crates.io on 2026-10-14",
   "src/docs/solverforge-python/solving-and-runtime.md" => [
     "0.23.0 runtime graph", "moves_speculative", "discarded_speculative",
     "phases = telemetry[\"phases\"]", "releases the GIL",
-    "not a universal cross-count guarantee"
+    "not a universal cross-count guarantee",
+    "## Callback Errors And Interrupts", "`KeyboardInterrupt`", "`except Exception`",
+    "`AttributeError` means an optional attribute is absent", "SolverPanicPayload",
+    "previously installed panic hook", "`FAILED`", "manager.wait(...)"
   ],
   "src/docs/solverforge-cli/mcp-shell.md" => [
     "get_candidate_trace",
@@ -317,8 +325,8 @@ crates.io on 2026-10-14",
   "src/reference/crate-map.md" => [
     "solverforge 0.23.0",
     "AcceptedCount(256)",
-    "solverforge 0.7.0",
-    "solverforge-py v0.7.0"
+    "solverforge 0.7.2",
+    "solverforge-py v0.7.2"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge 0.23.0",
@@ -382,8 +390,10 @@ crates.io on 2026-10-14",
     "retained `KeyOf` keys", "caller-owned", "`RowChanges` is gone",
     "lists are updated in place", "residual predicates", "duplicate",
     "benchmark results or measured performance gains",
-    "solverforge-py 0.7.0",
-    "40499986297", "40499989425",
+    "solverforge-py 0.7.2",
+    "40672018229", "40672022045",
+    "22833923229c008a70c385e05c76072a5d87c75f",
+    "Callback failures and interrupts",
     "over one compiled SolverForge 0.23.0 runtime graph",
     "`moves_speculative`, `discarded_speculative`",
     "solverforge-cli 3.7.1",
@@ -444,7 +454,7 @@ crates.io on 2026-10-14",
     "pinned"
   ],
       "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
-    "The current binding is `solverforge 0.7.0` on core `0.23.0`",
+    "The current binding is `solverforge 0.7.2` on core `0.23.0`",
     "/blog/releases/2026/10/27/solverforge-python-0-7-x/",
     "solverforge-py 0.6.15",
     "solverforge==0.6.15",
@@ -482,7 +492,7 @@ crates.io on 2026-10-14",
     "repository-only"
   ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [
-    "The current Python source line is `solverforge-py 0.7.0`",
+    "The current Python source line is `solverforge-py 0.7.2`",
     "/blog/releases/2026/10/27/solverforge-python-0-7-x/",
     "`0.6.10` | 2026-09-29",
     "`0.6.6` | 2026-08-11",
@@ -504,7 +514,7 @@ crates.io on 2026-10-14",
 }.freeze
 
 FORBIDDEN_TEXT = {
-  "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
+  "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.7.0", "solverforge==0.7.1", "git checkout v0.7.0", "git checkout v0.7.1", "solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
   "src/docs/solverforge-python/solving-and-runtime.md" => ["0.22.0 runtime graph"],
   "src/docs/solverforge/index.md" => [
     "These pages track the `solverforge 0.20.1` crate",

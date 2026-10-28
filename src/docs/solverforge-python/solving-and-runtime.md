@@ -431,7 +431,94 @@ views project entity and fact collections from that Rust-owned state, so working
 preview, and best-solution clones do not share mutable Python row objects. After
 the first full callback-view sync, only changed rows are synchronized.
 
+## Callback Errors And Interrupts
+
 Synchronous solve and analysis re-raise the original Python callback exception
 with its traceback, including failures originating in parallel evaluation.
-Retained jobs enter `FAILED` and expose the formatted Python callback traceback
-in the failed event's `error` field.
+`KeyboardInterrupt` raised by a callback or an attribute hook follows the same
+error path; catch it explicitly if the application needs cleanup, because
+`except Exception` does not catch it.
+
+Retained jobs report background callback failures differently: the job enters
+`FAILED` and the failed event's `error` field contains the formatted Python
+traceback. This includes a `KeyboardInterrupt` raised inside the job; it does
+not turn into a `KeyboardInterrupt` raised by `manager.wait(...)`. Errors during
+schema compilation or model import, before a background job starts, can still
+raise directly from `manager.solve(...)`.
+
+For callback-view, score-conversion, and dynamic compound-edit probes, only
+`AttributeError` means an optional attribute is absent. Other exceptions,
+including `KeyboardInterrupt`, propagate when the binding checks planning-field
+descriptors while synchronizing callback views or looks up a score object's
+`to_native`. Compound edits that infer a target from an `entity` object read
+its `_solverforge_entity_class` and `_solverforge_entity_index` markers when
+explicit target fields are omitted; failures in those attribute lookups also
+propagate. A failing attribute hook is not a missing field, a fallback score
+format, or an absent edit target.
+
+The binding suppresses the extra Rust `thread panicked` diagnostic only for
+its recognized callback-error payload (`SolverPanicPayload`). Direct callers
+still receive the original Python exception and traceback, and retained jobs
+still record the failure. Other Rust panics are forwarded to the previously
+installed panic hook; this is not a blanket suppression of panic diagnostics.
+
+For example, this complete model deliberately raises an exception in a filter.
+The checks distinguish direct exception handling from retained failure events:
+
+```python
+import traceback
+from solverforge import (
+    Solver, SolverManager, constraint_provider,
+    planning_entity, planning_solution, planning_variable,
+)
+
+@planning_entity
+class FailingTask:
+    worker = planning_variable(value_range_provider="workers", allows_unassigned=True)
+
+    def __init__(self, interrupt: bool = False):
+        self.worker = None
+        self.interrupt = interrupt
+
+@constraint_provider
+def failing_constraints(factory):
+    def fail(task):
+        if task.interrupt:
+            raise KeyboardInterrupt("callback interrupted")
+        raise ValueError("callback failed")
+
+    return [factory.for_each(FailingTask).filter(fail).penalize(1).named("failing rule")]
+
+@planning_solution(constraints=failing_constraints)
+class FailingPlan:
+    tasks: list[FailingTask]
+
+    def __init__(self, interrupt: bool = False):
+        self.tasks = [FailingTask(interrupt)]
+        self.workers = [0]
+        self.score = None
+
+for interrupt, expected in [(False, ValueError), (True, KeyboardInterrupt)]:
+    for direct_call in (Solver.solve, Solver.analyze):
+        try:
+            direct_call(FailingPlan(interrupt))
+        except expected as error:
+            assert any(frame.name == "fail" for frame in traceback.extract_tb(error.__traceback__))
+        else:
+            raise AssertionError("expected the original callback exception")
+
+    manager = SolverManager()
+    handle = manager.solve(FailingPlan(interrupt))
+    status = manager.wait(handle.job_id, timeout_seconds=5)
+    assert status["lifecycle_state"] == "FAILED"
+    failed = [event for event in manager.events(handle.job_id) if event["event_type"] == "FAILED"]
+    assert len(failed) == 1
+    assert expected.__name__ in failed[0]["error"]
+    assert "in fail" in failed[0]["error"]
+    manager.delete(handle.job_id)
+```
+
+Use `manager.cancel(job_id)` for retained-job cancellation. A Python-raised
+`KeyboardInterrupt` is an exception, not a lifecycle cancellation request;
+these error-path semantics do not guarantee prompt handling of process-level
+SIGINT in every solver phase or native operation.

@@ -129,7 +129,7 @@ not include the full trace.
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.0
+git checkout v0.7.2
 make develop
 make deliveries-run PORT=7861
 ```
@@ -147,7 +147,7 @@ To use the published binding with the tagged source-checkout app:
 ```bash
 python3.14 -m venv .venv-examples
 . .venv-examples/bin/activate
-python -m pip install "solverforge[examples]==0.7.0"
+python -m pip install "solverforge[examples]==0.7.2"
 python -m examples.solverforge_deliveries
 ```
 

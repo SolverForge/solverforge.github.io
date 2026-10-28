@@ -11,8 +11,8 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-The current public PyPI package is `solverforge 0.7.0`, from the tagged
-`solverforge-py v0.7.0` source for CPython 3.14. It pins the six SolverForge Rust
+The current public PyPI package is `solverforge 0.7.2`, from the tagged
+`solverforge-py v0.7.2` source for CPython 3.14. It pins the six SolverForge Rust
 dependencies to exactly `0.23.0` and embeds `solverforge-ui 0.9.0` assets for
 Python-hosted examples. Acceptor-forager local search supports opt-in
 [parallel move evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation).
@@ -31,7 +31,7 @@ selector or move engine.
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.7.0"
+python3.14 -m pip install "solverforge==0.7.2"
 ```
 
 Use the tagged source checkout when developing the repository examples or
@@ -40,7 +40,7 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.0
+git checkout v0.7.2
 make develop
 . .venv/bin/activate
 ```
@@ -76,8 +76,8 @@ make develop
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.7.0` |
-| Published PyPI version | `0.7.0` |
+| Documented source line | `0.7.2` |
+| Published PyPI version | `0.7.2` |
 | Python requirement | `>=3.14` |
 | Runtime base | `solverforge 0.23.0` |
 | Embedded UI base | `solverforge-ui 0.9.0` |
@@ -105,5 +105,5 @@ make develop
 ## Links
 
 - [SolverForge Python 0.7.x release notes](/blog/releases/2026/10/27/solverforge-python-0-7-x/)
-- [PyPI package 0.7.0](https://pypi.org/project/solverforge/0.7.0/)
-- [Python v0.7.0 source](https://github.com/SolverForge/solverforge-py/tree/v0.7.0)
+- [PyPI package 0.7.2](https://pypi.org/project/solverforge/0.7.2/)
+- [Python v0.7.2 source](https://github.com/SolverForge/solverforge-py/tree/v0.7.2)

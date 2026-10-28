@@ -224,7 +224,14 @@ Weights may be score objects, integers, score-level sequences, or callbacks.
 ```
 
 For callback weights, return a score object or integer compatible with the
-solution score family:
+solution score family. When native score conversion probes a score object's
+`to_native` attribute, only `AttributeError` means the method is absent; other
+exceptions, including `KeyboardInterrupt`, propagate rather than becoming a
+generic conversion failure. Callback errors retain their Python traceback for
+direct calls and appear in failed retained-job events. See
+[Callback Errors And Interrupts](/docs/solverforge-python/solving-and-runtime/#callback-errors-and-interrupts).
+
+For example:
 
 ```python
 (

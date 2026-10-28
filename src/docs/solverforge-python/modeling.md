@@ -82,6 +82,13 @@ class Shift:
 The `value_range_provider` name must match a collection on the solution object.
 In this example, `Schedule.employees` provides candidate values.
 
+When synchronizing callback views, the binding probes the entity class's
+planning-field descriptor to choose the backing storage attribute. Only
+`AttributeError` means the descriptor is absent. Other exceptions, including
+`KeyboardInterrupt`, propagate instead of silently selecting the plain field
+name. See
+[Callback Errors And Interrupts](/docs/solverforge-python/solving-and-runtime/#callback-errors-and-interrupts).
+
 Scalar variables can also declare bounded candidate and nearby callbacks:
 `candidate_values`, `nearby_value_candidates`, `nearby_entity_candidates`,
 `nearby_value_distance_meter`, and `nearby_entity_distance_meter`. Dynamic

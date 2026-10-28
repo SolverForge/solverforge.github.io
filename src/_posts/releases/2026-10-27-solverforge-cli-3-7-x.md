@@ -115,7 +115,7 @@ of the original artifact commit.
 | Maps | `solverforge-maps 2.1.4` | Web shell only |
 | MCP SDK | `rmcp 3.8.0` | MCP shell only; generated server uses `ServerConfig` |
 | Previous CLI | `solverforge-cli 3.7.0` | Targets `solverforge 0.23.0` and MCP `rmcp 3.5.1`; exact-commit CI failed on Windows |
-| Python binding | `solverforge 0.7.0` | Independent package; not a CLI scaffold dependency |
+| Python binding | `solverforge 0.7.2` | Independent package; not a CLI scaffold dependency |
 
 ## Patch History
 

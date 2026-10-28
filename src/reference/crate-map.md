@@ -168,7 +168,7 @@ free-threaded callbacks must not mutate shared state.
 | Repo               | Owns                                                              | Use it when...                                              |
 | ------------------ | ----------------------------------------------------------------- | ----------------------------------------------------------- |
 | `solverforge-cli`  | scaffolding and code generation                                   | you are starting a new app or extending a generated shell   |
-| `solverforge-py`   | the tagged `v0.7.0` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
+| `solverforge-py`   | the tagged `v0.7.2` Python source line, compiled-model PyO3 binding, retained diagnostics, native row-domain enforcement, and embedded UI asset bridge | you want Python model authoring backed by the Rust solver engine |
 | `solverforge-ui`   | retained-job frontend controls and scheduling-facing components   | you need a web UI around a retained solve lifecycle         |
 | `solverforge-maps` | road networks, routing, matrices, and map-backed planning helpers | you need route costs, geometry, or spatial planning support |
 
@@ -177,7 +177,7 @@ free-threaded callbacks must not mutate shared state.
 - Start with `solverforge-cli` to scaffold the app shell.
 - Start with the PyPI `solverforge` package when the application surface is
   Python and you do not need a generated Rust web/API/CLI shell. PyPI publishes
-  `solverforge 0.7.0`; use the matching `solverforge-py v0.7.0` tag for source
+  `solverforge 0.7.2`; use the matching `solverforge-py v0.7.2` tag for source
   and example development on SolverForge 0.23.0.
 - Keep application code on the `solverforge` facade unless a lower-level crate
   unlocks something you actually need.
@@ -207,7 +207,7 @@ free-threaded callbacks must not mutate shared state.
 | Scenario                           | Typical stack                                          |
 | ---------------------------------- | ------------------------------------------------------ |
 | service or CLI planner             | `solverforge-cli` scaffold + `solverforge`             |
-| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.7.0` source tag |
+| Python-authored planner            | PyPI `solverforge` package or the `solverforge-py v0.7.2` source tag |
 | web app with retained lifecycle UI | `solverforge-cli` + `solverforge` + `solverforge-ui`   |
 | routing or fleet optimization      | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | research or advanced runtime work  | `solverforge` plus selected lower-level crates         |

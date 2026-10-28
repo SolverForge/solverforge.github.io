@@ -102,14 +102,14 @@ work before cancellation or a time limit can take effect; a candidate pull
 is not interruptible. The other four apps are repository-only.
 See the [app release matrix](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/#october-runtime-updates).
 SolverForge Python has a
-tagged `solverforge-py 0.7.0` source line for CPython 3.14, compiled onto the
+tagged `solverforge-py 0.7.2` source line for CPython 3.14, compiled onto the
 `solverforge 0.23.0` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
-serves `solverforge 0.7.0`. Python's exact-tag
-[CI](https://github.com/SolverForge/solverforge-py/actions/runs/40499986297) and
-[release/PyPI publication](https://github.com/SolverForge/solverforge-py/actions/runs/40499989425)
-passed at `0f739eb5d427a8a7748b21009ca70bbfa4697750`. See the
+serves `solverforge 0.7.2`. Python's exact-tag
+[CI](https://github.com/SolverForge/solverforge-py/actions/runs/40672018229) and
+[release/PyPI publication](https://github.com/SolverForge/solverforge-py/actions/runs/40672022045)
+passed at `22833923229c008a70c385e05c76072a5d87c75f`. See the
 [0.7.x Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/)
-for parallel evaluation and the telemetry migration. The current UI line is `solverforge-ui 0.9.0`, which
+for parallel evaluation, the telemetry migration, and interrupt/error handling. The current UI line is `solverforge-ui 0.9.0`, which
 moved the bundled agent skill into the `solverforge-cli` repository, where both
 SolverForge skills now live.
 <% end %>
@@ -120,7 +120,7 @@ SolverForge skills now live.
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; Linux/Windows CI passed, macOS CI failed | Native Rust constraint solver published as `solverforge 0.23.0`: opt-in parallel acceptor-forager move evaluation, ordered per-phase telemetry, speculative-work diagnostics, and incremental scoring of list-shadow writes; Rust `1.95` |
 | **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.7.1` targets `solverforge 0.23.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.8.0`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.7.0` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.0`; opt-in parallel evaluation and ordered per-phase telemetry |
+| **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2`; opt-in parallel evaluation and ordered per-phase telemetry |
 | **Worked Use Cases** | Released; tag Space syncs and bundle CI passed | `solverforge-hospital@2.0.12`, `solverforge-lessons@2.0.14`, `solverforge-deliveries@2.0.13`, `solverforge-fsr@2.0.14`, plus the repository-only `solverforge-furnace@2.0.7`, `solverforge-orders@0.2.0`, `solverforge-fleet@0.1.9`, and `solverforge-flightcrew@0.2.0`; all eight target `solverforge 0.23.0` and `solverforge-ui 0.9.0` |
 | **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.7.1` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
@@ -189,12 +189,17 @@ SolverForge skills now live.
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.7.0"`; use the
-  matching `solverforge-py` `v0.7.0` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.7.2"`; use the
+  matching `solverforge-py` `v0.7.2` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
   metrics, hard per-row scalar candidate domains, native static same-value
   conflict fields, and callback constraints.
+- **Callback failures and interrupts**: optional attribute probes treat only
+  `AttributeError` as absence. Other exceptions, including `KeyboardInterrupt`,
+  propagate. Direct solves preserve the Python traceback; retained jobs record
+  failure. Recognized callback-error payloads do not print a redundant Rust
+  panic preamble, while unrelated Rust panics reach the previous hook.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
   `SolverManager(config=None)` over one compiled SolverForge 0.23.0 runtime graph.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
@@ -534,7 +539,7 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.7.0` is the current tagged SolverForge Python source line for
+`solverforge-py 0.7.2` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
 `solverforge 0.23.0` runtime, supports opt-in parallel acceptor-forager
 trial evaluation, retains every phase's telemetry, and keeps shared

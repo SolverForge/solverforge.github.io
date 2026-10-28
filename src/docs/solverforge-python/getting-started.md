@@ -21,13 +21,13 @@ Python. Concurrent Python callback execution requires free-threaded CPython 3.14
 The published wheels use the GIL-enabled `cp314` ABI, not `cp314t`; a
 free-threaded installation needs a source build with its matching interpreter.
 
-Install the published `solverforge 0.7.0` package:
+Install the published `solverforge 0.7.2` package:
 
 ```bash
 python3.14 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install "solverforge==0.7.0"
+python -m pip install "solverforge==0.7.2"
 ```
 
 Use the matching tagged source checkout when developing the repository examples
@@ -36,7 +36,7 @@ or inspecting the binding implementation:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.0
+git checkout v0.7.2
 make develop
 . .venv/bin/activate
 python - <<'PY'
@@ -45,7 +45,7 @@ print(solverforge.__version__)
 PY
 ```
 
-The version printed for either installation path should be `0.7.0`.
+The version printed for either installation path should be `0.7.2`.
 
 ## A Minimal Model
 

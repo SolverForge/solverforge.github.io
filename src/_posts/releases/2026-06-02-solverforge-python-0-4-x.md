@@ -9,7 +9,7 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Historical Python release", variant: "warning") do %>
-The current binding is `solverforge 0.7.0` on core `0.23.0`; see the
+The current binding is `solverforge 0.7.2` on core `0.23.0`; see the
 [0.7.x release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
 The versions, install commands, and publication status below describe this
 historical release, not the current PyPI package.

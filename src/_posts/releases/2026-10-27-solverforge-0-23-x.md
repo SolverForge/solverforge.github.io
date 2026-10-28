@@ -133,7 +133,7 @@ a correction to the documented contract, not a new swap restriction.
 | Previous core runtime | `solverforge 0.22.0` | Canonical grouping kernel; existing applications keep their pins |
 | CLI | `solverforge-cli 3.7.1` | Independently released on October 27; fresh scaffolds target core `0.23.0`; see the [CLI release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/) |
 | Previous CLI | `solverforge-cli 3.6.0` | Scaffolds core `0.22.0`; existing projects retain their pins |
-| Python | `solverforge-py 0.7.0` / PyPI `solverforge 0.7.0` | Independently released on October 27; core `0.23.0`, UI `0.9.0`; see the [Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/) |
+| Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Published October 28; the 0.7.x line started October 27; core `0.23.0`, UI `0.9.0`; see the [Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/) |
 | Previous Python | `solverforge-py 0.6.15` / PyPI `solverforge 0.6.15` | Core `0.22.0`; upgrading the Rust core alone does not retarget these wheels |
 | Worked use cases | October 27 released apps | All eight target core `0.23.0` and UI `0.9.0`; see the [app release matrix](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/#october-runtime-updates) |
 | Previous worked use cases | October 18 released apps | Retain core `0.22.0` and UI `0.9.0` |

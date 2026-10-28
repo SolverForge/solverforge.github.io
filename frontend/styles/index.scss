@@ -2169,6 +2169,10 @@ body.use-case-lightbox-open {
 }
 
 @media (max-width: 760px) {
+  html {
+    scroll-padding-top: 10rem;
+  }
+
   .benchmark-chart__budgets {
     grid-template-columns: 1fr;
   }
