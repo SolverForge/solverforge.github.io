@@ -62,8 +62,8 @@ follows one complete run from a paragraph to a solved plan.
 
 - `skills/solverforge-modeling/` turns a described planning problem into a
   runnable SolverForge app with this CLI - facts, entities, scalar and list
-  planning variables, constraints, demo data, output shells, and verification
-  - and bundles a solve smoke-test helper.
+  planning variables, constraints, demo data, output shells, and verification -
+  and bundles a solve smoke-test helper.
 - `skills/solverforge-ui/` extends a generated web shell into a domain-faithful
   interface with the shipped `solverforge-ui` components.
 
@@ -97,8 +97,8 @@ takes a directory that already exists; the installer creates the harness's
 skills folder inside it.
 
 `--agent` is repeatable and accepts `--agent opencode|claude|codex`; when
-omitted on a TTY the installer prompts. `--skill
-<name>` (repeatable) selects a subset; the default is every skill under
+omitted on a TTY the installer prompts. `--skill <name>` (repeatable) selects
+a subset; the default is every skill under
 `skills/`. From the repository root, `make install-skill` runs the same
 installer; pass harness selections with
 `make install-skill ARGS='--agent <harness>'`.
