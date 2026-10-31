@@ -19,7 +19,7 @@
   <div class="use-case-carousel__selectors" role="tablist" aria-label="Select a use case">
     <% cases.each_with_index do |use_case, index| %>
       <a
-        class="<%= ["use-case-carousel__selector", ("use-case-carousel__selector--space" if space?(use_case))].compact.join(" ") %>"
+        class="<%= selector_class(use_case) %>"
         id="use-case-tab-<%= use_case.fetch("id") %>"
         href="#<%= use_case.fetch("id") %>"
         role="tab"
@@ -31,6 +31,9 @@
         <% if space?(use_case) %>
           <span class="use-case-carousel__selector-ribbon">Space</span>
         <% end %>
+        <% if demoscene?(use_case) %>
+          <span class="use-case-carousel__selector-ribbon use-case-carousel__selector-ribbon--demoscene">Terminal</span>
+        <% end %>
       </a>
     <% end %>
   </div>
@@ -40,6 +43,7 @@
     # arranged against each other rather than in isolation.
     placed_callouts = {}
     cases.each do |use_case|
+      next if demoscene?(use_case)
       use_case.fetch("screenshots").each do |shot|
         placed_callouts[shot.fetch("image")] = UseCaseCalloutLayout.number(shot.fetch("callouts"))
       end
@@ -49,7 +53,7 @@
   <div class="use-case-carousel__slides">
     <% cases.each_with_index do |use_case, index| %>
       <article
-        class="use-case-carousel__slide"
+        class="<%= ["use-case-carousel__slide", ("use-case-carousel__slide--demoscene" if demoscene?(use_case))].compact.join(" ") %>"
         id="<%= use_case.fetch("id") %>"
         role="tabpanel"
         aria-labelledby="use-case-tab-<%= use_case.fetch("id") %>"
@@ -87,6 +91,10 @@
           <p class="use-case-carousel__intro"><%= use_case.fetch("intro") %></p>
         </header>
 
+        <% if demoscene?(use_case) %>
+          <%= render UseCase::Demoscene.new(use_case: use_case, part: :stage) %>
+        <% end %>
+
         <div class="use-case-proof">
           <div class="use-case-proof__metrics" aria-label="<%= use_case.fetch("label") %> data shape">
             <% use_case.fetch("metrics").each do |value, label| %>
@@ -115,6 +123,9 @@
           </div>
         </div>
 
+        <% if demoscene?(use_case) %>
+          <%= render UseCase::Demoscene.new(use_case: use_case, part: :captures) %>
+        <% else %>
         <figure class="use-case-runtime">
           <div class="use-case-runtime__frame">
             <% if videos?(use_case) %>
@@ -184,6 +195,7 @@
             </div>
           <% end %>
         </div>
+        <% end %>
       </article>
     <% end %>
   </div>
@@ -193,9 +205,10 @@
       <p class="use-case-eyebrow">Run one yourself</p>
       <h2>Run these examples, then model your own decision.</h2>
       <p class="use-case-cta__copy">
-        Every case above is a working app with a guide in the docs, and each one is
-        marked with the Hugging Face Space you can open and drive yourself. Scaffold
-        the generic project shell, follow one worked example, or start from a Space.
+        Every case above is a working app you can read and run: four with a written
+        guide and a Hugging Face Space you can drive in the browser, the rest with
+        their source. Scaffold the generic project shell, follow one worked example,
+        or start from a Space.
       </p>
     </div>
     <div class="use-case-cta__actions">

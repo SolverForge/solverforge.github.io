@@ -1,0 +1,85 @@
+---
+layout: default
+---
+<% use_case = data.use_case %>
+<article class="page-shell page-shell--use-case use-case-detail use-case-detail--demoscene">
+  <section class="use-case-demoscene-stage" aria-label="<%= use_case.fetch("label") %> video">
+    <header class="use-case-demoscene-stage__header">
+      <div>
+        <p class="use-case-eyebrow"><%= use_case.fetch("eyebrow") %></p>
+        <h1><%= use_case.fetch("title") %></h1>
+        <p class="use-case-detail__intro"><%= use_case.fetch("intro") %></p>
+      </div>
+      <ul class="use-case-detail__links">
+        <li>
+          <a class="use-case-doc-link" href="<%= use_case.fetch("repo_url") %>" target="_blank" rel="noopener">
+            App source <i class="fa-brands fa-github"></i>
+          </a>
+        </li>
+      </ul>
+    </header>
+
+    <%= render UseCase::Demoscene.new(use_case: use_case, part: :stage) %>
+  </section>
+
+  <div class="use-case-proof__metrics" aria-label="<%= use_case.fetch("label") %> data shape">
+    <% use_case.fetch("metrics").each do |value, label| %>
+      <div class="use-case-proof__metric">
+        <span class="use-case-proof__metric-value"><%= value %></span>
+        <span class="use-case-proof__metric-label"><%= label %></span>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="use-case-proof__body use-case-detail__body">
+    <div>
+      <% use_case.fetch("body").each do |paragraph| %>
+        <p><%= paragraph %></p>
+      <% end %>
+    </div>
+
+    <div class="use-case-proof__constraints" aria-label="<%= use_case.fetch("label") %> constraint summary">
+      <% use_case.fetch("constraints").each do |title, copy| %>
+        <div class="use-case-proof__constraint">
+          <strong><%= title %></strong>
+          <span><%= copy %></span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render UseCase::Demoscene.new(use_case: use_case, part: :captures) %>
+
+  <nav class="use-case-detail__nav" aria-label="Other use cases">
+    <p class="use-case-eyebrow">Keep inspecting</p>
+    <div class="card-grid">
+      <% site.data.use_cases.each do |other| %>
+        <% next if other.fetch("id") == use_case.fetch("id") %>
+        <%= render Ui::Card.new(title: other.fetch("label"), href: relative_url("/use-cases/#{other.fetch("id")}/"), eyebrow: other.fetch("teaser_metric"), icon: other.fetch("icon")) do %>
+<%= other.fetch("teaser_copy") %>
+        <% end %>
+      <% end %>
+    </div>
+  </nav>
+</article>
+
+<div
+  class="use-case-lightbox"
+  data-use-case-lightbox-root
+  role="dialog"
+  aria-modal="true"
+  aria-label="<%= use_case.fetch("label") %> capture viewer"
+  hidden
+>
+  <button class="use-case-lightbox__close" type="button" data-use-case-lightbox-close aria-label="Close capture viewer">
+    <span aria-hidden="true">&times;</span>
+  </button>
+  <figure class="use-case-lightbox__figure">
+    <div class="use-case-lightbox__frame">
+      <img class="use-case-lightbox__image" alt="" />
+      <div class="use-case-lightbox__markers" data-use-case-lightbox-markers aria-hidden="true"></div>
+    </div>
+    <figcaption class="use-case-lightbox__caption"></figcaption>
+    <ol class="use-case-showcase__legend use-case-lightbox__legend" data-use-case-lightbox-legend hidden></ol>
+  </figure>
+</div>

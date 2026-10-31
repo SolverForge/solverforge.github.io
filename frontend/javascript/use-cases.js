@@ -105,7 +105,9 @@ export const initializeUseCaseLightbox = () => {
     image.alt = trigger.dataset.useCaseLightboxAlt || ""
     caption.textContent = trigger.dataset.useCaseLightboxCaption || ""
 
-    const frame = trigger.closest(".use-case-showcase__item")
+    // Annotated captures carry markers and a legend; the demoscene case's plain
+    // captures carry neither, so both lists simply come back empty.
+    const frame = trigger.closest(".use-case-showcase__item, .use-case-demoscene__capture")
     if (markers) {
       markers.innerHTML = ""
       frame.querySelectorAll(".use-case-showcase__marker").forEach(marker => {
@@ -163,5 +165,43 @@ export const initializeUseCaseLightbox = () => {
       event.preventDefault()
       closeButton.focus()
     }
+  })
+}
+
+// The demoscene case pairs its video with a cue sheet. A cue seeks the video to
+// its scene and plays from there, and the cue for the scene on screen is marked
+// as it plays, so the sheet doubles as a chapter list.
+export const initializeDemosceneCues = () => {
+  document.querySelectorAll("[data-demoscene]").forEach(stage => {
+    const video = stage.querySelector("[data-demoscene-video]")
+    const cues = [...stage.querySelectorAll("[data-demoscene-cue]")]
+    if (!video || cues.length === 0) return
+
+    const startOf = cue => Number(cue.dataset.demosceneCue)
+
+    const markCurrent = () => {
+      const now = video.currentTime
+      let current = null
+      cues.forEach(cue => {
+        if (startOf(cue) <= now + 0.05) current = cue
+      })
+      cues.forEach(cue => {
+        if (cue === current) cue.setAttribute("aria-current", "true")
+        else cue.removeAttribute("aria-current")
+      })
+    }
+
+    cues.forEach(cue => {
+      cue.addEventListener("click", () => {
+        video.currentTime = startOf(cue)
+        markCurrent()
+        const playing = video.play()
+        if (playing && typeof playing.catch === "function") playing.catch(() => {})
+      })
+    })
+
+    video.addEventListener("timeupdate", markCurrent)
+    video.addEventListener("seeked", markCurrent)
+    markCurrent()
   })
 }

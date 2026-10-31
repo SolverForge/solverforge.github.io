@@ -2064,6 +2064,320 @@ body.use-case-lightbox-open {
   justify-content: flex-end;
 }
 
+/* The demoscene case (Planner123): a product, not a web demo. Its intro video
+   sits in a dark phosphor bezel with a cue sheet that seeks it, so the case reads
+   as different at a glance while keeping the shared proof blocks. */
+
+.use-case-carousel__selector--demoscene {
+  border-color: rgba(4, 22, 18, 0.9);
+  background: #04120f;
+  color: #a7f3d0;
+}
+
+.use-case-carousel__selector--demoscene:hover {
+  border-color: rgba(110, 231, 183, 0.6);
+  color: #ecfdf5;
+}
+
+.use-case-carousel__selector-ribbon--demoscene {
+  background: rgba(110, 231, 183, 0.16);
+  color: #6ee7b7;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.use-case-demoscene {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  padding: clamp(0.75rem, 1.6vw, 1.15rem);
+  border: 1px solid rgba(110, 231, 183, 0.18);
+  border-radius: var(--sf-radius);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.16), transparent 70%),
+    #020b09;
+  box-shadow: 0 34px 70px -40px rgba(2, 11, 9, 0.85);
+  color: #d1fae5;
+}
+
+.use-case-demoscene__screen {
+  display: grid;
+  gap: 0.85rem;
+  margin: 0;
+}
+
+.use-case-demoscene__bezel {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(110, 231, 183, 0.28);
+  border-radius: var(--sf-radius-sm);
+  background: #000;
+  box-shadow:
+    0 0 0 4px #000,
+    0 0 42px -6px rgba(52, 211, 153, 0.35);
+}
+
+.use-case-demoscene__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  object-fit: contain;
+}
+
+.use-case-demoscene__caption {
+  display: grid;
+  gap: 0.3rem;
+  padding-inline: 0.2rem;
+  color: rgba(209, 250, 229, 0.86);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.use-case-demoscene__label {
+  color: #6ee7b7;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.use-case-demoscene__cues {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.use-case-demoscene__cue {
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr);
+  align-items: baseline;
+  gap: 0.2rem 0.55rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid rgba(110, 231, 183, 0.14);
+  border-radius: var(--sf-radius-sm);
+  background: rgba(4, 18, 15, 0.9);
+  color: rgba(209, 250, 229, 0.78);
+  font: inherit;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms ease, background-color 160ms ease;
+}
+
+.use-case-demoscene__cue:hover {
+  border-color: rgba(110, 231, 183, 0.5);
+  color: #ecfdf5;
+}
+
+.use-case-demoscene__cue:focus-visible {
+  outline: 3px solid rgba(110, 231, 183, 0.6);
+  outline-offset: 2px;
+}
+
+.use-case-demoscene__cue[aria-current="true"] {
+  border-color: rgba(110, 231, 183, 0.75);
+  background: rgba(16, 185, 129, 0.16);
+  color: #ecfdf5;
+}
+
+.use-case-demoscene__cue-time {
+  color: #6ee7b7;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.use-case-demoscene__cue-key {
+  padding: 0.05rem 0.38rem;
+  border: 1px solid rgba(110, 231, 183, 0.4);
+  border-radius: 3px;
+  background: rgba(110, 231, 183, 0.1);
+  color: #a7f3d0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.74rem;
+  line-height: 1.3;
+}
+
+/* A cue without a key press: its text starts right after the time. */
+.use-case-demoscene__cue-time + .use-case-demoscene__cue-text {
+  grid-column: 2 / -1;
+}
+
+.use-case-demoscene__captures {
+  margin-top: clamp(2.4rem, 5vw, 4rem);
+}
+
+.use-case-demoscene__capture-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(0.85rem, 1.6vw, 1.2rem);
+}
+
+.use-case-demoscene__capture {
+  margin: 0;
+  min-width: 0;
+}
+
+.use-case-demoscene__capture-trigger {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--sf-border-strong);
+  border-radius: var(--sf-radius-sm);
+  background: #0b0f14;
+  box-shadow: 0 26px 52px -34px rgba(6, 47, 40, 0.45);
+  cursor: zoom-in;
+}
+
+.use-case-demoscene__capture-trigger:focus-visible {
+  outline: 3px solid rgba(16, 185, 129, 0.55);
+  outline-offset: 4px;
+}
+
+/* The case page opens on the stage: the dark panel holds the heading and the
+   video together, so the demo is the first thing on the page. */
+.use-case-demoscene-stage {
+  display: grid;
+  gap: clamp(1.25rem, 2.5vw, 2rem);
+  padding: clamp(1.25rem, 3vw, 2.25rem);
+  border-radius: var(--sf-radius);
+  background:
+    radial-gradient(ellipse at 85% 0%, rgba(16, 185, 129, 0.22), transparent 55%),
+    linear-gradient(180deg, #04120f 0%, #020b09 100%);
+  box-shadow: var(--sf-shadow);
+  color: #ecfdf5;
+}
+
+.use-case-demoscene-stage__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.6fr);
+  align-items: start;
+  gap: 1.25rem 2.5rem;
+}
+
+.use-case-demoscene-stage h1 {
+  margin: 0 0 1rem;
+  color: #ecfdf5;
+  font-size: clamp(2rem, 1.4rem + 2vw, 3.2rem);
+  overflow-wrap: break-word;
+}
+
+.use-case-demoscene-stage .use-case-eyebrow {
+  color: #6ee7b7;
+}
+
+.use-case-demoscene-stage .use-case-detail__intro {
+  color: rgba(209, 250, 229, 0.82);
+}
+
+.use-case-demoscene-stage .use-case-doc-link {
+  border-color: rgba(110, 231, 183, 0.3);
+  background: rgba(4, 18, 15, 0.9);
+  color: #d1fae5;
+}
+
+.use-case-demoscene-stage .use-case-doc-link:hover {
+  border-color: rgba(110, 231, 183, 0.7);
+  color: #ecfdf5;
+}
+
+.use-case-demoscene-stage .use-case-doc-link i {
+  margin-left: 0.4rem;
+}
+
+.use-case-demoscene-stage .use-case-demoscene {
+  margin-bottom: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.use-case-detail--demoscene .use-case-demoscene__captures {
+  margin-top: 0;
+}
+
+/* Home page: Planner123 is featured as a product beside the eight apps rather
+   than counted among them. */
+.home-demoscene {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  margin-top: clamp(1.75rem, 3vw, 2.5rem);
+  padding: clamp(1rem, 2.4vw, 1.6rem);
+  border-radius: var(--sf-radius);
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(16, 185, 129, 0.2), transparent 60%),
+    #020b09;
+  box-shadow: var(--sf-shadow);
+  color: #d1fae5;
+}
+
+.home-demoscene__poster {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border: 1px solid rgba(110, 231, 183, 0.28);
+  border-radius: var(--sf-radius-sm);
+  box-shadow: 0 0 36px -8px rgba(52, 211, 153, 0.35);
+}
+
+.home-demoscene__poster img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.home-demoscene__play {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgba(110, 231, 183, 0.5);
+  border-radius: var(--sf-radius-sm);
+  background: rgba(2, 11, 9, 0.85);
+  color: #a7f3d0;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.home-demoscene__poster:hover .home-demoscene__play,
+.home-demoscene__poster:focus-visible .home-demoscene__play {
+  border-color: #6ee7b7;
+  color: #ecfdf5;
+}
+
+.home-demoscene h3 {
+  margin: 0 0 0.75rem;
+  color: #ecfdf5;
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+}
+
+.home-demoscene p {
+  margin: 0 0 1rem;
+  color: rgba(209, 250, 229, 0.82);
+}
+
+.home-demoscene .page-shell__eyebrow {
+  color: #6ee7b7;
+}
+
 @media (max-width: 1120px) {
   .site-header__actions {
     grid-column: 1 / -1;
@@ -2122,6 +2436,16 @@ body.use-case-lightbox-open {
 
   .use-case-cta__actions {
     justify-content: flex-start;
+  }
+
+  .use-case-demoscene-stage__header,
+  .home-demoscene {
+    grid-template-columns: 1fr;
+  }
+
+  .use-case-demoscene__cues,
+  .use-case-demoscene__capture-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -2325,7 +2649,9 @@ body.use-case-lightbox-open {
   }
 
   .use-case-proof__constraints,
-  .use-case-showcase__pair {
+  .use-case-showcase__pair,
+  .use-case-demoscene__cues,
+  .use-case-demoscene__capture-grid {
     grid-template-columns: 1fr;
   }
 

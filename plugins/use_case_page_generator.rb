@@ -25,13 +25,16 @@ class UseCasePageGenerator < Bridgetown::Generator
 
   def build_page(use_case)
     id = use_case.fetch("id")
+    # The demoscene case is a product with an intro video, not a web demo with
+    # annotated captures, so its page has its own stage-first layout.
+    demoscene = use_case["variant"] == "demoscene"
     page = Bridgetown::GeneratedPage.new(@site, @site.source, "use-cases/#{id}", "index.html")
     page.data = Bridgetown::Utils.deep_merge_hashes(
       page.data,
       {
         "title" => "#{use_case.fetch('label')} use case",
-        "layout" => "use_case",
-        "page_class" => "page-use-case",
+        "layout" => demoscene ? "use_case_demoscene" : "use_case",
+        "page_class" => demoscene ? "page-use-case page-use-case--demoscene" : "page-use-case",
         "description" => use_case.fetch("intro"),
         "use_case" => use_case,
       }

@@ -4,7 +4,8 @@ layout: use_cases
 page_class: page-use-cases
 description: >-
   Explore planning problems across workforce scheduling, timetabling, routing,
-  manufacturing, order picking, fleet readiness, and flight crew planning.
+  manufacturing, order picking, fleet readiness, flight crew planning, and a
+  personal calendar planner.
   See how SolverForge handles resource limits, required rules, and competing goals.
 ---
 

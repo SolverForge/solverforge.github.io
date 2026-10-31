@@ -10,6 +10,12 @@ class UseCase::Showcase < Bridgetown::Component
     @cases
   end
 
+  # A component nested in this one (UseCase::Demoscene) resolves URLs through its
+  # view context's site, which a component only has when it exposes one.
+  def site
+    helpers.site
+  end
+
   def first_id
     @cases.first.fetch("id")
   end
@@ -28,5 +34,20 @@ class UseCase::Showcase < Bridgetown::Component
   # by whether they expose a Hugging Face Space you can drive in the browser.
   def space?(use_case)
     !use_case["space_url"].to_s.empty?
+  end
+
+  # The demoscene case is a product, not a web demo: it renders its intro video,
+  # a cue sheet, and plain captures through UseCase::Demoscene instead of the
+  # narrated walkthrough and annotated screenshots.
+  def demoscene?(use_case)
+    use_case["variant"] == "demoscene"
+  end
+
+  def selector_class(use_case)
+    [
+      "use-case-carousel__selector",
+      ("use-case-carousel__selector--space" if space?(use_case)),
+      ("use-case-carousel__selector--demoscene" if demoscene?(use_case)),
+    ].compact.join(" ")
   end
 end

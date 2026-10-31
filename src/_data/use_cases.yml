@@ -853,3 +853,70 @@
         - text: "Lifecycle actions and the event stream are integration points as well."
           top: 14.4
           left: 4.6
+
+# Planner123 is the one case that is a product rather than a web demo: a
+# terminal calendar built on SolverForge. `variant: demoscene` swaps the
+# narrated walkthrough and annotated captures for its video from
+# solverforge-demoscene (planner123_06), a cue sheet that seeks the video, and
+# plain captures of the real app. Copy describes what the reader sees on
+# screen, never how the video was made. Cue times are
+# seconds into the video; each label is that time rounded to m:ss.
+- id: planner123
+  label: "Planner123"
+  variant: demoscene
+  eyebrow: "Built on SolverForge · personal planning"
+  title: "Your tasks, your meetings, your hours. One week you approve."
+  intro: "Planner123 is a keyboard-driven terminal calendar with a SolverForge planner built in. It reads your real calendar, places unscheduled tasks inside the hours you declared, and writes nothing until you approve the proposal."
+  repo_url: "https://github.com/blackopsrepl/Planner123"
+  icon: "fa-solid fa-terminal"
+  teaser_metric: "14 constraints / local SQLite / JSON CLI"
+  teaser_copy: "A terminal calendar that schedules your to-do list around real meetings, deadlines, and focus hours."
+  metrics:
+    - ["14", "Constraints"]
+    - ["10 / 2 / 2", "Hard / medium / soft"]
+    - ["1", "Planning variable"]
+    - ["5 s", "Solve budget"]
+    - ["4", "Calendar views"]
+    - ["JSON", "CLI for agents"]
+  body:
+    - "A calendar remembers what is already scheduled. The Planner Inbox holds the other kind of work: tasks with a duration, a priority, a cognitive load, and a deadline, but no time yet. Press o and the solver proposes a start for every task it can place; press A and only then do the tasks become events."
+    - "The model is one scalar planning variable per task, its start slot, and it may stay unassigned when the week is full. Existing events are busy time, availability always wins, deadlines outrank deep-work preferences, and the proposal changes nothing until it is applied. Events live in a local SQLite file, and every action is also a JSON command, so an agent can drive the same workflow."
+  constraints:
+    - ["Busy time", "No task overlaps an existing event or another task."]
+    - ["Availability", "Work lands only inside the hours you declared, in your timezone."]
+    - ["Time bounds", "Never in the past, never before the earliest start, never after a hard deadline."]
+    - ["Dependencies", "Predecessors are placed and finish first, including tasks already applied."]
+    - ["Priority and lateness", "Medium level: unplaced tasks cost by priority, soft-deadline lateness by the minute."]
+    - ["Deep work", "Soft level: high-load tasks prefer focus windows and get recovery breaks."]
+  runtime:
+    video: "/videos/use-cases/planner123-demoscene.mp4"
+    poster: "/images/use-cases/planner123-demoscene-poster.png"
+    label: "Planner123 · 1:47"
+    copy: "A week planned to a soundtrack: the inbox fills, the planner proposes a slot for every task, and one key writes the plan into the calendar."
+  cues:
+    - { at: 0, label: "0:00", key: "planner123", text: "A CRT powers on and the app redraws the terminal row by row while its database loads." }
+    - { at: 7.68, label: "0:08", key: "", text: "The week loads one event per eighth note, with copper bars behind the hour grid." }
+    - { at: 23.04, label: "0:23", key: "1", text: "Month view: every day cell is a window onto one plasma, pulsing on the kick." }
+    - { at: 38.4, label: "0:38", key: "p", text: "The Planner Inbox fills with five tasks, one per beat." }
+    - { at: 46.08, label: "0:46", key: "o", text: "The proposal prints, and each task flies to its slot, landing on a downbeat." }
+    - { at: 65.28, label: "1:05", key: "A", text: "The proposal is written as events in one sweep." }
+    - { at: 72.96, label: "1:13", key: "4", text: "The agenda scrolls over a starfield while the greetings ride a sine." }
+    - { at: 92.16, label: "1:32", key: "?", text: "The help overlay turns into the credits, and the SolverForge ouroboros draws itself." }
+    - { at: 103.68, label: "1:44", key: "q", text: "The app erases itself back to the shell prompt." }
+  captures:
+    - image: "/images/use-cases/planner123-month.png"
+      badge: "Month"
+      alt: "Planner123 month view of October 2026 with event dots on each day and the selected day's events listed."
+      caption: "The month overview: dots mark busy days, the selected day lists its events."
+    - image: "/images/use-cases/planner123-week.png"
+      badge: "Week"
+      alt: "Planner123 week view with standups, a design review, and other events on an hourly grid with a now line."
+      caption: "The week grid the planner treats as busy time."
+    - image: "/images/use-cases/planner123-planner-inbox.png"
+      badge: "Planner Inbox"
+      alt: "Planner123 Planner Inbox listing four tasks with duration, priority, and cognitive load, and the selected task's details."
+      caption: "Tasks with a duration, priority, and cognitive load, waiting for a time."
+    - image: "/images/use-cases/planner123-planner-proposal.png"
+      badge: "Proposal"
+      alt: "Planner123 proposal preview with four of four tasks scheduled as dashed blocks on next week's grid."
+      caption: "The proposal preview: dashed blocks are proposed, not saved, until A applies them."

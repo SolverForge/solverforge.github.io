@@ -1,0 +1,74 @@
+<% if stage? %>
+  <div class="use-case-demoscene" data-demoscene>
+    <figure class="use-case-demoscene__screen">
+      <div class="use-case-demoscene__bezel">
+        <video
+          class="use-case-demoscene__video"
+          controls
+          playsinline
+          preload="metadata"
+          poster="<%= relative_url(runtime.fetch("poster")) %>"
+          aria-label="<%= runtime.fetch("copy") %>"
+          data-demoscene-video
+        >
+          <source src="<%= relative_url(runtime.fetch("video")) %>" type="video/mp4" />
+        </video>
+      </div>
+      <figcaption class="use-case-demoscene__caption">
+        <span class="use-case-demoscene__label"><%= runtime.fetch("label") %></span>
+        <span><%= runtime.fetch("copy") %></span>
+      </figcaption>
+    </figure>
+
+    <ol class="use-case-demoscene__cues" aria-label="<%= label %> demo scenes">
+      <% cues.each do |cue| %>
+        <li>
+          <button
+            class="use-case-demoscene__cue"
+            type="button"
+            data-demoscene-cue="<%= cue.fetch("at") %>"
+            aria-label="Play from <%= cue.fetch("label") %>: <%= cue.fetch("text") %>"
+          >
+            <span class="use-case-demoscene__cue-time"><%= cue.fetch("label") %></span>
+            <% unless cue.fetch("key").to_s.empty? %>
+              <kbd class="use-case-demoscene__cue-key"><%= cue.fetch("key") %></kbd>
+            <% end %>
+            <span class="use-case-demoscene__cue-text"><%= cue.fetch("text") %></span>
+          </button>
+        </li>
+      <% end %>
+    </ol>
+  </div>
+<% else %>
+  <section class="use-case-demoscene__captures" aria-label="<%= label %> captures of the real app">
+    <p class="use-case-eyebrow">The real app</p>
+    <div class="use-case-demoscene__capture-grid">
+      <% captures.each do |shot| %>
+        <figure class="use-case-demoscene__capture">
+          <button
+            class="use-case-demoscene__capture-trigger"
+            type="button"
+            aria-label="Open the <%= shot.fetch("badge") %> capture"
+            data-use-case-lightbox
+            data-use-case-lightbox-src="<%= relative_url(shot.fetch("image")) %>"
+            data-use-case-lightbox-alt="<%= shot.fetch("alt") %>"
+            data-use-case-lightbox-caption="<%= shot.fetch("badge") %>: <%= shot.fetch("caption") %>"
+          >
+            <img
+              class="use-case-showcase__image"
+              src="<%= relative_url(shot.fetch("image")) %>"
+              alt="<%= shot.fetch("alt") %>"
+              width="1920"
+              height="1080"
+              loading="lazy"
+            />
+          </button>
+          <figcaption class="use-case-showcase__caption">
+            <span class="use-case-showcase__badge"><%= shot.fetch("badge") %></span>
+            <span><%= shot.fetch("caption") %></span>
+          </figcaption>
+        </figure>
+      <% end %>
+    </div>
+  </section>
+<% end %>
