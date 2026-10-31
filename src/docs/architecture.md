@@ -75,6 +75,8 @@ SERIO, the Scoring Engine for Real-time Incremental Optimization, evaluates
 constraints incrementally as moves are explored. Constraint streams compile to
 typed scoring structures, and generated collection source methods carry source
 metadata so localized updates hit the right planning-entity collection.
+[SERIO Scoring](/docs/concepts/serio/) walks one move through the operator
+tree.
 
 Projected scoring rows are retained inside this layer. They are useful when a
 constraint needs a scoring-only row from one source entity or one joined pair

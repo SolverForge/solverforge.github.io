@@ -44,7 +44,7 @@ Use road-network data, route geometry, and travel-time matrices when distance an
 High in the Val Seriana above Bergamo, the river Serio rises at Valbondione.
 Since 1931 the Barbellino dam has held its water back for power; five days a
 year the water is released and the Serio falls return, 315 metres in three
-drops. [SERIO](<%= relative_url '/docs/architecture/#serio-scoring' %>), the
+drops. [SERIO](<%= relative_url '/docs/concepts/serio/' %>), the
 scoring engine at the heart of SolverForge, carries the river's name.
 
 Down the valley, iron from the mines of Bondione and the Val di Scalve was

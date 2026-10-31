@@ -12,3 +12,4 @@ Before diving into SolverForge, it's helpful to understand the core concepts beh
 - [What is Planning Optimization?](/docs/concepts/what-is-planning/) - Introduction to constraint satisfaction and optimization
 - [Problem Types](/docs/concepts/problem-types/) - Common categories of planning problems
 - [Terminology](/docs/concepts/terminology/) - Glossary of terms used throughout the documentation
+- [SERIO Scoring](/docs/concepts/serio/) - How constraint streams run as an operator tree and each move updates only the matches it touches
