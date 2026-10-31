@@ -92,8 +92,10 @@ jobs:
       - name: Install dependencies
         run: make install
 
-      - name: Install Playwright Chromium
-        run: npx playwright install --with-deps chromium
+      - name: Install Playwright browsers
+        # Chrome carries the H.264/AAC decoders the media checks need; the
+        # bundled Chromium cannot load any MP4.
+        run: npx playwright install --with-deps chromium chrome
 
       - name: Run local CI gate
         env:
@@ -101,6 +103,7 @@ jobs:
           SOLVERFORGE_MAPS_REPO: ${{ github.workspace }}/.ci/solverforge-maps
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
           SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
+          PLAYWRIGHT_CHANNEL: chrome
         run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" make ci-local
 
       - name: Configure Pages

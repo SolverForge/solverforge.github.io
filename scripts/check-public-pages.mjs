@@ -287,7 +287,11 @@ function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+// The media checks need H.264/AAC. Playwright's bundled Chromium ships without
+// them, so every MP4 on the site stays unloadable there: CI runs Google Chrome
+// (PLAYWRIGHT_CHANNEL=chrome) and a host uses its system Chromium.
 function chromiumOptions() {
+  if (process.env.PLAYWRIGHT_CHANNEL) return { channel: process.env.PLAYWRIGHT_CHANNEL };
   const executablePath = existsSync("/usr/bin/chromium") ? "/usr/bin/chromium" : undefined;
   return {
     executablePath,
@@ -554,7 +558,11 @@ async function checkUseCaseShowcase(origin) {
         return { skipped: false, playing: !video.paused, id: first.dataset.useCaseCase };
       });
 
-      if (!playingSlide.skipped) {
+      // A walkthrough that cannot play is a failure, not a pass: a skipped
+      // check here once hid that CI's browser could not decode any MP4.
+      if (playingSlide.skipped) {
+        failures.push({ path, issue: "the first walkthrough did not play, so the pause check could not run", reason: playingSlide.reason });
+      } else {
         const otherCase = await page.evaluate(() => {
           const carousel = document.querySelector("[data-use-case-carousel]");
           return [...carousel.querySelectorAll("[data-use-case-slide]")][1].dataset.useCaseCase;
@@ -581,7 +589,7 @@ async function checkUseCaseShowcase(origin) {
               new Promise((resolve) => video.addEventListener("loadeddata", () => resolve(true), { once: true })),
               new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
             ]);
-            if (!ready) return { ok: false, reason: "media never became ready" };
+            if (!ready) return { ok: false, reason: "media never became ready", diagnostics: { readyState: video.readyState, networkState: video.networkState, error: video.error?.code ?? null, h264: video.canPlayType('video/mp4; codecs="avc1.640020"'), src: video.currentSrc } };
           }
           try {
             await Promise.race([
@@ -594,7 +602,7 @@ async function checkUseCaseShowcase(origin) {
           return { ok: !video.paused };
         }, id);
         if (!started.ok) {
-          failures.push({ path, slide: id, issue: "product video did not play", reason: started.reason });
+          failures.push({ path, slide: id, issue: "product video did not play", reason: started.reason, diagnostics: started.diagnostics });
           continue;
         }
         await page.click(`[data-use-case-select="${ALL_CASES.find((other) => other !== id)}"]`);
@@ -699,12 +707,12 @@ async function checkProductPage(page, caseId) {
         new Promise((resolve) => video.addEventListener("loadedmetadata", () => resolve(true), { once: true })),
         new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
       ]);
-      if (!ready) return { ran: false, reason: "metadata never loaded" };
+      if (!ready) return { ran: false, reason: "metadata never loaded", diagnostics: { readyState: video.readyState, networkState: video.networkState, error: video.error?.code ?? null, h264: video.canPlayType('video/mp4; codecs="avc1.640020"'), src: video.currentSrc } };
     }
     return { ran: true, duration: video.duration };
   });
   if (!media.ran) {
-    failures.push({ path, issue: "product video metadata did not load", reason: media.reason });
+    failures.push({ path, issue: "product video metadata did not load", reason: media.reason, diagnostics: media.diagnostics });
   } else if (!(detail.cues.length && detail.cues[0] === 0 && detail.cues.every((at, i) => i === 0 || at > detail.cues[i - 1]) && detail.cues.at(-1) < media.duration)) {
     failures.push({ path, issue: "cues must start at 0, increase, and land inside the video", cues: detail.cues, duration: media.duration });
   }
