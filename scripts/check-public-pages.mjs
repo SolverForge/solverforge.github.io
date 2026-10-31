@@ -67,7 +67,21 @@ const stalePatterns = [
   /current surfaces/i,
   /Integration Surfaces/,
   /Ecosystem Maintainer/,
+  // Copy says what the reader can see or do, never how a page or its media was
+  // made: production notes read as filler and date the page.
+  /demoscene intro/i,
+  /software-rendered/i,
+  /choreograph/i,
+  /(recorded|rendered|written|generated|produced|assembled) by (an? )?(agent|AI|LLM)/i,
+  /this (page|video|walkthrough) (was|is) (built|made|assembled|generated|verified|recorded)/i,
 ];
+
+// Planner123 is a product rather than a web demo: its slide and page carry a
+// video with a cue sheet and plain captures instead of annotated screenshots.
+// Pinned here, not read from the rendered page, so a case that loses or gains
+// the variant fails instead of being re-classified.
+const DEMOSCENE_CASES = { planner123: { video: "/videos/use-cases/planner123-demoscene.mp4", repo: "https://github.com/blackopsrepl/Planner123", cues: 9, minCaptures: 4 } };
+const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "planner123"];
 
 function walk(dir, predicate, out = []) {
   for (const name of readdirSync(dir)) {
@@ -396,6 +410,9 @@ async function checkUseCaseShowcase(origin) {
             }
             return overlaps;
           })(),
+          cues: slide.querySelectorAll("[data-demoscene-cue]").length,
+          captures: slide.querySelectorAll(".use-case-demoscene__capture").length,
+          repoLinks: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")),
           videos: [...slide.querySelectorAll("video")].map((video) => ({
             poster: Boolean(video.getAttribute("poster")),
             src: video.querySelector("source")?.getAttribute("src") || "",
@@ -404,7 +421,7 @@ async function checkUseCaseShowcase(origin) {
           spaceRibbon: slide.querySelectorAll(".use-case-space-ribbon").length,
           docs: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => href?.startsWith("/docs/")) || "",
           repo: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => href?.includes("github.com/SolverForge")) || "",
-          casePage: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => /^\/use-cases\/[a-z-]+\/$/.test(href || "")) || "",
+          casePage: [...slide.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")).find((href) => /^\/use-cases\/[a-z0-9-]+\/$/.test(href || "")) || "",
           space: slide.querySelector(".use-case-space-link")?.getAttribute("href") || "",
         })),
         selectors: selectors.map((selector) => selector.dataset.useCaseSelect),
@@ -415,7 +432,7 @@ async function checkUseCaseShowcase(origin) {
     if (!showcase) {
       failures.push({ path, issue: "missing use-case carousel" });
     } else {
-      if (showcase.slides.length !== 8) failures.push({ path, issue: "expected 8 slides", found: showcase.slides.length });
+      if (showcase.slides.length !== ALL_CASES.length) failures.push({ path, issue: `expected ${ALL_CASES.length} slides`, found: showcase.slides.length });
       if (showcase.selectors.length !== showcase.slides.length) {
         failures.push({ path, issue: "selector count does not match slide count", selectors: showcase.selectors.length, slides: showcase.slides.length });
       }
@@ -426,6 +443,20 @@ async function checkUseCaseShowcase(origin) {
       for (const slide of showcase.slides) {
         if (slide.metrics !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 metrics", found: slide.metrics });
         if (slide.constraints !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 constraints", found: slide.constraints });
+        const product = DEMOSCENE_CASES[slide.id];
+        if (product) {
+          if (slide.screenshots !== 0 || slide.annotated !== 0) failures.push({ path, slide: slide.id, issue: "product case must not carry annotated screenshots", screenshots: slide.screenshots });
+          if (slide.cues !== product.cues) failures.push({ path, slide: slide.id, issue: `expected ${product.cues} video cues`, found: slide.cues });
+          if (slide.captures < product.minCaptures) failures.push({ path, slide: slide.id, issue: `expected at least ${product.minCaptures} app captures`, found: slide.captures });
+          if (slide.videos.length !== 1 || !slide.videos[0].poster || slide.videos[0].src !== product.video) {
+            failures.push({ path, slide: slide.id, issue: "product video missing, unposted, or wrong", videos: slide.videos });
+          }
+          if (!slide.repoLinks.includes(product.repo)) failures.push({ path, slide: slide.id, issue: "product case does not link its source", links: slide.repoLinks });
+          if (slide.spaceRibbon !== 0 || slide.space) failures.push({ path, slide: slide.id, issue: "product case must not claim a Space" });
+          if (slide.casePage !== `/use-cases/${slide.id}/`) failures.push({ path, slide: slide.id, issue: "case page link does not match the case", casePage: slide.casePage });
+          continue;
+        }
+        if (slide.cues !== 0 || slide.captures !== 0) failures.push({ path, slide: slide.id, issue: "web-demo case rendered the product layout", cues: slide.cues });
         // Every case carries at least six annotated captures; a case may ship more.
         if (slide.screenshots < 6) failures.push({ path, slide: slide.id, issue: "expected at least 6 screenshots", found: slide.screenshots });
         if (slide.annotated !== slide.screenshots * 2) {
@@ -538,6 +569,41 @@ async function checkUseCaseShowcase(origin) {
         }
       }
 
+      // The product case's video must stop too when the reader moves on.
+      for (const id of Object.keys(DEMOSCENE_CASES)) {
+        await page.goto(`${origin}${path}#${id}`, { waitUntil: "load" });
+        const started = await page.evaluate(async (caseId) => {
+          const video = document.querySelector(`[data-use-case-case="${caseId}"] video`);
+          if (!video) return { ok: false, reason: "no video" };
+          video.muted = true;
+          if (video.readyState < 2) {
+            const ready = await Promise.race([
+              new Promise((resolve) => video.addEventListener("loadeddata", () => resolve(true), { once: true })),
+              new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
+            ]);
+            if (!ready) return { ok: false, reason: "media never became ready" };
+          }
+          try {
+            await Promise.race([
+              video.play(),
+              new Promise((_, reject) => setTimeout(() => reject(new Error("play() did not settle")), 8000)),
+            ]);
+          } catch (error) {
+            return { ok: false, reason: String(error) };
+          }
+          return { ok: !video.paused };
+        }, id);
+        if (!started.ok) {
+          failures.push({ path, slide: id, issue: "product video did not play", reason: started.reason });
+          continue;
+        }
+        await page.click(`[data-use-case-select="${ALL_CASES.find((other) => other !== id)}"]`);
+        const paused = await page.evaluate((caseId) => document.querySelector(`[data-use-case-case="${caseId}"] video`).paused, id);
+        if (!paused) failures.push({ path, slide: id, issue: "product video kept playing after switching cases" });
+      }
+      // Leave the carousel on the second case, as the checks below expect.
+      await page.click(`[data-use-case-select="${second}"]`);
+
       // Arrow keys move between cases.
       await page.evaluate(() => document.querySelector("[data-use-case-carousel]").focus());
       await page.keyboard.press("ArrowRight");
@@ -583,6 +649,101 @@ async function checkUseCaseShowcase(origin) {
   return failures;
 }
 
+// The product case page opens on its video: the cue sheet has to seek it and
+// mark the scene on screen, and the plain captures open in the viewer.
+async function checkProductPage(page, caseId) {
+  const product = DEMOSCENE_CASES[caseId];
+  const path = `/use-cases/${caseId}/`;
+  const failures = [];
+  const detail = await page.evaluate(() => {
+    const root = document.querySelector(".use-case-detail");
+    if (!root) return null;
+    const stage = root.querySelector(".use-case-demoscene-stage");
+    const video = root.querySelector("[data-demoscene-video]");
+    return {
+      stylesheets: document.querySelectorAll('link[rel="stylesheet"]').length,
+      heading: stage?.querySelector("h1")?.textContent?.trim() || "",
+      videoFirst: Boolean(stage && video && stage.contains(video) && root.firstElementChild === stage),
+      videos: root.querySelectorAll("video").length,
+      poster: Boolean(video?.getAttribute("poster")),
+      src: video?.querySelector("source")?.getAttribute("src") || "",
+      cues: [...root.querySelectorAll("[data-demoscene-cue]")].map((cue) => Number(cue.dataset.demosceneCue)),
+      metrics: root.querySelectorAll(".use-case-proof__metric").length,
+      constraints: root.querySelectorAll(".use-case-proof__constraint").length,
+      captures: root.querySelectorAll(".use-case-demoscene__capture [data-use-case-lightbox]").length,
+      annotated: root.querySelectorAll(".use-case-showcase__marker").length,
+      links: [...root.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")),
+      otherCases: root.querySelectorAll(".use-case-detail__nav a").length,
+    };
+  });
+  if (!detail) return [{ path, issue: "case page has no detail shell" }];
+  if (detail.stylesheets === 0) failures.push({ path, issue: "case page loaded without the site stylesheet" });
+  if (!detail.heading) failures.push({ path, issue: "case page has no heading on its stage" });
+  if (!detail.videoFirst) failures.push({ path, issue: "the video does not open the page" });
+  if (detail.videos !== 1 || !detail.poster || detail.src !== product.video) failures.push({ path, issue: "product video missing, unposted, or wrong", ...detail });
+  if (detail.cues.length !== product.cues) failures.push({ path, issue: `expected ${product.cues} video cues`, found: detail.cues.length });
+  if (detail.metrics !== 6 || detail.constraints !== 6) failures.push({ path, issue: "expected 6 metrics and 6 constraints", metrics: detail.metrics, constraints: detail.constraints });
+  if (detail.captures < product.minCaptures) failures.push({ path, issue: `expected at least ${product.minCaptures} app captures`, found: detail.captures });
+  if (detail.annotated !== 0) failures.push({ path, issue: "product page must not carry annotation markers", found: detail.annotated });
+  if (!detail.links.includes(product.repo)) failures.push({ path, issue: "product page does not link its source", links: detail.links });
+  if (detail.otherCases !== ALL_CASES.length - 1) failures.push({ path, issue: `expected links to the other ${ALL_CASES.length - 1} cases`, found: detail.otherCases });
+
+  // Media metadata is measured from the file itself, independent of the page:
+  // every cue has to land inside the video.
+  const media = await page.evaluate(async () => {
+    const video = document.querySelector("[data-demoscene-video]");
+    if (!video) return { ran: false, reason: "no video" };
+    video.muted = true;
+    if (video.readyState < 1) {
+      const ready = await Promise.race([
+        new Promise((resolve) => video.addEventListener("loadedmetadata", () => resolve(true), { once: true })),
+        new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
+      ]);
+      if (!ready) return { ran: false, reason: "metadata never loaded" };
+    }
+    return { ran: true, duration: video.duration };
+  });
+  if (!media.ran) {
+    failures.push({ path, issue: "product video metadata did not load", reason: media.reason });
+  } else if (!(detail.cues.length && detail.cues[0] === 0 && detail.cues.every((at, i) => i === 0 || at > detail.cues[i - 1]) && detail.cues.at(-1) < media.duration)) {
+    failures.push({ path, issue: "cues must start at 0, increase, and land inside the video", cues: detail.cues, duration: media.duration });
+  }
+
+  // Clicking a cue seeks the video to its scene and marks that cue current.
+  const index = Math.min(4, detail.cues.length - 1);
+  await page.locator("[data-demoscene-cue]").nth(index).click();
+  await page.waitForTimeout(300);
+  const seek = await page.evaluate(() => {
+    const video = document.querySelector("[data-demoscene-video]");
+    video.pause();
+    return {
+      time: video.currentTime,
+      current: [...document.querySelectorAll("[data-demoscene-cue]")].findIndex((cue) => cue.getAttribute("aria-current") === "true"),
+    };
+  });
+  const target = detail.cues[index];
+  if (!(seek.time >= target - 0.05 && seek.time < target + 2)) failures.push({ path, issue: "cue did not seek the video to its scene", target, time: seek.time });
+  if (seek.current !== index) failures.push({ path, issue: "the clicked cue is not marked as the scene on screen", expected: index, current: seek.current });
+
+  // The plain captures open in the same viewer as the annotated ones.
+  const trigger = page.locator(".use-case-demoscene__capture [data-use-case-lightbox]").first();
+  const expectedCaption = await trigger.getAttribute("data-use-case-lightbox-caption");
+  await trigger.click();
+  const opened = await page.evaluate(() => {
+    const lightbox = document.querySelector("[data-use-case-lightbox-root]");
+    return {
+      hidden: lightbox.hidden,
+      src: lightbox.querySelector(".use-case-lightbox__image")?.getAttribute("src") || "",
+      caption: lightbox.querySelector(".use-case-lightbox__caption")?.textContent || "",
+    };
+  });
+  if (opened.hidden || !opened.src.includes("/images/use-cases/") || opened.caption !== expectedCaption) {
+    failures.push({ path, issue: "capture viewer did not open with the capture metadata", ...opened });
+  }
+  await page.keyboard.press("Escape");
+  return failures;
+}
+
 // Each case also has its own page, generated from the same data file. It has to
 // carry that case's proof and its own viewer, and the home page has to reach it.
 async function checkUseCasePages(origin) {
@@ -595,14 +756,16 @@ async function checkUseCasePages(origin) {
   const page = await context.newPage();
   const failures = [];
 
-  const cases = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew"];
-
   try {
-    for (const caseId of cases) {
+    for (const caseId of ALL_CASES) {
       const response = await page.goto(`${origin}/use-cases/${caseId}/`, { waitUntil: "load" });
       const status = response?.status() ?? 0;
       if (status >= 400) {
         failures.push({ path: `/use-cases/${caseId}/`, issue: "case page not served", status });
+        continue;
+      }
+      if (DEMOSCENE_CASES[caseId]) {
+        failures.push(...(await checkProductPage(page, caseId)));
         continue;
       }
 
@@ -704,7 +867,7 @@ async function checkUseCasePages(origin) {
       if (detail.legendMismatch !== 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "marker numbers do not match their legend lines", found: detail.legendMismatch });
       if (detail.videos !== 1 || !detail.poster) failures.push({ path: `/use-cases/${caseId}/`, issue: "runtime walkthrough missing", videos: detail.videos, poster: detail.poster });
       if (!detail.viewer) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no screenshot viewer" });
-      if (detail.otherCases !== 7) failures.push({ path: `/use-cases/${caseId}/`, issue: "expected links to the other 7 cases", found: detail.otherCases });
+      if (detail.otherCases !== ALL_CASES.length - 1) failures.push({ path: `/use-cases/${caseId}/`, issue: `expected links to the other ${ALL_CASES.length - 1} cases`, found: detail.otherCases });
       if (detail.heading.length === 0) failures.push({ path: `/use-cases/${caseId}/`, issue: "case page has no heading" });
     }
 
@@ -730,9 +893,24 @@ async function checkUseCasePages(origin) {
 
     // The home page has to reach the case pages, not only the carousel.
     await page.goto(`${origin}/`, { waitUntil: "load" });
-    const homeLinks = await page.evaluate(() =>
-      [...document.querySelectorAll(".home-section a")].map((link) => link.getAttribute("href")).filter((href) => /^\/use-cases\/[a-z-]+\/$/.test(href || "")));
-    if (homeLinks.length !== 8) failures.push({ path: "/", issue: "home page does not link all 8 case pages", found: homeLinks.length });
+    // The eight apps are cards; the product case is featured in its own band.
+    const home = await page.evaluate(() => {
+      const caseLink = (href) => /^\/use-cases\/[a-z0-9-]+\/$/.test(href || "");
+      return {
+        cards: [...document.querySelectorAll(".home-section .ui-card a")].map((link) => link.getAttribute("href")).filter(caseLink),
+        band: [...document.querySelectorAll("[data-home-demoscene] a")].map((link) => link.getAttribute("href")),
+        bandPoster: Boolean(document.querySelector("[data-home-demoscene] img")?.getAttribute("src")),
+      };
+    });
+    const apps = ALL_CASES.filter((id) => !DEMOSCENE_CASES[id]).map((id) => `/use-cases/${id}/`);
+    if (JSON.stringify([...home.cards].sort()) !== JSON.stringify([...apps].sort())) {
+      failures.push({ path: "/", issue: "home page cards do not link exactly the app case pages", found: home.cards });
+    }
+    for (const id of Object.keys(DEMOSCENE_CASES)) {
+      if (!home.band.length || !home.band.every((href) => href === `/use-cases/${id}/`) || !home.bandPoster) {
+        failures.push({ path: "/", issue: `home page does not feature ${id} with its poster`, band: home.band });
+      }
+    }
 
     // The hero's first action is the agent skill, and it has to be reachable
     // without scrolling; the evaluation list states four facts with sources.

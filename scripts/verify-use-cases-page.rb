@@ -11,7 +11,7 @@ require "yaml"
 ROOT = File.expand_path("..", __dir__)
 
 DATA_PATH = "src/_data/use_cases.yml"
-EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew].freeze
+EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew planner123].freeze
 # Cases with a written guide keep it; the repository-only cases ship the app
 # source instead, and every case has its own page generated from this file.
 EXPECTED_DOCS = {
@@ -23,6 +23,10 @@ EXPECTED_DOCS = {
 EXPECTED_SPACES = %w[hospital lessons deliveries field-service].freeze
 REPO_CASES = %w[furnace orders fleet flightcrew].freeze
 REPO_URL_PATTERN = %r{\Ahttps://github\.com/SolverForge/solverforge-usecases/tree/main/uc-[a-z]+\z}
+# Planner123 is a product, not a web demo: it ships its source, a video with a
+# cue sheet, and plain captures of the real app instead of annotated ones.
+DEMOSCENE_CASES = { "planner123" => "https://github.com/blackopsrepl/Planner123" }.freeze
+MINIMUM_CAPTURES = 4
 EXPECTED_METRICS = 6
 EXPECTED_CONSTRAINTS = 6
 MINIMUM_SCREENSHOTS = 6
@@ -92,17 +96,66 @@ cases.each do |use_case|
   else
     failures << "#{id}: repository-only case must not claim a Space" if use_case["space_url"].to_s.strip.length.positive?
     repo_url = use_case["repo_url"].to_s
-    failures << "#{id}: repo_url #{repo_url.inspect} is not this case's directory in solverforge-usecases" unless repo_url.match?(REPO_URL_PATTERN)
+    if DEMOSCENE_CASES.key?(id)
+      failures << "#{id}: repo_url #{repo_url.inspect} is not #{DEMOSCENE_CASES[id]}" unless repo_url == DEMOSCENE_CASES[id]
+    else
+      failures << "#{id}: repo_url #{repo_url.inspect} is not this case's directory in solverforge-usecases" unless repo_url.match?(REPO_URL_PATTERN)
+    end
+  end
+
+  demoscene = use_case["variant"] == "demoscene"
+  if demoscene != DEMOSCENE_CASES.key?(id)
+    failures << "#{id}: variant #{use_case['variant'].inspect} does not match the expected demoscene cases"
   end
 
   runtime = use_case["runtime"] || {}
-  %w[video poster label copy caption].each do |field|
+  runtime_fields = demoscene ? %w[video poster label copy] : %w[video poster label copy caption]
+  runtime_fields.each do |field|
     failures << "#{id}: runtime is missing #{field}" if runtime[field].to_s.strip.empty?
   end
   %w[video poster].each do |field|
     asset = runtime[field].to_s
     next if asset.empty?
     failures << "#{id}: runtime #{field} not found at #{asset}" unless File.file?(source_path(asset))
+  end
+
+  if demoscene
+    # Each cue seeks the video, so its start must be a real, increasing time
+    # and its label must be that time as the reader sees it (m:ss).
+    cues = use_case["cues"]
+    unless cues.is_a?(Array) && !cues.empty?
+      failures << "#{id}: demoscene case needs a cue sheet"
+      cues = []
+    end
+    previous = -1
+    cues.each_with_index do |cue, index|
+      at = cue["at"]
+      unless at.is_a?(Numeric) && at > previous
+        failures << "#{id} cue #{index + 1}: start #{at.inspect} must be a number after the previous cue"
+        next
+      end
+      failures << "#{id}: the first cue must start the video at 0" if index.zero? && at != 0
+      previous = at
+      seconds = at.round
+      label = format("%d:%02d", seconds / 60, seconds % 60)
+      failures << "#{id} cue #{index + 1}: label #{cue['label'].inspect} != #{label}" unless cue["label"] == label
+      failures << "#{id} cue #{index + 1}: missing text" if cue["text"].to_s.strip.empty?
+      failures << "#{id} cue #{index + 1}: key must be present (empty when no key is pressed)" unless cue.key?("key")
+    end
+
+    captures = use_case["captures"]
+    unless captures.is_a?(Array) && captures.length >= MINIMUM_CAPTURES
+      failures << "#{id}: expected at least #{MINIMUM_CAPTURES} captures, found #{captures.is_a?(Array) ? captures.length : 0}"
+    end
+    Array(captures).each_with_index do |shot, index|
+      %w[image badge alt caption].each do |field|
+        failures << "#{id} capture #{index + 1}: missing #{field}" if shot[field].to_s.strip.empty?
+      end
+      image = shot["image"].to_s
+      failures << "#{id} capture #{index + 1}: image not found at #{image}" unless image.empty? || File.file?(source_path(image))
+    end
+    failures << "#{id}: demoscene case must not carry annotated screenshots" if use_case.key?("screenshots")
+    next
   end
 
   screenshots = use_case["screenshots"]
@@ -146,8 +199,11 @@ PAGE_WIRING = {
   "frontend/styles/index.scss" => ["use-case-space-ribbon", "use-case-detail"],
   "src/_layouts/use_cases.erb" => ["page-shell--use-cases"],
   "src/_data/navigation.yml" => ["url: /use-cases/"],
-  "src/index.md" => ["site.data.use_cases"],
-  EXPECTED_GENERATOR => ["Bridgetown::Generator", "use-cases/", "use_case"],
+  "src/index.md" => ["site.data.use_cases", "data-home-demoscene"],
+  "src/_components/use_case/demoscene.erb" => ["data-demoscene", "data-demoscene-video", "data-demoscene-cue", "use-case-demoscene__capture"],
+  "src/_layouts/use_case_demoscene.erb" => ["layout: default", "use-case-detail", "data-use-case-lightbox-root", "UseCase::Demoscene.new"],
+  "frontend/javascript/use-cases.js" => ["initializeDemosceneCues", ".use-case-demoscene__capture"],
+  EXPECTED_GENERATOR => ["Bridgetown::Generator", "use-cases/", "use_case", "use_case_demoscene"],
   "src/_layouts/use_case.erb" => ["layout: default", "use-case-detail", "data-use-case-lightbox-root", "site.data.use_cases"]
 }.freeze
 
@@ -171,5 +227,6 @@ if failures.any?
 end
 
 puts "[verify-use-cases] Verified #{cases.length} use cases, " \
-     "#{cases.sum { |use_case| use_case['screenshots'].length }} annotated screenshots, " \
-     "and their runtime walkthroughs"
+     "#{cases.sum { |use_case| Array(use_case['screenshots']).length }} annotated screenshots, " \
+     "#{cases.sum { |use_case| Array(use_case['cues']).length }} video cues, " \
+     "and their runtime videos"
