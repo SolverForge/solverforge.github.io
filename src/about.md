@@ -30,6 +30,35 @@ Use road-network data, route geometry, and travel-time matrices when distance an
   <% end %>
 </div>
 
+## Where the Name Comes From
+
+<figure class="brand-film" data-brand-film>
+  <div class="brand-film__screen">
+    <video class="brand-film__video" controls playsinline preload="metadata" poster="<%= relative_url '/images/brand/the-serio-and-the-forge-poster.png' %>" aria-label="The Serio and the forge: the river Serio, the trip hammers of Ponte Nossa, and the SolverForge name tempered in the same water.">
+      <source src="<%= relative_url '/videos/brand/the-serio-and-the-forge.mp4' %>" type="video/mp4" />
+    </video>
+  </div>
+  <figcaption class="brand-film__caption">The Serio and the forge · 1:47</figcaption>
+</figure>
+
+High in the Val Seriana above Bergamo, the river Serio rises at Valbondione.
+Since 1931 the Barbellino dam has held its water back for power; five days a
+year the water is released and the Serio falls return, 315 metres in three
+drops. [SERIO](<%= relative_url '/docs/architecture/#serio-scoring' %>), the
+scoring engine at the heart of SolverForge, carries the river's name.
+
+Down the valley, iron from the mines of Bondione and the Val di Scalve was
+smelted and refined into steel. At Ponte Nossa, water wheels lifted trip hammers
+that beat the red-hot steel into nails, spades, and hoes, and the tools were
+tempered in the same water that drove the hammer. The Maglio Beltrami worked
+until 1964 and has been a museum since 1984.
+
+SolverForge is in its tempering stage: every part is being hardened on the way
+to 1.0.0.
+
+Read more about the [Serio falls](https://turismovalbondione.it/le-cascate-del-serio/)
+and the [hammers of Ponte Nossa](https://www.maglinossa.it/).
+
 ## How It Works
 
 The best way to judge SolverForge is through complete applications. These

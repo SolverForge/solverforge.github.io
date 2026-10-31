@@ -1575,6 +1575,54 @@ if (!existsSync(outputDir)) {
 
 const paths = pagePaths();
 const staleCopy = checkStaleCopy();
+// The About page carries the brand film beside the story of the name. Its
+// source and poster are pinned, and its duration is measured from the file so
+// a missing or truncated encode fails instead of rendering an empty frame.
+async function checkBrandFilm(origin) {
+  const browser = await chromium.launch(chromiumOptions());
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+  const path = "/about/";
+  const failures = [];
+  try {
+    await page.goto(`${origin}${path}`, { waitUntil: "load" });
+    const film = await page.evaluate(async () => {
+      const figures = document.querySelectorAll("[data-brand-film]");
+      const video = figures[0]?.querySelector("video");
+      if (!video) return { figures: figures.length, ran: false, reason: "no video" };
+      const heading = [...document.querySelectorAll(".prose h2")].find((h) => h.textContent.trim() === "Where the Name Comes From");
+      video.muted = true;
+      if (video.readyState < 1) {
+        const ready = await Promise.race([
+          new Promise((resolve) => video.addEventListener("loadedmetadata", () => resolve(true), { once: true })),
+          new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
+        ]);
+        if (!ready) return { figures: figures.length, ran: false, reason: "metadata never loaded", networkState: video.networkState, error: video.error?.code ?? null };
+      }
+      return {
+        figures: figures.length,
+        ran: true,
+        src: video.querySelector("source")?.getAttribute("src") || "",
+        poster: video.getAttribute("poster") || "",
+        duration: video.duration,
+        underHeading: Boolean(heading && heading.compareDocumentPosition(figures[0]) & Node.DOCUMENT_POSITION_FOLLOWING),
+      };
+    });
+    if (film.figures !== 1) failures.push({ path, issue: "expected exactly one brand film", found: film.figures });
+    if (!film.ran) {
+      failures.push({ path, issue: "brand film did not load", ...film });
+    } else {
+      if (film.src !== "/videos/brand/the-serio-and-the-forge.mp4") failures.push({ path, issue: "unexpected brand film source", src: film.src });
+      if (film.poster !== "/images/brand/the-serio-and-the-forge-poster.png") failures.push({ path, issue: "brand film poster missing or wrong", poster: film.poster });
+      if (!(Math.abs(film.duration - 107.5) < 1)) failures.push({ path, issue: "brand film duration is not the full 1:47 cut", duration: film.duration });
+      if (!film.underHeading) failures.push({ path, issue: "brand film is not under the story of the name" });
+    }
+  } catch (error) {
+    failures.push({ path, issue: "brand film check threw", error: String(error) });
+  }
+  await browser.close();
+  return failures;
+}
+
 const missingLinks = checkInternalLinks();
 const docsIndexTargets = checkDocsIndexTargets();
 const { server, origin } = await startServer();
@@ -1585,6 +1633,7 @@ let useCasePages = [];
 let benchmarksPage = [];
 let benchmarksDocs = [];
 let releaseDocs = [];
+let brandFilm = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
@@ -1594,6 +1643,7 @@ try {
   benchmarksPage = await checkBenchmarksPage(origin);
   benchmarksDocs = await checkBenchmarksDocs(origin);
   releaseDocs = await checkReleaseDocs(origin);
+  brandFilm = await checkBrandFilm(origin);
 } finally {
   server.close();
 }
@@ -1610,6 +1660,7 @@ const summary = {
   benchmarksPage,
   benchmarksDocs,
   releaseDocs,
+  brandFilm,
   layoutFailures,
 };
 
@@ -1625,6 +1676,7 @@ if (
   benchmarksPage.length ||
   benchmarksDocs.length ||
   releaseDocs.length ||
+  brandFilm.length ||
   layoutFailures.length
 ) {
   process.exit(1);
