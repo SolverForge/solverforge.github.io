@@ -78,6 +78,13 @@ verbatim in a fixture file. `make test` runs the static half
 (`--static`); `make ci-local` runs the whole contract, so a host without
 `solverforge-cli 3.7.1` and cargo fails it.
 
+`make verify-serio-page` holds the SERIO concept page to the engine. It builds
+`scripts/fixtures/serio-trace/` against the documented solverforge tag from
+`SOLVERFORGE_RS_REPO`, runs one traced move, and compares the printed input and
+scores with the page's tables; every kept score must equal a fresh full
+evaluation, and the page's constraint function must be verbatim in the
+fixture. `make test` runs the static half; `make ci-local` runs the trace.
+
 `make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
 linting, a full Bridgetown build, the public-page copy/link/nav/layout checks,
 and the portable tutorial verifiers.
