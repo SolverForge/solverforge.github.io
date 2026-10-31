@@ -103,11 +103,29 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
     </p>
     <div class="card-grid">
       <% site.data.use_cases.each do |use_case| %>
+        <% next if use_case["variant"] == "demoscene" %>
         <%= render Ui::Card.new(title: use_case["label"], href: relative_url("/use-cases/#{use_case["id"]}/"), eyebrow: use_case["teaser_metric"], icon: use_case["icon"]) do %>
 <%= use_case["teaser_copy"] %>
         <% end %>
       <% end %>
     </div>
+    <% product = site.data.use_cases.find { |use_case| use_case["variant"] == "demoscene" } %>
+    <% if product %>
+      <div class="home-demoscene" data-home-demoscene>
+        <a class="home-demoscene__poster" href="<%= relative_url("/use-cases/#{product["id"]}/") %>" aria-label="Watch <%= product["label"] %> plan a week">
+          <img src="<%= relative_url(product["runtime"]["poster"]) %>" alt="" width="1280" height="720" loading="lazy" />
+          <span class="home-demoscene__play"><i class="fa-solid fa-play"></i> 1:47</span>
+        </a>
+        <div>
+          <p class="page-shell__eyebrow">Built on SolverForge</p>
+          <h3><%= product["label"] %>: a calendar that plans your week.</h3>
+          <p><%= product["teaser_copy"] %> It runs in your terminal, keeps your events in a local file, and changes nothing until you approve the proposal.</p>
+          <a class="button button--secondary" href="<%= relative_url("/use-cases/#{product["id"]}/") %>">
+            Watch it plan a week <i class="fa-solid fa-play"></i>
+          </a>
+        </div>
+      </div>
+    <% end %>
     <div class="button-row">
       <a class="button button--primary" href="<%= relative_url '/use-cases/' %>">
         Compare every use case <i class="fa-solid fa-arrow-right"></i>
