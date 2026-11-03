@@ -241,8 +241,8 @@ crates.io on 2026-10-14",
     "/docs/solverforge/constraints/joiners/",
     "/docs/solverforge/constraints/collectors/"
   ],
-    "scripts/verify-rust-snippets.rb" => [
-    'DEFAULT_SOLVERFORGE_RS_REF = "v0.23.0"'
+  "scripts/lib/rust_pages.rb" => [
+    'RELEASE = "0.24.0"'
   ],
 
   "src/docs/solverforge/index.md" => [

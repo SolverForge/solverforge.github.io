@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version
+.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -38,7 +38,8 @@ help:
 	@printf '  make verify-benchmarks          Verify recorded full-run benchmark evidence\n'
 	@printf '  make verify-use-cases           Verify the use-case showcase content and assets\n'
 	@printf '  make verify-cli-release         Install the published CLI and verify scaffold targets\n'
-	@printf '  make verify-rust-snippets       Compile-check Rust snippets in docs\n'
+	@printf '  make verify-rust-snippets       Compile Rust library doc blocks against crates.io solverforge, run shown outputs\n'
+	@printf '  make verify-rust-snippets-legacy Compile-check Rust snippets on pages not yet in that scope\n'
 	@printf '  make verify-hospital-tutorial   Run portable tutorial contract checks\n'
 	@printf '  make verify-lessons-tutorial    Run portable lessons contract checks\n'
 	@printf '  make verify-deliveries-tutorial Run portable deliveries contract checks\n'
@@ -103,6 +104,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-cli-getting-started.rb --static
 	$(call status,Verifying SERIO page contract)
 	@ruby scripts/verify-serio-page.rb --static
+	$(call status,Verifying Rust snippet page contract)
+	@ruby scripts/verify-rust-snippets.rb --static
 
 lint:
 	$(call status,Checking Ruby syntax)
@@ -116,7 +119,7 @@ check-public-pages:
 	$(call status,Checking public page copy, links, nav, and layout)
 	@node scripts/check-public-pages.mjs
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page verify-rust-snippets-legacy
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -138,8 +141,12 @@ verify-use-cases:
 	@ruby scripts/verify-use-cases-page.rb
 
 verify-rust-snippets:
-	$(call status,Verifying Rust documentation snippets)
+	$(call status,Compiling and running Rust library documentation blocks)
 	@ruby scripts/verify-rust-snippets.rb
+
+verify-rust-snippets-legacy:
+	$(call status,Verifying Rust snippets outside the compiled scope)
+	@ruby scripts/verify-rust-snippets-legacy.rb
 
 verify-hospital-tutorial:
 	$(call status,Verifying hospital tutorial contract)
