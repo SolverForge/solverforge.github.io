@@ -27,19 +27,19 @@ generated collection accessors as stream sources, and trims the public API.
 See the [0.24.x release note](/blog/releases/2026/11/01/solverforge-0-24-x/)
 for the breaking changes and upgrade checklist.
 
-The independently published CLI line is `solverforge-cli 3.8.1`. Fresh
+The independently published CLI line is `solverforge-cli 3.8.2`. Fresh
 scaffolds target `solverforge 0.24.0`, with `solverforge-ui 0.9.0` and
-`solverforge-maps 2.1.4` for the web shell and `rmcp 3.8.0` for the MCP shell.
+`solverforge-maps 2.1.5` for the web shell and `rmcp 3.8.0` for the MCP shell.
 A fresh scaffold solves its empty plan through the runtime's default pipeline,
 generated code is rustfmt-clean, `--field` types are imported, and `check`
 states that it does not compile the project. Generated constraint skeletons
-still panic until their placeholders are replaced. The 3.8.1
-[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/41640965796)
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/41640965834)
+still panic until their placeholders are replaced. The 3.8.2
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/41718367762)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/41718367773)
 workflows and the exact-commit
-[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/41640961789)
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/41718364701)
 on Linux, macOS, Windows, and integration tests passed at
-`1e14044e924164a9aaf974628135b7a75a1f341f`. The
+`e842faa9c774eb342f29de4529de1ca18e91e171`. The
 `3.8.0` package was published from `96ddbeefc5076761b9d69ad667a177330fd374dd`,
 but its tag [CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/41625985949)
 failed on Windows, where the destroy refusal printed backslash paths, and
@@ -51,14 +51,13 @@ deliberately upgraded and validated.
 
 The worked-use-case bundle ships eight apps on `solverforge 0.24.0` and
 `solverforge-ui 0.9.0`: `solverforge-hospital@3.0.0`,
-`solverforge-lessons@3.0.0`, `solverforge-deliveries@3.0.0`,
-`solverforge-fsr@3.0.0`, `solverforge-furnace@3.0.0`,
+`solverforge-lessons@3.0.0`, `solverforge-deliveries@3.0.1`,
+`solverforge-fsr@3.0.1`, `solverforge-furnace@3.0.0`,
 `solverforge-orders@0.3.0`, `solverforge-fleet@0.2.0`, and
-`solverforge-flightcrew@0.3.0`. The four Space-backed apps' release-tag sync
-workflows succeeded. Bundle CI failed at the final app tag on a missing `rg`
-in the metadata check and passed at the following tooling commit
-`50371ec410b363864420ba97d6c5ee94771709d4`
-([run 41637463799](https://github.com/SolverForge/solverforge-usecases/actions/runs/41637463799)).
+`solverforge-flightcrew@0.3.1`. The four Space-backed apps' release-tag sync
+workflows succeeded. Bundle CI passed at the final app tag,
+`solverforge-flightcrew@0.3.1`
+([run 41718256141](https://github.com/SolverForge/solverforge-usecases/actions/runs/41718256141)).
 Furnace, Orders, Fleet, and Flight crew are repository-only. See the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
 
@@ -78,11 +77,11 @@ live in the `solverforge-cli` repository.
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.24.0`: explicit `solver_toml` configuration, unknown-key rejection, runtime constraint weights, problem changes on running jobs, and overflow-checked scores; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.8.1` targets `solverforge 0.24.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.8.0`; `3.8.0` was published with a failed Windows tag CI |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.8.2` targets `solverforge 0.24.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.5`, MCP `rmcp 3.8.0`; `3.8.0` was published with a failed Windows tag CI |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
-| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.0`, `solverforge-lessons@3.0.0`, `solverforge-deliveries@3.0.0`, `solverforge-fsr@3.0.0`, plus the repository-only `solverforge-furnace@3.0.0`, `solverforge-orders@0.3.0`, `solverforge-fleet@0.2.0`, and `solverforge-flightcrew@0.3.0`; all eight target `solverforge 0.24.0` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets; `solverforge-cli 3.8.1` scaffolds it directly |
-| **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
+| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.0`, `solverforge-lessons@3.0.0`, `solverforge-deliveries@3.0.1`, `solverforge-fsr@3.0.1`, plus the repository-only `solverforge-furnace@3.0.0`, `solverforge-orders@0.3.0`, `solverforge-fleet@0.2.0`, and `solverforge-flightcrew@0.3.1`; all eight target `solverforge 0.24.0` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets; `solverforge-cli 3.8.2` scaffolds it directly |
+| **Maps** | Published | `solverforge-maps 2.1.5` carries matrix route-distance access and identifies its client to Overpass |
 
 ## Try It Today
 
@@ -190,7 +189,7 @@ live in the `solverforge-cli` repository.
 
 - **Core runtime line**: these manuals describe `solverforge 0.24.0`, with
   Rust `1.95`. The
-  published `solverforge-cli 3.8.1` package targets `solverforge 0.24.0` for
+  published `solverforge-cli 3.8.2` package targets `solverforge 0.24.0` for
   fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.23.0`
   from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x), and an app should
   move to a newer core line only when that app is deliberately upgraded and

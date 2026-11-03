@@ -30,8 +30,10 @@ server. `NetworkConfig::default()` uses the public instance at
 `.osm_cache`, relative to the process's working directory.
 
 The public instance is a shared community service with usage limits: it answers
-busy periods with `429 Too Many Requests` or `503 Service Unavailable`, and
-large regions can take minutes. A failed request on a server error, `429`, or
+busy periods with `429 Too Many Requests`, `502 Bad Gateway`, or
+`503 Service Unavailable`, and large regions can take minutes. Every request
+identifies the client as `solverforge-maps/<version> (+<repository>)`, as the
+instance's usage policy requires. A failed request on a server error, `429`, or
 `408` is retried up to `2` more times per endpoint, waiting longer after each
 attempt; when every endpoint fails, `load_or_fetch` returns
 `RoutingError::Network`. A region already in `.osm_cache` loads without network

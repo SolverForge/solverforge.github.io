@@ -79,6 +79,17 @@ its terminal state.
 | `solverforge-fleet@0.2.0` | `f170630becdd2f1cd6df5916c9c9e6d488d7ef85` | [0.1.9 → 0.2.0](https://github.com/SolverForge/solverforge-usecases/compare/solverforge-fleet@0.1.9...solverforge-fleet@0.2.0) | repository-only |
 | `solverforge-flightcrew@0.3.0` | `97b93b1edd32286be48a84335f130d0edb22ba9a` | [0.2.0 → 0.3.0](https://github.com/SolverForge/solverforge-usecases/compare/solverforge-flightcrew@0.2.0...solverforge-flightcrew@0.3.0) | repository-only |
 
+### Patch releases
+
+| App tag | Source commit | Change | Space sync |
+| --- | --- | --- | --- |
+| `solverforge-deliveries@3.0.1` | `5785901d2e8a03a69b46c7e88979cb1c6dce4f7b` | Requires `solverforge-maps 2.1.5`, which identifies the app to Overpass | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/41718266892) |
+| `solverforge-fsr@3.0.1` | `b696484e288e62aae71761a056b3c7c2b8ddb435` | Requires `solverforge-maps 2.1.5`, which identifies the app to Overpass | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/41718285190) |
+| `solverforge-flightcrew@0.3.1` | `484990d56ce5053bcb3ee281252db8285eca647b` | Requires `solverforge-maps 2.1.5`, which identifies the app to Overpass | repository-only |
+
+Bundle CI passed at the final patch tag, `solverforge-flightcrew@0.3.1`
+([run 41718256141](https://github.com/SolverForge/solverforge-usecases/actions/runs/41718256141)).
+
 The app-owned `cli_version` provenance in each `solverforge.app.toml` stays at
 `2.2.2` for Hospital, Lessons, Deliveries, Field service, Furnace, and Fleet,
 and `3.1.0` for Orders and Flight crew; installing a newer CLI does not

@@ -654,7 +654,7 @@ Current dataset shape:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-fsr@3.0.0` release targets the published SolverForge
+The tagged `solverforge-fsr@3.0.1` release targets the published SolverForge
 0.24.0 line:
 
 ```toml
@@ -662,7 +662,7 @@ The tagged `solverforge-fsr@3.0.0` release targets the published SolverForge
 solverforge = { version = "0.24.0", features = ["serde", "console", "verbose-logging"] }
 solverforge-core = "0.24.0"
 solverforge-ui = { version = "0.9.0" }
-solverforge-maps = { version = "2.1.4" }
+solverforge-maps = { version = "2.1.5" }
 # Web server
 axum = "0.8.9"
 tokio = { version = "1.52.3", features = ["full"] }
@@ -1208,7 +1208,7 @@ curl http://localhost:7860/demo-data
 
 | Topic | File |
 | ----- | ---- |
-| Tagged app release | `solverforge-fsr@3.0.0` |
+| Tagged app release | `solverforge-fsr@3.0.1` |
 | App contract | `solverforge.app.toml` |
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |

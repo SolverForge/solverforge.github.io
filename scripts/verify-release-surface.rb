@@ -19,8 +19,8 @@ REQUIRED_TEXT = {
   "scripts/verify-cli-release.rb" => [
     "EXPECTED_CLI_VERSION = ReleasePins::CLI", "EXPECTED_RUNTIME_VERSION = ReleasePins::RUNTIME",
     'EXPECTED_MCP_VERSION = "3.8.0"',
-    "1e14044e924164a9aaf974628135b7a75a1f341f",
-    "40e017937e0df564f2c767291bf1dc7eda4bded3f67cd4928b3f7566497851c0",
+    "e842faa9c774eb342f29de4529de1ca18e91e171",
+    "5f4253813e86c9c19b3df26404f0714608e1623b51104463c16013c4c20bbba3",
     "pub phases: Vec<PhaseTelemetryDto>", "pub moves_speculative: u64",
     "duplicates the built-in", "The project was not compiled.",
     "because source files still reference it"
@@ -43,7 +43,8 @@ REQUIRED_TEXT = {
   ],
   "src/_posts/releases/2026-11-03-solverforge-cli-3-8-x.md" => [
     "**solverforge-cli #{CLI} was published on November 3, 2026**",
-    "`3.8.1` | 2026-11-03", "`3.8.0` | 2026-11-03",
+    "`3.8.2` | 2026-11-03", "`3.8.1` | 2026-11-03", "`3.8.0` | 2026-11-03",
+    "e842faa9c774eb342f29de4529de1ca18e91e171", "5f4253813e86c9c19b3df26404f0714608e1623b51104463c16013c4c20bbba3", "41718367762", "41718367773", "41718364701",
     "1e14044e924164a9aaf974628135b7a75a1f341f",
     "40e017937e0df564f2c767291bf1dc7eda4bded3f67cd4928b3f7566497851c0",
     "96ddbeefc5076761b9d69ad667a177330fd374dd",
@@ -61,6 +62,8 @@ REQUIRED_TEXT = {
     "`solverforge-fleet@0.2.0`", "`solverforge-flightcrew@0.3.0`",
     "41637155114", "41637164072", "41637120152", "41637141120",
     "41637114103", "41637463799", "50371ec410b363864420ba97d6c5ee94771709d4",
+    "`solverforge-deliveries@3.0.1`", "`solverforge-fsr@3.0.1`", "`solverforge-flightcrew@0.3.1`",
+    "41718266892", "41718285190", "41718256141",
     "weightMultiplier", "make install-e2e", NOTE_CORE
   ],
   "src/_posts/releases/2026-10-27-solverforge-0-23-x.md" => [
@@ -320,7 +323,7 @@ crates.io on 2026-10-14",
     "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
   "src/docs/solverforge-maps/index.md" => [
-    "solverforge-maps 2.1.4"
+    "solverforge-maps #{ReleasePins::MAPS}"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
     "SolverForge 0.23.0", "`cp314` ABI, not `cp314t`"
@@ -422,10 +425,10 @@ crates.io on 2026-10-14",
     "Fresh\nscaffolds target `solverforge #{CORE}`",
     "`solverforge-cli #{CLI}` targets `solverforge #{CORE}`",
     "c114e2d2bfabaada78beb5ee77318b847b964489", "41314986907", "41314989365",
-    "1e14044e924164a9aaf974628135b7a75a1f341f", "41640965796", "41640965834", "41640961789", "41625985949",
-    "solverforge-hospital@3.0.0", "solverforge-lessons@3.0.0", "solverforge-deliveries@3.0.0",
-    "solverforge-fsr@3.0.0", "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0",
-    "solverforge-fleet@0.2.0", "solverforge-flightcrew@0.3.0", "41637463799",
+    "e842faa9c774eb342f29de4529de1ca18e91e171", "41718367762", "41718367773", "41718364701", "41625985949",
+    "solverforge-hospital@3.0.0", "solverforge-lessons@3.0.0", "solverforge-deliveries@3.0.1",
+    "solverforge-fsr@3.0.1", "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0",
+    "solverforge-fleet@0.2.0", "solverforge-flightcrew@0.3.1", "41718256141",
     NOTE_CORE, NOTE_CLI, NOTE_APPS,
     "- **Parallel local search**", "- **Per-phase telemetry**", "- **List-shadow scoring**",
     "- **Core runtime line**", "- **Joined-tuple grouping**", "- **Guided native scalar search**",
@@ -458,11 +461,11 @@ crates.io on 2026-10-14",
     "solverforge 0.24.0"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@3.0.0",
+    "solverforge-deliveries@3.0.1",
     "solverforge 0.24.0"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@3.0.0",
+    "solverforge-fsr@3.0.1",
     "solverforge 0.24.0"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [

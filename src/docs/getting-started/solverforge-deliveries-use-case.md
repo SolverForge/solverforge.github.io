@@ -91,7 +91,7 @@ solverforge --version
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
 This page uses `solverforge-cli 3.8`, which scaffolds `solverforge 0.24.0`,
-`solverforge-ui 0.9.0`, and `solverforge-maps 2.1.4`.
+`solverforge-ui 0.9.0`, and `solverforge-maps 2.1.5`.
 
 ### Build a Router from the CLI
 
@@ -645,7 +645,7 @@ Current dataset sizes:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-deliveries@3.0.0` release uses SolverForge core, UI,
+The tagged `solverforge-deliveries@3.0.1` release uses SolverForge core, UI,
 and Maps from crates.io:
 
 ```toml
@@ -656,7 +656,7 @@ solverforge = { version = "0.24.0", features = [
   "verbose-logging",
 ] }
 solverforge-ui = "0.9.0"
-solverforge-maps = "2.1.4"
+solverforge-maps = "2.1.5"
 # Web server
 axum = "0.8.9"
 tokio = { version = "1.52.3", features = ["full"] }
@@ -1193,7 +1193,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@3.0.0`       |
+| Tagged app release               | `solverforge-deliveries@3.0.1`       |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |

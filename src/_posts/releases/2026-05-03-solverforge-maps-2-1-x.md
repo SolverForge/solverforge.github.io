@@ -8,10 +8,14 @@ description: >
 ---
 
 **solverforge-maps 2.1.x** is the current maps line for routing and delivery
-applications. The latest patch, **2.1.4**, is available on
-[crates.io](https://crates.io/crates/solverforge-maps/2.1.4), documented on
-[docs.rs](https://docs.rs/solverforge-maps/2.1.4), and tagged in the
-[source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.1.4).
+applications. The latest patch, **2.1.5**, is available on
+[crates.io](https://crates.io/crates/solverforge-maps/2.1.5), documented on
+[docs.rs](https://docs.rs/solverforge-maps/2.1.5), and tagged in the
+[source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.1.5).
+Its [Publish](https://github.com/SolverForge/solverforge-maps/actions/runs/41714196655),
+[Release](https://github.com/SolverForge/solverforge-maps/actions/runs/41714196766),
+and [CI](https://github.com/SolverForge/solverforge-maps/actions/runs/41714194281)
+workflows passed at `dc1b86a`.
 
 Patch releases are folded into this line note instead of published as separate
 release-note pages.
@@ -38,7 +42,7 @@ Use the crates.io package pin:
 
 ```toml
 [dependencies]
-solverforge-maps = "2.1.4"
+solverforge-maps = "2.1.5"
 ```
 
 ## Example
@@ -60,4 +64,5 @@ matrix used by the solver.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `2.1.5` | 2026-11-03 | Overpass requests send `User-Agent: solverforge-maps/<version> (+<repository>)` instead of the fixed `SolverForge/0.5.0`; the Overpass usage policy requires a User-Agent that identifies the client. |
 | `2.1.4` | 2026-05-03 | Stores route distances beside travel-time matrix data and exposes aligned distance rows and slices. |

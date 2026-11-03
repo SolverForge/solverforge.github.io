@@ -12,8 +12,8 @@ require_relative "release_pins"
 # Provenance of the audited solverforge-cli artifact. A newer publish moves
 # ReleasePins::CLI, and then these two values must be re-audited before the
 # gate passes again.
-EXPECTED_SOURCE_SHA = "1e14044e924164a9aaf974628135b7a75a1f341f"
-EXPECTED_ARTIFACT_SHA256 = "40e017937e0df564f2c767291bf1dc7eda4bded3f67cd4928b3f7566497851c0"
+EXPECTED_SOURCE_SHA = "e842faa9c774eb342f29de4529de1ca18e91e171"
+EXPECTED_ARTIFACT_SHA256 = "5f4253813e86c9c19b3df26404f0714608e1623b51104463c16013c4c20bbba3"
 
 EXPECTED_CLI_VERSION = ReleasePins::CLI
 EXPECTED_RUNTIME_VERSION = ReleasePins::RUNTIME

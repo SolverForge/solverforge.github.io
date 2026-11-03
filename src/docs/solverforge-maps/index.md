@@ -8,8 +8,8 @@ description: >
 ---
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-maps 2.1.4` crate.
-`solverforge-cli` web scaffolds pin the same `solverforge-maps 2.1.4`
+This section tracks the published `solverforge-maps 2.1.5` crate.
+`solverforge-cli` web scaffolds pin the same `solverforge-maps 2.1.5`
 release.
 <% end %>
 

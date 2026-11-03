@@ -1511,7 +1511,7 @@ async function checkReleaseDocs(origin) {
     { path: "/docs/solverforge-python/modeling/", required: ["Entity Pinning", "planning_pin()", "planning_variable(pinning=True) is not supported", "mandatory planning work incomplete"] },
     { path: "/docs/solverforge-python/solving-and-runtime/", required: ["moves_speculative", "discarded_speculative", "phases", "GIL", "Callback Errors And Interrupts", "KeyboardInterrupt", "AttributeError", "SolverPanicPayload", "FAILED"] },
     { path: "/blog/releases/2026/10/27/solverforge-python-0-7-x/", required: ["SolverForge Python 0.7.x follows solverforge 0.6.15", "32 evaluators", "releases the GIL", "phases", "discarded_speculative", "solverforge 0.7.2", "0.7.1", "KeyboardInterrupt", "previous hook"] },
-    { path: "/docs/status-and-roadmap/", required: [`documentation tracks the solverforge ${pins.core} release`, `cargo add solverforge installs ${pins.core}`, `The independently published CLI line is solverforge-cli ${pins.cli}`, "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0", "solverforge-flightcrew@0.3.0", "solverforge-fleet@0.2.0"] },
+    { path: "/docs/status-and-roadmap/", required: [`documentation tracks the solverforge ${pins.core} release`, `cargo add solverforge installs ${pins.core}`, `The independently published CLI line is solverforge-cli ${pins.cli}`, "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0", "solverforge-flightcrew@0.3.1", "solverforge-fleet@0.2.0"] },
     { path: "/blog/releases/2026/11/01/solverforge-0-24-x/", required: ["solverforge 0.24.x follows solverforge 0.23.0", "weight_multiplier", "solver_toml"] },
     { path: "/blog/releases/2026/11/03/solverforge-cli-3-8-x/", required: [`solverforge-cli ${pins.cli} was published on November 3, 2026`, "Windows failed", "BendableScore"] },
     { path: "/blog/releases/2026/11/03/solverforge-usecases-3-0/", required: ["solverforge-hospital@3.0.0", "weightMultiplier", "make install-e2e"] },
@@ -1521,7 +1521,7 @@ async function checkReleaseDocs(origin) {
     { path: "/blog/releases/2026/09/27/solverforge-usecases-repository-apps/", required: ["October 27 (core 0.23.0)", "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0", "solverforge-flightcrew@0.2.0", "movesSpeculative", "discarded_speculative", "does not make that pull interruptible"] },
     ...[
       ["hospital", "3.0.0", "0.24.0"], ["lessons", "3.0.0", "0.24.0"],
-      ["deliveries", "3.0.0", "0.24.0"], ["fsr", "3.0.0", "0.24.0"],
+      ["deliveries", "3.0.1", "0.24.0"], ["fsr", "3.0.1", "0.24.0"],
     ].map(([app, version, runtime]) => ({
       path: `/docs/getting-started/solverforge-${app}-use-case/`,
       required: [`solverforge-${app}@${version}`, `solverforge ${runtime}`],

@@ -128,7 +128,7 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "3.8.1"
+cli_version = "3.8.2"
 
 [runtime]
 target = "solverforge 0.24.0"
@@ -144,7 +144,7 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 3.8.1` web scaffold target. Fresh
+This example reflects the `solverforge-cli 3.8.2` web scaffold target. Fresh
 web generated apps target `solverforge 0.24.0`, take the CLI's
 `solverforge-ui 0.9.0` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.

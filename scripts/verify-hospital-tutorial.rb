@@ -32,7 +32,7 @@ PAGE_URL = "/docs/getting-started/solverforge-hospital-use-case/"
 RENDERED = File.join(SITE_ROOT, "output", PAGE_URL, "index.html")
 
 # The published artifacts this page documents.
-CLI_VERSION = "3.8.1"
+CLI_VERSION = "3.8.2"
 RUNTIME_VERSION = "0.24.0"
 UI_VERSION = "0.9.0"
 APP_VERSION = "3.0.0"
