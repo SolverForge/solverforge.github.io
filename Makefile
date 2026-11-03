@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-serio-page start clean version
+.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -44,6 +44,7 @@ help:
 	@printf '  make verify-deliveries-tutorial Run portable deliveries contract checks\n'
 	@printf '  make verify-fsr-tutorial        Run portable FSR tutorial contract checks\n'
 	@printf '  make verify-maintenance-walkthrough Replay, test, and solve the agent-skill walkthrough\n'
+	@printf '  make verify-cli-getting-started Replay, build, and solve the CLI Getting Started page\n'
 	@printf '  make verify-serio-page          Run the SERIO page trace and compare it with the page\n'
 	@printf '  make ci-local                   Run the same gate used by CI\n'
 	@printf '  make pre-release                Run the release-readiness gate\n'
@@ -98,6 +99,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-fsr-tutorial.rb
 	$(call status,Verifying maintenance walkthrough page contract)
 	@ruby scripts/verify-maintenance-walkthrough.rb --static
+	$(call status,Verifying CLI Getting Started page contract)
+	@ruby scripts/verify-cli-getting-started.rb --static
 	$(call status,Verifying SERIO page contract)
 	@ruby scripts/verify-serio-page.rb --static
 
@@ -113,7 +116,7 @@ check-public-pages:
 	$(call status,Checking public page copy, links, nav, and layout)
 	@node scripts/check-public-pages.mjs
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-serio-page
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -157,6 +160,10 @@ verify-fsr-tutorial:
 verify-maintenance-walkthrough:
 	$(call status,Replaying and solving the maintenance walkthrough)
 	@ruby scripts/verify-maintenance-walkthrough.rb
+
+verify-cli-getting-started:
+	$(call status,Replaying and solving the CLI Getting Started page)
+	@ruby scripts/verify-cli-getting-started.rb
 
 verify-serio-page:
 	$(call status,Tracing one move through SERIO against the page)

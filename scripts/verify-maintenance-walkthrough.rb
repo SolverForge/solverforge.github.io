@@ -31,8 +31,8 @@ RENDERED = File.join(SITE_ROOT, "output", PAGE_URL, "index.html")
 FIXTURES = File.join(SITE_ROOT, "scripts/fixtures/maintenance-walkthrough")
 PROMPT = File.join(FIXTURES, "prompt.md")
 
-EXPECTED_CLI_VERSION = "3.7.1"
-EXPECTED_RUNTIME_VERSION = "0.23.0"
+EXPECTED_CLI_VERSION = "3.8.1"
+EXPECTED_RUNTIME_VERSION = "0.24.0"
 EXPECTED_UNIT_TESTS = 20
 APP_NAME = "depot-maintenance"
 APP_BINARY = "depot_maintenance"

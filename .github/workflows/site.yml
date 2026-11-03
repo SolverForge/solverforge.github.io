@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     # A wedged step must fail the run, not sit on it. The default is six hours,
     # which is how a hanging browser check burned a deploy instead of reporting.
-    timeout-minutes: 20
+    timeout-minutes: 35
 
     steps:
       - uses: actions/checkout@v4
@@ -59,8 +59,9 @@ jobs:
           rustup toolchain install 1.95.0 --profile minimal
           rustup default 1.95.0
 
-      # The maintenance walkthrough replays its commands with the published
-      # CLI and solves the result, so CI needs the exact release it documents.
+      # The maintenance walkthrough and the CLI Getting Started page replay
+      # their commands with the published CLI and solve the result, so CI
+      # needs the exact release they document (scripts/release_pins.rb).
       - name: Cache the walkthrough toolchain
         uses: actions/cache@v4
         with:
@@ -69,13 +70,14 @@ jobs:
             ~/.cargo/git
             ~/.cargo/bin/solverforge
             ~/.cache/walkthrough-target
-          key: walkthrough-solverforge-cli-3.7.1-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
-          restore-keys: walkthrough-solverforge-cli-3.7.1-
+            ~/.cache/getting-started-target
+          key: walkthrough-solverforge-cli-3.8.1-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
+          restore-keys: walkthrough-solverforge-cli-3.8.1-
 
-      - name: Install solverforge-cli 3.7.1
+      - name: Install solverforge-cli 3.8.1
         run: |
-          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.7.1'; then
-            cargo install solverforge-cli --version 3.7.1 --locked --force
+          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.8.1'; then
+            cargo install solverforge-cli --version 3.8.1 --locked --force
           fi
           solverforge --version
 
@@ -104,7 +106,7 @@ jobs:
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
           SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
           PLAYWRIGHT_CHANNEL: chrome
-        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" make ci-local
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" make ci-local
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'

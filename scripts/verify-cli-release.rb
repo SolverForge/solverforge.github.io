@@ -7,14 +7,18 @@ require "tmpdir"
 require "digest"
 require "json"
 require "rubygems/version"
+require_relative "release_pins"
 
-EXPECTED_SOURCE_SHA = "fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca"
-EXPECTED_ARTIFACT_SHA256 = "ba476ea2862d6e0a6e2f0a9a434428d2887f8863abdd1e932b6ef87598d7d538"
+# Provenance of the audited solverforge-cli artifact. A newer publish moves
+# ReleasePins::CLI, and then these two values must be re-audited before the
+# gate passes again.
+EXPECTED_SOURCE_SHA = "1e14044e924164a9aaf974628135b7a75a1f341f"
+EXPECTED_ARTIFACT_SHA256 = "40e017937e0df564f2c767291bf1dc7eda4bded3f67cd4928b3f7566497851c0"
 
-EXPECTED_CLI_VERSION = "3.7.1"
-EXPECTED_RUNTIME_VERSION = "0.23.0"
-EXPECTED_UI_VERSION = "0.9.0"
-EXPECTED_MAPS_VERSION = "2.1.4"
+EXPECTED_CLI_VERSION = ReleasePins::CLI
+EXPECTED_RUNTIME_VERSION = ReleasePins::RUNTIME
+EXPECTED_UI_VERSION = ReleasePins::UI
+EXPECTED_MAPS_VERSION = ReleasePins::MAPS
 EXPECTED_MCP_VERSION = "3.8.0"
 
 def fail!(message)
@@ -45,6 +49,9 @@ def assert_file_contains(path, needle)
   assert_contains(File.read(path), needle, path)
 end
 
+registry = ReleasePins.registry_failures
+fail!(registry.join("\n")) unless registry.empty?
+
 Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   install_root = File.join(tmp_dir, "install")
   scaffold_root = File.join(tmp_dir, "scaffold")
@@ -67,13 +74,11 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
     "MAPS" => EXPECTED_MAPS_VERSION, "MCP" => EXPECTED_MCP_VERSION }.each do |name, version|
     assert_contains(target_source, "pub const #{name}_CRATE_VERSION: &str = \"#{version}\";", "published scaffold target")
   end
-  %w[scalar list].each do |family|
-    template = run_command("tar", "-xOf", artifact, "solverforge-cli-#{EXPECTED_CLI_VERSION}/templates/#{family}/generic/solver.toml")
-    ['# [move_thread_count]', '# count = 4', 'RAYON_NUM_THREADS', 'by 32'].each do |needle|
-      assert_contains(template, needle, "#{family} parallel configuration template")
-    end
+  template = run_command("tar", "-xOf", artifact, "solverforge-cli-#{EXPECTED_CLI_VERSION}/templates/scalar/generic/solver.toml")
+  ['# [move_thread_count]', '# count = 4', 'RAYON_NUM_THREADS', 'by 32'].each do |needle|
+    assert_contains(template, needle, "scaffold parallel configuration template")
   end
-  log "Artifact checksum, source SHA, scaffold constants, and both parallel configuration templates verified: #{EXPECTED_SOURCE_SHA}"
+  log "Artifact checksum, source SHA, scaffold constants, and the parallel configuration template verified: #{EXPECTED_SOURCE_SHA}"
 
   log "Installing solverforge-cli #{EXPECTED_CLI_VERSION} from crates.io"
   run_command(
@@ -136,10 +141,15 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
     fail!("#{shell} scaffold should not contain static assets") if File.exist?(File.join(root, "static"))
   end
 
+  # The CLI configuration page: a 30-second limit, no declared phases, and the
+  # commented explicit pipeline.
   config = File.join(app_root, "solver.toml")
-  ['construction_heuristic_type = "first_fit"', 'type = "late_acceptance"',
-   'late_acceptance_size = 400', 'type = "accepted_count"', 'limit = 4',
-   'seconds_spent_limit = 30'].each { |needle| assert_file_contains(config, needle) }
+  config_text = File.read(config)
+  assert_contains(config_text, "[termination]\nseconds_spent_limit = 30\n", "scaffold solver.toml")
+  fail!("scaffold solver.toml declares phases; the configuration page says it declares none") if config_text.match?(/^\[\[phases\]\]/)
+  ['# construction_heuristic_type = "first_fit"', '# type = "late_acceptance"',
+   '# late_acceptance_size = 400', '# type = "accepted_count"', '# limit = 4'].each { |needle| assert_contains(config_text, needle, "scaffold solver.toml") }
+  assert_file_contains(File.join(app_root, "src", "domain", "plan.rs"), 'solver_toml = "../../solver.toml"')
   assert_file_contains(config, '# [move_thread_count]')
   assert_file_contains(config, '# count = 4')
   assert_file_contains(config, 'RAYON_NUM_THREADS')
@@ -170,6 +180,16 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   fail!("invalid config set changed solver.toml") unless File.read(config) == before_invalid_set
   log "Thread-count validation: 4 valid forms, 6 invalid forms, dotted-key round trip and rejected-write preservation passed"
 
+  # Behavior the CLI pages rely on: built-in fields are rejected, check states
+  # that it does not compile, and destroy refuses a referenced resource.
+  %w[fact entity].each do |kind|
+    field = kind == "fact" ? "name" : "id"
+    stdout, stderr, status = Open3.capture3(cli, "generate", kind, "probe_#{kind}", "--field", "#{field}:String", chdir: app_root)
+    fail!("generate #{kind} accepted a duplicate #{field} field") if status.success?
+    assert_contains(stdout + stderr, "duplicates the built-in '#{field}' field", "duplicate-field diagnostic")
+  end
+  assert_contains(run_command(cli, "check", chdir: app_root), "The project was not compiled. Run `cargo build` to compile it.", "check output")
+
   run_command(cli, "config", "set", "termination.seconds_spent_limit", "60", chdir: app_root)
   assert_contains(run_command(cli, "config", "show", chdir: app_root), "seconds_spent_limit = 60", "config round trip")
   run_command(cli, "generate", "fact", "resource", "--quiet", chdir: app_root)
@@ -180,6 +200,10 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   assert_file_contains(File.join(app_root, "src", "constraints", "assigned.rs"), "HardSoftDecimalScore")
   assert_file_contains(File.join(app_root, "solverforge.app.toml"), 'score = "HardSoftDecimalScore"')
   run_command(cli, "check", "--quiet", chdir: app_root)
+  stdout, stderr, status = Open3.capture3(cli, "destroy", "--yes", "entity", "task", chdir: app_root)
+  fail!("destroy removed an entity a constraint still reads") if status.success?
+  assert_contains(stdout + stderr, "cannot destroy entity 'Task' because source files still reference it: src/constraints/assigned.rs", "destroy refusal")
+  fail!("refused destroy removed src/domain/task.rs") unless File.file?(File.join(app_root, "src", "domain", "task.rs"))
   run_command(cli, "destroy", "--yes", "constraint", "assigned", "--quiet", chdir: app_root)
   fail!("destroy left the constraint behind") if File.exist?(File.join(app_root, "src", "constraints", "assigned.rs"))
 
