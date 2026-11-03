@@ -3,29 +3,33 @@
 
 # Holds /docs/concepts/serio/ to what SERIO actually does.
 #
-# The page traces one move through the score director. Its constraint
-# function must be verbatim in the published fixture, its shift table must be
-# the fixture's input, and its score column must be what the fixture prints
-# when built against the documented solverforge tag, with every kept score
-# equal to a fresh full evaluation. Nothing here skips: a missing repository,
-# tool, or build is a failure.
+# The page traces one move through the score director. The trace crate is
+# the page's own model and constraint files (the `crate=serio` blocks) plus
+# the fixture's src/main.rs, which drives the score director and defines no
+# model of its own. Its shift table must be the fixture's input, and its score
+# column must be what that crate prints when built against the published
+# solverforge release (RustPages::RELEASE, from crates.io), with every kept
+# score equal to a fresh full evaluation. Nothing here skips: a missing tool
+# or a failed build is a failure.
 #
 #   ruby scripts/verify-serio-page.rb            # static + live
 #   ruby scripts/verify-serio-page.rb --static   # page/fixture contract only
 #
-# The live run needs cargo and the solverforge repository (SOLVERFORGE_RS_REPO,
-# default /srv/lab/dev/solverforge/solverforge) holding SOLVERFORGE_RS_REF.
+# The live run needs cargo and the crates.io index. SERIO_TRACE_TARGET_DIR
+# (or SOLVERFORGE_SNIPPETS_TARGET_DIR) keeps the build between runs.
 
 require "fileutils"
 require "open3"
 require "tmpdir"
 
+require_relative "lib/rust_pages"
+
 SITE_ROOT = File.expand_path("..", __dir__)
-PAGE = File.join(SITE_ROOT, "src/docs/concepts/serio.md")
+PAGE_PATH = "src/docs/concepts/serio.md"
+PAGE = File.join(SITE_ROOT, PAGE_PATH)
 PAGE_URL = "/docs/concepts/serio/"
 FIXTURE = File.join(SITE_ROOT, "scripts/fixtures/serio-trace/src/main.rs")
-RS_REPO = ENV.fetch("SOLVERFORGE_RS_REPO", "/srv/lab/dev/solverforge/solverforge")
-RS_REF = ENV.fetch("SOLVERFORGE_RS_REF", "v0.23.0")
+RELEASE = RustPages::RELEASE
 
 # Page step label => fixture step name. "Retract" has no fresh check: the
 # entity is mid-move, so the solution and the kept score describe different
@@ -72,10 +76,17 @@ def static_contract
   page = read(PAGE)
   fixture = read(FIXTURE)
 
-  log "Checking the constraint function against the fixture"
-  rust = page.scan(/^```rust\n(.*?)^```/m).map(&:first)
-  fail!("page must carry exactly one Rust block, found #{rust.length}") unless rust.length == 1
-  fail!("the page's constraint function is not verbatim in the fixture") unless fixture.include?(rust.first)
+  log "Checking the page's model and constraint files"
+  plan = RustPages::Plan.new(SITE_ROOT, [PAGE_PATH], RELEASE).build!
+  fail!(plan.errors.join("\n")) unless plan.errors.empty?
+  crate = plan.crates["serio"] or fail!("page has no crate=serio blocks")
+  stray = plan.rust_blocks.reject { |block| crate.files.values.map(&:block).include?(block) }
+  fail!("every Rust block on the page must be a crate=serio file: #{stray.map(&:where).join(', ')}") unless stray.empty?
+  wanted = %w[src/domain/mod.rs src/domain/model.rs src/constraints.rs]
+  fail!("page must show #{wanted.join(', ')}; it shows #{crate.files.keys.sort.join(', ')}") unless crate.files.keys.sort == wanted.sort
+  if fixture.match?(/#\[planning_solution|fn define_constraints|__internal|PlanningModelSupport/)
+    fail!("the fixture must use the page's model and constraints, not define or implement its own")
+  end
 
   log "Checking the shift table against the fixture input"
   shifts = table_rows(page, "Shift").map do |id, hours, employee|
@@ -98,31 +109,32 @@ def static_contract
     needles.each { |needle| fail!("#{relative} is missing #{needle}") unless text.include?(needle) }
   end
 
-  steps.to_h
+  [steps.to_h, crate]
 end
 
-def live_trace(expected)
-  fail!("SOLVERFORGE_RS_REPO #{RS_REPO} is not a git repository") unless File.directory?(File.join(RS_REPO, ".git")) || File.file?(File.join(RS_REPO, ".git"))
-  _, status = Open3.capture2e("git", "-C", RS_REPO, "rev-parse", "--verify", "#{RS_REF}^{commit}")
-  fail!("#{RS_REPO} has no #{RS_REF}") unless status.success?
+def live_trace(expected, crate)
   _, status = Open3.capture2e("cargo", "--version")
   fail!("cargo is required for the live trace") unless status.success?
 
   Dir.mktmpdir("serio-trace") do |dir|
-    FileUtils.mkdir_p(File.join(dir, "src"))
+    crate.files.each_value do |file|
+      path = File.join(dir, file.path)
+      FileUtils.mkdir_p(File.dirname(path))
+      File.write(path, file.code)
+    end
     FileUtils.cp(FIXTURE, File.join(dir, "src/main.rs"))
     File.write(File.join(dir, "Cargo.toml"), <<~TOML)
       [package]
       name = "serio-trace"
       version = "0.0.0"
-      edition = "2021"
+      edition = "2024"
 
       [dependencies]
-      solverforge = { git = "file://#{RS_REPO}", tag = "#{RS_REF}", package = "solverforge" }
+      solverforge = "=#{RELEASE}"
     TOML
 
-    log "Building and running the trace against solverforge #{RS_REF}"
-    target = ENV.fetch("SERIO_TRACE_TARGET_DIR", File.join(dir, "target"))
+    log "Building and running the trace against crates.io solverforge #{RELEASE}"
+    target = ENV["SERIO_TRACE_TARGET_DIR"] || ENV["SOLVERFORGE_SNIPPETS_TARGET_DIR"] || File.join(dir, "target")
     output, status = Open3.capture2e({ "CARGO_TARGET_DIR" => target }, "cargo", "run", "--quiet", chdir: dir)
     fail!("trace did not run:\n#{output}") unless status.success?
 
@@ -142,10 +154,10 @@ def live_trace(expected)
   log "Trace matches the page: #{expected.values.join(' -> ')}"
 end
 
-expected = static_contract
+expected, crate = static_contract
 if ARGV.include?("--static")
   log "Static contract passed"
 else
-  live_trace(expected)
+  live_trace(expected, crate)
   log "Contract passed"
 end

@@ -1,84 +1,18 @@
 // One move traced through SERIO, the example on /docs/concepts/serio/.
 //
-// scripts/verify-serio-page.rb builds this against the documented solverforge
-// tag, runs it, and compares every printed line with the page: the input
+// scripts/verify-serio-page.rb copies the page's model and constraint files
+// beside this file, builds the crate against the published solverforge
+// release, runs it, and compares every printed line with the page: the input
 // shifts, the score after each step, and a fresh full evaluation beside each
-// cached score. The constraint function must stay verbatim on the page.
+// kept score.
 
+mod constraints;
+mod domain;
+
+use constraints::define_constraints;
+use domain::{Employee, Schedule, Shift};
 use solverforge::prelude::*;
-use solverforge::stream::{joiner::*, ConstraintFactory};
 use solverforge::ScoreDirector;
-
-#[problem_fact]
-pub struct Employee {
-    #[planning_id]
-    pub id: usize,
-}
-
-#[planning_entity]
-pub struct Shift {
-    #[planning_id]
-    pub id: usize,
-    pub start: usize,
-    pub end: usize,
-    #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
-    pub employee_idx: Option<usize>,
-}
-
-#[planning_solution(constraints = "define_constraints")]
-pub struct Schedule {
-    #[planning_entity_collection]
-    pub shifts: Vec<Shift>,
-    #[problem_fact_collection]
-    pub employees: Vec<Employee>,
-    #[planning_score]
-    pub score: Option<HardSoftScore>,
-}
-
-impl solverforge::__internal::PlanningModelSupport for Schedule {
-    fn attach_descriptor_hooks(_descriptor: &mut solverforge::__internal::SolutionDescriptor) {}
-
-    fn attach_runtime_scalar_hooks(
-        slot: solverforge::__internal::ScalarVariableSlot<Self>,
-    ) -> solverforge::__internal::ScalarVariableSlot<Self> {
-        slot
-    }
-
-    fn attach_scalar_groups(
-        _scalar_variables: &[solverforge::__internal::ScalarVariableSlot<Self>],
-    ) -> Vec<solverforge::__internal::ScalarGroupBinding<Self>> {
-        Vec::new()
-    }
-
-    fn validate_model(_descriptor: &solverforge::__internal::SolutionDescriptor) {}
-
-    fn update_entity_shadows(_solution: &mut Self, _descriptor: usize, _entity: usize) -> bool {
-        false
-    }
-
-    fn update_all_shadows(_solution: &mut Self) -> bool {
-        false
-    }
-}
-
-fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
-    type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-    (
-        Streams::new()
-            .for_each(Schedule::shifts())
-            .join(equal(|shift: &Shift| shift.employee_idx))
-            .filter(|a: &Shift, b: &Shift| {
-                a.employee_idx.is_some() && a.start < b.end && b.start < a.end
-            })
-            .penalize(HardSoftScore::ONE_HARD)
-            .named("Overlapping shifts"),
-        Streams::new()
-            .for_each(Schedule::shifts())
-            .filter(|shift: &Shift| shift.employee_idx.is_none())
-            .penalize(HardSoftScore::ONE_SOFT)
-            .named("Unassigned shift"),
-    )
-}
 
 // The shift collection is the first entity collection: descriptor 0.
 const SHIFTS: usize = 0;
