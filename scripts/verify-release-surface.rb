@@ -12,7 +12,6 @@ NOTE_APPS = "/blog/releases/2026/11/03/solverforge-usecases-3-0/"
 
 REQUIRED_TEXT = {
   ".github/workflows/site.yml" => [
-    'ref: "solverforge-furnace@2.0.7"',
     "cargo install solverforge-cli --version #{CLI} --locked --force",
     "walkthrough-solverforge-cli-#{CLI}-",
     "SOLVERFORGE_GETTING_STARTED_TARGET_DIR"

@@ -22,9 +22,6 @@ jobs:
     # A wedged step must fail the run, not sit on it. The default is six hours,
     # which is how a hanging browser check burned a deploy instead of reporting.
     timeout-minutes: 35
-    # The tutorial replays build two release apps on a cold cache, so the bound
-    # leaves room for that and nothing more.
-    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -56,15 +53,6 @@ jobs:
           repository: SolverForge/solverforge-bench
           ref: d7ca9e3c56784cc9ee21089af314f085e18eb39b
           path: .ci/solverforge-bench
-
-      - name: Checkout released SolverForge use-case bundle
-        uses: actions/checkout@v4
-        with:
-          repository: SolverForge/solverforge-usecases
-          # The coordinated releases were cut sequentially; the final tag
-          # contains the app versions this site documents.
-          ref: "solverforge-furnace@2.0.7"
-          path: .ci/solverforge-usecases
 
       - name: Install Rust 1.95
         run: |
@@ -129,16 +117,7 @@ jobs:
           path: ~/.cache/ui-gate-target
           key: ui-gate-${{ hashFiles('src/docs/solverforge-ui/getting-started.md') }}
           restore-keys: ui-gate-
-      # Tutorial replay gates install the published CLI into this cache
-      # (scripts/lib/tutorial_replay.rb) and share Cargo output across runs.
-      - name: Cache the tutorial replay toolchain
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/solverforge-cli
-            ~/.cache/tutorial-target
-          key: tutorial-replay-${{ hashFiles('scripts/verify-hospital-tutorial.rb', 'scripts/lib/tutorial_replay.rb') }}
-          restore-keys: tutorial-replay-
+
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -163,13 +142,11 @@ jobs:
           SOLVERFORGE_RS_REPO: ${{ github.workspace }}/.ci/solverforge-rs
           SOLVERFORGE_MAPS_REPO: ${{ github.workspace }}/.ci/solverforge-maps
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
-          SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
           SOLVERFORGE_BENCH_REPO: ${{ github.workspace }}/.ci/solverforge-bench
           PLAYWRIGHT_CHANNEL: chrome
-        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" SOLVERFORGE_UI_GATE_TARGET_DIR="$HOME/.cache/ui-gate-target" TUTORIAL_REPLAY_TARGET_DIR="$HOME/.cache/tutorial-target" make ci-local
         # The use-case tutorial replays build two apps each and run their
         # test suites, so they run in the `tutorials` job below instead.
-        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" make ci-local TUTORIAL_REPLAYS=
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" SOLVERFORGE_UI_GATE_TARGET_DIR="$HOME/.cache/ui-gate-target" make ci-local TUTORIAL_REPLAYS=
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'
@@ -192,7 +169,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        page: [lessons, deliveries, fsr]
+        page: [hospital, lessons, deliveries, fsr]
 
     steps:
       - uses: actions/checkout@v4

@@ -40,9 +40,7 @@ help:
 	@printf '  make verify-cli-release         Install the published CLI and verify scaffold targets\n'
 	@printf '  make verify-rust-snippets       Compile Rust library doc blocks against crates.io solverforge, run shown outputs\n'
 	@printf '  make verify-rust-snippets-legacy Compile-check Rust snippets on pages not yet in that scope\n'
-	@printf '  make verify-hospital-tutorial   Run portable tutorial contract checks\n'
 	@printf '  make verify-hospital-tutorial   Replay, build, and solve both hospital tutorial paths\n'
-	@printf '  make verify-lessons-tutorial    Run portable lessons contract checks\n'
 	@printf '  make verify-lessons-tutorial    Replay the lessons page: CLI build, Space clone, solves\n'
 	@printf '  make verify-deliveries-tutorial Replay the deliveries page: CLI build, Space clone, solves\n'
 	@printf '  make verify-fsr-tutorial        Replay the FSR page: CLI build, Space clone, solves\n'
@@ -98,8 +96,6 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-use-cases-page.rb
 	$(call status,Verifying hospital tutorial page contract)
 	@ruby scripts/verify-hospital-tutorial.rb --static
-	$(call status,Verifying lessons tutorial contract)
-	@ruby scripts/verify-lessons-tutorial.rb
 	$(call status,Verifying lessons tutorial page contract)
 	@ruby scripts/verify-lessons-tutorial.rb --static
 	$(call status,Verifying deliveries tutorial page contract)
@@ -133,12 +129,11 @@ check-public-pages:
 	$(call status,Checking public page copy, links, nav, and layout)
 	@node scripts/check-public-pages.mjs
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page verify-rust-snippets-legacy verify-solver-config verify-companion-docs verify-ui-getting-started verify-python-docs
 # Use-case pages replayed end to end (CLI build, Space clone, solves, the
-# page's validation commands). CI runs them in their own job.
-TUTORIAL_REPLAYS ?= verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
+# page's validation commands). CI runs them in their own matrix job.
+TUTORIAL_REPLAYS ?= verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial $(TUTORIAL_REPLAYS) verify-maintenance-walkthrough verify-serio-page
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets verify-rust-snippets-legacy verify-solver-config verify-companion-docs build check-public-pages verify-ui-getting-started verify-python-docs verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page $(TUTORIAL_REPLAYS)
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
