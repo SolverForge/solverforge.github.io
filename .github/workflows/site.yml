@@ -45,6 +45,15 @@ jobs:
           repository: SolverForge/solverforge-ui
           path: .ci/solverforge-ui
 
+      # The bench docs page describes this revision; the companion-docs gate
+      # compares the page with its Makefile, harness, and migrations.
+      - name: Checkout documented SolverForge bench revision
+        uses: actions/checkout@v4
+        with:
+          repository: SolverForge/solverforge-bench
+          ref: d7ca9e3c56784cc9ee21089af314f085e18eb39b
+          path: .ci/solverforge-bench
+
       - name: Checkout released SolverForge use-case bundle
         uses: actions/checkout@v4
         with:
@@ -102,6 +111,22 @@ jobs:
           fi
           solverforge --version
 
+      # The Python docs gate installs the published PyPI package into fresh
+      # venvs and replays the pages, so CI needs the interpreter they name.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+          cache-dependency-path: src/docs/solverforge-python/*.md
+
+      # The UI getting-started gate builds the page's crate from crates.io.
+      - name: Cache the UI getting-started build
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ui-gate-target
+          key: ui-gate-${{ hashFiles('src/docs/solverforge-ui/getting-started.md') }}
+          restore-keys: ui-gate-
+
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4
@@ -126,8 +151,9 @@ jobs:
           SOLVERFORGE_MAPS_REPO: ${{ github.workspace }}/.ci/solverforge-maps
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
           SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
+          SOLVERFORGE_BENCH_REPO: ${{ github.workspace }}/.ci/solverforge-bench
           PLAYWRIGHT_CHANNEL: chrome
-        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" make ci-local
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" SOLVERFORGE_UI_GATE_TARGET_DIR="$HOME/.cache/ui-gate-target" make ci-local
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'

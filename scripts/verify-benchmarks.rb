@@ -271,7 +271,11 @@ class BenchmarkSnapshotTest
   def test_site_has_no_python_tooling
     assert(Dir.glob(File.join(ROOT, "scripts/**/*.py")).empty?, "Python scripts remain")
     assert(!File.read(File.join(ROOT, "Makefile")).include?("python3"), "Makefile still requires Python")
-    assert(!File.read(File.join(ROOT, ".github/workflows/site.yml")).include?("setup-python"), "CI still installs Python")
+    # CI provides python3.14 only as the subject of the Python docs gate
+    # (scripts/verify-python-docs.rb, Ruby); no site step may run Python itself.
+    workflow = File.read(File.join(ROOT, ".github/workflows/site.yml"))
+    run_lines = workflow.lines.grep(/\A\s*(run:|[^:#]*$)/).join
+    assert(!run_lines.match?(/\b(python3?(\.\d+)?|pip3?)\s/), "CI runs Python directly")
   end
 end
 

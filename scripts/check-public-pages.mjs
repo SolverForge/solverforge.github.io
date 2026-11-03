@@ -76,6 +76,21 @@ const stalePatterns = [
   /this (page|video|walkthrough) (was|is) (built|made|assembled|generated|verified|recorded)/i,
 ];
 
+// Documentation and reference pages state SolverForge's own checkable facts and
+// never name a competing solver; the benchmark results page carries the tested
+// solver list as data.
+const docsStalePatterns = [
+  /Timefold/i,
+  /OptaPlanner/i,
+  /OR-Tools/i,
+  /\bHiGHS\b/,
+  /PyVRP/i,
+  /Hygese/i,
+  /\bVROOM\b/,
+  /jsprit/i,
+  /Hexaly/i,
+];
+
 // Planner123 is a product rather than a web demo: its slide and page carry a
 // video with a cue sheet and plain captures instead of annotated screenshots.
 // Pinned here, not read from the rendered page, so a case that loses or gains
@@ -178,9 +193,11 @@ function checkStaleCopy() {
   const failures = [];
   for (const file of walk(outputDir, (path) => path.endsWith(".html"))) {
     const html = readFileSync(file, "utf8");
-    for (const pattern of stalePatterns) {
+    const path = relative(outputDir, file);
+    const docsPage = path.startsWith("docs/") || path.startsWith("reference/");
+    for (const pattern of docsPage ? [...stalePatterns, ...docsStalePatterns] : stalePatterns) {
       if (pattern.test(html)) {
-        failures.push({ file: relative(outputDir, file), pattern: pattern.toString() });
+        failures.push({ file: path, pattern: pattern.toString() });
       }
     }
   }

@@ -95,6 +95,28 @@ must fail with that text. Every Rust block on those pages must be verbatim in a
 `// page:` region of the fixture, which runs the lifecycle snippets and asserts
 their outcomes. `make test` runs the static half; `make ci-local` builds and
 runs everything (`SOLVER_CONFIG_TARGET_DIR` sets the cargo target directory).
+`make verify-ui-getting-started` builds the solverforge-ui Getting Started app
+from the page's own blocks against crates.io, boots it with the page's run
+command, and loads it in Playwright: `/` must be `text/html`, `SF.version` must
+equal the solverforge-ui version Cargo resolved, and the browser must report
+zero console errors. The Scheduling Views Gantt example and the Integration &
+Assets map example run against the same app's `/sf/*` assets, and the
+retained-job route table and `createTable` unsafe field are compared with the
+crate's `sf.js`. It runs in `make ci-local`.
+
+`make verify-python-docs` replays the Python pages against PyPI in fresh venvs:
+the install block, every block saved to `schedule.py` with its printed output,
+the API Surface names, the Required Selector Fields table, every complete
+example (a block with `assert`), and the Hospital Example's published-package
+path through a COMPLETED `POST /jobs`. It needs `python3.14` and git. `make test`
+runs the page contract (`--static`); `make ci-local` runs the replay.
+
+`make verify-companion-docs` checks the solverforge-maps, solverforge-bench, and
+Integration Boundaries pages against crates.io release tarballs and the
+documented solverforge-bench revision (`SOLVERFORGE_BENCH_REPO`, or a cached
+clone). It runs in `make test` and `make ci-local`. Documentation and reference
+pages never name a competing solver; `make check-public-pages` rejects the
+names.
 
 `make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
 linting, a full Bridgetown build, the public-page copy/link/nav/layout checks,
