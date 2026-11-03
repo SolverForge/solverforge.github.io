@@ -85,6 +85,17 @@ scores with the page's tables; every kept score must equal a fresh full
 evaluation, and the page's constraint function must be verbatim in the
 fixture. `make test` runs the static half; `make ci-local` runs the trace.
 
+`make verify-solver-config` holds the solver pages
+(`src/docs/solverforge/solver/` and the lifecycle contract note) to crates.io
+`solverforge =0.24.0`. Every ```` ```toml ```` block is parsed with
+`SolverConfig::from_toml_str` and solved on a fixture model that owns the
+variables it names (`scripts/fixtures/solver-config/`); a block meant to fail
+carries `<!-- sf-toml: expect="parse-error|solve-error" message="..." -->` and
+must fail with that text. Every Rust block on those pages must be verbatim in a
+`// page:` region of the fixture, which runs the lifecycle snippets and asserts
+their outcomes. `make test` runs the static half; `make ci-local` builds and
+runs everything (`SOLVER_CONFIG_TARGET_DIR` sets the cargo target directory).
+
 `make ci-local` runs the same path as GitHub Actions: toolchain checks, syntax
 linting, a full Bridgetown build, the public-page copy/link/nav/layout checks,
 and the portable tutorial verifiers.

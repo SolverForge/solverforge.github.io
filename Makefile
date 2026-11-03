@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy
+.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy verify-solver-config
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -47,6 +47,7 @@ help:
 	@printf '  make verify-maintenance-walkthrough Replay, test, and solve the agent-skill walkthrough\n'
 	@printf '  make verify-cli-getting-started Replay, build, and solve the CLI Getting Started page\n'
 	@printf '  make verify-serio-page          Run the SERIO page trace and compare it with the page\n'
+	@printf '  make verify-solver-config       Parse/solve every solver-page TOML block and run its lifecycle snippets\n'
 	@printf '  make ci-local                   Run the same gate used by CI\n'
 	@printf '  make pre-release                Run the release-readiness gate\n'
 	@printf '\nInspection\n'
@@ -106,6 +107,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-serio-page.rb --static
 	$(call status,Verifying Rust snippet page contract)
 	@ruby scripts/verify-rust-snippets.rb --static
+	$(call status,Verifying solver page config/snippet contract)
+	@ruby scripts/verify-solver-config.rb --static
 
 lint:
 	$(call status,Checking Ruby syntax)
@@ -119,7 +122,7 @@ check-public-pages:
 	$(call status,Checking public page copy, links, nav, and layout)
 	@node scripts/check-public-pages.mjs
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page verify-rust-snippets-legacy
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page verify-rust-snippets-legacy verify-solver-config
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -175,6 +178,10 @@ verify-cli-getting-started:
 verify-serio-page:
 	$(call status,Tracing one move through SERIO against the page)
 	@ruby scripts/verify-serio-page.rb
+
+verify-solver-config:
+	$(call status,Parsing and solving solver-page config blocks; running lifecycle snippets)
+	@ruby scripts/verify-solver-config.rb
 
 start:
 	$(call status,Starting Bridgetown on $(BIND):$(PORT))

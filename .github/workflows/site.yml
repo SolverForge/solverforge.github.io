@@ -83,6 +83,18 @@ jobs:
           key: rust-snippets-${{ hashFiles('scripts/lib/rust_pages.rb') }}-${{ github.sha }}
           restore-keys: rust-snippets-${{ hashFiles('scripts/lib/rust_pages.rb') }}-
 
+      # The solver-page gate parses and solves every config block with the
+      # published solverforge crate pinned in its fixture's Cargo.lock.
+      - name: Cache the solver-config fixture build
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cache/solver-config-target
+          key: solver-config-${{ hashFiles('scripts/fixtures/solver-config/Cargo.lock') }}-${{ hashFiles('scripts/fixtures/solver-config/src/**') }}
+          restore-keys: solver-config-${{ hashFiles('scripts/fixtures/solver-config/Cargo.lock') }}-
+
       - name: Install solverforge-cli 3.8.1
         run: |
           if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.8.1'; then
@@ -115,7 +127,7 @@ jobs:
           SOLVERFORGE_UI_REPO: ${{ github.workspace }}/.ci/solverforge-ui
           SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
           PLAYWRIGHT_CHANNEL: chrome
-        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" make ci-local
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" make ci-local
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'

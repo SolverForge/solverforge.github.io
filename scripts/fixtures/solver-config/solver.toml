@@ -1,0 +1,28 @@
+environment_mode = "non_reproducible"
+move_thread_count = "auto"
+
+[termination]
+seconds_spent_limit = 300
+unimproved_seconds_spent_limit = 60
+
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+construction_obligation = "preserve_unassigned"
+value_candidate_limit = 32
+
+[[phases]]
+type = "local_search"
+
+[phases.acceptor]
+type = "simulated_annealing"
+level_temperatures = [5.0, 500.0]
+hard_regression_policy = "never_accept_hard_regression"
+
+[phases.move_selector]
+type = "change_move_selector"
+variable_name = "employee_idx"
+value_candidate_limit = 32
+
+[phases.termination]
+step_count_limit = 100000
