@@ -8,6 +8,11 @@ description: >
   thread-independent dynamic scores.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core release. The current core release is
+`solverforge 0.24.0`; see the [0.24.x release note](/blog/releases/2026/11/01/solverforge-0-24-x/).
+<% end %>
+
 **solverforge 0.23.x** follows `solverforge 0.22.0`; the line was published on
 crates.io on 2026-10-27. The first release is
 [0.23.0](https://crates.io/crates/solverforge/0.23.0), with a Rust `1.95`

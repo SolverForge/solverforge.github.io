@@ -8,6 +8,14 @@ description: >
   support, and the furnace cancellation-latency fix.
 ---
 
+<%= render Ui::Callout.new(title: "Update, November 3, 2026") do %>
+This note records the 2.x app releases through October 27. On November 3 the
+bundle moved to `solverforge 0.24.0`: Hospital, Lessons, Deliveries, Field
+service, and Furnace released `3.0.0`, Orders and Flight crew `0.3.0`, and
+Fleet `0.2.0`; see the
+[use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
+<% end %>
+
 **Published September 27, 2026; updated October 27, 2026.** The
 `solverforge-usecases` bundle is the publication source for the runnable
 SolverForge example applications. The September release carries **eight** apps instead of four:
@@ -183,8 +191,8 @@ and [Field service](https://github.com/SolverForge/solverforge-usecases/actions/
 These syncs are separate from bundle validation. The final bundle
 [CI run 40537219778](https://github.com/SolverForge/solverforge-usecases/actions/runs/40537219778)
 succeeded at `2da90f5e8d3994e8f91186bd268fc301472f9dfb`, the
-`solverforge-furnace@2.0.7` tag. That released tree contains all eight latest
-app manifests and is the site's bundle pin. The earlier October 27 bundle
+`solverforge-furnace@2.0.7` tag. That released tree contains all eight October 27
+app manifests. The earlier October 27 bundle
 [run 40524500379](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524500379)
 failed before the furnace fix; it is not the final bundle verdict.
 
@@ -230,7 +238,7 @@ above supersede these versions without changing which apps have hosted Spaces.
 ## Upgrade Checklist
 
 - Select the app's own release tag from the October 27 column; use
-  `solverforge-furnace@2.0.7` when checking out the complete current bundle.
+  `solverforge-furnace@2.0.7` when checking out the complete October 27 bundle.
 - Keep the tagged dependency versions and recorded `cli_version` metadata;
   installing a newer CLI does not rewrite an app's scaffold provenance.
 - Update orders and flight-crew telemetry consumers to iterate `phases` and

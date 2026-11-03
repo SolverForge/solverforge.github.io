@@ -7,9 +7,15 @@ description: >
   parallel settings, and projects per-phase telemetry and speculative work.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older CLI line. The current CLI is `solverforge-cli 3.8.1`,
+which scaffolds `solverforge 0.24.0`; see the
+[3.8.x CLI release note](/blog/releases/2026/11/03/solverforge-cli-3-8-x/).
+<% end %>
+
 **solverforge-cli 3.7.1 was published on October 27, 2026**, following
 `3.7.0`, which introduced this line's runtime and telemetry changes after
-`3.6.0` scaffolded `solverforge 0.22.0`. The current package targets
+`3.6.0` scaffolded `solverforge 0.22.0`. The 3.7.x packages target
 `solverforge 0.23.0`; the web UI, maps, and MCP targets remain independent.
 Existing applications keep their own manifests and generated source.
 
@@ -78,7 +84,7 @@ validation are recorded separately below.
 
 ### Publication and exact-commit validation are separate
 
-The current [3.7.1 crate](https://crates.io/crates/solverforge-cli/3.7.1) carries
+The [3.7.1 crate](https://crates.io/crates/solverforge-cli/3.7.1) carries
 source SHA `fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca` in `.cargo_vcs_info.json`.
 Its SHA-256 is
 `ba476ea2862d6e0a6e2f0a9a434428d2887f8863abdd1e932b6ef87598d7d538`,
@@ -127,8 +133,9 @@ of the original artifact commit.
 
 ## Upgrade Checklist
 
-- Install with `cargo install solverforge-cli --version 3.7.1 --locked --force`
-  and inspect `solverforge --version`.
+- To stay on this line, install with
+  `cargo install solverforge-cli --version 3.7.1 --locked --force` and inspect
+  `solverforge --version`.
 - Upgrade existing applications deliberately: installing the CLI does not
   regenerate their telemetry DTOs or change their dependency manifests.
 - For an existing MCP app, update `rmcp` to `3.8.0` and replace `ServerInfo`

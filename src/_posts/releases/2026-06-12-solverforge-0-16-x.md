@@ -8,20 +8,20 @@ description: >
   line on crates.io.
 ---
 
-<%= render Ui::Callout.new(title: "Update, October 27, 2026") do %>
-This is a historical release note. `solverforge 0.23.0` is the current core
-release; its line note is the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/).
+<%= render Ui::Callout.new(title: "Update, November 3, 2026") do %>
+This is a historical release note. `solverforge 0.24.0` is the current core
+release; its line note is the [0.24.x release note](/blog/releases/2026/11/01/solverforge-0-24-x/).
 For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
 is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
-The `solverforge-cli 3.7.1` line scaffolds core `0.23.0` (3.6.0 targeted
-`0.22.0`; 3.4.0 targeted
+The `solverforge-cli 3.8.1` line scaffolds core `0.24.0` (3.7.x targeted
+`0.23.0`, 3.6.0 targeted `0.22.0`; 3.4.0 targeted
 `0.20.4`, 3.5.0 targeted `0.21.0`, 3.5.1 targeted `0.21.2`, and 3.5.2 targeted
 `0.21.3`); Python 0.7.2 targets core 0.23.0 (see the
 [Python line note](/blog/releases/2026/10/27/solverforge-python-0-7-x/)); the
-October 27 Rust app releases also target core 0.23.0 (see the
-[use-case release note](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/)).
+November 3 Rust app releases target core 0.24.0 (see the
+[use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/)).
 <% end %>
 
 **SolverForge 0.16.0** was published on crates.io and tagged as
