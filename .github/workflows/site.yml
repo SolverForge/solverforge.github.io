@@ -192,7 +192,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        page: [lessons]
+        page: [lessons, deliveries]
 
     steps:
       - uses: actions/checkout@v4

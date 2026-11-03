@@ -70,14 +70,10 @@ replay harness is `scripts/lib/tutorial_replay.rb`.
 The Make target is the stable public workflow; the Ruby script is an
 implementation detail behind that target.
 
-`make verify-deliveries-tutorial` follows the same pattern for
-`solverforge-deliveries`. It always checks the published guide and dependency
-snippets, then adds source-level and live app checks when
-`SOLVERFORGE_DELIVERIES_REPO` points to the app checkout.
-
-`make verify-lessons-tutorial` replays the Lessons use-case page the way a
-reader follows it (`scripts/lib/use_case_tutorial.rb` on the shared
-`scripts/lib/tutorial_replay.rb`). It installs the pinned published
+`make verify-lessons-tutorial` and `make verify-deliveries-tutorial` replay
+the Lessons and Deliveries use-case pages the way a reader follows them
+(`scripts/lib/use_case_tutorial.rb` on the shared
+`scripts/lib/tutorial_replay.rb`). Each installs the pinned published
 `solverforge-cli`, runs the page's Getting Started commands in page order with
 the complete files the page shows, builds, boots with the page's run command,
 runs the page's `curl` commands, and solves; then it clones the Hugging Face
