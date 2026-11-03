@@ -25,13 +25,42 @@ Both forms create scoring-only rows; neither form changes the domain model.
 
 ## Single-Source Projection
 
+The examples on this page use the
+[example model](/docs/solverforge/constraints/#example-model) plus
+`src/windows.rs` below (declare it with `mod windows;`), and compile in the
+model's `src/examples.rs`.
+
 Use a named projection type when one entity can emit zero, one, or several
-bounded scoring rows.
+bounded scoring rows. `ShiftWindows` emits one row for the part of a shift
+before 17:00 and one for the part after:
 
+<!-- rust: crate=schedule file=src/windows.rs -->
 ```rust
-use solverforge::{Projection, ProjectionSink};
+use solverforge::prelude::*;
 
-struct ShiftWindows;
+use crate::domain::Shift;
+
+/// One stretch of a shift. Shifts that run past 17:00 split there, so the
+/// overtime part is its own row.
+pub struct WorkWindow {
+    pub shift_id: usize,
+    pub employee_idx: Option<usize>,
+    pub date: u32,
+    pub start: u32,
+    pub end: u32,
+}
+
+impl WorkWindow {
+    pub fn is_overtime(&self) -> bool {
+        self.start >= 17
+    }
+
+    pub fn overlaps(&self, other: &WorkWindow) -> bool {
+        self.date == other.date && self.start < other.end && other.start < self.end
+    }
+}
+
+pub struct ShiftWindows;
 
 impl Projection<Shift> for ShiftWindows {
     type Out = WorkWindow;
@@ -41,18 +70,35 @@ impl Projection<Shift> for ShiftWindows {
     where
         Sink: ProjectionSink<Self::Out>,
     {
-        sink.emit(WorkWindow::primary(shift));
-        if let Some(secondary) = WorkWindow::secondary(shift) {
-            sink.emit(secondary);
+        let window = |start, end| WorkWindow {
+            shift_id: shift.id,
+            employee_idx: shift.employee_idx,
+            date: shift.date,
+            start,
+            end,
+        };
+        if shift.start < 17 {
+            sink.emit(window(shift.start, shift.end.min(17)));
+        }
+        if shift.end > 17 {
+            sink.emit(window(shift.start.max(17), shift.end));
         }
     }
 }
+```
 
-factory.for_each(Schedule::shifts())
+Score the overtime rows:
+
+<!-- rust: crate=schedule in=example -->
+```rust
+use crate::windows::{ShiftWindows, WorkWindow};
+
+Streams::new()
+    .for_each(Schedule::shifts())
     .project(ShiftWindows)
     .filter(|window: &WorkWindow| window.is_overtime())
-    .penalize(|_: &WorkWindow| HardSoftScore::ONE_SOFT)
-    .named("Projected overtime");
+    .penalize(|window: &WorkWindow| HardSoftScore::of_soft(i64::from(window.end - window.start)))
+    .named("Projected overtime")
 ```
 
 `MAX_EMITS` is part of the contract. Avoid returning `Vec` from projection
@@ -63,37 +109,35 @@ closures; the scoring layer expects bounded emission through `ProjectionSink`.
 Use cross-join projection when the row only exists after two source collections
 match.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-struct AssignmentCapacity {
-    assignment_id: usize,
-    demand: i64,
-    capacity: i64,
+struct ShiftLoad {
+    shift_id: usize,
+    hours: i64,
+    max_hours: i64,
 }
 
-type Streams = ConstraintFactory<Plan, HardSoftScore>;
-
 Streams::new()
-    .for_each(Plan::assignments())
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().for_each(Plan::capacities()),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
-            |assignment: &Assignment| assignment.bucket,
-            |capacity: &Capacity| capacity.bucket,
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
         ),
     ))
-    .project(|assignment: &Assignment, capacity: &Capacity| AssignmentCapacity {
-        assignment_id: assignment.id,
-        demand: assignment.demand,
-        capacity: capacity.amount,
+    .project(|shift: &Shift, employee: &Employee| ShiftLoad {
+        shift_id: shift.id,
+        hours: shift.hours(),
+        max_hours: employee.max_hours,
     })
-    .penalize(hard_weight(|row: &AssignmentCapacity| {
-        HardSoftScore::of_hard((row.demand - row.capacity).max(0))
+    .penalize(hard_weight(|row: &ShiftLoad| {
+        HardSoftScore::of_hard((row.hours - row.max_hours).max(0))
     }))
-    .named("Assignment capacity shortage");
+    .named("Shift longer than the employee's limit")
 ```
 
-Since the `0.11.x` release line, joined-pair projected rows are retained by joined
-coordinates, so localized updates from either side of the join can update the
+Joined-pair projected rows are retained by joined coordinates, so localized updates from either side of the join can update the
 cached scoring rows without materializing facts. The fluent
 `.project(|left, right| row)` shape is unchanged: it creates a projected
 `JoinedSource` and continues through the projected stream API. Incremental
@@ -106,21 +150,20 @@ projected terminal with direct pair scoring, which finalizes onto
 If the rule only needs an aggregate over joined pairs, use direct cross-join
 grouping instead:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 Streams::new()
-    .for_each(Plan::assignments())
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().for_each(Plan::capacities()),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
-            |assignment: &Assignment| assignment.capacity_id,
-            |capacity: &Capacity| Some(capacity.id),
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
         ),
     ))
     .group_by(
-        |assignment: &Assignment, capacity: &Capacity| assignment.bucket,
-        sum(|(assignment, capacity): (&Assignment, &Capacity)| {
-            capacity.amount - assignment.demand
-        }),
+        |_shift: &Shift, employee: &Employee| employee.index,
+        sum(|(shift, employee): (&Shift, &Employee)| employee.max_hours - shift.hours()),
     )
 ```
 
@@ -132,8 +175,8 @@ row.
 
 ## Clone-Free Rows and Keys
 
-Projected outputs, projected self-join keys, and grouped collector values no
-longer need to implement `Clone` since the `0.11.x` release line. This matters for
+Projected outputs, projected self-join keys, and grouped collector values do
+not need to implement `Clone`. This matters for
 heavy scoring rows whose data should stay owned by the retained scoring state
 rather than cloned through hot paths.
 
@@ -141,19 +184,24 @@ rather than cloned through hot paths.
 
 Projected streams can be filtered, self-joined, merged, grouped, and weighted
 like normal scoring state. Use `equal(...)` when both sides use the same key
-and each unordered pair should be considered once.
+and each unordered pair should be considered once. `None` keys are equal, so
+filter unassigned rows out:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-factory.for_each(Schedule::shifts())
+use crate::windows::{ShiftWindows, WorkWindow};
+
+Streams::new()
+    .for_each(Schedule::shifts())
     .project(ShiftWindows)
-    .join(equal(|window: &WorkWindow| window.employee_id))
+    .join(equal(|window: &WorkWindow| window.employee_idx))
     .filter(|a: &WorkWindow, b: &WorkWindow| {
-        a.shift_id != b.shift_id && a.overlaps(b)
+        a.employee_idx.is_some() && a.shift_id != b.shift_id && a.overlaps(b)
     })
     .penalize(hard_weight(|_: &WorkWindow, _: &WorkWindow| {
         HardSoftScore::ONE_HARD
     }))
-    .named("Projected overlap");
+    .named("Projected overlap")
 ```
 
 Self-join ordering is coordinate-stable. It follows source ownership and emit
@@ -161,22 +209,25 @@ index instead of sparse storage row IDs, so row reuse does not define pair
 orientation.
 
 Use `equal_bi(left_key, right_key)` when the projected rows have the same output
-type but the relationship is oriented. The retained scorer evaluates directed
+type but the relationship is oriented, such as a window that ends where the
+same employee's next window starts. The retained scorer evaluates directed
 left/right pairs where the left key equals the right key and skips only the
 same retained row. Reciprocal rows therefore count as two matches when both
 directions satisfy the keys.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-factory.for_each(Schedule::shifts())
+use crate::windows::{ShiftWindows, WorkWindow};
+
+Streams::new()
+    .for_each(Schedule::shifts())
     .project(ShiftWindows)
     .join(equal_bi(
-        |left: &WorkWindow| Some(left.shift_id),
-        |right: &WorkWindow| right.employee_id,
+        |left: &WorkWindow| (left.employee_idx, left.date, left.end),
+        |right: &WorkWindow| (right.employee_idx, right.date, right.start),
     ))
-    .penalize(hard_weight(|_: &WorkWindow, _: &WorkWindow| {
-        HardSoftScore::ONE_HARD
-    }))
-    .named("Projected directed relationship");
+    .penalize(|_: &WorkWindow, _: &WorkWindow| HardSoftScore::ONE_SOFT)
+    .named("Back-to-back windows")
 ```
 
 Low-level projected self-join filters receive each projected row's primary owner
@@ -190,14 +241,18 @@ fact or entity source. Use this when the projected rows represent demand,
 coverage, or usage and the constraint also needs explicit rows for keys with no
 projected matches.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-factory.for_each(Schedule::shifts())
+use crate::windows::{ShiftWindows, WorkWindow};
+
+Streams::new()
+    .for_each(Schedule::shifts())
     .project(ShiftWindows)
     .group_by(
-        |window: &WorkWindow| window.employee_id.unwrap_or(usize::MAX),
+        |window: &WorkWindow| window.employee_idx.unwrap_or(usize::MAX),
         count(),
     )
-    .complement(Schedule::employees(), |employee: &Employee| employee.index, |_employee| 0usize)
+    .complement(Schedule::employees(), |employee: &Employee| employee.index, |_employee: &Employee| 0usize)
     .penalize(|_employee_idx: &usize, count: &usize| {
         HardSoftScore::of_soft((*count as i64 - 4).abs())
     })

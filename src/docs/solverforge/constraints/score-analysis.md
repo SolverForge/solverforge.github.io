@@ -12,44 +12,92 @@ explain results to users.
 
 ## ScoreAnalysis
 
-Types that derive `#[planning_solution]` with a `constraints` path automatically implement the `Analyzable` trait, which provides the `analyze` method.
+Types that derive `#[planning_solution]` with a `constraints` path implement
+the `Analyzable` trait, which provides the `analyze` method. This program
+analyzes a two-shift plan of the
+[example model](/docs/solverforge/constraints/#example-model): one shift is
+unassigned and the other falls on its employee's unavailable day. It adds
+`src/main.rs` to the example model:
 
+<!-- rust: crate=score-analysis extends=schedule file=src/main.rs -->
 ```rust
-use solverforge::prelude::*;
+mod constraints;
+mod domain;
+
+use domain::{Employee, Schedule, Shift, Unavailability};
 use solverforge::Analyzable;
 
-let analysis = solution.analyze();
-
-println!("Total score: {:?}", analysis.score);
-
-for constraint in &analysis.constraints {
-    println!(
-        "{}: {:?} (count: {})",
-        constraint.name,
-        constraint.score,
-        constraint.match_count,
-    );
+fn shift(id: usize, employee_idx: Option<usize>) -> Shift {
+    Shift {
+        id,
+        date: 2,
+        start: 8,
+        end: 16,
+        required_skill: "nurse".into(),
+        preferred_employee: None,
+        employee_idx,
+    }
 }
+
+fn main() {
+    let solution = Schedule {
+        employees: vec![Employee {
+            index: 0,
+            name: "Amina".into(),
+            skills: vec!["nurse".into()],
+            available_days: vec![1],
+            max_hours: 40,
+        }],
+        unavailability: vec![Unavailability { id: 0, employee_idx: 0, date: 2 }],
+        shifts: vec![shift(0, Some(0)), shift(1, None)],
+        score: None,
+    };
+
+    let analysis = solution.analyze();
+
+    println!("Total score: {}", analysis.score);
+
+    for constraint in &analysis.constraints {
+        println!(
+            "{}: {} (count: {}, weight multiplier: {})",
+            constraint.name,
+            constraint.score,
+            constraint.match_count,
+            constraint.weight_multiplier,
+        );
+    }
+}
+```
+
+`cargo run` prints one row per named constraint, including the ones that do
+not match:
+
+<!-- rust: crate=score-analysis output -->
+```text
+Total score: -2hard/0soft
+Unassigned shift: -1hard/0soft (count: 1, weight multiplier: 1)
+Overlapping shifts: 0hard/0soft (count: 0, weight multiplier: 1)
+Unavailable employee: -1hard/0soft (count: 1, weight multiplier: 1)
+Preferred employee: 0hard/0soft (count: 0, weight multiplier: 1)
 ```
 
 ### `ConstraintAnalysis`
 
 Each `ConstraintAnalysis` contains:
 
-| Field         | Description                                      |
-| ------------- | ------------------------------------------------ |
-| `name`        | Human-readable constraint name (from `.named()`) |
-| `weight`      | Constraint weight used when scoring              |
-| `score`       | Total score impact of this constraint            |
-| `match_count` | Number of times the constraint matched           |
+| Field               | Description                                                     |
+| ------------------- | --------------------------------------------------------------- |
+| `name`              | Constraint name (from `.named()`)                               |
+| `weight_multiplier` | Runtime weight multiplier bound to the constraint; `0` disables it, `1` keeps the authored weight |
+| `score`             | Total score impact of this constraint, after the multiplier     |
+| `match_count`       | Number of times the constraint matched                          |
 
-The stock `solution.analyze()` method returns this summarized view. If you need
-full per-match justifications and indictment maps, use the lower-level
-`solverforge-scoring` analysis APIs directly.
+`solution.analyze()` returns this summarized view: totals per constraint, not
+the individual matches. For per-match justifications, use the lower-level
+`solverforge::analysis` and `solverforge-scoring` APIs directly.
 
 Lower-level scoring metadata uses `ConstraintRef` as the constraint identity.
-Since the `0.11.x` release line, analysis views borrow that identity from the owning
-constraint rather than cloning it into public reporting types. That means
+Analysis views borrow that identity from the owning constraint rather than cloning it into public reporting types. That means
 package-qualified constraints can share a short display name without collapsing
 into one constraint during scoring, analysis, or conflict-repair lookup.
 Configured constraint keys match that metadata exactly: package-qualified

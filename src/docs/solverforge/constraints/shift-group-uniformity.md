@@ -52,10 +52,13 @@ A `ShiftAssignment` stores a shift ID and an optional employee index. `Shift`
 stores the block; `Employee` stores the shift-group value. The complete listing
 uses plain structs so the rule can run independently of a solver configuration.
 
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below defines and executes the model" -->
+<!-- rust: crate=shift-group excerpt -->
 ```rust
-struct ShiftAssignment { shift_id: usize, employee_idx: Option<usize> }
+#[derive(Clone, Debug)]
 struct Shift { index: usize, start: i64, end: i64, location: String }
+#[derive(Clone, Debug)]
+struct ShiftAssignment { shift_id: usize, employee_idx: Option<usize> }
+#[derive(Clone, Debug)]
 struct Employee { index: usize, shift_group: i32 }
 ```
 
@@ -71,7 +74,7 @@ facts. It only needs the `solverforge` dependency.
 Start from assignments and filter out `None` values before the first equality
 join. Later employee-key extraction can then safely require an assigned index.
 
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+<!-- rust: crate=shift-group excerpt -->
 ```rust
 Streams::new()
     .for_each(source(assignments as fn(&Schedule) -> &[ShiftAssignment], ChangeSource::Descriptor(0)))
@@ -87,7 +90,7 @@ dispatch; see [Constraint Streams](/docs/solverforge/constraints/constraint-stre
 The first join uses entity keys. The continuation uses `equal_on` over the
 whole borrowed pair and the new employee leaf.
 
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+<!-- rust: crate=shift-group excerpt -->
 ```rust
 .join((
     source(shifts as fn(&Schedule) -> &[Shift], ChangeSource::Static),
@@ -107,16 +110,18 @@ employee)` in that order.
 ### 3. Choose the bucket key
 
 Fluent `Tri::group_by` takes a key closure with three separate entity
-arguments. Both rules use the same stream; only the key and name differ.
+arguments. Both rules use the same stream; only the key and name differ:
 
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+<!-- rust: crate=shift-group excerpt -->
 ```rust
-// Same shift:
-|_assignment: &ShiftAssignment, shift: &Shift, _employee: &Employee| shift.index
-
-// Same exact block, even across different shift IDs:
-|_assignment: &ShiftAssignment, shift: &Shift, _employee: &Employee| {
-    (shift.start, shift.end, shift.location.clone())
+fn shift_rule() -> impl IncrementalConstraint<Schedule, HardMediumSoftScore> {
+    uniformity(|_assignment, shift, _employee| shift.index, "Same shift keeps one shift group")
+}
+fn block_rule() -> impl IncrementalConstraint<Schedule, HardMediumSoftScore> {
+    uniformity(
+        |_assignment, shift, _employee| (shift.start, shift.end, shift.location.clone()),
+        "Same block keeps one shift group",
+    )
 }
 ```
 
@@ -130,7 +135,7 @@ is compared. The complete listing tests both wrong-key regressions.
 Unlike the key closure, a collector mapper takes **one tuple argument** of
 borrowed entities, not a nested operator row and not three separate arguments.
 
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+<!-- rust: crate=shift-group excerpt -->
 ```rust
 .group_by(
     key,
@@ -150,7 +155,7 @@ Grouping changes the terminal input. The weight closure now receives two
 separate borrowed arguments: `&K` and `&CollectedVec<i32>`, **not** the original
 three-entity tuple.
 
-<!-- sf-rust: ignore reason="walkthrough excerpt; the complete listing below compiles end to end" -->
+<!-- rust: crate=shift-group excerpt -->
 ```rust
 .penalize(|_key: &K, groups: &CollectedVec<i32>| {
     let distinct = groups.iter().copied().collect::<HashSet<_>>().len();
@@ -165,12 +170,13 @@ for scoring; the collection itself is not cloned.
 
 ## Complete runnable example
 
-Use `solverforge = "=0.21.0"` in the dependencies of a Rust binary crate and
-save this listing as `src/main.rs`. Run it with `cargo run`. `check()` covers
+In a binary crate with `cargo add solverforge@=0.24.0`, save this listing as
+`src/main.rs`. Run it with `cargo run`. `check()` covers
 uniform and mixed groups, duplicate values, unassigned and empty input,
 separate shift IDs, exact shared blocks, different times and locations, overlap,
 wrong keys, and incremental reassignment with membership exit and re-entry.
 
+<!-- rust: crate=shift-group file=src/main.rs -->
 ```rust
 use std::collections::HashSet;
 use std::hash::Hash;
@@ -224,7 +230,9 @@ where K: Eq + Hash + Clone + Send + Sync + 'static,
         ))
         .group_by(
             key,
-            collect_vec(|(_assignment, _shift, employee): (&ShiftAssignment, &Shift, &Employee)| employee.shift_group),
+            collect_vec(|(_assignment, _shift, employee): (&ShiftAssignment, &Shift, &Employee)| {
+                employee.shift_group
+            }),
         )
         .penalize(|_key: &K, groups: &CollectedVec<i32>| {
             let distinct = groups.iter().copied().collect::<HashSet<_>>().len();
@@ -337,6 +345,13 @@ fn main() {
 }
 ```
 
+`cargo run` prints:
+
+<!-- rust: crate=shift-group output -->
+```text
+Shift-group uniformity: all behavioral checks passed.
+```
+
 ## Authoring boundaries
 
 Named joined arities `Tri`, `Quad`, and `Penta`, and their same-source
@@ -353,4 +368,4 @@ The joined tri/quad/penta grouped builder exposes `penalize` and `reward`, not
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — fluent operations and boundaries
 - [Collectors](/docs/solverforge/constraints/collectors/) — collector input and result shapes
-- [Tagged joined-group implementation](https://github.com/SolverForge/solverforge/blob/v0.21.0/crates/solverforge-scoring/src/stream/group_by_tri.rs)
+- [Tagged joined-group implementation](https://github.com/SolverForge/solverforge/blob/v0.24.0/crates/solverforge-scoring/src/stream/group_by_tri.rs)

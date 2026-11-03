@@ -12,13 +12,14 @@ from a fresh zero-state factory and pass the generated collection source to
 `for_each(...)`, such as `Streams::new().for_each(Schedule::shifts())` or
 `Streams::new().for_each(Schedule::employees())`.
 
-Generated solution methods carry source ownership metadata that ad hoc
-slice-returning closures do not carry. Use `solverforge::stream::vec(...)` only
-for custom collection surfaces that are not generated from the planning
-solution.
+Generated solution methods carry source ownership metadata that a
+hand-written extractor does not carry. The examples on this page use the
+[example model](/docs/solverforge/constraints/#example-model) and compile in
+its `src/examples.rs`.
 
 ## Standard Pattern
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
@@ -62,6 +63,7 @@ on.
 `ConstraintFactory::<Solution, Score>::new()` constructs the zero-state factory
 for a concrete planning solution and score type.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 let factory = ConstraintFactory::<Schedule, HardSoftScore>::new();
 ```
@@ -73,6 +75,7 @@ type is the same score type used by the `#[planning_score]` field, such as
 
 `ConstraintFactory` also implements `Default`, so these are equivalent:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 let explicit = ConstraintFactory::<Schedule, HardSoftScore>::new();
 let defaulted = ConstraintFactory::<Schedule, HardSoftScore>::default();
@@ -85,6 +88,7 @@ Generated stream roots consume the factory value so stream builder types remain
 concrete. `ConstraintFactory` stores no runtime solution data, so construct a
 fresh factory for each independent source:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
@@ -104,17 +108,18 @@ let preference = Streams::new()
 ## Generated Collection Sources
 
 For every collection field on a `#[planning_solution]`, SolverForge generates a
-method with the same name as the field:
+method with the same name as the field. The example model's solution:
 
+<!-- rust: crate=schedule excerpt -->
 ```rust
-#[planning_solution(constraints = "define_constraints")]
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct Schedule {
-    #[planning_entity_collection]
-    pub shifts: Vec<Shift>,
-
     #[problem_fact_collection]
     pub employees: Vec<Employee>,
-
+    #[problem_fact_collection]
+    pub unavailability: Vec<Unavailability>,
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
     #[planning_score]
     pub score: Option<HardSoftScore>,
 }
@@ -122,9 +127,11 @@ pub struct Schedule {
 
 This solution generates:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-Schedule::shifts();
-Schedule::employees();
+let shifts = Schedule::shifts();
+let employees = Schedule::employees();
+let unavailability = Schedule::unavailability();
 ```
 
 Each generated method returns a source-aware collection extractor over the
@@ -135,6 +142,7 @@ constraint source or as the right-hand collection in a keyed cross-join.
 
 Use these methods as the first operation in a stream:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 Streams::new()
     .for_each(Schedule::shifts())
@@ -145,6 +153,7 @@ Streams::new()
 
 Use generated methods again when joining another solution collection:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 Streams::new()
     .for_each(Schedule::shifts())
@@ -179,8 +188,8 @@ This is important for generated sources used with operations such as
 `join`, `if_exists`, `if_not_exists`, `project`, `flatten_last`, `balance`, and
 `unassigned`.
 
-Custom `vec(...)` extractors passed to `for_each(...)` do not have descriptor
-source metadata. They are still supported, but they are a lower-level API.
+Hand-written `source(...)` extractors passed to `for_each(...)` do not have
+descriptor source metadata; see `for_each(...)` below.
 
 ## Filtered Unary Join Targets
 
@@ -199,48 +208,33 @@ derived operators: compatible derived producers can instead feed low-level
 
 ## `for_each(...)`
 
-`for_each(...)` starts a stream from any extractor that implements
-`CollectionExtract<Solution>`.
+`for_each(...)` starts a stream from an extractor that implements
+`CollectionExtract<Solution>`. For solution collections, pass the generated
+source method:
 
-For generated solution collections, pass the generated source method:
-
+<!-- rust: crate=schedule in=example -->
 ```rust
 Streams::new().for_each(Schedule::shifts())
 ```
 
-```rust
-use solverforge::stream::vec;
+Closures and plain `fn` items are not extractors. A hand-written extractor
+wraps a `fn` pointer with `source(...)` and declares how its rows change;
+`ChangeSource::Static` says they never change during a solve:
 
-Streams::new().for_each(vec(|solution: &Schedule| &solution.custom_rows))
+<!-- rust: crate=schedule in=example -->
+```rust
+use solverforge::stream::{source, ChangeSource};
+
+fn rows(schedule: &Schedule) -> &[Unavailability] {
+    &schedule.unavailability
+}
+
+Streams::new().for_each(source(rows as fn(&Schedule) -> &[Unavailability], ChangeSource::Static))
 ```
 
-Use it when:
-
-- the collection is a generated planning entity or problem fact source, such as
-  `Schedule::shifts()`
-- the collection is a custom view wrapped with `vec(...)`
-- you are writing low-level scoring or runtime tests
-
-For `Vec<T>` fields, use the `vec(...)` wrapper from the stream API:
-
-```rust
-use solverforge::stream::vec;
-
-Streams::new().for_each(vec(|solution: &Schedule| &solution.custom_rows))
-```
-
-For normal application constraints over generated solution fields, prefer the
-generated source method:
-
-```rust
-Streams::new().for_each(Schedule::shifts())
-```
-
-instead of:
-
-```rust
-Streams::new().for_each(vec(|solution: &Schedule| &solution.shifts))
-```
+A hand-written extractor has no descriptor metadata, so incremental scoring
+cannot localize changes to it. Use one only for low-level scoring or runtime
+tests; constraints over model collections use the generated methods.
 
 ## Generated `unassigned()`
 
@@ -248,6 +242,7 @@ Streams::new().for_each(vec(|solution: &Schedule| &solution.shifts))
 whose planning entity has exactly one `Option<_>` planning variable with
 unassigned support.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 Streams::new()
     .for_each(Schedule::shifts())
@@ -266,32 +261,54 @@ by the surrounding constraint function.
 Generated source methods are the preferred source for projected scoring rows because
 the projection can keep the same localized source ownership.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
+struct ShiftHours {
+    hours: i64,
+}
+
+struct HoursOf;
+
+impl Projection<Shift> for HoursOf {
+    type Out = ShiftHours;
+    const MAX_EMITS: usize = 1;
+
+    fn project<Sink: ProjectionSink<ShiftHours>>(&self, shift: &Shift, sink: &mut Sink) {
+        sink.emit(ShiftHours { hours: shift.hours() });
+    }
+}
+
 Streams::new()
     .for_each(Schedule::shifts())
-    .project(ShiftPenaltyProjection)
-    .penalize(|row: &ShiftPenalty| row.score)
-    .named("Shift penalty")
+    .project(HoursOf)
+    .penalize(|row: &ShiftHours| HardSoftScore::of_soft(row.hours))
+    .named("Shift hours")
 ```
 
 Joined-pair projection should also start from generated methods on both sides:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
+struct HoursOverMax {
+    shift_id: usize,
+    score: HardSoftScore,
+}
+
 Streams::new()
-    .for_each(Plan::assignments())
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().for_each(Plan::capacities()),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
-            |assignment: &Assignment| assignment.capacity_id,
-            |capacity: &Capacity| Some(capacity.id),
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
         ),
     ))
-    .project(|assignment: &Assignment, capacity: &Capacity| CapacityViolation {
-        assignment_id: assignment.id,
-        score: HardSoftScore::of_hard((assignment.demand - capacity.amount).max(0)),
+    .project(|shift: &Shift, employee: &Employee| HoursOverMax {
+        shift_id: shift.id,
+        score: HardSoftScore::of_hard((shift.hours() - employee.max_hours).max(0)),
     })
-    .penalize(hard_weight(|row: &CapacityViolation| row.score))
-    .named("Capacity violation")
+    .penalize(hard_weight(|row: &HoursOverMax| row.score))
+    .named("Shift longer than the employee's limit")
 ```
 
 ## Naming Rules
@@ -308,11 +325,11 @@ names, not these stream method names.
 
 ## Common Mistakes
 
-- Starting normal constraints with `Streams::new().for_each(vec(|s: &Schedule| &s.shifts))`
+- Starting normal constraints from a hand-written `source(...)` extractor
   instead of `Streams::new().for_each(Schedule::shifts())`.
 - Joining facts through a custom extractor or closure when `Schedule::employees()`
   is generated.
-- Extending a joined pair with only `(source, key_fn)`. Chained joins now need
+- Extending a joined pair with only `(source, key_fn)`. Chained joins need
   `(source, equal_on(left_row_key, right_leaf_key))`, with borrowed row views
   and a fresh condition for the added relationship. At each of `Bi::join`,
   `Tri::join`, `Quad::join`, `Penta::join`, and `Chain::join`, the left key

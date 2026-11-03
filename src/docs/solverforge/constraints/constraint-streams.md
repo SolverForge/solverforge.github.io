@@ -12,12 +12,17 @@ the stream, and terminate with a scoring impact.
 
 ## Defining Constraints
 
+The examples on this page use the
+[example model](/docs/solverforge/constraints/#example-model) and compile in
+its `src/examples.rs`.
+
 Constraints are defined as a function that returns a constraint set, usually a
 tuple of fluent terminal constraints. The `#[planning_solution]` macro wires
 this up automatically. Use `#[solverforge_constraints]` when the function owns
 reusable stream bindings or grouped chains that should be compiled as one
 shared retained node.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
@@ -50,11 +55,10 @@ with tuple support up to 32 members.
 Generated solution source methods select all items from a solution collection
 and carry hidden source metadata for localized incremental scoring.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
-Streams::new().for_each(Schedule::shifts())
-Streams::new().for_each(Schedule::employees())
+let shifts = Streams::new().for_each(Schedule::shifts());
+let employees = Streams::new().for_each(Schedule::employees());
 ```
 
 These should be the default source arguments for planning entity and problem fact
@@ -63,14 +67,20 @@ for the generated method contract.
 
 ### `for_each`
 
-`for_each` starts a stream from any collection extractor. Use generated source
-methods such as `Schedule::shifts()` for ordinary model collections. Use
-`solverforge::stream::vec(...)` for lower-level custom collection surfaces.
+`for_each` starts a stream from a collection extractor. Pass the generated
+source methods such as `Schedule::shifts()` for model collections. A closure or
+plain `fn` item is not a stream source; a hand-written extractor wraps a
+`fn` pointer with `source(...)` and states how its rows change:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-use solverforge::stream::vec;
+use solverforge::stream::{source, ChangeSource};
 
-factory.for_each(vec(|solution: &Schedule| &solution.custom_rows))
+fn rows(schedule: &Schedule) -> &[Unavailability] {
+    &schedule.unavailability
+}
+
+Streams::new().for_each(source(rows as fn(&Schedule) -> &[Unavailability], ChangeSource::Static))
 ```
 
 ## Intermediate Operations
@@ -97,9 +107,11 @@ groups with a medium penalty.
 
 ### `filter`
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-factory.for_each(Schedule::shifts())
-    .filter(|shift| shift.employee_idx.is_none())
+Streams::new()
+    .for_each(Schedule::shifts())
+    .filter(|shift: &Shift| shift.employee_idx.is_none())
 ```
 
 ### `join`
@@ -118,23 +130,22 @@ insertion, and pair creation. A filtered unary right target preserves its own
 source membership. Put nullable-row filters on each unary input whose keys
 require an assignment:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
 Streams::new()
     .for_each(Schedule::shifts())
     .filter(|shift: &Shift| shift.employee_idx.is_some())
     .join((
         Streams::new()
             .for_each(Schedule::unavailability())
-            .filter(|u: &Unavailability| u.employee_idx.is_some()),
+            .filter(|u: &Unavailability| u.date < 7),
         equal_bi(
             |shift: &Shift| shift.employee_idx.expect("filtered assigned shift"),
-            |u: &Unavailability| u.employee_idx.expect("filtered assigned row"),
+            |u: &Unavailability| u.employee_idx,
         ),
     ))
     .penalize(HardSoftScore::ONE_HARD)
-    .named("Assigned employee unavailable")
+    .named("Assigned employee unavailable this week")
 ```
 
 Original source indexes and change metadata survive incremental transitions
@@ -150,9 +161,8 @@ collection as the right target of a keyed cross-join. This tuple form still
 uses the first unary equality cross-join dispatch and its source-membership
 boundary:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
 Streams::new()
     .for_each(Schedule::shifts())
     .join((
@@ -164,6 +174,13 @@ Streams::new()
     ))
 ```
 
+This keyed cross-join emits every ordered pair whose keys match, including a
+shift paired with itself and both `(a, b)` and `(b, a)`, and `None` keys match
+each other. Filter on assignment and on `a.id < b.id` when the rule counts
+each pair once, as the full example below does, or use
+`.join(equal(...))`. [Joiners](/docs/solverforge/constraints/joiners/#pair-counts)
+runs both forms and prints their pair counts.
+
 For same-source unique combinations instead, use `.join(equal(|row| key))`.
 That dispatch creates the same-source `BiConstraintStream`; it does not receive
 the left-source key-extraction pushdown described above. Do not confuse it with
@@ -172,16 +189,15 @@ collection.
 
 Cross-join with a generated accessor plus `equal_bi`:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
 Streams::new()
     .for_each(Schedule::shifts())
     .join((
         Streams::new().for_each(Schedule::unavailability()),
         equal_bi(
             |shift: &Shift| shift.employee_idx,
-            |u: &Unavailability| u.employee_idx,
+            |u: &Unavailability| Some(u.employee_idx),
         ),
     ))
 ```
@@ -198,13 +214,12 @@ After a cross join, choose the operation that matches the rule:
 A cross join does not stop at two sources. A subsequent `.join((target,
 equal_on(left_row_key, right_leaf_key)))` relates the whole existing row to
 the new source. Each join has its own key type and domain; it need not reuse
-the first join's key. For example, match an employee by index, then match that
-shift's unavailability by `(employee index, date)`:
+the first join's key. For example, match a shift's employee by index, then
+match that employee's unavailability by `(employee index, date)`:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 use solverforge::stream::relational::{operator::Pair, Leaf};
-
-type Streams = ConstraintFactory<Schedule, SoftScore>;
 
 Streams::new()
     .for_each(Schedule::shifts())
@@ -219,12 +234,12 @@ Streams::new()
         Schedule::unavailability(),
         equal_on(
             |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
-                (row.left.entity.employee_idx, row.left.entity.date)
+                (row.right.entity.index, row.left.entity.date)
             },
             |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
         ),
     ))
-    .penalize(|_shift: &Shift, _employee: &Employee, _u: &Unavailability| SoftScore::of(1))
+    .penalize(|_shift: &Shift, _employee: &Employee, _u: &Unavailability| HardSoftScore::ONE_HARD)
     .named("Shift falls on an unavailability day")
 ```
 
@@ -267,8 +282,10 @@ as parent-child or predecessor-successor rows.
 
 ### `group_by`
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-factory.for_each(Schedule::shifts())
+Streams::new()
+    .for_each(Schedule::shifts())
     .group_by(
         |shift: &Shift| shift.employee_idx,
         count(),
@@ -282,20 +299,19 @@ Cross-join streams can group pairs without a projection step. The key function
 receives the joined values as separate arguments, while the collector receives
 the stream match shape as one tuple:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Plan, HardSoftScore>;
-
 Streams::new()
-    .for_each(Plan::assignments())
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().for_each(Plan::capacities()),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
-            |assignment: &Assignment| assignment.capacity_id,
-            |capacity: &Capacity| Some(capacity.id),
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
         ),
     ))
     .group_by(
-        |assignment: &Assignment, capacity: &Capacity| (assignment.id, capacity.id),
+        |shift: &Shift, employee: &Employee| (employee.index, shift.date),
         count(),
     )
 ```
@@ -303,26 +319,25 @@ Streams::new()
 Grouped cross-join streams can continue into `complement(...)` when the rule
 needs a row for target keys that have no joined matches:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Plan, HardSoftScore>;
-
 Streams::new()
-    .for_each(Plan::assignments())
+    .for_each(Schedule::shifts())
     .join((
-        Streams::new().for_each(Plan::capacities()),
+        Streams::new().for_each(Schedule::employees()),
         equal_bi(
-            |assignment: &Assignment| assignment.capacity_id,
-            |capacity: &Capacity| Some(capacity.id),
+            |shift: &Shift| shift.employee_idx,
+            |employee: &Employee| Some(employee.index),
         ),
     ))
     .group_by(
-        |_assignment: &Assignment, capacity: &Capacity| capacity.id,
-        sum(|(assignment, _capacity): (&Assignment, &Capacity)| assignment.demand),
+        |_shift: &Shift, employee: &Employee| employee.index,
+        sum(|(shift, _employee): (&Shift, &Employee)| shift.hours()),
     )
     .complement(
-        Plan::capacities(),
-        |capacity: &Capacity| capacity.id,
-        |_capacity: &Capacity| 0i64,
+        Schedule::employees(),
+        |employee: &Employee| employee.index,
+        |_employee: &Employee| 0i64,
     )
 ```
 
@@ -335,7 +350,7 @@ or to the cross-Penta continuation limitation described above.
 The `if_exists`/`if_not_exists` terminal builds the count-backed
 `ExistenceNode`: its right side is the right stream's collection,
 whose key adapter expands flattened children in place, so flattened existence
-no longer creates child rows. Incremental notifications emit into
+creates no child rows. Incremental notifications emit into
 caller-owned buffers. See
 [Existence & Flattening](/docs/solverforge/constraints/existence-and-flattening/).
 
@@ -346,6 +361,7 @@ boundary while preserving normal fluent Rust authoring. When repeated grouped
 terminals reuse the same local grouped stream binding, SolverForge updates one
 retained node and refreshes separate terminal scorers from that shared state:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 #[solverforge_constraints]
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
@@ -387,8 +403,10 @@ There is no public `share` or cache API.
 returns `Option<K>`; `None` values are skipped, which is useful for unassigned
 entities.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-factory.for_each(Schedule::shifts())
+Streams::new()
+    .for_each(Schedule::shifts())
     .balance(|shift: &Shift| shift.employee_idx)
 ```
 
@@ -398,6 +416,7 @@ factory.for_each(Schedule::shifts())
 
 Apply a fixed score impact per match, then finalize with `.named()`.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
@@ -412,20 +431,21 @@ let soft = Streams::new()
     .named("Preference bonus");
 ```
 
-Use fixed score values when the constraint applies one hard or soft unit:
+Fixed score values apply one hard or soft unit per match:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
 let hard = Streams::new()
     .for_each(Schedule::shifts())
+    .filter(|shift: &Shift| shift.hours() > 12)
     .penalize(HardSoftScore::ONE_HARD)
-    .named("Hard violation");
+    .named("Shift longer than 12 hours");
 
 let soft = Streams::new()
     .for_each(Schedule::shifts())
+    .filter(|shift: &Shift| shift.is_preferred())
     .reward(HardSoftScore::ONE_SOFT)
-    .named("Soft preference");
+    .named("Preferred employee");
 ```
 
 Use a typed dynamic closure when the score depends on the match. Dynamic
@@ -433,20 +453,20 @@ closure weights are non-hard metadata by default; wrap the closure in
 `hard_weight(...)` when score analysis and conflict repair should classify the
 constraint as hard.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
 let overtime = Streams::new()
     .for_each(Schedule::shifts())
     .penalize(hard_weight(|shift: &Shift| {
-        HardSoftScore::of_hard(shift.overtime_hours() as i64)
+        HardSoftScore::of_hard((shift.hours() - 8).max(0))
     }))
     .named("Overtime");
 
 let preference = Streams::new()
     .for_each(Schedule::shifts())
-    .penalize(|shift: &Shift| HardSoftScore::of_soft(shift.preference_penalty()))
-    .named("Preference");
+    .filter(|shift: &Shift| shift.preferred_employee.is_some() && !shift.is_preferred())
+    .penalize(|shift: &Shift| HardSoftScore::of_soft(shift.hours()))
+    .named("Preference missed");
 ```
 
 ## Joined Filter Indexes
@@ -468,6 +488,7 @@ does not change ordinary fluent `.filter(|a, b| ...)` application code.
 
 ## Full Example
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 use solverforge::prelude::*;
 use solverforge::stream::{joiner::*, ConstraintFactory};
@@ -500,7 +521,7 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
 
         Streams::new()
             .for_each(Schedule::shifts())
-            .filter(|shift| shift.is_preferred_by_employee())
+            .filter(|shift| shift.is_preferred())
             .reward(HardSoftScore::ONE_SOFT)
             .named("Preference"),
     )

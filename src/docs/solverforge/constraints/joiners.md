@@ -12,14 +12,23 @@ the candidate pairs, while a general predicate scans retained opposite rows.
 Use an indexed condition when the relationship can be expressed with keys,
 comparisons, or intervals.
 
+The examples on this page use the
+[example model](/docs/solverforge/constraints/#example-model) and compile in
+its `src/examples.rs`.
+
 ## Available Joiners
 
 ### `equal`
 
-For symmetric self-joins, takes a single key extractor:
+For a same-source self-join, `.join(equal(key))` takes a single key extractor
+and emits each unordered pair of distinct rows with equal keys once. A `None`
+key equals another `None`, so filter unassigned rows when they must not pair:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-equal(|shift: &Shift| shift.employee_idx)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join(equal(|shift: &Shift| shift.employee_idx))
 ```
 
 ### `equal_bi`
@@ -28,8 +37,14 @@ For the first unary cross-join or a directed projected self-join, takes separate
 left and right entity/output key extractors. It is not the entity-key API for
 later joins in a chain:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::unavailability()),
+        equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| Some(u.employee_idx)),
+    ))
 ```
 
 ### `equal_on`
@@ -37,15 +52,25 @@ equal_bi(|shift: &Shift| shift.employee_idx, |u: &Unavailability| u.employee_idx
 For chained joins, takes keys over the whole borrowed left row and the new
 right leaf. It does not inherit the first join's key domain:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 use solverforge::stream::relational::{operator::Pair, Leaf};
 
-equal_on(
-    |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
-        (row.left.entity.employee_idx, row.left.entity.date)
-    },
-    |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
-)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::employees()),
+        equal_bi(|shift: &Shift| shift.employee_idx, |employee: &Employee| Some(employee.index)),
+    ))
+    .join((
+        Schedule::unavailability(),
+        equal_on(
+            |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
+                (row.right.entity.index, row.left.entity.date)
+            },
+            |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
+        ),
+    ))
 ```
 
 The right key receives `Leaf<Unavailability>`, not `&Unavailability`.
@@ -60,44 +85,78 @@ intended binding explicitly, including when an earlier join repeats a type.
 ### `less_than`
 
 Matches when the left value is less than the right. Takes two extractors.
+`less_than(|a| a.id, |b| b.id)` also keeps one orientation of each pair, so
+`equal_bi(...).and(less_than(...))` is the indexed unique-pair form of a keyed
+cross-join.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-less_than(|a: &Shift| a.id, |b: &Shift| b.id)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::shifts()),
+        less_than(|a: &Shift| a.id, |b: &Shift| b.id),
+    ))
 ```
 
 ### `greater_than`
 
 Matches when the left value is greater than the right. Takes two extractors.
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-greater_than(|a: &Shift| a.priority, |b: &Shift| b.priority)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::shifts()),
+        greater_than(|a: &Shift| a.start, |b: &Shift| b.start),
+    ))
 ```
 
 ### `overlapping`
 
-Matches when two ranges overlap. Takes four extractors: start and end for each side.
+Matches when two half-open ranges `[start, end)` overlap, so `8..12` and
+`12..16` do not. Takes four extractors: start and end for each side. On a
+same-collection cross-join every row overlaps itself; filter `a.id != b.id`
+(or `a.id < b.id` for unordered pairs).
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-overlapping(
-    |a: &Shift| a.start_time, |a: &Shift| a.end_time,
-    |b: &Shift| b.start_time, |b: &Shift| b.end_time,
-)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::shifts()),
+        overlapping(
+            |a: &Shift| a.start, |a: &Shift| a.end,
+            |b: &Shift| b.start, |b: &Shift| b.end,
+        ),
+    ))
 ```
 
-### `filtering`
+### Predicate joins
 
-A general-purpose joiner that uses a predicate over both elements.
+A closure in the condition position joins on an arbitrary predicate over both
+elements. It has no index, so each change scans the other side:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-filtering(|a: &Shift, b: &Shift| a.location.distance_to(&b.location) < 50.0)
+Streams::new()
+    .for_each(Schedule::shifts())
+    .join((
+        Streams::new().for_each(Schedule::shifts()),
+        |a: &Shift, b: &Shift| a.date == b.date && a.required_skill != b.required_skill,
+    ))
 ```
 
 ## Using Joiners with `join`
 
 **Same-collection keyed cross-join** — pass the same generated source on the
 right. The tuple form uses keyed cross-join dispatch, not the same-source
-unique-combination dispatch of `.join(equal(|row| key))`:
+unique-combination dispatch of `.join(equal(|row| key))`. It emits every
+ordered pair with equal keys: each row with itself, and both `(a, b)` and
+`(b, a)`:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 type Streams = ConstraintFactory<Schedule, HardSoftScore>;
 
@@ -114,9 +173,8 @@ Streams::new()
 
 **Cross-join** - pass a tuple of (stream, joiner):
 
+<!-- rust: crate=schedule in=example -->
 ```rust
-type Streams = ConstraintFactory<Schedule, HardSoftScore>;
-
 Streams::new()
     .for_each(Schedule::shifts())
     .join((
@@ -128,10 +186,9 @@ Streams::new()
 **Third source with an independent relationship** - pass the new collection
 extractor and a row-aware joiner to `.join((target, equal_on(...)))`:
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 use solverforge::stream::relational::{operator::Pair, Leaf};
-
-type Streams = ConstraintFactory<Schedule, SoftScore>;
 
 Streams::new()
     .for_each(Schedule::shifts())
@@ -146,7 +203,7 @@ Streams::new()
         Schedule::unavailability(),
         equal_on(
             |row: &Pair<Leaf<'_, Shift>, Leaf<'_, Employee>>| {
-                (row.left.entity.employee_idx, row.left.entity.date)
+                (row.right.entity.index, row.left.entity.date)
             },
             |u: &Leaf<'_, Unavailability>| (u.entity.employee_idx, u.entity.date),
         ),
@@ -192,6 +249,110 @@ After a projected stream, `join(equal(|row| key))` creates a symmetric
 projected self-join. `join(equal_bi(left_key, right_key))` creates a directed
 projected self-join where row orientation is part of the rule.
 
+## Pair Counts
+
+Which pairs a join emits decides how often a rule fires. This program counts
+them for three shifts assigned to one employee and two unassigned shifts. It
+adds `src/main.rs` to the
+[example model](/docs/solverforge/constraints/#example-model):
+
+<!-- rust: crate=joiner-pairs extends=schedule file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use domain::{Employee, Schedule, Shift};
+use solverforge::prelude::*;
+use solverforge::stream::joiner::*;
+use solverforge::IncrementalConstraint;
+
+type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+fn shift(id: usize, employee_idx: Option<usize>) -> Shift {
+    Shift {
+        id,
+        date: 1,
+        start: 8,
+        end: 16,
+        required_skill: "nurse".into(),
+        preferred_employee: None,
+        employee_idx,
+    }
+}
+
+fn main() {
+    let schedule = Schedule {
+        employees: vec![Employee {
+            index: 0,
+            name: "Amina".into(),
+            skills: vec!["nurse".into()],
+            available_days: vec![1],
+            max_hours: 40,
+        }],
+        unavailability: vec![],
+        shifts: vec![
+            shift(0, Some(0)),
+            shift(1, Some(0)),
+            shift(2, Some(0)),
+            shift(3, None),
+            shift(4, None),
+        ],
+        score: None,
+    };
+
+    let self_join = Streams::new()
+        .for_each(Schedule::shifts())
+        .join(equal(|shift: &Shift| shift.employee_idx))
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("equal self-join");
+    let self_join_assigned = Streams::new()
+        .for_each(Schedule::shifts())
+        .join(equal(|shift: &Shift| shift.employee_idx))
+        .filter(|a: &Shift, _b: &Shift| a.employee_idx.is_some())
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("equal self-join, assigned");
+    let cross_join = Streams::new()
+        .for_each(Schedule::shifts())
+        .join((
+            Streams::new().for_each(Schedule::shifts()),
+            equal_bi(|a: &Shift| a.employee_idx, |b: &Shift| b.employee_idx),
+        ))
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("keyed cross-join");
+    let cross_join_unique = Streams::new()
+        .for_each(Schedule::shifts())
+        .filter(|shift: &Shift| shift.employee_idx.is_some())
+        .join((
+            Streams::new().for_each(Schedule::shifts()),
+            equal_bi(|a: &Shift| a.employee_idx, |b: &Shift| b.employee_idx)
+                .and(less_than(|a: &Shift| a.id, |b: &Shift| b.id)),
+        ))
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("keyed cross-join, unique");
+
+    println!("{}: {} pairs", self_join.name(), self_join.match_count(&schedule));
+    println!("{}: {} pairs", self_join_assigned.name(), self_join_assigned.match_count(&schedule));
+    println!("{}: {} pairs", cross_join.name(), cross_join.match_count(&schedule));
+    println!("{}: {} pairs", cross_join_unique.name(), cross_join_unique.match_count(&schedule));
+}
+```
+
+`cargo run` prints:
+
+<!-- rust: crate=joiner-pairs output -->
+```text
+equal self-join: 4 pairs
+equal self-join, assigned: 3 pairs
+keyed cross-join: 13 pairs
+keyed cross-join, unique: 3 pairs
+```
+
+The self-join emits the three pairs among the assigned shifts once each, plus
+one pair of the two unassigned shifts, whose `None` keys are equal. The keyed
+cross-join emits 3 × 3 ordered pairs for the assigned shifts and 2 × 2 for the
+unassigned ones, each shift paired with itself included. Filtering assigned
+rows before the join and adding `less_than` on the id leaves each pair once.
+
 ## Source Filters and Target Boundaries
 
 For the first unary keyed equality cross-join, apply nullable-row filters on
@@ -207,17 +368,17 @@ Fluent right-hand targets implement `CollectionExtract`, including filtered
 unary streams. Compatible arbitrary derived producers belong at the low-level
 `JoinNode` input boundary, not as interchangeable fluent targets.
 
-`stream::cross::Penta::join` drops the authored penta filter; apply the row filter on the returned `Chain`.
-filter the returned `Chain` instead. Same-source `PentaConstraintStream` is
+`stream::cross::Penta::join` drops the authored penta filter; apply the row
+filter on the returned `Chain` instead. Same-source `PentaConstraintStream` is
 terminal. These are distinct APIs despite sharing the five-source name.
 
 ## Performance Note
 
 Equality conditions compile to hash-indexed plans; comparison conditions use
-ordered scans, and overlap conditions use interval narrowing. A bare
-`filtering` predicate uses a scan. Prefer a structural condition that narrows
-candidates before applying an arbitrary predicate. Compose conditions with
-`.and(...)`; the compiled plan still checks the complete condition. These
+ordered scans, and overlap conditions use interval narrowing. A predicate
+join uses a scan. Prefer a structural condition that narrows
+candidates before applying an arbitrary predicate. Compose indexed conditions
+with `.and(...)`; the compiled plan still checks the complete condition. These
 strategies are shared across the relational operator tree rather than selected
 by a separate retained engine for each tuple arity.
 
@@ -248,8 +409,8 @@ final count. This is internal bookkeeping, not a new indexing API or a
 measured performance guarantee.
 
 Low-level joined filters receive semantic source indexes in the current runtime.
-The fluent `filtering(|left, right| ...)` and `.filter(|left, right| ...)`
-closures remain value-oriented.
+The fluent predicate-join and `.filter(|left, right| ...)` closures remain
+value-oriented.
 
 ## See Also
 

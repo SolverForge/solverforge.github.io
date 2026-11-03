@@ -14,8 +14,10 @@ and compiler boundary, not a new modeling API.
 ## Use the Attribute
 
 Annotate the constraint factory function with `#[solverforge_constraints]`.
-Inside the function, keep writing ordinary fluent constraint streams:
+Inside the function, keep writing ordinary fluent constraint streams. The
+example uses the [example model](/docs/solverforge/constraints/#example-model):
 
+<!-- rust: crate=schedule in=example -->
 ```rust
 #[solverforge_constraints]
 fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
