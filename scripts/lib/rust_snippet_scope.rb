@@ -18,6 +18,22 @@ module RustSnippetScope
     "src/reference/library/**/*.md"
   ].freeze
 
+  # Pages whose Rust blocks a dedicated gate builds as the reader does: the
+  # solver pages verbatim in scripts/fixtures/solver-config (crates.io
+  # solverforge), the use-case and maintenance pages and the CLI pages by
+  # replaying them into a running app, the UI Getting Started page by building and loading
+  # the getting-started app in a browser. The legacy snippet check skips these too.
+  REPLAYED_GLOBS = [
+    "src/docs/solverforge/solver/**/*.md",
+    "src/docs/getting-started/*.md",
+    "src/docs/solverforge-cli/**/*.md",
+    "src/docs/solverforge-ui/getting-started.md"
+  ].freeze
+
+  def self.replayed_pages(root)
+    REPLAYED_GLOBS.flat_map { |glob| Dir.glob(File.join(root, glob)) }.uniq.sort
+  end
+
   def self.pages(root)
     GLOBS.flat_map { |glob| Dir.glob(File.join(root, glob)) }.uniq.sort
   end

@@ -142,7 +142,7 @@ class Extractor
 
   def source_files
     Dir.glob(File.join(ROOT, "{src/docs,src/reference,src/_posts}/**/*.{md,html,erb}"), File::FNM_EXTGLOB).sort -
-      RustSnippetScope.pages(ROOT)
+      RustSnippetScope.pages(ROOT) - RustSnippetScope.replayed_pages(ROOT)
   end
 
   def slug(path)
