@@ -1484,7 +1484,7 @@ async function checkReleaseDocs(origin) {
   const page = await browser.newPage();
   const failures = [];
   const checks = [
-    { path: "/docs/solverforge/", required: ["These pages track the solverforge 0.23.0 release", "solverforge-cli 3.7.1 line scaffolds solverforge 0.23.0"] },
+    { path: "/docs/solverforge/", required: ["cargo add solverforge@=0.24.0", "These pages track solverforge 0.24.0", "solverforge-cli 3.8 line scaffolds solverforge 0.24.0"] },
     { path: "/docs/solverforge/solver/configuration/", required: ["Sequential (default)", "min(count, rayon::current_num_threads(), 32)"] },
     { path: "/docs/solverforge/solver/local-search/", required: ["DiscardedSpeculative", "trajectory can depend on evaluator count"] },
     { path: "/docs/solverforge/solver/phases/", required: ["SolverTelemetry::phases", "every started phase in execution order"] },

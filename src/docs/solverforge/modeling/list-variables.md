@@ -26,33 +26,223 @@ Use scalar planning variables when:
 
 ## Stock Representation
 
-In the current stock runtime, the canonical sequence is represented as
-`Vec<usize>` on the owner entity. The indices refer to a named collection on
-the planning solution.
+The canonical sequence is a `Vec<usize>` on the owner entity. The indices
+refer to the solution collection named by `element_collection`. This
+complete vehicle-routing model keeps each vehicle's load and distance as
+shadow state, refreshed after every route change.
 
+`src/domain/mod.rs`:
+
+<!-- rust: crate=routes file=src/domain/mod.rs -->
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Vehicle, VehicleRoutePlan, Visit};
+}
+```
+
+`src/domain/model.rs`. A location is an index into the plan's distance
+matrix; location 0 is the depot:
+
+<!-- rust: crate=routes file=src/domain/model.rs -->
 ```rust
 use solverforge::prelude::*;
 
-#[problem_fact]
+#[planning_entity]
 pub struct Visit {
     #[planning_id]
     pub id: usize,
-    pub location: Location,
-    pub demand: i32,
+    pub location: usize,
+    pub demand: i64,
+    #[inverse_relation_shadow_variable(source_variable_name = "visits")]
+    pub vehicle: Option<usize>,
+    #[previous_element_shadow_variable(source_variable_name = "visits")]
+    pub previous_stop: Option<usize>,
+    #[next_element_shadow_variable(source_variable_name = "visits")]
+    pub next_stop: Option<usize>,
 }
 
 #[planning_entity]
 pub struct Vehicle {
     #[planning_id]
     pub id: usize,
-    pub capacity: i32,
-    pub depot: Location,
+    pub capacity: i64,
     #[planning_list_variable(element_collection = "visits")]
+    pub visits: Vec<usize>,
+    pub load: i64,
+    pub distance: i64,
+}
+
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
+#[shadow_variable_updates(
+    list_owner = "vehicles",
+    inverse_field = "vehicle",
+    previous_field = "previous_stop",
+    next_field = "next_stop",
+    post_update_listener = "refresh_vehicle_totals"
+)]
+pub struct VehicleRoutePlan {
+    pub distances: Vec<Vec<i64>>,
+    #[planning_entity_collection]
+    pub visits: Vec<Visit>,
+    #[planning_entity_collection]
+    pub vehicles: Vec<Vehicle>,
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+
+impl VehicleRoutePlan {
+    /// Recomputes one vehicle's load and its depot-to-depot distance.
+    pub fn refresh_vehicle_totals(&mut self, vehicle_idx: usize) {
+        let route = &self.vehicles[vehicle_idx].visits;
+        let load = route.iter().map(|&visit| self.visits[visit].demand).sum();
+        let mut distance = 0;
+        let mut at = 0;
+        for &visit in route {
+            let next = self.visits[visit].location;
+            distance += self.distances[at][next];
+            at = next;
+        }
+        distance += self.distances[at][0];
+        let vehicle = &mut self.vehicles[vehicle_idx];
+        vehicle.load = load;
+        vehicle.distance = distance;
+    }
+}
+```
+
+The list variable stores visit indices, not `Visit` structs. `Visit` is a
+planning entity without planning variables only so its fields can carry the
+shadow attributes; the solver assigns nothing on it. The shadow updates keep each visit's `vehicle`, `previous_stop` and `next_stop` in step
+with the owner lists, and `post_update_listener` names a solution method the
+score director calls with the owner index after each change, so constraints
+can read `load` and `distance` from the vehicle itself.
+
+`src/constraints.rs`:
+
+<!-- rust: crate=routes file=src/constraints.rs -->
+```rust
+use solverforge::prelude::*;
+
+use crate::domain::{Vehicle, VehicleRoutePlan, Visit};
+
+pub fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
+    type Streams = ConstraintFactory<VehicleRoutePlan, HardSoftScore>;
+
+    (
+        Streams::new()
+            .for_each(VehicleRoutePlan::visits())
+            .filter(|visit: &Visit| visit.vehicle.is_none())
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unassigned visit"),
+        Streams::new()
+            .for_each(VehicleRoutePlan::vehicles())
+            .filter(|vehicle: &Vehicle| vehicle.load > vehicle.capacity)
+            .penalize(hard_weight(|vehicle: &Vehicle| {
+                HardSoftScore::of_hard(vehicle.load - vehicle.capacity)
+            }))
+            .named("Capacity"),
+        Streams::new()
+            .for_each(VehicleRoutePlan::vehicles())
+            .penalize(|vehicle: &Vehicle| HardSoftScore::of_soft(vehicle.distance))
+            .named("Distance"),
+    )
+}
+```
+
+This program scores a fixed plan: one vehicle of capacity 3 serves visits 0
+and 1 (demand 2 each), and visit 2 is on no route. Its load and distance
+start at zero; analysis refreshes them through the listener:
+
+<!-- rust: crate=routes file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use domain::{Vehicle, VehicleRoutePlan, Visit};
+use solverforge::Analyzable;
+
+fn visit(id: usize, location: usize) -> Visit {
+    Visit { id, location, demand: 2, vehicle: None, previous_stop: None, next_stop: None }
+}
+
+fn main() {
+    let plan = VehicleRoutePlan {
+        distances: vec![
+            vec![0, 4, 5, 9],
+            vec![4, 0, 3, 7],
+            vec![5, 3, 0, 6],
+            vec![9, 7, 6, 0],
+        ],
+        visits: vec![visit(0, 1), visit(1, 2), visit(2, 3)],
+        vehicles: vec![Vehicle { id: 0, capacity: 3, visits: vec![0, 1], load: 0, distance: 0 }],
+        score: None,
+    };
+
+    let analysis = plan.analyze();
+    println!("score: {}", analysis.score);
+    for constraint in &analysis.constraints {
+        println!("{}: {} ({} matches)", constraint.name, constraint.score, constraint.match_count);
+    }
+}
+```
+
+`cargo run` prints:
+
+<!-- rust: crate=routes output -->
+```text
+score: -2hard/-12soft
+Unassigned visit: -1hard/0soft (1 matches)
+Capacity: -1hard/0soft (1 matches)
+Distance: 0hard/-12soft (1 matches)
+```
+
+The route depot → 1 → 2 → depot is 4 + 3 + 5 = 12, its load 4 exceeds the
+capacity by 1, and visit 2 has no `vehicle`.
+
+## Solution-Side Trait Bounds
+
+Some list-variable helpers, distance meters, or route utilities need more from
+the planning solution than the base `PlanningSolution` contract. Name that
+extra trait with `solution_trait = "crate::routing::RouteContext"` on
+`#[planning_list_variable]`; generated stock list helpers then require the
+solution to implement it. Use `solution_trait` only when stock list-variable
+helpers must see an explicit extra trait on the solution type.
+
+## CVRP Route Profile
+
+Stock CVRP route lists can use the built-in domain profile,
+`domain = "cvrp"`. The profile makes the solution implement
+`solverforge::cvrp::VrpSolution`, which hands each vehicle's
+`solverforge::cvrp::ProblemData` (capacity, depot, demands, distance and
+travel-time matrices, time windows) to the stock meters and hooks. A complete
+model, `src/domain/model.rs` with the same `planning_model!` manifest as above:
+
+<!-- rust: crate=cvrp-routes file=src/domain/model.rs -->
+```rust
+use solverforge::cvrp::{ProblemData, VrpSolution};
+use solverforge::prelude::*;
+
+#[problem_fact]
+pub struct Visit {
+    #[planning_id]
+    pub id: usize,
+}
+
+#[planning_entity]
+pub struct Vehicle {
+    #[planning_id]
+    pub id: usize,
+    #[planning_list_variable(element_collection = "visits", domain = "cvrp")]
     pub visits: Vec<usize>,
 }
 
 #[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct VehicleRoutePlan {
+    pub routing: ProblemData,
     #[problem_fact_collection]
     pub visits: Vec<Visit>,
     #[planning_entity_collection]
@@ -60,39 +250,51 @@ pub struct VehicleRoutePlan {
     #[planning_score]
     pub score: Option<HardSoftScore>,
 }
+
+impl VrpSolution for VehicleRoutePlan {
+    fn vehicle_data(&self, _vehicle_idx: usize) -> Option<&ProblemData> {
+        Some(&self.routing)
+    }
+
+    fn vehicle_visits(&self, vehicle_idx: usize) -> &[usize] {
+        &self.vehicles[vehicle_idx].visits
+    }
+
+    fn vehicle_visits_mut(&mut self, vehicle_idx: usize) -> &mut Vec<usize> {
+        &mut self.vehicles[vehicle_idx].visits
+    }
+
+    fn vehicle_count(&self) -> usize {
+        self.vehicles.len()
+    }
+}
 ```
 
-The list variable stores visit indices, not `Visit` structs directly. This keeps
-move generation and list manipulation aligned with the stock runtime and its
-shared `RuntimeModel`-based construction path.
-
-## Solution-Side Trait Bounds
-
-Some list-variable helpers, distance meters, or route utilities need more from
-the planning solution than the base `PlanningSolution` contract. The current
-runtime lets `#[planning_list_variable]` express that directly:
-
+<!-- rust: crate=cvrp-routes file=src/domain/mod.rs -->
 ```rust
-#[planning_list_variable(
-    element_collection = "visits",
-    solution_trait = "crate::routing::RouteContext"
-)]
-pub visits: Vec<usize>,
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Vehicle, VehicleRoutePlan, Visit};
+}
 ```
 
-Use `solution_trait` only when stock list-variable helpers must see an explicit
-extra trait on the solution type.
-
-## CVRP Route Profile
-
-Stock CVRP route lists can use the built-in domain profile:
-
+<!-- rust: crate=cvrp-routes file=src/constraints.rs -->
 ```rust
-#[planning_list_variable(
-    element_collection = "visits",
-    domain = "cvrp"
-)]
-pub visits: Vec<usize>,
+use solverforge::prelude::*;
+
+use crate::domain::{Vehicle, VehicleRoutePlan};
+
+pub fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
+    (
+        ConstraintFactory::<VehicleRoutePlan, HardSoftScore>::new()
+            .for_each(VehicleRoutePlan::vehicles())
+            .penalize(|vehicle: &Vehicle| HardSoftScore::of_soft(vehicle.visits.len() as i64))
+            .named("Route length"),
+    )
+}
 ```
 
 The profile expands to `solverforge::cvrp::VrpSolution`, the stock
@@ -104,26 +306,23 @@ owners, data, or visit IDs are rejected, but scoreable capacity and time-window
 violations can still be assigned and compared against unassigned work.
 Unreachable travel-time legs remain strict route-local infeasibilities, and
 unreachable or malformed distance entries become large finite costs so
-construction and local search stay panic-free.
+construction and local search stay panic-free. `vehicle_data` returning
+`None` for a vehicle is an initialization error: the stock route helpers
+panic on it and the feasibility gates reject the route.
 
 ## Custom Route Construction Hooks
 
 For non-CVRP route domains, or for a custom pruning policy, omit
-`domain = "cvrp"` and wire explicit route-local and savings hooks:
+`domain = "cvrp"` and name the hooks on `#[planning_list_variable]`:
 
-```rust
-#[planning_list_variable(
-    element_collection = "visits",
-    solution_trait = "crate::routing::RouteContext",
-    route_hooks = "crate::routing::route_hooks",
-    savings_hooks = "crate::routing::savings_hooks",
-    savings_metric_class_fn = "crate::routing::savings_metric_class"
-)]
-pub visits: Vec<usize>,
-```
+| Attribute | Value |
+| --- | --- |
+| `solution_trait` | extra trait the solution implements, such as `crate::routing::RouteContext` |
+| `route_hooks` | module path exporting `get`, `set`, `depot`, `distance`, and `feasible` |
+| `savings_hooks` | module path exporting `depot`, `distance`, and `feasible` |
+| `savings_metric_class_fn` | function grouping owners that share construction depot and distance behavior |
 
-`route_hooks` must export `get`, `set`, `depot`, `distance`, and `feasible`.
-`savings_hooks` must export `depot`, `distance`, and `feasible`. The hooks
+The hooks
 receive the route owner, so heterogeneous fleets can score and check routes
 against the correct depot, distance matrix, capacity, and time-window context.
 Use `savings_metric_class_fn` when several owners share the same construction
@@ -142,18 +341,15 @@ Route-local feasibility remains available to k-opt and route assignment through
 ## Ownership and Precedence Hooks
 
 List variables can also declare plain stock hooks for fixed ownership,
-construction order, and precedence-aware sequencing:
+construction order, and precedence-aware sequencing. Each attribute names a
+function:
 
-```rust
-#[planning_list_variable(
-    element_collection = "operations",
-    element_owner_fn = "operation_owner",
-    construction_element_order_key = "operation_construction_order",
-    precedence_duration_fn = "operation_duration",
-    precedence_successors_fn = "operation_successors"
-)]
-pub operations: Vec<usize>,
-```
+| Attribute | Supplies |
+| --- | --- |
+| `element_owner_fn` | the owner an element is fixed to, if any |
+| `construction_element_order_key` | the order list construction inserts elements in |
+| `precedence_duration_fn` | each element's duration |
+| `precedence_successors_fn` | each element's fixed successor arcs |
 
 `element_owner_fn` returns `Some(owner_index)` when an element is fixed to one
 list owner and `None` when the element is unrestricted. Construction,
@@ -238,9 +434,9 @@ shadow fields behind the director bypasses incremental stream maintenance.
 
 ## Generated Runtime Surface
 
-Generated public list mutation helpers such as `list_len_static()`,
-`element_count()`, and `assign_element()` are no longer part of the user-facing
-model API in the current release. Keep application code on the public modeling,
+Generated list mutation helpers such as `list_len_static()`,
+`element_count()`, and `assign_element()` are not part of the user-facing
+model API. Keep application code on the public modeling,
 constraint-stream, descriptor, solver, and configuration APIs instead of
 calling hidden runtime operations directly.
 
@@ -251,8 +447,8 @@ result for the solve. Dynamic binding models declare the corresponding list
 access and metadata capability bundles explicitly and enter the same graph.
 
 For constraints over list-owner entities, start from the generated solution
-source method and let the stream API preserve source ownership. The vehicle
-routing example below uses `VehicleRoutePlan::vehicles()` for that reason.
+source method and let the stream API preserve source ownership, as the
+vehicle-routing constraints above do with `VehicleRoutePlan::vehicles()`.
 
 ## List Moves
 
@@ -269,29 +465,6 @@ The solver uses specialized moves for list variables:
 | `KOptMove`          | K-opt style moves for routing problems                             |
 | `ListRuinMove`      | Remove list elements and reinsert them (list ruin-and-recreate)    |
 | precedence support  | Critical-path precedence repairs for list variables with precedence hooks |
-
-## Example: Vehicle Routing Constraint
-
-```rust
-fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
-    type Streams = ConstraintFactory<VehicleRoutePlan, HardSoftScore>;
-
-    (
-        Streams::new()
-            .for_each(VehicleRoutePlan::vehicles())
-            .filter(|v| v.total_demand() > v.capacity)
-            .penalize(hard_weight(|v: &Vehicle| {
-                HardSoftScore::of_hard((v.total_demand() - v.capacity) as i64)
-            }))
-            .named("Capacity"),
-
-        Streams::new()
-            .for_each(VehicleRoutePlan::vehicles())
-            .penalize(|v: &Vehicle| HardSoftScore::of_soft(v.total_distance()))
-            .named("Distance"),
-    )
-}
-```
 
 ## Nearby and K-Opt Search
 

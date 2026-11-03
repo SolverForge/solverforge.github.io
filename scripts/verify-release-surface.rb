@@ -246,12 +246,10 @@ crates.io on 2026-10-14",
   ],
 
   "src/docs/solverforge/index.md" => [
-    "These pages track the `solverforge 0.23.0` release",
-    "The `0.23.0` workspace declares Rust `1.95`.",
-    "/blog/releases/2026/10/27/solverforge-0-23-x/",
-    "/blog/releases/2026/10/18/solverforge-0-22-x/",
-    "solverforge-cli 3.7.1",
-    "apps scaffolded by earlier lines pin older cores"
+    "cargo add solverforge@=0.24.0",
+    "These pages track `solverforge 0.24.0`",
+    "The workspace declares Rust `1.95`.",
+    "The `solverforge-cli 3.8` line scaffolds `solverforge 0.24.0`"
   ],
 
   "src/docs/solverforge/solver/solver-manager.md" => ["holding the worker's pause gate", "does not restart from the best solution"],
@@ -389,7 +387,7 @@ crates.io on 2026-10-14",
     "/docs/solverforge/constraints/shift-group-uniformity/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.23.0",
+    "solverforge 0.24.0",
     "AcceptedCount(256)",
     "solverforge 0.7.2",
     "solverforge-py v0.7.2"

@@ -12,19 +12,16 @@ and score field.
 
 ## The `#[planning_solution]` Macro
 
-```rust
-use solverforge::prelude::*;
+From `src/domain/schedule.rs` of the model on
+[Domain Modeling](/docs/solverforge/modeling/), which also shows the
+`planning_model!` manifest every solution needs:
 
-#[planning_solution(
-    constraints = "crate::constraints::define_constraints",
-    scalar_groups = "crate::domain::scalar_groups"
-)]
+<!-- rust: crate=modeling excerpt -->
+```rust
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct Schedule {
     #[problem_fact_collection]
     pub employees: Vec<Employee>,
-
-    #[problem_fact_collection]
-    pub availability: Vec<Availability>,
 
     #[planning_entity_collection]
     pub shifts: Vec<Shift>,
@@ -35,10 +32,16 @@ pub struct Schedule {
 ```
 
 The `constraints` parameter is optional, but it is what enables the generated
-`Solvable` and `Analyzable` implementations used by the stock runtime.
-`scalar_groups` is optional; use it when the model declares candidate-backed or
-assignment-backed `ScalarGroup` values for grouped construction and grouped
-scalar local search.
+`Solvable` and `Analyzable` implementations used by the stock runtime. Other
+optional parameters:
+
+- `solver_toml = "../../solver.toml"` embeds that solver configuration file
+  at compile time; the path is relative to the source file. Without it, or a `SolverConfig` passed
+  at solve time, the solver uses its defaults and does not read a
+  `solver.toml` from the working directory.
+- `scalar_groups = "crate::domain::scalar_groups"` names the function that
+  declares candidate-backed or assignment-backed `ScalarGroup` values for
+  grouped construction and grouped scalar local search.
 
 ## Field Attributes
 
@@ -47,6 +50,7 @@ scalar local search.
 Marks a `Vec<T>` field containing planning entities. The solver iterates these
 collections to find variables to change.
 
+<!-- rust: crate=modeling excerpt -->
 ```rust
 #[planning_entity_collection]
 pub shifts: Vec<Shift>,
@@ -58,6 +62,7 @@ Marks a `Vec<T>` field containing problem facts. Input data is immutable during
 solving; configured list-shadow fields on elements are derived state maintained
 by the director, and their generated stream sources react to those updates.
 
+<!-- rust: crate=modeling excerpt -->
 ```rust
 #[problem_fact_collection]
 pub employees: Vec<Employee>,
@@ -67,6 +72,7 @@ pub employees: Vec<Employee>,
 
 Marks the field that holds the current solution quality. Must be `Option<ScoreType>`.
 
+<!-- rust: crate=modeling excerpt -->
 ```rust
 #[planning_score]
 pub score: Option<HardSoftScore>,

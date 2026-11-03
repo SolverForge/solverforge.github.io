@@ -61,17 +61,20 @@ problems using different modeling approaches.
     <button class="code-tabs__button" type="button" data-tab-button="gurobi">Gurobi / CVXPY</button>
   </div>
   <div class="code-tabs__panel" data-tab-panel="solverforge">
+    <!-- rust: crate=overview file=src/constraints.rs -->
     <%= render Ui::CodeBlock.new(language: "rust") do %>
       use solverforge::prelude::*;
-      use solverforge::stream::{joiner::*, ConstraintFactory};
+      use solverforge::stream::joiner::equal_bi;
 
-      fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftDecimalScore> {
+      use crate::domain::{Employee, Schedule, Shift};
+
+      pub fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftDecimalScore> {
           type Streams = ConstraintFactory<Schedule, HardSoftDecimalScore>;
 
           let unassigned = Streams::new()
               .for_each(Schedule::shifts())
               .unassigned()
-              .penalize(HardSoftDecimalScore::of_hard_scaled(100_000))
+              .penalize(HardSoftDecimalScore::ONE_HARD)
               .named("Unassigned shift");
 
           let missing_skill = Streams::new()
@@ -87,7 +90,7 @@ problems using different modeling approaches.
               .filter(|shift: &Shift, employee: &Employee| {
                   !employee.skills.contains(&shift.required_skill)
               })
-              .penalize(HardSoftDecimalScore::of_hard_scaled(1_000_000))
+              .penalize(HardSoftDecimalScore::ONE_HARD)
               .named("Missing skill");
 
           (unassigned, missing_skill)
@@ -126,28 +129,51 @@ Use Gurobi, CPLEX, or CVXPY when:
 
 ## Developer Experience
 
-SolverForge provides a Rust derive-macro API for ergonomic domain modeling:
+SolverForge provides a Rust derive-macro API for domain modeling. The
+constraints above run against this model, `src/domain/model.rs`:
 
+<!-- rust: crate=overview file=src/domain/model.rs -->
 ```rust
 use solverforge::prelude::*;
+
+#[problem_fact]
+pub struct Employee {
+    #[planning_id]
+    pub index: usize,
+    pub name: String,
+    pub skills: Vec<String>,
+}
 
 #[planning_entity]
 pub struct Shift {
     #[planning_id]
-    pub id: String,
+    pub id: usize,
     pub required_skill: String,
     #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
     pub employee_idx: Option<usize>,
 }
 
 #[planning_solution(constraints = "crate::constraints::define_constraints")]
-pub struct Plan {
+pub struct Schedule {
     #[problem_fact_collection]
     pub employees: Vec<Employee>,
     #[planning_entity_collection]
     pub shifts: Vec<Shift>,
     #[planning_score]
     pub score: Option<HardSoftDecimalScore>,
+}
+```
+
+and `src/domain/mod.rs` registers it with the solver:
+
+<!-- rust: crate=overview file=src/domain/mod.rs -->
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Employee, Schedule, Shift};
 }
 ```
 

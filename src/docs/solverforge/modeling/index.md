@@ -37,9 +37,23 @@ planning variables name their value source with `value_range_provider = "solutio
 and `#[planning_solution]` generates typed stream source methods such as
 `factory.for_each(Schedule::shifts())`.
 
-Current generated domains also declare the model boundary with
-`solverforge::planning_model!` in `src/domain/mod.rs`:
+## The Model Manifest
 
+Every model needs a `solverforge::planning_model!` manifest. It lists the
+modules that hold the model, and it is what makes a `#[planning_solution]`
+solvable: without it the solution type fails to compile with
+`PlanningModelSupport is not satisfied`. The manifest lives in
+`src/domain/mod.rs` and its modules are files under the `root` directory.
+It accepts only `mod name;` and `pub use ...;` items; a re-export can rename a
+type (`pub use shift::Shift as Duty;`), but solver configuration still names
+the canonical descriptor type, such as `Shift.employee_idx`.
+
+The model these pages build: start a crate with `cargo new`, run
+`cargo add solverforge@=0.24.0`, and add these files.
+
+`src/domain/mod.rs`:
+
+<!-- rust: crate=modeling file=src/domain/mod.rs -->
 ```rust
 solverforge::planning_model! {
     root = "src/domain";
@@ -54,11 +68,94 @@ solverforge::planning_model! {
 }
 ```
 
-That manifest is the canonical place where the runtime validates the model and
-derives scalar/list metadata across separate Rust files. Public Rust aliases are
-accepted at the manifest boundary, including `type Alias = Type;` and
-`pub use module::Type as Alias;`, but solver configuration still targets the
-canonical descriptor type name such as `Task.worker`.
+`src/domain/employee.rs`:
+
+<!-- rust: crate=modeling file=src/domain/employee.rs -->
+```rust
+use solverforge::prelude::*;
+
+#[problem_fact]
+pub struct Employee {
+    #[planning_id]
+    pub id: usize,
+    pub name: String,
+    pub skills: Vec<String>,
+}
+```
+
+`src/domain/shift.rs`:
+
+<!-- rust: crate=modeling file=src/domain/shift.rs -->
+```rust
+use solverforge::prelude::*;
+
+#[planning_entity]
+pub struct Shift {
+    #[planning_id]
+    pub id: usize,
+    pub required_skill: String,
+
+    #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
+    pub employee_idx: Option<usize>,
+}
+```
+
+`src/domain/schedule.rs`:
+
+<!-- rust: crate=modeling file=src/domain/schedule.rs -->
+```rust
+use solverforge::prelude::*;
+
+use super::{Employee, Shift};
+
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
+pub struct Schedule {
+    #[problem_fact_collection]
+    pub employees: Vec<Employee>,
+
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
+
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+```
+
+`src/constraints.rs` holds the constraint set the solution names:
+
+<!-- rust: crate=modeling file=src/constraints.rs -->
+```rust
+use solverforge::prelude::*;
+use solverforge::stream::joiner::equal_bi;
+
+use crate::domain::{Employee, Schedule, Shift};
+
+pub fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+    type Streams = ConstraintFactory<Schedule, HardSoftScore>;
+
+    (
+        Streams::new()
+            .for_each(Schedule::shifts())
+            .unassigned()
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unassigned shift"),
+        Streams::new()
+            .for_each(Schedule::shifts())
+            .join((
+                Streams::new().for_each(Schedule::employees()),
+                equal_bi(|shift: &Shift| shift.employee_idx, |employee: &Employee| Some(employee.id)),
+            ))
+            .filter(|shift: &Shift, employee: &Employee| !employee.skills.contains(&shift.required_skill))
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Missing skill"),
+    )
+}
+```
+
+`employee_idx` stores a position in `Schedule::employees`; the "Missing skill"
+join relies on each employee's `id` being that position.
+
+Declare both modules in the crate root (`mod constraints; mod domain;`).
 
 Scalar runtime metadata is descriptor-addressed. The generated compact
 `variable_index` remains an internal getter/setter dispatch index, while runtime

@@ -18,6 +18,10 @@ collections remain static. See [List Variables](/docs/solverforge/modeling/list-
 
 ## The `#[problem_fact]` Macro
 
+The examples on this page come from the model on
+[Domain Modeling](/docs/solverforge/modeling/), `src/domain/employee.rs`:
+
+<!-- rust: crate=modeling excerpt -->
 ```rust
 use solverforge::prelude::*;
 
@@ -28,15 +32,6 @@ pub struct Employee {
     pub name: String,
     pub skills: Vec<String>,
 }
-
-#[problem_fact]
-pub struct Timeslot {
-    #[planning_id]
-    pub id: usize,
-    pub day_of_week: String,
-    pub start_time: String,
-    pub end_time: String,
-}
 ```
 
 ## Field Attributes
@@ -46,6 +41,7 @@ pub struct Timeslot {
 Provides stable identity for the fact. This is recommended whenever the fact is
 referenced by a planning variable or appears in analysis output.
 
+<!-- rust: crate=modeling excerpt -->
 ```rust
 #[planning_id]
 pub id: usize,
@@ -61,28 +57,19 @@ pub id: usize,
 | **Role** | Input data / possible values | Things being assigned |
 
 A common pattern is to use a problem-fact collection as the named value range
-for a planning variable:
+for a planning variable. `value_range_provider = "employees"` names the
+`Schedule::employees` collection, and `employee_idx` stores a position in it:
 
+<!-- rust: crate=modeling excerpt -->
 ```rust
 #[planning_entity]
 pub struct Shift {
     #[planning_id]
     pub id: usize,
+    pub required_skill: String,
 
     #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
-    pub employee_id: Option<usize>,
-}
-
-#[planning_solution]
-pub struct Schedule {
-    #[problem_fact_collection]
-    pub employees: Vec<Employee>,
-
-    #[planning_entity_collection]
-    pub shifts: Vec<Shift>,
-
-    #[planning_score]
-    pub score: Option<HardSoftScore>,
+    pub employee_idx: Option<usize>,
 }
 ```
 
