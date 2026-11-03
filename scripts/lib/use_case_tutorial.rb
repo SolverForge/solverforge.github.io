@@ -18,8 +18,10 @@
 #      clone;
 #   3. the "Testing and Validation" commands, run in the clone.
 #
-# Nothing skips silently: a command the gate cannot run (Docker) is listed by
-# name in the gate's config, logged, and covered by the page's literal proof.
+# Nothing skips silently: a command the gate cannot run (Docker, or a test
+# that always fetches fresh data from a public service) is listed by name with
+# its reason in the gate's config, logged, and covered by the page's literal
+# proof.
 
 require "fileutils"
 require "json"
@@ -39,7 +41,7 @@ module UseCaseTutorial
     :clone_section,     # heading of the finished-example section
     :constraints_section, # heading whose lists/tables name the finished app's constraints
     :validation_section,  # heading of the validation commands
-    :docker_commands,   # validation commands that need Docker (not run by the gate)
+    :not_run,           # { "command" => "why the gate cannot run it" }; logged, proven by hand
     :dataset_table,     # { demo_id_column => ..., "Column" => ->(plan) { count } }
     :cli_score_prefix,  # score prefix the CLI build must reach, e.g. "0hard"
     :banned,            # { "needle" => "why it must not appear" }
@@ -274,8 +276,8 @@ module UseCaseTutorial
           log "skip: #{command}    (solverforge-cli #{config.cli_version} is installed by the gate)"
           next
         end
-        if config.docker_commands.include?(command)
-          log "not run: #{command}    (needs Docker; covered by the page's literal proof)"
+        if (reason = config.not_run[command])
+          log "not run: #{command}    (#{reason}; covered by the page's literal proof)"
           next
         end
         if command.match?(RUN_COMMAND)
@@ -516,12 +518,15 @@ module UseCaseTutorial
       first_test = commands.index { |c| c.start_with?("make test") }
       fail!("#{config.validation_section} must run `make install-e2e` before `make test`") if first_test && (install.nil? || install > first_test)
       commands.each do |command|
-        if config.docker_commands.include?(command)
-          log "not run: #{command}    (needs Docker; covered by the page's literal proof)"
+        if (reason = config.not_run[command])
+          log "not run: #{command}    (#{reason}; covered by the page's literal proof)"
         elsif command.start_with?("curl ")
           log "not run: #{command}    (needs the server; the boot above exercised these routes)"
         else
-          @workspace.run(command, env: cargo_env.merge("E2E_PORT" => UseCaseTutorial.port.to_s))
+          # The apps' browser tests bind E2E_PORT (Makefile) or PLAYWRIGHT_PORT
+          # (Playwright config); keep both inside the gate's port range.
+          ports = { "E2E_PORT" => UseCaseTutorial.port.to_s, "PLAYWRIGHT_PORT" => UseCaseTutorial.port.to_s }
+          @workspace.run(command, env: cargo_env.merge(ports))
         end
       end
     end

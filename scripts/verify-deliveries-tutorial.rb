@@ -47,7 +47,12 @@ UseCaseTutorial.run(
     clone_section: "Run the Finished Example",
     constraints_section: "Writing Constraints",
     validation_section: "Testing and Validation",
-    docker_commands: ["make ci-local", "make space-build", "make space-run"],
+    not_run: {
+      "make ci-local" => "needs Docker",
+      "make space-build" => "needs Docker",
+      "make space-run" => "needs Docker and runs until stopped",
+      "make test-live-road" => "always fetches fresh road data from the public Overpass API"
+    },
     dataset_table: {
       "Vehicles" => UseCaseTutorial.count("vehicles"),
       "Deliveries" => UseCaseTutorial.count("deliveries")
