@@ -20,7 +20,7 @@ data, and solves it before handing it back.
 1. Install the CLI and check its scaffold targets:
 
    ```bash
-   cargo install solverforge-cli
+   cargo install solverforge-cli --locked
    solverforge --version
    ```
 

@@ -24,7 +24,9 @@ A new neutral web shell looks like this:
 
 ```text
 my-scheduler/
+|- .gitignore
 |- Cargo.toml
+|- README.md
 |- solver.toml
 |- solverforge.app.toml
 |- src/
@@ -182,6 +184,8 @@ points:
 - `.solverforge/templates/solution.rs.tmpl`
 
 Those overrides are applied before the built-in generator template is used.
+An override must keep the managed block markers of the built-in template it
+replaces; the CLI refuses a template that drops or duplicates them.
 They are for advanced teams that want opinionated internal defaults while still
 using the stock CLI workflow.
 

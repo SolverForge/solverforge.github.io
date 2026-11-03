@@ -17,32 +17,34 @@ They serve different purposes and should be treated differently.
 
 ## `solver.toml`: Solver Runtime Configuration
 
-Fresh projects start with a default configuration like this:
+Fresh projects start with a termination limit and no explicit phases:
 
 ```toml
-[[phases]]
-type = "construction_heuristic"
-construction_heuristic_type = "first_fit"
-
-[[phases]]
-type = "local_search"
-[phases.acceptor]
-type = "late_acceptance"
-late_acceptance_size = 400
-[phases.forager]
-type = "accepted_count"
-limit = 4
-
 [termination]
 seconds_spent_limit = 30
 ```
 
+The rest of the generated file is commented guidance. With no `[[phases]]`
+declared, the runtime runs its model-aware default pipeline: construction for
+every scalar, scalar-group, and list variable, then local search when the
+model has moves to make. The same pipeline completes a fresh project with no
+planning variables, so the empty scaffold solves to `COMPLETED`.
+
+Declaring any `[[phases]]` replaces the whole default pipeline. The generated
+comments show an explicit first-fit construction phase followed by late
+acceptance with an accepted-count forager; an explicit `local_search` phase
+that omits `move_selector` is valid only once the model has planning
+variables.
+
+The generated app reads this file through the
+`solver_toml = "../../solver.toml"` argument of `#[planning_solution]` in
+`src/domain/plan.rs`. The runtime does not look for `solver.toml` in the
+working directory, so keep that argument when you edit the solution. The file
+is compiled into the app: rebuild and restart after changing it. The runtime
+rejects unknown keys: a solve started with a misspelled key ends `FAILED` at
+once. `solverforge check` does not detect unknown keys.
+
 This is the user-owned search layer. Edit it directly or use the CLI helpers.
-The list template uses `list_cheapest_insertion` instead of `first_fit`; both
-templates keep late acceptance, an accepted-count forager, and the 30-second
-termination limit shown above. The neutral scaffold does not declare an explicit
-move selector, so the runtime resolves the applicable neighborhoods from the
-model. Adding a list variable does not rewrite an app-owned search policy.
 
 `solver.toml` should answer operational search questions:
 
@@ -126,11 +128,11 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "3.7.1"
+cli_version = "3.8.1"
 
 [runtime]
-target = "solverforge 0.23.0"
-runtime_source = "crates.io: solverforge 0.23.0"
+target = "solverforge 0.24.0"
+runtime_source = "crates.io: solverforge 0.24.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -142,8 +144,8 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 3.7.1` web scaffold target. Fresh
-web generated apps target `solverforge 0.23.0`, take the CLI's
+This example reflects the `solverforge-cli 3.8.1` web scaffold target. Fresh
+web generated apps target `solverforge 0.24.0`, take the CLI's
 `solverforge-ui 0.9.0` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.
 
@@ -253,6 +255,7 @@ This reports:
 - scaffold runtime target
 - scaffold UI target
 - scaffold maps target
+- scaffold MCP target
 - source labels for each dependency line
 
 In generated apps, the crate versions are pinned in `Cargo.toml`, while the app

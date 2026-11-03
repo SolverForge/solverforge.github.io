@@ -33,6 +33,36 @@ Subcommands:
 | `scalar-group` | Declare a SolverForge scalar group for coupled scalar construction/search |
 | `conflict-repair` | Declare a conflict repair provider for a constraint |
 
+The `bash` examples on this page run in order in one project, a staffing model
+that assigns employees to shifts. Start it with:
+
+```bash
+solverforge new staffing
+cd staffing
+```
+
+### `generate solution`
+
+```text
+solverforge generate solution [OPTIONS] <NAME>
+```
+
+| Option                 | Meaning                             |
+| ---------------------- | ----------------------------------- |
+| `--score <SCORE_TYPE>` | Score type; default `HardSoftScore` |
+
+A fresh neutral scaffold's `Plan` can be replaced once by this command. If the
+project is already shaped, destroy the existing solution first.
+
+The solution type and its score type are rewritten together across the generated
+contract as well as the solution file, so the web/API/MCP DTOs, the solver
+service, `lib.rs`, and the MCP files never keep a reference to the previous
+solution or score.
+
+```bash
+solverforge generate solution schedule --score HardSoftScore
+```
+
 ### `generate fact`
 
 ```text
@@ -45,13 +75,22 @@ solverforge generate fact [OPTIONS] <NAME>
 | `-f, --force`         | Overwrite the fact file if it already exists |
 | `--pretend`           | Preview changes without writing files        |
 
-Creates `src/domain/<name>.rs`, updates `src/domain/mod.rs`, wires the
-collection into the planning solution, and syncs `solverforge.app.toml` plus the
-generated UI model.
+Creates `src/domain/<name>.rs` with `id` and `name` fields, updates
+`src/domain/mod.rs`, wires the collection into the planning solution, and syncs
+`solverforge.app.toml`, the generated UI model, and the demo data.
 
 ```bash
-solverforge generate fact employee --field "skill:String"
+solverforge generate fact employee --field skill:String
 ```
+
+`--field` accepts any Rust type. The command rejects `--field id:...` and
+`--field name:...`, because it already writes both fields. It imports the
+`chrono` types it recognizes (such as `NaiveDate`, `NaiveDateTime`, and
+`Weekday`) and adds `chrono` to `Cargo.toml` when one is used. For any other
+type that is not defined in `src/domain/`, it prints a warning: define that
+type in `src/domain/` and export it from `src/domain/mod.rs` before you build.
+Quote a type that contains `<` or `>`, such as `'skills:Vec<String>'`, so the
+shell does not read it as a redirection.
 
 ### `generate entity`
 
@@ -66,13 +105,16 @@ solverforge generate entity [OPTIONS] <NAME>
 | `-f, --force`                 | Overwrite the entity file if it already exists       |
 | `--pretend`                   | Preview changes without writing files                |
 
-`--planning-variable` emits `#[planning_variable(allows_unassigned = true)]`
-with an `Option<usize>` field. Use `generate variable` when you need an explicit
-scalar range or list element collection.
+The entity gets an `id` field; `--field id:...` is rejected.
 
 ```bash
-solverforge generate entity shift --planning-variable employee_idx
+solverforge generate entity shift --field required_skill:String
 ```
+
+`--planning-variable <FIELD>` adds an `Option<usize>` scalar variable with
+`#[planning_variable(allows_unassigned = true)]` and no value range. Use
+`generate variable` when the variable needs a range or a list element
+collection, as below.
 
 ### `generate variable`
 
@@ -117,18 +159,29 @@ solution trait, so those entries cannot be overridden alongside `--domain cvrp`.
 `standard` is not a variable kind. It is only the default demo data size label
 used by `solverforge.app.toml`.
 
+Scalar examples on the `Shift` entity, over the `employees` collection and an
+hour of the day:
+
 ```bash
 solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --allows-unassigned
 solverforge generate variable hour --entity Shift --kind scalar --countable-range 0..24
-solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --candidate-values employee_candidates
-solverforge generate variable stops --entity Route --kind list --elements visits
-solverforge generate variable visit_order --entity Route --kind list --elements visits --domain cvrp
 ```
 
-Scalar-hook and list-metadata flags only write `#[planning_variable(...)]` or
+A list variable on a new `Route` entity, over a new `Visit` fact:
+
+```bash
+solverforge generate fact visit
+solverforge generate entity route
+solverforge generate variable stops --entity Route --kind list --elements visits
+```
+
+Scalar-hook and list-metadata flags such as `--candidate-values` or
+`--domain cvrp` only write `#[planning_variable(...)]` or
 `#[planning_list_variable(...)]` metadata; they project it into
-`solverforge.app.toml` and the web-shell UI model, and they name user-owned Rust
-implementations that you still have to write.
+`solverforge.app.toml` and the web-shell UI model. The project compiles only
+after you write the Rust they name: the hook function for
+`--candidate-values employee_candidates`, or the `VrpSolution` implementation
+on the planning solution that `--domain cvrp` requires.
 
 ### `generate constraint`
 
@@ -148,7 +201,7 @@ Pattern options:
 | Option      | Meaning |
 | ----------- | ------- |
 | `--unary`   | Penalize matching entities with `for_each + filter + penalize` |
-| `--pair`    | Penalize conflicting pairs with `for_each_unique_pair` |
+| `--pair`    | Penalize conflicting pairs from a self-join on the entity's first planning variable; each unordered pair appears once |
 | `--join`    | Penalize entity-fact mismatch with `for_each + join` |
 | `--balance` | Generate a load-balance style soft constraint |
 | `--reward`  | Reward matching entities with `for_each + filter + reward` |
@@ -167,7 +220,7 @@ Write options:
 
 Choose at most one pattern flag. If no pattern flag is supplied, the command
 scans the current domain and opens an interactive wizard. `--balance` and
-`--reward` imply soft scoring in the current generator.
+`--reward` always score soft.
 
 ```bash
 solverforge generate constraint max_hours --unary --hard
@@ -175,27 +228,15 @@ solverforge generate constraint no_overlap --pair
 solverforge generate constraint required_skill --join --hard
 ```
 
-### `generate solution`
+`max_hours` filters single shifts, `no_overlap` pairs shifts that share an
+`employee_idx`, and `required_skill` joins each shift to the employee its
+`employee_idx` points at.
 
-```text
-solverforge generate solution [OPTIONS] <NAME>
-```
-
-| Option                 | Meaning                             |
-| ---------------------- | ----------------------------------- |
-| `--score <SCORE_TYPE>` | Score type; default `HardSoftScore` |
-
-A fresh neutral scaffold can be replaced once by this command. If the project
-is already shaped, destroy the existing solution first.
-
-The solution type and its score type are rewritten together across the generated
-contract as well as the solution file, so the web/API/MCP DTOs, the solver
-service, `lib.rs`, and the MCP files never keep a reference to the previous
-solution or score.
-
-```bash
-solverforge generate solution schedule --score HardSoftScore
-```
+Every skeleton compiles, but its rule is a placeholder that panics. A solve
+fails with `lifecycleState` `FAILED` until you replace it; the panic message
+names the function and file to edit. The
+[Getting Started](/docs/solverforge-cli/getting-started/#add-constraints) guide
+replaces two of them.
 
 ### `generate score`
 
@@ -204,8 +245,9 @@ solverforge generate score [OPTIONS] <SCORE_TYPE>
 ```
 
 `<SCORE_TYPE>` can be `HardSoftScore`, `HardSoftDecimalScore`,
-`HardMediumSoftScore`, `SoftScore`, or a concrete bendable score such as
-`BendableScore<2, 3>`. `SimpleScore` is not accepted.
+`HardMediumSoftScore`, or `SoftScore`. `BendableScore` is refused: a planning
+solution's score must be parseable, and the runtime parses only those four.
+`SimpleScore` is not a score type.
 
 The command rewrites the score type on every surface that carries it — the
 solution, every `src/constraints/*.rs` module, and the generated contract files
@@ -232,6 +274,12 @@ solverforge generate data [OPTIONS]
 The command rewrites `src/data/data_seed.rs`, ensures the stable
 `src/data/mod.rs` wrapper exists, and updates `[demo].default_size` in
 `solverforge.app.toml` when `--size` is provided.
+
+Other `generate` and `destroy` commands also re-render the seed so it matches
+the model, but only while the file still starts with the
+`// @generated by solverforge-cli: data v1` header. Remove that line once you
+write your own demo data, and later commands leave the file alone;
+`generate data` still rewrites it when you ask.
 
 ```bash
 solverforge generate data
@@ -279,12 +327,19 @@ Limit and write options:
 | `--max-rematch-size <N>` | Limit rematch size for assignment groups |
 | `--skip-solver-config` | Do not add matching `solver.toml` phases |
 
-Examples:
+A candidate-backed group that moves a shift's employee and hour together:
 
 ```bash
-solverforge generate scalar-group required_assignment --assignment Task.resource_idx --required-entity required_task
-solverforge generate scalar-group paired_assignment --candidates paired_candidates --target Task.primary_idx --target Task.secondary_idx
+solverforge generate scalar-group shift_slot --candidates shift_slot_candidates --target Shift.employee_idx --target Shift.hour
 ```
+
+An assignment-backed group names one nullable scalar variable instead, for
+example `--assignment Shift.employee_idx --required-entity required_shift`. A
+variable belongs to at most one group.
+
+The command adds a stub for each hook function to the planning solution file
+and its phases to the managed `solver.toml` region. Each stub is a `todo!()`
+that panics until you write the function.
 
 ### `generate conflict-repair`
 
@@ -305,8 +360,11 @@ solverforge generate conflict-repair [OPTIONS] --provider <FN_PATH> <CONSTRAINT>
 Example:
 
 ```bash
-solverforge generate conflict-repair required_assignment --provider repair_required_assignment
+solverforge generate conflict-repair no_overlap --provider repair_no_overlap
 ```
+
+The constraint must exist; the provider stub `repair_no_overlap` in the
+planning solution file is a `todo!()` until you write it.
 
 ## `solverforge destroy`
 
@@ -315,12 +373,29 @@ solverforge destroy [OPTIONS] <COMMAND>
 ```
 
 Removes generated resources and resyncs the app spec, the generated demo data,
-and the UI model. Destroying a fact, entity, or constraint re-renders
-`src/data/data_seed.rs` the same way the generate paths do, so a removed type
-does not stay behind in the seed; destroying the solution skips that render,
-because no planning solution remains to render the seed against. The
-confirmation flag belongs to the `destroy` command itself, so place it before
-the resource subcommand.
+and the UI model; the demo-data seed follows the header rule above. Remove
+dependents before what they depend on:
+
+1. constraints that read an entity or fact (`destroy constraint`)
+2. conflict repairs and scalar groups that name a constraint or variable
+3. planning variables, or the entity that owns them
+4. facts whose collection a variable ranges over
+5. the solution
+
+`destroy` refuses a resource that something else still references, names the
+references, and changes nothing: an entity read by constraint files or
+targeted by a scalar group, a fact whose collection a planning variable ranges
+over, a constraint named by a conflict repair, or a variable targeted by a
+scalar group. For example, after the repair and the group are gone but the
+three constraints still read `Shift`:
+
+```text
+error: cannot destroy entity 'Shift' because source files still reference it: src/constraints/max_hours.rs, src/constraints/no_overlap.rs, src/constraints/required_skill.rs
+```
+
+Destroying the solution does not re-render the seed, because no planning
+solution remains to render it against. The confirmation flag belongs to the
+`destroy` command itself, so place it before the resource subcommand.
 
 | Option      | Meaning                      |
 | ----------- | ---------------------------- |
@@ -339,12 +414,17 @@ Subcommands:
 | `conflict-repair` | `solverforge destroy [OPTIONS] conflict-repair <NAME>` | Remove a conflict repair declaration |
 
 ```bash
-solverforge destroy entity shift
+solverforge destroy --yes conflict-repair no_overlap
+solverforge destroy --yes scalar-group shift_slot
 solverforge destroy --yes constraint no_overlap
-solverforge destroy -y variable --entity Task resource_idx
-solverforge destroy --yes scalar-group required_assignment
-solverforge destroy --yes conflict-repair required_assignment
+solverforge destroy --yes constraint max_hours
+solverforge destroy --yes constraint required_skill
+solverforge destroy -y variable --entity Shift hour
+solverforge destroy --yes entity shift
+solverforge destroy --yes fact employee
 ```
+
+Without `--yes`, each command asks for confirmation.
 
 ## See Also
 

@@ -37,7 +37,16 @@ The CLI writes code, but not every generated line has the same ownership model.
 
 When a generator uses managed markers, keep the `@solverforge:begin` and
 `@solverforge:end` comments intact. They are the boundary that lets future CLI
-operations patch generated regions without taking over the whole file.
+operations patch generated regions without taking over the whole file. The
+CLI runs rustfmt on the Rust files it writes, and `cargo fmt` leaves the
+managed regions in a shape the CLI still accepts.
+
+The `bash` examples on this page run in order in one project:
+
+```bash
+solverforge new planner
+cd planner
+```
 
 ## Choosing The Next Generator
 
@@ -78,10 +87,16 @@ Useful flags:
 Generated facts include:
 
 - `#[problem_fact]`
-- a `#[planning_id]` field
+- a `#[planning_id]` `id` field
 - a `name` field
 - a `new(...)` constructor
 - a small construction test
+
+Generated entities get the `id` field but no `name`. Do not pass either name
+to `--field`: the CLI rejects a field it already writes. Field types from
+`chrono` are imported and add `chrono` to `Cargo.toml`; any other type must be
+defined in `src/domain/` before the app compiles, and the CLI warns until it
+is.
 
 ## Entities
 
@@ -91,11 +106,9 @@ Create a planning entity:
 solverforge generate entity task --field label:String --field priority:i32
 ```
 
-Or create the entity and its first scalar variable together:
-
-```bash
-solverforge generate entity shift --planning-variable employee_idx --field start:String --field duration:i32
-```
+`generate entity` can also add a first scalar variable with
+`--planning-variable <FIELD>`. That variable has no value range, so the next
+section adds one explicitly instead.
 
 Useful flags:
 
@@ -153,9 +166,12 @@ default demo data size label.
 
 ## List Variables
 
-Create a list variable when each entity owns an ordered collection:
+Create a list variable when each entity owns an ordered collection. This one
+needs a `Visit` fact and a `Route` entity first:
 
 ```bash
+solverforge generate fact visit
+solverforge generate entity route
 solverforge generate variable stops \
   --entity Route \
   --kind list \
@@ -205,28 +221,26 @@ That is a core design decision of the CLI:
 ## Solution and Score
 
 Fresh projects already include a `Plan` solution using `HardSoftScore`.
+`solverforge generate solution <name>` renames that neutral solution once,
+before the model grows; see
+[Generator Commands](/docs/solverforge-cli/generator-commands/#generate-solution).
 
-If you need to regenerate or rename the planning solution:
-
-```bash
-solverforge generate solution schedule --score HardSoftScore
-```
-
-If the solution exists and you only want to change the score type:
+To change the score type of an existing solution:
 
 ```bash
 solverforge generate score HardSoftDecimalScore
 ```
 
-The current `generate score` command accepts score types such as:
+`generate score` accepts exactly these score types:
 
 - `HardSoftScore`
 - `HardSoftDecimalScore`
 - `HardMediumSoftScore`
 - `SoftScore`
-- `BendableScore<N, M>`
 
-`SimpleScore` is not accepted.
+It rewrites the solution, every constraint module, and the generated DTO and
+service files together. `BendableScore` is refused because a planning
+solution's score must be parseable, and `SimpleScore` is not a score type.
 
 ## Constraints
 
@@ -242,7 +256,7 @@ you want to write:
 | Flag | Pattern | Typical use |
 | ---- | ------- | ----------- |
 | `--unary` | `for_each + filter + penalize` | single-entity violations |
-| `--pair` | `for_each_unique_pair` | collisions and overlap checks |
+| `--pair` | self-join on the first planning variable, each unordered pair once | collisions and overlap checks |
 | `--join` | entity-fact comparison | requirement matching |
 | `--balance` | balance stream | distribution fairness |
 | `--reward` | `for_each + filter + reward` | preferred states |
@@ -259,16 +273,17 @@ Useful flags:
 - `--force` - overwrite an existing constraint
 - `--pretend` - preview without writing changes
 
-Important: generated constraint files are not finished logic. They are
-deliberately scaffolded placeholders. Replace the TODO text and placeholder
-conditions before you treat the constraint as real.
+Generated constraint files are not finished logic. Each one compiles, but its
+rule is a placeholder that panics: a solve fails with `lifecycleState`
+`FAILED`, and the server log names the function and file to edit. Replace
+every placeholder before you solve.
 
 ## Scalar Groups
 
 Scalar groups describe coupled scalar construction and search resources that
 the runtime can consume from `solver.toml`.
 
-Assignment-backed group:
+Assignment-backed group over the nullable `Task.resource_idx` variable:
 
 ```bash
 solverforge generate scalar-group required_assignment \
@@ -277,14 +292,9 @@ solverforge generate scalar-group required_assignment \
   --capacity-key resource_capacity
 ```
 
-Candidate-backed group:
-
-```bash
-solverforge generate scalar-group paired_assignment \
-  --candidates paired_candidates \
-  --target Task.primary_idx \
-  --target Task.secondary_idx
-```
+A candidate-backed group instead takes `--candidates <FN_PATH>` and one
+`--target <ENTITY.FIELD>` per scalar variable it moves together; a variable
+belongs to at most one group.
 
 Useful flags:
 
@@ -303,16 +313,21 @@ Useful flags:
 By default the command writes scalar-group metadata to `solverforge.app.toml`,
 adds hook stubs and `ScalarGroup` declarations to the planning solution, and
 synchronizes grouped construction and search refs in the CLI-managed
-`# @solverforge:begin solver-config` region.
+`# @solverforge:begin solver-config` region. Each hook stub is a `todo!()`
+that panics until you write the function. Those managed phases replace the
+runtime's default pipeline, as any declared `[[phases]]` do.
 
 ## Conflict Repairs
 
 Conflict repairs connect a named constraint to an app-owned repair provider:
 
 ```bash
-solverforge generate conflict-repair required_assignment \
-  --provider repair_required_assignment
+solverforge generate conflict-repair no_overlap \
+  --provider repair_no_overlap
 ```
+
+The named constraint must exist, and the generated `repair_no_overlap` stub
+is a `todo!()` until you write it.
 
 Useful flags:
 
@@ -359,23 +374,24 @@ stable while the seed file is regenerated underneath it.
 
 ## Destroy Flows
 
-Generators are not one-way only. You can remove scaffolded resources:
+Generators are not one-way only. Remove resources in the reverse order of
+their dependencies: repairs and groups, then constraints, then variables and
+entities, then facts, and the solution last.
 
 ```bash
-solverforge destroy entity task
-solverforge destroy variable --entity Task resource_idx
-solverforge destroy fact resource
-solverforge destroy constraint no_overlap
-solverforge destroy scalar-group required_assignment
-solverforge destroy conflict-repair required_assignment
-solverforge destroy solution
-```
-
-Use `--yes` or `-y` on the `destroy` command to skip the confirmation prompt:
-
-```bash
+solverforge destroy --yes conflict-repair no_overlap
+solverforge destroy --yes scalar-group required_assignment
 solverforge destroy --yes constraint no_overlap
+solverforge destroy --yes variable --entity Task resource_idx
+solverforge destroy --yes entity task
+solverforge destroy --yes fact resource
 ```
+
+`--yes` (or `-y`) on the `destroy` command skips the confirmation prompt. A
+destroy that would leave a dangling reference is refused before anything
+changes: the error names the constraint files, variables, scalar groups, or
+conflict repairs that still reference the resource, and a hint names the
+command to run first.
 
 Destroy operations update the same managed surfaces used by generation:
 

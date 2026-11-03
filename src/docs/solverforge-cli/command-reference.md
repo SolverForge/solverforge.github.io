@@ -2,7 +2,7 @@
 title: Command Reference
 description: >
   Command groups, global options, version reporting, and the full
-  solverforge-cli 3.7.1 command surface.
+  solverforge-cli 3.8.1 command surface.
 weight: 5
 ---
 
@@ -41,7 +41,8 @@ equivalent to the matching nested `--help` form.
 
 Portable preferences come from `.solverforgerc` in the project root and then
 `~/.solverforgerc`. The recognized keys are intentionally narrow: `port`,
-`no_color`, and `quiet`.
+`no_color`, and `quiet`. For `solverforge server`, `--port` wins over the `PORT`
+environment variable, which wins over `.solverforgerc`; the default is `7860`.
 
 ## Command Groups
 
@@ -61,7 +62,7 @@ Portable preferences come from `.solverforgerc` in the project root and then
 | `destroy`     | Remove a generated resource from the current project |
 | `server`      | Start the development server |
 | `info`        | Summarize entities, facts, constraints, and score type |
-| `check`       | Validate project structure and configuration |
+| `check`       | Validate managed blocks, domain wiring, model resources, and `solver.toml`; does not compile |
 | `test`        | Run `cargo test` with passthrough arguments |
 | `routes`      | List HTTP routes defined in `src/api/` (web and API shells) |
 | `connect`     | Print MCP client connection configs for an MCP-shell project |
@@ -82,28 +83,28 @@ solverforge generate variable --help
 `solverforge -V` prints only the CLI package version:
 
 ```text
-solverforge 3.7.1
+solverforge 3.8.1
 ```
 
 `solverforge --version` reports the CLI package version separately from every
 crate target and source used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 3.7.1
-CLI version: 3.7.1
-Scaffold runtime target: SolverForge crate target 0.23.0
+solverforge solverforge-cli 3.8.1
+CLI version: 3.8.1
+Scaffold runtime target: SolverForge crate target 0.24.0
 Scaffold UI target: solverforge-ui 0.9.0
 Scaffold maps target: solverforge-maps 2.1.4
 Scaffold MCP target: rmcp 3.8.0
-Runtime source: crates.io: solverforge 0.23.0
+Runtime source: crates.io: solverforge 0.24.0
 UI source: crates.io: solverforge-ui 0.9.0
 Maps source: crates.io: solverforge-maps 2.1.4
 MCP source: crates.io: rmcp 3.8.0
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 3.7.1` line starts new scaffolds on the published
-`solverforge 0.23.0` runtime, with `solverforge-ui 0.9.0` and
+`solverforge-cli 3.8.1` line starts new scaffolds on the published
+`solverforge 0.24.0` runtime, with `solverforge-ui 0.9.0` and
 `solverforge-maps 2.1.4` for the web shell and `rmcp 3.8.0` for the MCP shell.
 The core runtime can move ahead of the scaffold target, so registry installs
 should always be checked with `solverforge --version`.

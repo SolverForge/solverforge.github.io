@@ -29,7 +29,8 @@ directory.
 solverforge check [OPTIONS]
 ```
 
-Validates:
+Validates the project's structure. It does not compile the project and ends by
+saying so; run `cargo build` to compile.
 
 | Check                                                | Result |
 | ---------------------------------------------------- | ------ |
@@ -42,6 +43,9 @@ Validates:
 | entities have solvable fields                        | Warns for entities with no scalar or list variable |
 | scalar-group and conflict-repair references          | Errors when generated model-resource refs are stale |
 
+`check` does not reject unknown `solver.toml` keys; the runtime does, and a
+solve started with one ends `FAILED` at once.
+
 ## `solverforge routes`
 
 ```text
@@ -49,8 +53,10 @@ solverforge routes [OPTIONS]
 ```
 
 Searches for `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs`, then
-parses Axum `.route("...", method(handler))` calls and prints a
-`METHOD / PATH / HANDLER` table. This applies to web and API shells.
+parses Axum `.route("...", method(handler))` calls, including chained methods
+such as `get(a).delete(b)` and calls split across lines, and prints a
+`METHOD / PATH / HANDLER` table. This applies to web and API shells; routers
+defined in other files are not listed.
 
 ## `solverforge connect`
 
@@ -60,7 +66,8 @@ solverforge connect [OPTIONS]
 
 Prints ready-to-paste MCP client configuration for an MCP-shell project: the
 stdio command plus the Streamable HTTP URL for opencode, Claude Code,
-Claude Desktop, Cursor, VS Code, and other clients.
+Claude Desktop, Cursor, VS Code, and other clients. In a web, API, or CLI
+project it exits with an error.
 
 Options:
 
@@ -95,14 +102,15 @@ solverforge connect --port 8080
 ## `solverforge test`
 
 ```text
-solverforge test [OPTIONS] [EXTRA_ARGS]...
+solverforge test [OPTIONS] [CARGO_ARGS]... [-- <HARNESS_ARGS>...]
 ```
 
 Arguments:
 
-| Argument          | Meaning |
-| ----------------- | ------- |
-| `[EXTRA_ARGS]...` | Arguments passed directly to `cargo test` |
+| Argument            | Meaning |
+| ------------------- | ------- |
+| `[CARGO_ARGS]...`   | Arguments passed to `cargo test`, such as a test-name filter or Cargo flags |
+| `[HARNESS_ARGS]...` | Arguments after `--`, passed to the test binaries, such as `--nocapture` |
 
 Examples:
 
@@ -188,8 +196,11 @@ Examples:
 ```bash
 solverforge completions bash >> ~/.bashrc
 solverforge completions zsh >> ~/.zshrc
+mkdir -p ~/.config/fish/completions
 solverforge completions fish > ~/.config/fish/completions/solverforge.fish
 ```
+
+Run the line for your shell, then open a new shell.
 
 ## `solverforge help`
 

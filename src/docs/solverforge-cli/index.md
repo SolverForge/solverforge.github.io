@@ -11,10 +11,10 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual documents the `solverforge-cli 3.7.1` interface. Fresh projects use
+This manual documents the `solverforge-cli 3.8.1` interface. Fresh projects use
 the scaffold targets baked into the binary you have installed; run
 `solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
-Fresh scaffolds target `solverforge 0.23.0`, matching the
+Fresh scaffolds target `solverforge 0.24.0`, matching the
 [core manual](/docs/solverforge/). Parallel local-search evaluation is opt-in;
 the default `auto` setting stays sequential.
 <% end %>
@@ -38,7 +38,7 @@ Think of the CLI as a project shaper, not as a separate modeling language.
 
 | Layer | Owner | What changes there |
 | ----- | ----- | ------------------ |
-| Scaffold shell | `solverforge new` | Web, API, or CLI shell, config files, and app metadata |
+| Scaffold shell | `solverforge new` | Web, API, CLI, or MCP shell, config files, and app metadata |
 | Domain model | CLI generators plus Rust edits | facts, entities, scalar variables, list variables, solution type |
 | Constraint logic | generated skeletons, then user Rust | real hard and soft scoring rules |
 | Runtime search | `solver.toml` | phases, acceptors, selectors, termination, candidate limits |
@@ -64,8 +64,8 @@ variables as the domain earns them, and the app metadata follows the Rust model.
 - A frontend that composes shipped `solverforge-ui` assets rather than
   vendoring a template-specific asset pipeline
 - A local development flow built around `solverforge server`, `solverforge
-  info`, `solverforge check`, `solverforge routes`, `solverforge connect`, and
-  `solverforge test`
+  info`, `solverforge check`, `solverforge routes`, and `solverforge test`,
+  plus `solverforge connect` for MCP shells
 - The portable `solverforge-modeling` and `solverforge-ui` agent skills with an
   agent-centric installer and an installable solve smoke test
 
@@ -75,47 +75,42 @@ Use this loop while shaping a generated app:
 
 ```bash
 solverforge info
-solverforge generate fact employee --field skill:String
-solverforge generate entity shift --field starts_at:String --field ends_at:String
+solverforge generate fact employee
+solverforge generate entity shift --field starts_at:NaiveDateTime --field ends_at:NaiveDateTime
 solverforge generate variable employee_idx --entity Shift --kind scalar --range employees --allows-unassigned
 solverforge generate constraint no_overlap --pair --hard
-solverforge generate conflict-repair no_overlap --provider repair_no_overlap --skip-solver-config
-solverforge generate data --size standard
 solverforge check
+cargo build
 solverforge test
 solverforge server --debug
 ```
 
-After each generator step, inspect the Rust files it touched. Generated
-constraint skeletons are deliberately unfinished; replace placeholder logic
-before treating a solve result as meaningful.
+After each generator step, read the Rust files it touched. Every generated
+constraint skeleton contains a placeholder that panics: a solve fails until you
+replace it with the real rule, as the
+[Getting Started](/docs/solverforge-cli/getting-started/#add-constraints)
+guide shows. `solverforge check` validates structure only; `cargo build` is
+the step that compiles the app.
 
 ## Installation
 
 ```bash
-cargo install solverforge-cli
+cargo install solverforge-cli --locked
 ```
 
 Update an existing install:
 
 ```bash
-cargo install solverforge-cli --force
-```
-
-Install from a local checkout when you are working on the CLI itself:
-
-```bash
-cd solverforge-cli
-cargo install --path .
+cargo install solverforge-cli --locked --force
 ```
 
 Use `solverforge --version` to see:
 
 - the CLI version
-- the scaffold runtime target
-- the scaffold UI target
-- the scaffold maps target
-- the exact runtime, UI, and maps sources used by newly generated projects
+- the scaffold runtime, UI, maps, and MCP targets
+- the exact crates.io sources used by newly generated projects
+
+The CLI and the apps it generates need Rust `1.95` or newer.
 
 ## Default Workflow
 
@@ -125,17 +120,10 @@ cd my-scheduler
 solverforge server
 ```
 
-Open `http://localhost:7860` after the server starts.
-
-Then expand the model:
-
-```bash
-solverforge generate fact resource --field category:String --field load:i32
-solverforge generate entity task --field label:String --field priority:i32
-solverforge generate variable resource_idx --entity Task --kind scalar --range resources --allows-unassigned
-solverforge generate constraint no_overlap --pair --hard
-solverforge generate data --size large
-```
+Open `http://localhost:7860` after the server starts. The fresh shell solves its
+empty plan to `0hard/0soft`; the
+[Getting Started](/docs/solverforge-cli/getting-started/) guide grows it into a
+task assignment model and solves that.
 
 The default web shell is intentionally thin. It starts with a neutral `Plan`
 solution, solver lifecycle routes, `solverforge-ui`-backed frontend assets, and
@@ -160,7 +148,8 @@ model for you.
   repairs, demo data, and metadata.
 - It keeps managed blocks and `solverforge.app.toml` synchronized.
 - It does not infer business rules from field names.
-- It does not make generated constraint TODOs correct.
+- It does not write constraint rules: generated skeletons panic until you
+  replace their placeholders.
 - It does not replace runtime-level `solver.toml` tuning when a model needs a
   different construction, selector, acceptor, or termination policy.
 

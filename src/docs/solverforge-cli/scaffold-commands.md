@@ -43,8 +43,8 @@ Rust crate name, and Rust keywords are rejected.
 
 Unless `--skip-git` is set, the command initializes a Git repository and
 attempts an initial commit. Unless `--skip-readme` is set, it writes a generated
-README. When not running quiet, it prompts to run `cargo check` after
-scaffolding.
+README. Without `--quiet`, it then asks whether to run `cargo check`; in a
+non-interactive session the question is skipped.
 
 Example:
 
@@ -85,7 +85,7 @@ Options:
 
 | Option              | Meaning |
 | ------------------- | ------- |
-| `-p, --port <PORT>` | Port to bind; when omitted, use `.solverforgerc` and then `7860` |
+| `-p, --port <PORT>` | Port to bind; when omitted, use the `PORT` environment variable, then `.solverforgerc`, then `7860` |
 | `--debug`           | Run in debug mode (faster compilation, slower runtime) |
 
 Command behavior depends on the shell:
@@ -105,6 +105,7 @@ Examples:
 ```bash
 solverforge server
 solverforge server --port 8080
+PORT=8080 solverforge server
 solverforge server --debug
 ```
 

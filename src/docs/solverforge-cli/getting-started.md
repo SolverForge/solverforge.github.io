@@ -1,8 +1,8 @@
 ---
 title: Getting Started
 description: >
-  Install solverforge-cli, scaffold a neutral app shell, and take the first
-  generated project from empty shell to real model edits.
+  Install solverforge-cli, scaffold a web app, grow it into a small task
+  assignment model, replace the generated placeholders, and solve it.
 weight: 1
 ---
 
@@ -14,428 +14,299 @@ and describe your problem: the agent runs the steps below for you. The
 [maintenance planning walkthrough](/docs/getting-started/maintenance-planning-with-the-agent-skill/)
 shows one complete run.
 
-This guide walks the same path by hand:
+This guide walks the same path by hand, from an empty directory to a solved
+plan:
 
-1. install the CLI
-2. verify the scaffold targets baked into your binary
-3. scaffold a fresh project shell
-4. boot the generated backend and frontend
-5. grow the domain with the first generator commands
-6. inspect and validate the generated application
+1. install the CLI and read the scaffold targets it carries
+2. scaffold a web app and solve its empty plan
+3. add a resource fact, a task entity, and a planning variable
+4. generate two constraints and replace their placeholders
+5. build the app and solve the task plan
 
-If you want a concrete app after that generic shell, continue with the
-[SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/),
-[SolverForge Lessons Use Case](/docs/getting-started/solverforge-lessons-use-case/),
-[SolverForge Deliveries Use Case](/docs/getting-started/solverforge-deliveries-use-case/),
-or the [SolverForge FSR Use Case](/docs/getting-started/solverforge-fsr-use-case/).
+Every command runs from a terminal; the solve steps use `curl`.
 
 ## Prerequisites
 
-- Rust stable `1.95+` to build the CLI itself
-- The Rust toolchain required by the scaffolded runtime target reported by
-  `solverforge --version`
-- Cargo
-- A working C toolchain for Rust dependencies on your platform
+- Rust `1.95` or newer with Cargo. The CLI and every app it generates declare
+  `rust-version = "1.95"`. Check your toolchain:
 
-The CLI crate itself declares `rust-version = "1.95"`. Generated applications
-compile against the scaffolded SolverForge crate targets reported by
-`solverforge --version`; use the runtime crate metadata as the source of truth
-for the generated app's Rust version requirement.
+  ```bash
+  rustc --version
+  ```
 
-## Install or Update the CLI
+- A C toolchain for native Rust dependencies (`cc` on Linux and macOS, the MSVC
+  build tools on Windows).
+- `curl`, to send the solve requests below.
 
-```bash
-cargo install solverforge-cli
-```
-
-That command installs the current package published on crates.io.
-
-Update an existing install:
+## Install the CLI
 
 ```bash
-cargo install solverforge-cli --force
-```
-
-Install from a checkout when you are iterating on the CLI itself:
-
-```bash
-cd solverforge-cli
-cargo install --path .
-```
-
-## Verify the Installed Targets
-
-The CLI version is only one part of what matters. The binary also carries the
-current scaffold targets for the runtime, UI, and maps crates.
-
-```bash
+cargo install solverforge-cli --locked
 solverforge --version
 ```
 
-The output includes:
+`cargo install` builds the newest `solverforge-cli` from crates.io. The version
+output names the CLI and every crate a new project depends on:
 
-- CLI version
-- scaffold runtime target
-- scaffold UI target
-- scaffold maps target
-- scaffold MCP target
-- explicit source labels for each dependency line used in new projects
+```text
+solverforge solverforge-cli 3.8.1
+CLI version: 3.8.1
+Scaffold runtime target: SolverForge crate target 0.24.0
+Scaffold UI target: solverforge-ui 0.9.0
+Scaffold maps target: solverforge-maps 2.1.4
+Scaffold MCP target: rmcp 3.8.0
+Runtime source: crates.io: solverforge 0.24.0
+UI source: crates.io: solverforge-ui 0.9.0
+Maps source: crates.io: solverforge-maps 2.1.4
+MCP source: crates.io: rmcp 3.8.0
+```
 
-## Create a New Project
+To update an existing install, add `--force` to the same `cargo install`
+command.
 
-The `new` command creates a neutral shell:
+## Create a Project
 
 ```bash
 solverforge new my-scheduler
 cd my-scheduler
 ```
 
-Useful options:
+`solverforge new` writes a neutral web shell and runs `git init`. In an
+interactive terminal it then asks whether to run `cargo check`; either answer
+works, because the server step below compiles the app anyway. Pass
+`--shell api`, `--shell cli`, or `--shell mcp` for the other shells; see
+[Scaffold Commands](/docs/solverforge-cli/scaffold-commands/). The web shell
+contains:
 
-- `--shell web|api|cli|mcp` - choose the generated shell; `web` is the default
-- `--skip-git` - do not run `git init` or create the initial commit
-- `--skip-readme` - do not generate `README.md`
+- an Axum backend with retained job routes, typed SSE events, snapshots, and
+  score analysis
+- a `solverforge-ui` frontend in `static/`
+- `solverforge.app.toml`, the scaffold contract the CLI keeps in sync
+- `solver.toml`, the search configuration; it starts with a 30-second
+  termination limit and the runtime's default phases
 
-Fresh output includes a short "next steps" block and reminds you that the
-default web generated shell already contains:
+## Solve the Empty Plan
 
-- one neutral app shell for scalar and list modeling
-- retained lifecycle routes and UI wiring
-- typed SSE events
-- `solverforge.app.toml` as the scaffold contract
-- `solver.toml` as the solver search configuration layer
-
-Use `--shell api` when you want the Axum API without static frontend assets.
-Use `--shell cli` when you want a command-line app rather than an HTTP server.
-Use `--shell mcp` when you want an MCP server that exposes the solver to an
-agent harness; see the [MCP Shell](/docs/solverforge-cli/mcp-shell/) page. The
-shell choice is recorded in `[app].shell`; it is not a scalar, list, or mixed
-model selector.
-
-## Run the Local Server
+Start the server:
 
 ```bash
 solverforge server
 ```
 
-By default, `solverforge server` runs the generated project in release mode via
-`cargo run --release`. That makes first boot slower, but it keeps the default
-behavior close to the production runtime path.
-
-Useful options:
-
-- `--port <PORT>` - bind a different port instead of the default `7860`
-- `--debug` - run the generated app in debug mode for faster local iteration
-
-Open `http://localhost:7860` in your browser.
-
-The default web generated project serves:
-
-- the `solverforge-ui` asset bundle
-- a neutral frontend in `static/app.js`
-- retained job routes under `/jobs/*`
-- demo data endpoints under `/demo-data/*`
-
-For an `mcp` project, `solverforge server` boots the stateless Streamable HTTP
-transport; the default stdio transport starts with `cargo run`. A `cli` project
-does not use `solverforge server`; run it with `cargo run -- demo-data`. See the
-[MCP Shell](/docs/solverforge-cli/mcp-shell/) page.
-
-## Inspect the Scaffold Before You Change It
-
-Right after scaffolding, these commands are useful:
+The first start compiles the app in release mode, which takes a few minutes.
+When the server prints `listening on http://0.0.0.0:7860`, open
+`http://localhost:7860` in a browser, or send a solve from a second terminal
+in the same directory:
 
 ```bash
-solverforge info
-solverforge check
-solverforge routes
-solverforge connect
+curl -s localhost:7860/demo-data/STANDARD > plan.json
+curl -s -X POST -H 'content-type: application/json' --data @plan.json localhost:7860/jobs
+curl -s localhost:7860/jobs/0
 ```
 
-`solverforge info` summarizes the current planning solution, facts, entities,
-constraints, and solver-owned fields. `solverforge check` validates the project
-structure. `solverforge routes` lists the HTTP routes defined in `src/api/`.
+The `POST` answers `{"id":"0"}`. The new project has no facts, entities, or
+constraints yet, so the job finishes at once with `"lifecycleState":"COMPLETED"`
+and `"bestScore":"0hard/0soft"`. Stop the server with `Ctrl+C`.
 
-In a brand-new shell, the generated route surface already includes health,
-info, demo data, retained job lifecycle, snapshot analysis, pause, resume,
-cancel, and SSE events.
+`solverforge server` binds port `7860` unless you pass `--port <PORT>` or set
+the `PORT` environment variable.
 
 ## Grow the Domain
 
-The normal build-out flow is:
+This guide models a small assignment problem: every task needs one resource,
+and the total task duration should be spread evenly across the resources.
 
-1. add facts
-2. add entities
-3. add scalar or list variables
-4. add constraints
-5. regenerate demo data
-6. replace placeholder constraint logic with real domain rules
-
-Keep this order unless the domain gives you a reason to deviate. Facts define
-the immutable value ranges and reference data. Entities define the mutable
-records the solver can change. Planning variables make those entities solvable.
-Constraints make the solve meaningful.
-
-After each step, run:
+Add the problem fact and the planning entity:
 
 ```bash
-solverforge info
-solverforge check
+solverforge generate fact resource
+solverforge generate entity task --field duration:u32
 ```
 
-Use `info` to verify that the CLI sees the model you meant to create. Use
-`check` to catch missing files, incomplete domain wiring, and entities that
-still have no scalar or list planning variable.
+`generate fact` writes `src/domain/resource.rs` with an `id` and a `name`
+field. `generate entity` writes `src/domain/task.rs` with an `id` and the
+extra `duration` field. Do not pass `--field id:...` or `--field name:...`: the
+CLI already writes those fields and rejects duplicates. A field type from
+`chrono` makes the CLI add `chrono` to `Cargo.toml`; a type the CLI does not
+know, such as an enum of your own, must be defined in `src/domain/` before the
+app compiles, and the CLI prints a warning until it is.
 
-### Add Problem Facts
-
-```bash
-solverforge generate fact resource --field category:String --field load:i32
-solverforge generate fact employee --field name:String --field skill_level:i32
-```
-
-This creates `src/domain/<fact>.rs`, exports the new type from
-`src/domain/mod.rs`, patches the planning solution collections, and syncs
-`solverforge.app.toml`.
-
-### Add Planning Entities
-
-```bash
-solverforge generate entity task --field label:String --field priority:i32
-solverforge generate entity shift --planning-variable employee_idx --field start:String --field duration:i32
-```
-
-`--planning-variable` lets you create the entity and its first scalar planning
-variable in one step. If you omit it, the entity starts with no solvable field
-yet and `solverforge check` will warn until you add one.
-
-### Add Planning Variables to Existing Entities
+Give each task a resource to choose:
 
 ```bash
 solverforge generate variable resource_idx --entity Task --kind scalar --range resources --allows-unassigned
-solverforge generate variable stops --entity Route --kind list --elements visits
 ```
 
-Use `scalar` for single-value assignment variables and `list` for sequence
-variables. The only valid `--kind` values are `scalar` and `list`; `standard` is
-only the default demo data size label.
+`resource_idx` is an `Option<usize>` index into the plan's `resources`
+collection. `--allows-unassigned` lets the solver leave a task without a
+resource, which the first constraint below makes a hard violation.
 
-Scalar example:
+Every generator also updates `src/domain/mod.rs`, the planning solution in
+`src/domain/plan.rs`, `solverforge.app.toml`, the generated UI model, and the
+demo data in `src/data/data_seed.rs`.
+
+## Add Constraints
 
 ```bash
-solverforge generate variable resource_idx \
-  --entity Task \
-  --kind scalar \
-  --range resources \
-  --allows-unassigned
+solverforge generate constraint task_assigned --unary --hard
+solverforge generate constraint balanced_duration --balance
 ```
 
-A scalar variable can also draw from a half-open integer range instead of a fact
-collection; it is still an `Option<usize>` candidate index:
+Each command writes a module in `src/constraints/` and registers it in
+`src/constraints/mod.rs`. The stream wiring is complete, but the rule itself
+is a placeholder that panics. Until you replace it, every solve fails at once
+with `"lifecycleState":"FAILED"`, and the server log names the file:
 
-```bash
-solverforge generate variable hour \
-  --entity Shift \
-  --kind scalar \
-  --countable-range 0..24
+```text
+replace placeholder condition in `unary_condition` (src/constraints/task_assigned.rs) before enabling this constraint
 ```
 
-`--range` and `--countable-range` are mutually exclusive.
+Replace every placeholder before you solve.
 
-List example:
+### Every task needs a resource
 
-```bash
-solverforge generate variable stops \
-  --entity Route \
-  --kind list \
-  --elements visits
+`task_assigned` streams tasks from the generated `Plan::tasks()` accessor,
+keeps the ones that match `unary_condition`, and penalizes each with one hard
+point. Replace the placeholder condition with "the task has no resource". The
+complete `src/constraints/task_assigned.rs`:
+
+```rust
+use crate::domain::{Plan, Task};
+use solverforge::prelude::*;
+use solverforge::IncrementalConstraint;
+
+/// HARD: every task needs a resource.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardSoftScore> {
+    ConstraintFactory::<Plan, HardSoftScore>::new()
+        .for_each(Plan::tasks())
+        .filter(unary_condition)
+        .penalize(hard_weight(unary_weight))
+        .named("task_assigned")
+}
+
+/// Selects each Task that has no resource yet.
+fn unary_condition(entity: &Task) -> bool {
+    entity.resource_idx.is_none()
+}
+
+/// Penalty for one Task selected by `unary_condition`.
+fn unary_weight(_entity: &Task) -> HardSoftScore {
+    <HardSoftScore as Score>::one_hard()
+}
 ```
 
-Scalar variables can also declare hook metadata for app-owned candidate and
-ordering functions:
+### Spread the work evenly
 
-```bash
-solverforge generate variable resource_idx \
-  --entity Task \
-  --kind scalar \
-  --range resources \
-  --candidate-values resource_candidates \
-  --construction-entity-order-key task_priority \
-  --construction-value-order-key resource_priority
+`balanced_duration` groups all tasks into one scope and collects a load per
+resource with `load_balance`. The generated metric counts each task as `1`;
+count its duration instead, and replace the placeholder condition and weight
+with one soft point per unit of the collector's unfairness, the square root
+of the summed squared deviation from the mean load. The complete
+`src/constraints/balanced_duration.rs`:
+
+```rust
+use crate::domain::{Plan, Task};
+use solverforge::prelude::*;
+use solverforge::stream::collector::LoadBalance;
+use solverforge::IncrementalConstraint;
+
+/// SOFT: spread task duration evenly across resources.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardSoftScore> {
+    ConstraintFactory::<Plan, HardSoftScore>::new()
+        .for_each(Plan::tasks())
+        .group_by(
+            balance_scope,
+            load_balance(balance_group_key, balance_metric),
+        )
+        .penalize(balance_weight)
+        .named("balanced_duration")
+}
+
+/// Every task belongs to one balancing scope.
+fn balance_scope(_entity: &Task) -> usize {
+    0
+}
+
+/// Load is counted per resource.
+fn balance_group_key(entity: &Task) -> Option<usize> {
+    entity.resource_idx
+}
+
+/// Each task adds its duration to its resource's load.
+fn balance_metric(entity: &Task) -> i64 {
+    i64::from(entity.duration)
+}
+
+/// One soft point per unit of unfairness across the resource loads.
+fn balance_weight(_scope: &usize, load: &LoadBalance<Option<usize>>) -> HardSoftScore {
+    HardSoftScore::of_soft(load.unfairness())
+}
 ```
 
-Those flags write `#[planning_variable(...)]` metadata and synchronize it into
-`solverforge.app.toml`; you still own the referenced Rust functions.
+## Build and Solve
 
-### Add Constraints
-
-```bash
-# Unary constraint: penalize one entity at a time
-solverforge generate constraint max_hours --unary --hard
-
-# Pair constraint: compare pairs of entities
-solverforge generate constraint no_overlap --pair
-
-# Join constraint: entity-fact mismatch
-solverforge generate constraint required_skill --join --hard
-
-# Balance assignments
-solverforge generate constraint fair_distribution --balance
-
-# Reward preferred states
-solverforge generate constraint preferred_shift --reward
-```
-
-Constraint generation writes a skeleton into `src/constraints/` and updates
-`src/constraints/mod.rs`. Generated skeletons stream from the accessors
-`#[planning_solution]` generates for each collection (`Plan::tasks()`,
-`Plan::resources()`, ...) rather than hand-written extractor functions, and
-they still include placeholder predicates and weights; placeholder filters
-intentionally panic until you replace them with real domain logic.
-
-Keep the accessor streams exactly as generated. A hand-written extractor such
-as `fn entity_items(solution: &Plan) -> &[Task]` carries
-`ChangeSource::Unknown`; the incremental engine cannot localize per-move
-updates through it, and the first solver-applied move fails with
-`source Unknown cannot localize entity indexes`. The stub compiles and
-`solverforge check` passes, so the failure only surfaces mid-solve.
-
-Treat the generated file as a wiring aid. It gives you the module, constraint
-name, score shape, stream pattern, and the accessor wiring; you still own the
-real predicate, join keys, weights, and hard/soft decision.
-
-### Add Model Resources
-
-When the runtime model needs coupled scalar construction/search or
-constraint-specific repair moves, declare those resources explicitly:
-
-```bash
-solverforge generate scalar-group required_assignment \
-  --assignment Task.resource_idx \
-  --required-entity required_task
-
-solverforge generate conflict-repair required_assignment \
-  --provider repair_required_assignment
-```
-
-By default these commands synchronize `solver.toml` inside the CLI-managed
-`# @solverforge:begin solver-config` region. Use `--skip-solver-config` only
-when you want to write those phase and selector references yourself.
-
-### Generate Demo Data
-
-```bash
-solverforge generate data
-solverforge generate data --size large
-solverforge generate data --mode stub
-```
-
-The `solverforge generate data` command rewrites the compiler-owned sample
-builders in `src/data/data_seed.rs`. The stable wrapper in `src/data/mod.rs`
-delegates to that generated seed file by default, so the command can keep
-regenerating sample data without clobbering user-owned entrypoints. Dataset size
-defaults are persisted in `solverforge.app.toml`.
-
-`sample` mode generates generic deterministic values. `stub` mode keeps the
-shape but minimizes content so you can take over manually.
-
-## Project Management Commands
-
-The CLI has inspection commands for different layers of the generated app:
-
-| Command | Use it when |
-| ------- | ----------- |
-| `solverforge info` | You want to see the model the CLI currently detects |
-| `solverforge check` | You want structural validation before running Rust tests |
-| `solverforge routes` | You want to confirm the backend route surface |
-| `solverforge test` | You want the app's Rust tests, with passthrough args |
-| `solverforge config show` | You want the current `solver.toml` without opening the file |
-
-### View Project Summary
+Inspect the model the CLI sees, then compile it:
 
 ```bash
 solverforge info
-```
-
-Shows a summary of entities, facts, constraints, and score type.
-
-### Validate Project
-
-```bash
 solverforge check
+cargo build
 ```
 
-This validates the structure of `src/domain/`, `src/constraints/`, and
-`solver.toml`. It warns when an entity exists but still has no scalar or list
-planning variables.
+`solverforge info` lists the `Plan` solution, the `Task` entity with its
+`resource_idx` scalar variable, the `Resource` fact, and both constraints.
+`solverforge check` validates the managed blocks, the domain model, and
+`solver.toml`; it does not compile the project, so `cargo build` is the step
+that proves the Rust is correct.
 
-### Run Tests
+Start the server again and solve the standard demo data, which holds 4
+resources and 9 tasks with durations 1 through 9:
 
 ```bash
-solverforge test
-solverforge test -- --nocapture
-solverforge test integration
+solverforge server
 ```
 
-Runs `cargo test` with optional passthrough arguments.
+```bash
+curl -s localhost:7860/demo-data/STANDARD > plan.json
+curl -s -X POST -H 'content-type: application/json' --data @plan.json localhost:7860/jobs
+curl -s localhost:7860/jobs/0
+curl -s localhost:7860/jobs/0/analysis
+```
 
-### List API Routes
+The solve runs for the 30 seconds set in `solver.toml`. Read the job again
+after that: it reports `"lifecycleState":"COMPLETED"` and a `bestScore` of
+`0hard` with a soft part of zero or below. `0hard` means every task has a
+resource; the soft part is the remaining imbalance. The analysis lists the
+score of `task_assigned` and `balanced_duration` separately.
+
+## Inspect and Test
 
 ```bash
 solverforge routes
+solverforge test
 ```
 
-This parses `src/api/routes.rs`, `src/api/mod.rs`, or `src/api.rs` and lists the
-generated routes. It is a quick way to verify whether a web or API shell still
-exposes the retained lifecycle and demo data surface you expect.
-
-### Manage Solver Configuration
-
-```bash
-solverforge config show
-solverforge config set termination.seconds_spent_limit 60
-```
-
-### Generate Shell Completions
-
-```bash
-solverforge completions bash >> ~/.bashrc
-solverforge completions zsh >> ~/.zshrc
-solverforge completions fish > ~/.config/fish/completions/solverforge.fish
-```
-
-## Remove Resources
-
-All destroy commands support `--yes` (or `-y`) to skip confirmation. Place it on
-the `destroy` command before the resource subcommand.
-
-```bash
-solverforge destroy --yes entity task
-solverforge destroy --yes constraint no_overlap
-solverforge destroy --yes variable --entity Task resource_idx
-solverforge destroy --yes scalar-group required_assignment
-solverforge destroy --yes conflict-repair required_assignment
-solverforge destroy --yes fact employee
-solverforge destroy --yes solution
-```
-
-## Global Options
-
-These options work with any command:
-
-- `-q, --quiet` - suppress all output except errors
-- `-v, --verbose` - show extra diagnostic output
-- `--no-color` - disable colored output (also respects `NO_COLOR` environment
-  variable)
+`solverforge routes` lists the HTTP routes in `src/api/routes.rs`, including
+the job lifecycle, snapshot, analysis, pause, resume, cancel, and SSE routes.
+`solverforge test` runs `cargo test`; arguments before `--` go to Cargo and
+arguments after it go to the test binaries, as in
+`solverforge test -- --nocapture`.
 
 ## Next Steps
 
-- Read [Project Anatomy](/docs/solverforge-cli/project-anatomy/) before you start heavy manual
-  edits.
-- Read [Modeling & Generation](/docs/solverforge-cli/modeling-and-generation/) for the full
-  generator workflow.
-- Read [Configuration](/docs/solverforge-cli/configuration/) before changing the solver or UI
-  metadata layers.
-- Keep [Command Reference](/docs/solverforge-cli/command-reference/) open while working.
-- Continue with [SolverForge](/docs/solverforge/) when you need runtime-level
-  domain modeling and solver API detail.
+- Read [Project Anatomy](/docs/solverforge-cli/project-anatomy/) before you
+  start heavy manual edits.
+- Read [Modeling & Generation](/docs/solverforge-cli/modeling-and-generation/)
+  for list variables, scalar groups, conflict repairs, demo data, and
+  removing resources.
+- Read [Configuration](/docs/solverforge-cli/configuration/) before you change
+  `solver.toml` or `solverforge.app.toml`.
+- Keep the [Command Reference](/docs/solverforge-cli/command-reference/) open
+  while working.
+- Continue with a worked use case:
+  [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
+  [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
+  [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
+  [FSR](/docs/getting-started/solverforge-fsr-use-case/).
+- Continue with [SolverForge](/docs/solverforge/) for runtime-level modeling
+  and solver detail.
