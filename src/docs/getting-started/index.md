@@ -30,7 +30,7 @@ Follow one agent run from a plain-language depot maintenance problem to a
 solved plan served by an API shell.
   <% end %>
   <%= render Ui::Card.new(title: "CLI Quickstart", href: relative_url('/docs/solverforge-cli/getting-started/'), icon: "fa-solid fa-terminal") do %>
-Install `solverforge-cli`, scaffold a new project, run the server, and extend the domain incrementally.
+Install `solverforge-cli`, scaffold a project, grow a small task model, and solve it.
   <% end %>
   <%= render Ui::Card.new(title: "SolverForge Hospital Use Case", href: relative_url('/docs/getting-started/solverforge-hospital-use-case/'), icon: "fa-solid fa-calendar-days") do %>
 Follow a longer worked example that carries the generic CLI shell into a
@@ -52,7 +52,7 @@ road-network travel, retained jobs, and route geometry.
 
 ## Prerequisites
 
-- **Rust toolchain**: Install via [rustup.rs](https://rustup.rs/) (stable channel)
+- **Rust toolchain**: Rust `1.95` or newer, installed via [rustup.rs](https://rustup.rs/)
 - **Cargo**: Included with the Rust toolchain
 - Familiarity with Rust basics (structs, traits, closures, derive macros)
 
@@ -61,7 +61,7 @@ road-network travel, retained jobs, and route geometry.
 With a coding agent:
 
 ```bash
-cargo install solverforge-cli
+cargo install solverforge-cli --locked
 git clone https://github.com/SolverForge/solverforge-cli
 cd solverforge-cli
 ./scripts/install-skill --agent claude     # or: --agent codex, --agent opencode
@@ -74,7 +74,7 @@ template.
 By hand:
 
 ```bash
-cargo install solverforge-cli
+cargo install solverforge-cli --locked
 solverforge new my-scheduler
 cd my-scheduler
 solverforge server
@@ -91,9 +91,11 @@ solverforge generate variable resource_idx --entity Task --kind scalar --range r
 solverforge generate data --size large
 ```
 
-The current CLI no longer asks you to pick a modeling shape up front. Scalar
-variables, list variables, and models that contain both are introduced through
-generation and `solverforge.app.toml` after scaffolding.
+The CLI does not ask you to pick a modeling shape up front. Scalar variables,
+list variables, and models that contain both are introduced through generation
+after scaffolding. Constraints come next: the
+[CLI quickstart](/docs/solverforge-cli/getting-started/#add-constraints)
+generates two, replaces their placeholder rules, and solves the result.
 
 ## Where to Read More
 

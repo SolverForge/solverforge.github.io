@@ -49,13 +49,16 @@ do not duplicate their full contents here.
 - while editing locally: `make help`, `make install`, `make build`, and `make start`
 - in a product repo: run that repo's own build, test, and release checks there
 
-`make verify-hospital-tutorial` and `make verify-deliveries-tutorial` run
-documentation checks without product checkouts. Set `SOLVERFORGE_CLI_REPO` or
-`SOLVERFORGE_HOSPITAL_REPO` to add the deeper CLI scaffold and live hospital app
-checks. Set `SOLVERFORGE_DELIVERIES_REPO` to add deliveries source checks and the
-straight-line retained-job smoke against the local deliveries app. The Make
-targets are the stable workflow entry points; the verifier implementations are
-Ruby.
+`make verify-cli-getting-started` and `make verify-maintenance-walkthrough`
+replay their pages' commands with the published `solverforge-cli` named in
+`scripts/release_pins.rb` and the walkthrough gate, build the app, and solve
+it; both fail rather than skip when `solverforge` or `cargo` is missing. Every
+gate that states a current version reads it from `scripts/release_pins.rb`,
+which `make verify-release-surface` compares with the crates.io index, so a new
+publish fails the gates until the pin and the pages move. The tutorial gates
+describe the checkouts and environment they need at the top of each
+`scripts/verify-*-tutorial.rb`. The Make targets are the stable workflow entry
+points; the verifier implementations are Ruby.
 
 ## See also
 

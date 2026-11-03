@@ -10,119 +10,78 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.23.0` release and keeps core,
+documentation tracks the `solverforge 0.24.0` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.23.0, and docs.rs serves the 0.23.0 API.
-Acceptor-forager local search supports parallel move evaluation with an explicit
-`move_thread_count = { count = 4 }`; `"auto"` remains sequential. Evaluation is
-capped by the current Rayon pool and 32 evaluators, including the main director.
-Telemetry retains every started phase in execution order and reports discarded
-speculative work separately from logical move counts.
-The 0.21.x line added joined-tuple grouping, live-solution cursor lending,
-owned search state, correct selector-subgraph merging, and net-route-delta
-precedence scoring. The 0.22.0 release routes every grouped stream through one
-accumulator kernel, retracts group and hash memberships by position, and owns
-each grouping key once; the `0.21.1` number failed publication and was retired. The `v0.21.0` tag points to
-`70aa9f71ab305265cfe7d83753af2f86fb06acf9` ([CI](https://github.com/SolverForge/solverforge/actions/runs/38598708211),
-[publish](https://github.com/SolverForge/solverforge/actions/runs/38598906107),
-[release](https://github.com/SolverForge/solverforge/actions/runs/38598906248)),
-`v0.21.2` to `cb916a73d86c46c25b0e4182626f9adc2c9aa5ad`
-([CI](https://github.com/SolverForge/solverforge/actions/runs/38606335292),
-[publish](https://github.com/SolverForge/solverforge/actions/runs/38606339972),
-[release](https://github.com/SolverForge/solverforge/actions/runs/38606340238)),
-and `v0.21.3` to `1000a7d471aafe4aa10e900ad075230b9df51ca8`
-([CI](https://github.com/SolverForge/solverforge/actions/runs/38640704980),
-[publish](https://github.com/SolverForge/solverforge/actions/runs/38640708258),
-[release](https://github.com/SolverForge/solverforge/actions/runs/38640708277));
-`v0.22.0` points to `df1ce37b4a69a61fe249e71852ea694de94b4493`
-([publish](https://github.com/SolverForge/solverforge/actions/runs/39109402359),
-[release](https://github.com/SolverForge/solverforge/actions/runs/39109402581));
-all eleven runs completed for their tag commits. Rust `1.95` remains the
-workspace floor.
+`cargo add solverforge` installs 0.24.0, and docs.rs serves the 0.24.0 API.
+Rust `1.95` remains the workspace floor.
 
-`v0.23.0` points to `e835624a7c04a8ecd2a2ac9a1bcbd92cbc6aca89`.
-Its [publish](https://github.com/SolverForge/solverforge/actions/runs/40473570696)
-and [release](https://github.com/SolverForge/solverforge/actions/runs/40473570732)
-workflows passed. The tag's [CI run](https://github.com/SolverForge/solverforge/actions/runs/40473567305)
-passed on Linux and Windows but failed the macOS
-`dynamic_nearby_swap_uses_the_finite_all_entity_row_fallback` test; integration
-was skipped. See the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/)
-for the published API boundaries and upgrade checklist.
+`v0.24.0` points to `c114e2d2bfabaada78beb5ee77318b847b964489`. Its
+[CI run](https://github.com/SolverForge/solverforge/actions/runs/41314986907)
+passed on Linux, macOS, and Windows, with the MSRV, docs, and package jobs, and
+its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/41314989365)
+verified the release, published to crates.io, and created the GitHub Release.
+The 0.24.x line reads `solver.toml` only from a model's `solver_toml` file or
+an explicitly loaded `SolverConfig`, rejects unknown configuration keys and
+YAML, adds runtime constraint weights and problem changes, accepts only
+generated collection accessors as stream sources, and trims the public API.
+See the [0.24.x release note](/blog/releases/2026/11/01/solverforge-0-24-x/)
+for the breaking changes and upgrade checklist.
 
-The independently published CLI line is `solverforge-cli 3.7.1`. Fresh
-scaffolds target `solverforge 0.23.0`, with `solverforge-ui 0.9.0` and
+The independently published CLI line is `solverforge-cli 3.8.1`. Fresh
+scaffolds target `solverforge 0.24.0`, with `solverforge-ui 0.9.0` and
 `solverforge-maps 2.1.4` for the web shell and `rmcp 3.8.0` for the MCP shell.
-`check` and `config set` validate `move_thread_count` as `"auto"`, `"none"`,
-or a non-negative `{ count = N }` table. Generated telemetry exposes ordered
-`phases`, run/per-phase `movesSpeculative`, and `discarded_speculative` trace
-outcomes. The MCP scaffold uses `ServerConfig` instead of the deprecated
-`ServerInfo` alias. The 3.7.1 patch also matches the thread-count template
-comment lines independently of LF/CRLF line endings. Its exact-commit
-[CI](https://github.com/SolverForge/solverforge-cli/actions/runs/40546499568),
-[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/40546507692),
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/40546507680)
-all passed at `fcaad8e3ef59444cb28f7e4742494e2b0cbb64ca`.
+A fresh scaffold solves its empty plan through the runtime's default pipeline,
+generated code is rustfmt-clean, `--field` types are imported, and `check`
+states that it does not compile the project. Generated constraint skeletons
+still panic until their placeholders are replaced. The 3.8.1
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/41640965796)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/41640965834)
+workflows and the exact-commit
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/41640961789)
+on Linux, macOS, Windows, and integration tests passed at
+`1e14044e924164a9aaf974628135b7a75a1f341f`. The
+`3.8.0` package was published from `96ddbeefc5076761b9d69ad667a177330fd374dd`,
+but its tag [CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/41625985949)
+failed on Windows, where the destroy refusal printed backslash paths, and
+skipped integration tests; 3.8.1 fixes that message. See the
+[3.8.x CLI release note](/blog/releases/2026/11/03/solverforge-cli-3-8-x/).
+Apps scaffolded by earlier lines pin older cores (`0.23.0` from 3.7.x,
+`0.22.0` from 3.6.0), and an app moves to a newer core line only when
+deliberately upgraded and validated.
 
-The preceding 3.7.0 tag's [Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/40525393646)
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/40525393731)
-workflows passed. [CI](https://github.com/SolverForge/solverforge-cli/actions/runs/40525390383)
-passed on Linux and macOS, but Windows failed
-`test_new_creates_neutral_project_files` on the opt-in solver-config comment
-assertion; integration tests were skipped. See the
-[3.7.x CLI release note](/blog/releases/2026/10/27/solverforge-cli-3-7-x/).
-The 3.3.x line added the `mcp` shell, `solverforge connect`, the
-`solverforge-modeling` and `solverforge-ui` agent skills with an agent-centric
-installer, and multi-client MCP config writing; 3.3.2 moved generated
-constraint skeletons onto the `#[planning_solution]` accessors, 3.3.3 rewrote
-every score-bearing surface on `generate score`, and 3.4.0 moved the release
-toolchain to csemver while retargeting scaffolds to core `0.20.4`; `v3.4.0`
-and `v3.5.0` publish and release workflows passed on their tag commits. Apps
-scaffolded by earlier lines pin `solverforge 0.19.7` (3.3.x),
-`solverforge 0.19.5` (3.1.0), or `solverforge 0.19.4` (3.0.0, which carried
-`solverforge-ui 0.7.0` with `rmcp 3.3.0`), and an app moves to a newer core
-line only when deliberately upgraded and validated.
+The worked-use-case bundle ships eight apps on `solverforge 0.24.0` and
+`solverforge-ui 0.9.0`: `solverforge-hospital@3.0.0`,
+`solverforge-lessons@3.0.0`, `solverforge-deliveries@3.0.0`,
+`solverforge-fsr@3.0.0`, `solverforge-furnace@3.0.0`,
+`solverforge-orders@0.3.0`, `solverforge-fleet@0.2.0`, and
+`solverforge-flightcrew@0.3.0`. The four Space-backed apps' release-tag sync
+workflows succeeded. Bundle CI failed at the final app tag on a missing `rg`
+in the metadata check and passed at the following tooling commit
+`50371ec410b363864420ba97d6c5ee94771709d4`
+([run 41637463799](https://github.com/SolverForge/solverforge-usecases/actions/runs/41637463799)).
+Furnace, Orders, Fleet, and Flight crew are repository-only. See the
+[use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
 
-The worked-use-case bundle ships eight apps on one `solverforge 0.23.0` line:
-`solverforge-hospital@2.0.12`, `solverforge-lessons@2.0.14`,
-`solverforge-deliveries@2.0.13`, `solverforge-fsr@2.0.14`,
-`solverforge-furnace@2.0.7`, `solverforge-orders@0.2.0`,
-`solverforge-fleet@0.1.9`, and `solverforge-flightcrew@0.2.0`, all on
-`solverforge-ui 0.9.0`; all four Space-backed apps' release-tag sync workflows
-completed ([Hospital](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524550543),
-[Lessons](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524558093),
-[Deliveries](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524507822),
-[FSR](https://github.com/SolverForge/solverforge-usecases/actions/runs/40524530701)),
-the bundle main-branch [CI run](https://github.com/SolverForge/solverforge-usecases/actions/runs/40537219778)
-passed at the final `solverforge-furnace@2.0.7` bundle commit
-`2da90f5e8d3994e8f91186bd268fc301472f9dfb`; this supersedes the earlier
-failed run at the Orders release commit. Orders and Flight Crew expose the
-full `phases` array and `movesSpeculative`; the other six apps keep their
-narrower app-owned telemetry summaries. Furnace 2.0.7 reduces task-provider
-work before cancellation or a time limit can take effect; a candidate pull
-is not interruptible. The other four apps are repository-only.
-See the [app release matrix](/blog/releases/2026/09/27/solverforge-usecases-repository-apps/#october-runtime-updates).
-SolverForge Python has a
-tagged `solverforge-py 0.7.2` source line for CPython 3.14, compiled onto the
-`solverforge 0.23.0` runtime with embedded `solverforge-ui 0.9.0` assets; PyPI
-serves `solverforge 0.7.2`. Python's exact-tag
-[CI](https://github.com/SolverForge/solverforge-py/actions/runs/40672018229) and
-[release/PyPI publication](https://github.com/SolverForge/solverforge-py/actions/runs/40672022045)
+SolverForge Python has a tagged `solverforge-py 0.7.2` source line for CPython
+3.14, compiled onto the `solverforge 0.23.0` runtime with embedded
+`solverforge-ui 0.9.0` assets; PyPI serves `solverforge 0.7.2`. Python's
+exact-tag [CI](https://github.com/SolverForge/solverforge-py/actions/runs/40672018229)
+and [release/PyPI publication](https://github.com/SolverForge/solverforge-py/actions/runs/40672022045)
 passed at `22833923229c008a70c385e05c76072a5d87c75f`. See the
-[0.7.x Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/)
-for parallel evaluation, the telemetry migration, and interrupt/error handling. The current UI line is `solverforge-ui 0.9.0`, which
-moved the bundled agent skill into the `solverforge-cli` repository, where both
-SolverForge skills now live.
+[0.7.x Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
+The current UI line is `solverforge-ui 0.9.0`; both SolverForge agent skills
+live in the `solverforge-cli` repository.
 <% end %>
 
 ## Current Status
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; Linux/Windows CI passed, macOS CI failed | Native Rust constraint solver published as `solverforge 0.23.0`: opt-in parallel acceptor-forager move evaluation, ordered per-phase telemetry, speculative-work diagnostics, and incremental scoring of list-shadow writes; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.7.1` targets `solverforge 0.23.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.8.0`; `generate score` rewrites every score-bearing surface and the generated demo data re-renders on `destroy` (3.3.3), `3.4.0` migrated release tooling to csemver targeting core `0.20.4`, and the earlier `3.1.0` package scaffolded `solverforge 0.19.5` with `rmcp 3.4.0`, `3.0.0` scaffolded `solverforge 0.19.4` with `solverforge-ui 0.7.0` and `rmcp 3.3.0` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2`; opt-in parallel evaluation and ordered per-phase telemetry |
-| **Worked Use Cases** | Released; tag Space syncs and bundle CI passed | `solverforge-hospital@2.0.12`, `solverforge-lessons@2.0.14`, `solverforge-deliveries@2.0.13`, `solverforge-fsr@2.0.14`, plus the repository-only `solverforge-furnace@2.0.7`, `solverforge-orders@0.2.0`, `solverforge-fleet@0.1.9`, and `solverforge-flightcrew@0.2.0`; all eight target `solverforge 0.23.0` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets and moves the bundled agent skill into `solverforge-cli`; `solverforge-cli 3.7.1` scaffolds `solverforge-ui 0.9.0` directly, while apps scaffolded by `3.0.0` still pin `0.7.0` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.24.0`: explicit `solver_toml` configuration, unknown-key rejection, runtime constraint weights, problem changes on running jobs, and overflow-checked scores; Rust `1.95` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.8.1` targets `solverforge 0.24.0`, web `solverforge-ui 0.9.0` + `solverforge-maps 2.1.4`, MCP `rmcp 3.8.0`; `3.8.0` was published with a failed Windows tag CI |
+| **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
+| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.0`, `solverforge-lessons@3.0.0`, `solverforge-deliveries@3.0.0`, `solverforge-fsr@3.0.0`, plus the repository-only `solverforge-furnace@3.0.0`, `solverforge-orders@0.3.0`, `solverforge-fleet@0.2.0`, and `solverforge-flightcrew@0.3.0`; all eight target `solverforge 0.24.0` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.0` exposes framework-neutral embedded assets; `solverforge-cli 3.8.1` scaffolds it directly |
 | **Maps** | Published | `solverforge-maps 2.1.4` carries matrix route-distance access |
 
 ## Try It Today
@@ -136,11 +95,7 @@ SolverForge skills now live.
   [Hospital](/docs/getting-started/solverforge-hospital-use-case/),
   [Lessons](/docs/getting-started/solverforge-lessons-use-case/),
   [Deliveries](/docs/getting-started/solverforge-deliveries-use-case/), or
-  [FSR](/docs/getting-started/solverforge-fsr-use-case/). Those guides now
-  document the released Hospital 2.0.12, Lessons 2.0.14, Deliveries 2.0.13, and
-  FSR 2.0.14 contracts on `solverforge 0.23.0`, while keeping their recorded
-  `solverforge-cli 2.2.2` scaffold provenance separate from the current
-  `solverforge-cli 3.7.1` scaffold target.
+  [FSR](/docs/getting-started/solverforge-fsr-use-case/).
 - Use [Constraint Node Sharing](/docs/solverforge/constraints/node-sharing/)
   when a constraint function reuses the same grouped stream across several
   named terminal constraints.
@@ -182,7 +137,9 @@ SolverForge skills now live.
   complete best-solution publication, pause/resume, completion, cancellation,
   failure, snapshots, snapshot-bound analysis, ordered per-phase telemetry, and
   explicit candidate-trace detail retrieval
-- **Configuration**: stock `solver.toml`, TOML/YAML parsing helpers, bounded
+- **Configuration**: stock `solver.toml` embedded through `solver_toml` or
+  loaded with `SolverConfig::load`, strict TOML parsing that rejects unknown
+  keys, bounded
   scalar candidates, grouped scalar selectors, per-leaf ordering and metrics,
   weighted unions, seeded score ties, parallel move evaluation, candidate tracing, level-aware simulated
   annealing, and per-solution config overlays
@@ -231,13 +188,21 @@ SolverForge skills now live.
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.23.0`, with
+- **Core runtime line**: these manuals describe `solverforge 0.24.0`, with
   Rust `1.95`. The
-  published `solverforge-cli 3.7.1` package targets `solverforge 0.23.0` for
-  fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.19.7`
-  from 3.3.x, `0.19.5` from 3.1.0, `0.19.4` from 3.0.0), and an app should
+  published `solverforge-cli 3.8.1` package targets `solverforge 0.24.0` for
+  fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.23.0`
+  from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x), and an app should
   move to a newer core line only when that app is deliberately upgraded and
   validated.
+- **Explicit configuration**: a model reads `solver.toml` only from the file
+  its `solver_toml` argument embeds; nothing is read from the working
+  directory. Unknown keys fail the load, YAML is not supported, and invalid
+  acceptor, forager, and `best_score_limit` values fail the solve.
+- **Constraint weights and problem changes**: a `#[constraint_weights]`
+  solution field scales each named constraint, and analysis reports its
+  `weight_multiplier`. `ProblemChange` values submitted to a running job are
+  applied at runtime safe points in submission order.
 - **Parallel local search**: an explicit `move_thread_count` of two or more
   enables acceptor-forager evaluation windows on independent score directors.
   Candidate generation and acceptor/forager decisions remain serial and ordered.
