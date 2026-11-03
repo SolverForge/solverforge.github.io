@@ -34,6 +34,29 @@ Use this when your backend exposes the stock `solverforge-ui` lifecycle
 contract. New integrations should model retained jobs and snapshots rather than
 build around schedule-specific naming.
 
+### Retained-Job HTTP Routes
+
+The HTTP adapter (`type: "axum"` or `type: "fetch"`) calls these routes,
+relative to `baseUrl`, with the default `jobsPath` and `demoDataPath`:
+
+| Method | Path | Backend method |
+|---|---|---|
+| `POST` | `/jobs` | `createJob(data)`: start a retained job |
+| `GET` | `/jobs/{id}` | `getJob(id)`: job summary |
+| `GET` | `/jobs/{id}/status` | `getJobStatus(id)`: lifecycle status |
+| `GET` | `/jobs/{id}/snapshot` | `getSnapshot(id, snapshotRevision?)`: latest or requested snapshot |
+| `GET` | `/jobs/{id}/analysis` | `analyzeSnapshot(id, snapshotRevision?)`: score analysis |
+| `POST` | `/jobs/{id}/pause` | `pauseJob(id)`: request an exact pause |
+| `POST` | `/jobs/{id}/resume` | `resumeJob(id)`: resume from the retained checkpoint |
+| `POST` | `/jobs/{id}/cancel` | `cancelJob(id)`: cancel a live or paused job |
+| `DELETE` | `/jobs/{id}` | `deleteJob(id)`: delete a terminal retained job |
+| `GET` | `/jobs/{id}/events` | `streamJobEvents(id, onMessage, onError)`: server-sent events |
+| `GET` | `/demo-data` | `listDemoData()`: demo dataset names |
+| `GET` | `/demo-data/{name}` | `getDemoData(name)`: one demo dataset (`STANDARD` when no name is given) |
+
+A `snapshotRevision` is sent as the `snapshot_revision` query parameter on the
+snapshot and analysis routes.
+
 ### Tauri Adapter
 
 ```js
@@ -88,8 +111,7 @@ The shared lifecycle model is job-oriented:
 - delete job
 - get demo data
 
-Older articles may mention schedule-named routes. Current generated apps expose
-`/jobs/...`; new integrations should use the job vocabulary directly.
+Apps scaffolded by `solverforge-cli` expose these `/jobs/...` routes.
 
 The create operation may resolve to either:
 
@@ -237,7 +259,7 @@ The crate emits both stable and versioned bundle filenames:
 - stable: `/sf/sf.css`, `/sf/sf.js`
 - versioned: `/sf/sf.<crate-version>.css`, `/sf/sf.<crate-version>.js`
 
-`src/lib.rs` serves them with different cache policies:
+The crate serves them with different cache policies:
 
 - stable bundles use `Cache-Control: public, max-age=3600`
 - versioned bundles use `Cache-Control: public, max-age=31536000, immutable`
@@ -268,15 +290,24 @@ served.
 
 ## Optional Modules
 
-When the optional map module is shipped in `static/sf/modules/`, include it
-alongside Leaflet:
+The optional map module ships in `static/sf/modules/` and wraps Leaflet, which
+ships under `/sf/vendor/leaflet/`. `sf-map.js` attaches to the `SF` global, so
+load it after both `sf.js` and `leaflet.js`, and give the map container a
+height:
 
 ```html
+<link rel="stylesheet" href="/sf/sf.css" />
 <link rel="stylesheet" href="/sf/vendor/leaflet/leaflet.css" />
-<script src="/sf/vendor/leaflet/leaflet.js"></script>
 <link rel="stylesheet" href="/sf/modules/sf-map.css" />
+<script src="/sf/sf.js"></script>
+<script src="/sf/vendor/leaflet/leaflet.js"></script>
 <script src="/sf/modules/sf-map.js"></script>
+
+<div id="map" style="height: 400px"></div>
 ```
+
+The map draws OpenStreetMap tiles from `tile.openstreetmap.org`, so the
+browser needs network access to that tile server.
 
 For route geometry, travel-time, and map-data pipeline details, see the existing
 [solverforge-maps](/docs/solverforge-maps/) docs.
@@ -308,7 +339,7 @@ map.drawRoute({
   ],
   color: "#10b981",
 });
-map.drawEncodedRoute({ encoded: "encodedPolylineString", color: "#3b82f6" });
+map.drawEncodedRoute({ encoded: "ovarGo}|m@o}@o}@", color: "#3b82f6" });
 map.fitBounds();
 map.highlight("#10b981");
 map.clearHighlight();
@@ -318,9 +349,10 @@ map.clearMarkers();
 map.clearAll();
 ```
 
-`fitBounds()` fits vehicle and visit markers. Since `0.6.2`, marker bounds are
-backed by a Leaflet feature group, so marker-only maps can call `fitBounds()`
-without needing route polylines first.
+`fitBounds()` fits vehicle and visit markers. Marker bounds come from a Leaflet
+feature group, so marker-only maps can call `fitBounds()` without route
+polylines. `drawEncodedRoute()` takes a Google encoded polyline, the format
+`solverforge-maps` produces for route geometry.
 
 ## Non-Rust Integration Path
 

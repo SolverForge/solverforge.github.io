@@ -15,11 +15,10 @@ This section tracks the published `solverforge-ui 0.9.0` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
 null-safe snapshot callbacks, exact dense scheduling geometry, normalized
 create-job identifiers, optional map helpers, and framework-neutral embedded
-asset access. The bundled agent skill moved to the `solverforge-cli` repository
-in 0.9.0. The `solverforge-cli 3.7.1` scaffold pins `solverforge-ui 0.9.0`, so
-new projects get these assets directly; apps scaffolded by the earlier `3.0.0`
-line still pin `0.7.0` and move to `0.9.0` only when that app is deliberately
-upgraded.
+asset access. The agent skill lives in the `solverforge-cli` repository.
+`solverforge-cli` web scaffolds pin `solverforge-ui 0.9.0`, so new projects get
+these assets directly; an existing app keeps the version its `Cargo.toml` pins
+until it is upgraded.
 <% end %>
 
 `solverforge-ui` is SolverForge's frontend component library for
@@ -43,7 +42,7 @@ the runtime integration path.
   production deployments
 - **Agent skill** for mapping a planning model onto the shipped timeline, Gantt,
   map, rail, and table surfaces; it lives with the other SolverForge skills in
-  the `solverforge-cli` repository as of 0.9.0
+  the `solverforge-cli` repository
 
 ## Installation
 
@@ -61,9 +60,9 @@ the crates.io package.
 `solverforge-ui 0.9.0` declares `rust-version = "1.95"`.
 
 Production cache pinning uses the versioned bundles for the installed crate
-version, `/sf/sf.0.9.0.css` and `/sf/sf.0.9.0.js`. `SF.version` in either
-bundle and `solverforge_ui::assets::version()` both report the crate version
-that produced the embedded asset set.
+version, `/sf/sf.0.9.0.css` and `/sf/sf.0.9.0.js`. `SF.version` in the loaded
+JavaScript bundle and `solverforge_ui::assets::version()` both report the crate
+version that produced the embedded asset set.
 
 ## Minimal Workflow
 
@@ -72,6 +71,8 @@ let app = api::router(state).merge(solverforge_ui::routes()); // serves /sf/*
 ```
 
 ```html
+<link rel="stylesheet" href="/sf/vendor/fontawesome/css/fontawesome.min.css" />
+<link rel="stylesheet" href="/sf/vendor/fontawesome/css/solid.min.css" />
 <link rel="stylesheet" href="/sf/sf.css" />
 <script src="/sf/sf.js"></script>
 <script>

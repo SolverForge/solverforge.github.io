@@ -257,9 +257,6 @@ crates.io on 2026-10-14",
   "src/docs/solverforge/constraints/existence-and-flattening.md" => [
     "DenseKeys::add", "per event", "at most once"
   ],
-  "src/reference/integration-surfaces.md" => [
-    "tracks `solverforge 0.23.0`", "the current CLI 3.7.1 line scaffolds core 0.23.0"
-  ],
   "src/docs/solverforge-python/index.md" => [
     "solverforge-py v0.7.2",
     "solverforge==0.7.2",
@@ -324,8 +321,7 @@ crates.io on 2026-10-14",
     "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
   "src/docs/solverforge-maps/index.md" => [
-    "solverforge-maps 2.1.4",
-    "solverforge-cli 3.7.1"
+    "solverforge-maps 2.1.4"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
     "SolverForge 0.23.0", "`cp314` ABI, not `cp314t`"
@@ -354,8 +350,6 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-ui/index.md" => [
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.7.1",
-    "`0.7.0`",
     "/sf/sf.0.9.0.css",
     "SF.version"
   ],

@@ -71,7 +71,7 @@ Default content is text-rendered. These opt-ins accept trusted HTML:
 | `SF.el(tag, attrs, ...)`  | `unsafeHtml`                                           |
 | `SF.createModal(config)`  | `unsafeBody`                                           |
 | `SF.createTabs(config)`   | `tabs[].content.unsafeHtml`                            |
-| `SF.createTable(config)`  | `cells[].unsafeHtml`                                   |
+| `SF.createTable(config)`  | `rows[][].unsafeHtml`                                  |
 | `SF.gantt.create(config)` | `unsafePopupHtml`, `columns[].render(task).unsafeHtml` |
 
 Escape user-provided content before interpolation. `SF.escHtml(...)` is the

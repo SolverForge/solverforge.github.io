@@ -25,9 +25,8 @@ The shipped dense timeline surface is built around:
 
 Use this as the default scheduling surface when you need sticky time headers,
 sticky lane labels, synchronized scrolling, overview clustering, or packed
-detailed inspection. Since `solverforge-ui 0.6.4`, detailed timeline blocks keep
-their exact interval width instead of receiving timeline-specific minimum-width
-inflation.
+detailed inspection. Detailed timeline blocks keep their exact interval width;
+the timeline adds no minimum-width inflation.
 
 ### Timeline Model Contract
 
@@ -150,7 +149,7 @@ aggregate signals rendered.
 
 ### Detailed Geometry and Viewport Rules
 
-`solverforge-ui 0.6.4` tightened the timeline contract for solved schedules:
+The timeline contract for solved schedules:
 
 - `zoomPresets` defaults to `["1w", "2w", "4w", "reset"]`; pass `[]` to omit
   zoom controls for fixed-horizon app surfaces
@@ -187,6 +186,22 @@ dense timeline surface.
   `getChart`, `destroy`
 
 ### Gantt Example
+
+The Gantt view renders with Frappe Gantt inside a Split.js pane, so load both
+vendor scripts after `sf.js`, and give the mount target a height before
+calling `mount()`:
+
+```html
+<link rel="stylesheet" href="/sf/sf.css" />
+<link rel="stylesheet" href="/sf/vendor/frappe-gantt/frappe-gantt.min.css" />
+<script src="/sf/sf.js"></script>
+<script src="/sf/vendor/frappe-gantt/frappe-gantt.min.js"></script>
+<script src="/sf/vendor/split/split.min.js"></script>
+
+<div id="my-container" style="height: 480px"></div>
+```
+
+Then create, mount, and fill the chart:
 
 ```js
 var gantt = SF.gantt.create({

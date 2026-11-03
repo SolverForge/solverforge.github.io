@@ -1,48 +1,47 @@
 ---
 title: Getting Started
 description: >
-  Mount the bundled assets and wire verified solverforge-ui primitives into an
-  Axum app.
+  Create an Axum app that serves the bundled solverforge-ui assets and wires
+  the shipped components and retained-job solver helpers into a page.
 weight: 1
 ---
 
 # Getting Started with solverforge-ui
 
-<%= render Ui::Callout.new do %>
-This guide follows the current `solverforge-ui` surface: retained jobs, typed
-lifecycle events, and exact paused or terminal snapshot sync.
-<% end %>
+This guide builds a small Axum app that serves the `solverforge-ui` assets and
+renders a page with a header, tabs, a status bar, and the retained-job solver
+controller:
 
-This guide covers the verified integration path:
-
-1. add the crate
-2. mount `/sf/*` assets with `.merge(solverforge_ui::routes())`
-3. include the bundled CSS and JS
+1. create a crate with the published dependencies
+2. serve an HTML page and mount `/sf/*` with `.merge(solverforge_ui::routes())`
+3. include the bundled CSS and JS in that page
 4. instantiate components plus the retained-job backend and solver helpers
 
-## Add the Dependency
+`solverforge-ui 0.9.0` declares `rust-version = "1.95"`, so use Rust 1.95 or
+newer.
 
-```toml
-[dependencies]
-axum = "0.8.9"
-solverforge-ui = { version = "0.9.0" }
+## Create the Project
 
-# Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.9.0" }
+```bash
+cargo new sf-ui-quickstart
+cd sf-ui-quickstart
+cargo add solverforge-ui@0.9.0 axum@0.8
+cargo add tokio@1 --features macros,rt-multi-thread,net
+mkdir static
 ```
 
-Use the Git tag form when you need exact source-tag reproducibility instead of
-the crates.io package.
+`solverforge-ui` depends on `axum 0.8`, so the app and the crate share one Axum
+version and `solverforge_ui::routes()` merges into the app's `Router`.
 
-Use Rust `1.95+` for the current crate line.
+## Serve the Page and Mount `/sf/*`
 
-## Mount `/sf/*` Routes in Axum
+Replace `src/main.rs`:
 
 ```rust
-use axum::{routing::get, Router};
+use axum::{response::Html, routing::get, Router};
 
-async fn index() -> &'static str {
-    include_str!("../static/index.html")
+async fn index() -> Html<&'static str> {
+    Html(include_str!("../static/index.html"))
 }
 
 fn app() -> Router {
@@ -50,12 +49,28 @@ fn app() -> Router {
         .route("/", get(index))
         .merge(solverforge_ui::routes())
 }
+
+#[tokio::main]
+async fn main() {
+    let port = std::env::var("PORT").unwrap_or_else(|_| "3000".to_string());
+    let listener = tokio::net::TcpListener::bind(format!("127.0.0.1:{port}"))
+        .await
+        .expect("bind the HTTP port");
+    println!("serving http://127.0.0.1:{port}/");
+    axum::serve(listener, app()).await.expect("serve the app");
+}
 ```
+
+The `Html` wrapper sends the page as `text/html`; a bare `&'static str` handler
+would send `text/plain`, and the browser would show the HTML source instead of
+running it.
 
 `solverforge_ui::routes()` serves the embedded `/sf/*` assets. Your application
 still owns its HTML pages and any job/solver API routes.
 
 ## Include Required Assets in HTML
+
+Save this as `static/index.html`:
 
 ```html
 <!doctype html>
@@ -64,6 +79,7 @@ still owns its HTML pages and any job/solver API routes.
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>solverforge-ui quickstart</title>
+    <link rel="icon" href="/sf/img/ouroboros.svg" />
 
     <link
       rel="stylesheet"
@@ -166,7 +182,7 @@ still owns its HTML pages and any job/solver API routes.
 </html>
 ```
 
-`SF.createSolver(...)` now follows the retained-job lifecycle. Use
+`SF.createSolver(...)` follows the retained-job lifecycle. Use
 `onProgress(...)` for score and telemetry updates, `onSolution(...)` for
 snapshot-bearing `best_solution` events, and `onPaused(...)`, `onCancelled(...)`,
 or `onComplete(...)` when you need the exact retained snapshot after the runtime
@@ -179,14 +195,28 @@ The header renders the cancel action as **Stop**. Keep using the `onCancel`
 configuration key and call `solver.cancel()`; `delete()` is reserved for
 terminal retained-job cleanup.
 
+## Run the App
+
+```bash
+cargo run
+```
+
+Open `http://127.0.0.1:3000/`. The page shows the header with its **Plan** and
+**Gantt** tabs, the status bar, and the active tab panel, and
+`SF.version` in the browser console reports `"0.9.0"`. Set `PORT` to serve on
+another port.
+
+The **Solve** button calls `POST /jobs` through the Axum backend adapter. This
+app does not define that route yet, so a solve fails until the app adds its job
+API.
+
 ## Application Routes
 
 `solverforge-ui` does not generate your scheduling API. The crate ships the UI
 surface and a set of backend helpers. If you use
-`SF.createBackend({ type: 'axum' })`, follow the canonical retained-job contract
-documented in [Integration & Assets](/docs/solverforge-ui/integration-assets/). Older
-Schedule-named route shapes are historical. Current generated apps expose the
-retained `/jobs/...` contract.
+`SF.createBackend({ type: 'axum' })`, implement the retained-job routes listed
+in [Integration & Assets](/docs/solverforge-ui/integration-assets/#retained-job-http-routes).
+Apps scaffolded by `solverforge-cli` already expose them.
 
 ## Next Steps
 
