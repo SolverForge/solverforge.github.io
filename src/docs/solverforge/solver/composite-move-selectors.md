@@ -13,9 +13,7 @@ selector family is not enough, or when a broad selector needs an explicit cap.
 
 Selectors expose cursor-scoped candidates with stable candidate IDs. Search
 phases evaluate borrowed candidates, release losers promptly, and transfer only
-the selected winner by value. `MoveArena` remains a reusable-capacity owner for
-the concrete APIs and composite storage that need it; it is not the universal
-runtime owner for every selector step. This keeps cartesian and union execution
+the selected winner by value. This keeps cartesian and union execution
 preview-safe without cloning large move payloads.
 
 ### Lending Cursor Contract
@@ -27,13 +25,10 @@ receive the caller's solution. The cursor retains declaration/state and move
 ownership, not a solution borrow across evaluation. `candidate(id)` lends a
 `MoveCandidateRef`; `take_candidate(id)` transfers that candidate exactly once,
 and `release_candidate(id)` drops a loser promptly. Dropping a cursor does not
-require exhausting its unrequested tail. `CandidateStore::reset()` drops live
-candidates while retaining its backing capacities.
+require exhausting its unrequested tail.
 
-The hidden resource-aware runtime boundary lends the mutable score director:
-`next_candidate_with_resources(director: &mut D, resources: &mut Resources)`.
-The public director-aware pull `next_candidate_with_director(&mut D)` defaults
-to the ordinary solution pull; preview-aware cursors and decorators forward it.
+The director-aware pull `next_candidate_with_director(&mut D)` defaults to the
+ordinary solution pull; preview-aware cursors and decorators forward it.
 Do not retain the lent solution/director between pulls or leave speculative
 writes behind when returning a candidate.
 
@@ -102,8 +97,7 @@ live director. Every right pull reinstates that row's left preview, generates
 and checks the right candidate, then undoes the preview and restores the
 snapshotted score state before returning. Nested Cartesian rows compose the
 same transaction. Compiled Cartesian discovery does not clone a preview
-solution. The ordinary public Cartesian selector uses its separately owned
-preview director; it is not the compiled implementation.
+solution.
 
 Sequential candidate evaluation uses
 `Move::is_doable_with_working_preview(&mut D)`, so later legs see earlier legs'
@@ -133,44 +127,21 @@ horizon.
 
 ## Lower-Level Building Blocks
 
-### Entity Selectors
+Configured selectors cover generated and dynamic models; their entity and value
+sources come from the model (`entity_class`, `variable_name`, and
+`#[planning_variable]` hooks such as `candidate_values` and
+`nearby_value_candidates`), not from separately constructed entity or value
+selectors. Leaf ordering is a `selection_order` setting, not a decorator type:
+configure random, shuffled, sorted, or probabilistic order on a leaf selector,
+and register a metric with `selection_metric` for the sorted and probabilistic
+modes.
 
-Entity selectors decide which entities are visited by a move selector. Most app
-configs target entities through optional `entity_class` and `variable_name`
-fields instead of constructing entity selectors directly.
-
-### Value Selectors
-
-Value selectors provide candidate scalar values. In generated apps, scalar
-value neighborhoods come from `#[planning_variable]` hooks such as
-`candidate_values`, `nearby_value_candidates`, or a bounded range selected by
-config.
-
-### Descriptor Scalar Selectors
-
-Descriptor scalar selectors target variables through model descriptors rather
-than hand-written field access. They remain a standalone opt-in selector API.
-Generated and dynamic configured solves use the immutable runtime compiler;
-descriptor selectors do not create a second construction or configured-search
-engine.
-
-### Selector Decorators
-
-| Decorator | Purpose |
-| --------- | ------- |
-| `FilteringMoveSelector` | filter borrowable candidates without reopening cartesian children |
-
-Leaf ordering is not a public decorator type. Configure random, shuffled, sorted,
-or probabilistic order through `selection_order` on a leaf selector, and register
-a metric with `selection_metric` for the sorted and probabilistic modes.
-
-## Move Unions
-
-| Move union | Purpose |
-| ---------- | ------- |
-| `ScalarMoveUnion` | change, swap, pillar, ruin, and related scalar moves |
-| `ListMoveUnion` | list change, list swap, reverse, K-opt, and list ruin moves |
-| `DescriptorMoveUnion` | descriptor-targeted moves |
+Custom search writes its own moves and selectors against the traits in
+`solverforge::heuristic`: `Move`, `MoveSelector`, `MoveCursor`,
+`MoveCandidateRef`, `MoveTabuSignature`, and `SequentialCompositeMoveRef` for
+two-move sequences. `solverforge::builder::local_search(...)` turns a selector,
+acceptor, and forager into a phase for a `#[planning_solution(search = ...)]`
+declaration.
 
 ## See Also
 

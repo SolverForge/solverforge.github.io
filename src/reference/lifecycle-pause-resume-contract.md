@@ -1,15 +1,20 @@
 ---
 title: "Lifecycle Pause / Resume Contract"
-description: "Historical maintainer note for retained-job lifecycle, snapshot identity, and exact pause/resume semantics."
+description: "Historical maintainer note for retained-job lifecycle, snapshot identity, and pause/resume semantics."
 ---
 
 # Lifecycle Pause / Resume Contract
 
 <%= render Ui::Callout.new(title: "Internal maintainer note", variant: "warning") do %>
 This is a historical maintainer note from April 6, 2026. The current public
-contract is documented in the `solverforge 0.23.0` runtime docs, the
-`solverforge-cli 3.7.1` CLI docs, and the `solverforge-ui 0.9.0` UI docs; use
-those pages for user-facing guidance.
+contract is documented in the `solverforge 0.24.0` runtime docs
+([SolverManager](/docs/solverforge/solver/solver-manager/)), the
+`solverforge-cli` CLI docs, and the `solverforge-ui 0.9.0` UI docs; use those
+pages for user-facing guidance. Resume in `solverforge 0.24.0` continues the
+retained job rather than restarting from the best solution, but it is not
+move-for-move exact: a reproducible job paused inside a local-search step can
+finish with a different solution than the same job run without a pause. The
+exact-resume goals below are not met by that release.
 <% end %>
 
 Date: 2026-04-06
@@ -82,12 +87,12 @@ The UI may orchestrate a generic lifecycle against that truth, but it must not:
 - reconstruct telemetry locally
 - fake exact resume semantics that the runtime does not own
 
-### 3. Exact resume means exact resume
+### 3. Resume continues the session
 
 If the user pauses and resumes a job, SolverForge must continue from the same
 solver session, not from a fresh solve seeded with the last best solution.
 
-Exact resume means preserving, at minimum:
+The goal stated here was to preserve, at minimum:
 
 - current working solution state
 - best solution state
@@ -128,7 +133,7 @@ Every renderable snapshot has a monotonic `snapshot_revision` within its job.
 
 ### Checkpoint
 
-An internal retained runtime state sufficient for exact resume.
+An internal retained runtime state sufficient to resume the job.
 
 A checkpoint is stronger than a snapshot. A snapshot is renderable. A checkpoint
 is resumable.
@@ -190,9 +195,9 @@ Examples:
 
 ## Required Runtime Contract Changes (`solverforge-rs`)
 
-### 1. Runtime-managed exact pause/resume
+### 1. Runtime-managed pause/resume
 
-The runtime must expose exact pause and resume semantics for retained jobs.
+The runtime must expose pause and resume semantics for retained jobs.
 
 The manager layer must own:
 
@@ -231,8 +236,8 @@ Rules:
 
 ### 4. Pause-safe checkpoints
 
-Pause must settle only at a runtime-safe boundary where the checkpoint is exact
-and resumable.
+Pause must settle only at a runtime-safe boundary where the checkpoint is
+resumable.
 
 The runtime may not report `PAUSED` until the checkpoint is ready.
 
@@ -281,16 +286,10 @@ Every event must carry enough metadata for consumers to render truthfully:
 
 ### 7. Exact-resume validation mode
 
-The runtime must support deterministic validation of exact resume in
-reproducible mode.
-
-Acceptance must compare:
-
-- uninterrupted run
-- paused then resumed run at the same event boundary
-
-From the pause boundary onward, the resumed run must match the uninterrupted run
-for event order, snapshot revisions, scores, and final result.
+The goal was deterministic validation of exact resume in reproducible mode,
+comparing an uninterrupted run with a run paused and resumed at the same event
+boundary. `solverforge 0.24.0` does not meet it: a pause that settles inside a
+local-search step can change the final result.
 
 ## Required Shared UI Contract Changes (`solverforge-ui`)
 
@@ -500,10 +499,8 @@ The required execution order is:
 
 ### Runtime acceptance (`solverforge-rs`)
 
-- exact pause/resume is real, not restart-from-best
-- pause settles only when checkpoint is exact and resumable
-- reproducible-mode pause/resume matches uninterrupted execution after the pause
-  boundary
+- pause/resume continues the retained job, not restart-from-best
+- pause settles only when the checkpoint is resumable
 - lifecycle state distinguishes solving, pause requested, paused, completed,
   cancelled, and failed
 - terminal reason is explicit
@@ -536,4 +533,4 @@ The required execution order is:
 - no layer in the stack overloads delete as pause or stop
 - no layer in the stack uses schedule-specific lifecycle terminology as the
   shared default
-- exact resume is a real runtime capability and not a UI illusion
+- resume is a runtime capability and not a UI illusion

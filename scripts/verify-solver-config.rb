@@ -298,7 +298,8 @@ def check_blocks(binary, blocks, failures)
   end
 
   parse_only = blocks.count { |block| block.model == "parse" }
-  log "  parsed #{parsed}/#{blocks.length}; solved #{solved}/#{blocks.length - parse_only}; parse-only #{parse_only}"
+  solvable = blocks.count { |block| block.model != "parse" && block.expect != "parse-error" }
+  log "  parsed as stated #{parsed}/#{blocks.length}; solved as stated #{solved}/#{solvable}; parse-only #{parse_only}"
   blocks.select(&:reason).group_by(&:reason).each do |reason, group|
     log "    parse-only (#{reason}): #{group.map(&:where).join(", ")}"
   end

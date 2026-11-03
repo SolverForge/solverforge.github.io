@@ -11,12 +11,12 @@ Termination conditions tell the solver when to stop searching. You can set termi
 ## Omitted Phases Require an Effective Limit
 
 With `phases` omitted, state-aware construction runs first. Default local
-search is eligible only if top-level termination contains a parsed time, work,
-unimproved, or valid score limit. Missing termination, an empty object, or an
-invalid score-only limit does not enable it: those solves are construction-only.
-An explicit local-search phase and its omitted selector defaults are a separate
-configuration choice. A valid score target enables the default phase, but does
-not guarantee that the target can be reached.
+search is eligible only if top-level termination contains a time, work,
+unimproved, or score limit. Missing termination or an empty `[termination]`
+table does not enable it: those solves are construction-only. An explicit
+local-search phase and its omitted selector defaults are a separate
+configuration choice. A score target enables the default phase, but does not
+guarantee that the target can be reached.
 
 ## Termination Types
 
@@ -25,8 +25,10 @@ not guarantee that the target can be reached.
 ```toml
 [termination]
 seconds_spent_limit = 300           # Stop after 5 minutes
-minutes_spent_limit = 10            # Stop after 10 minutes
 ```
+
+`minutes_spent_limit` sets the same budget in minutes. The two keys add up:
+`minutes_spent_limit = 1` with `seconds_spent_limit = 30` is a 90-second limit.
 
 ### Step-Based
 
@@ -37,13 +39,28 @@ step_count_limit = 100000           # Stop after 100k steps
 
 ### Unimproved Time/Steps
 
-Stop when no improvement has been found for a duration:
+Stop when no improvement has been found for a number of steps:
+
+```toml
+[termination]
+unimproved_step_count_limit = 10000        # No improvement for 10k steps
+```
+
+or for a duration:
 
 ```toml
 [termination]
 unimproved_seconds_spent_limit = 60        # No improvement for 60s
-unimproved_step_count_limit = 10000        # No improvement for 10k steps
 ```
+
+### Fallback Time Guard
+
+A step, unimproved, or score criterion without `seconds_spent_limit` or
+`minutes_spent_limit` still runs under a time guard: 30 seconds for a model
+with only scalar variables, 60 seconds for a model with a list variable.
+`step_count_limit = 100000` alone therefore stops after 100000 steps or 30
+seconds on a scalar model, whichever comes first. Set a time limit to choose
+the guard yourself.
 
 ### Score-Based
 
@@ -57,10 +74,9 @@ best_score_limit = "0hard/-100soft"    # Stop when feasible with soft ≥ -100
 ## Composite Termination
 
 The configured parser combines a time limit with one selected score/work
-criterion. It chooses the first effective criterion in this order: a valid
+criterion. It chooses the first criterion present in this order:
 `best_score_limit`, `step_count_limit`, `unimproved_step_count_limit`, then
-unimproved time. A malformed score target is ignored for this selection, so a
-later valid criterion can still apply. It does not OR every populated field
+`unimproved_seconds_spent_limit`. It does not OR every populated field
 together. The time guard and selected criterion stop the solver when **either**
 is met:
 
@@ -69,6 +85,16 @@ is met:
 seconds_spent_limit = 300
 best_score_limit = "0hard/0soft"
 # Stops after 5 minutes OR when a perfect score is found
+```
+
+A `best_score_limit` must parse as the model's score type. One that does not
+fails the job before any phase runs, naming the key:
+
+<!-- sf-toml: expect="solve-error" message="termination.best_score_limit" -->
+```toml
+[termination]
+seconds_spent_limit = 300
+best_score_limit = "0hard/-5sotf"
 ```
 
 ## Per-Phase Termination
@@ -111,6 +137,8 @@ does not measure all physical speculative scoring work. See
 Use `SolverManager::cancel(job_id)` to stop a retained job from code:
 
 ```rust
+use solverforge::SolverManager;
+
 static MANAGER: SolverManager<Schedule> = SolverManager::new();
 
 let (job_id, rx) = MANAGER.solve(problem).expect("solver job should start");
@@ -118,6 +146,8 @@ let (job_id, rx) = MANAGER.solve(problem).expect("solver job should start");
 // Later...
 MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
+
+The job's event stream then ends with `SolverEvent::Cancelled`.
 
 Configured limits remain binding during mandatory scalar and list construction.
 Their terminal result depends on whether the solution is structurally complete:
@@ -139,11 +169,8 @@ instead of charging the paused interval.
 
 ## Extension State and Polling
 
-Lower-level termination implementations use
-`Termination::is_terminated(&mut self, solver_scope)`; optional termination
-adapters likewise use `MaybeTermination::should_terminate(&mut self, ...)`.
-Unimproved and diminished-returns terminations own mutable observation state.
-Repeated checks on the same step do not count as extra unimproved steps.
+Unimproved terminations own mutable observation state. Repeated checks on the
+same step do not count as extra unimproved steps.
 
 Control and wall-clock checks are batched within candidate loops and are also
 performed at step, phase, and terminal boundaries. The local-search loop polls

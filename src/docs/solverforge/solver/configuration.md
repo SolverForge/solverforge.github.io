@@ -6,10 +6,21 @@ description: >
   Runtime configuration with SolverConfig, solver.toml, and parsing helpers.
 ---
 
-The stock generated runtime loads `solver.toml` automatically when you call
-`SolverManager::solve(...)`. In the current release, the `solverforge` facade
-also exports the normal configuration API directly, so app code can stay on one
-public dependency when it needs to inspect or build configs directly.
+A model reads a `solver.toml` only when it names one. Add `solver_toml` to
+`#[planning_solution]` with a path relative to the source file that declares
+the solution. With the solution in `src/domain/schedule.rs` and the file next
+to `Cargo.toml` (the scaffold layout), that is
+`solver_toml = "../../solver.toml"`; the full declaration is under
+[Per-Solution Overlays](#per-solution-overlays).
+
+The file is embedded at compile time, so the binary does not depend on its
+working directory. Without `solver_toml`, a solve starts from
+`SolverConfig::default()`; no file is read from the working directory. An
+embedded file that does not parse fails the job with one `Failed` event whose
+error starts with `solver configuration invalid: TOML parse error`.
+
+The `solverforge` facade exports the configuration API, so app code that
+inspects or builds configs needs no other dependency:
 
 ```rust
 use solverforge::{
@@ -32,26 +43,63 @@ scalar candidates, assignment-backed scalar groups, or conflict repair
 providers, the model must expose those capabilities through the generated model
 support layer.
 
-SolverForge compiles the complete resolved policy before solving. A bad
+Every table rejects keys it does not know, so a misspelt key fails to parse
+instead of silently running on a default:
+
+<!-- sf-toml: expect="parse-error" message="unknown field `seconds_spent_limt`" -->
+```toml
+[termination]
+seconds_spent_limt = 30
+```
+
+SolverForge compiles the complete resolved policy before any phase runs. A bad
 target, missing operation bundle, unknown provider or metric, invalid selector
-composition, or inconsistent construction source is a build error at its config
-path; the runtime does not defer schema discovery until a hot candidate loop.
+composition, out-of-range value, or inconsistent construction source fails the
+job with one `Failed` event that names its config path; the runtime does not
+defer schema discovery until a hot candidate loop. On a model whose variable is
+`employee_idx`, this config:
+
+<!-- sf-toml: expect="solve-error" message="runtime compilation failed at phases[1].local_search.move_selector" -->
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+
+[[phases]]
+type = "local_search"
+
+[phases.move_selector]
+type = "change_move_selector"
+variable_name = "employee_id"
+```
+
+fails with `runtime compilation failed at phases[1].local_search.move_selector:
+... no scalar planning slot matches entity_class=None
+variable_name=Some("employee_id")`.
 
 ## Loading Configuration
 
-### From a TOML file
+### Embedded in the model
+
+`solver_toml = "..."` on `#[planning_solution]` embeds the file at compile
+time and every `SolverManager` solve of that solution starts from it. This is
+the normal setup; see the top of this page.
+
+### From a TOML file at run time
+
+`SolverConfig::load` reads a path relative to the process's working directory:
 
 ```rust
-use solverforge::SolverConfig;
-
-let config = SolverConfig::load("solver.toml").unwrap();
+let config = SolverConfig::load("solver.toml").expect("solver.toml should parse");
 ```
+
+To solve with a file chosen at run time, load it and return it from the
+solution's [`config` callback](#per-solution-overlays), or pass it to
+[`solve_with_config`](/docs/solverforge/solver/solver-manager/#solving-without-a-manager).
 
 ### From a TOML string
 
 ```rust
-use solverforge::SolverConfig;
-
 let config = SolverConfig::from_toml_str(r#"
     environment_mode = "reproducible"
     move_thread_count = { count = 4 }
@@ -68,25 +116,15 @@ let config = SolverConfig::from_toml_str(r#"
     [phases.acceptor]
     type = "late_acceptance"
     late_acceptance_size = 400
-"#).unwrap();
+"#).expect("config should parse");
 ```
 
-### From YAML
-
-```rust
-use solverforge::SolverConfig;
-
-let config = SolverConfig::from_yaml_str(r#"
-environment_mode: reproducible
-termination:
-  seconds_spent_limit: 120
-phases:
-  - type: construction_heuristic
-    construction_heuristic_type: first_fit
-"#).unwrap();
-```
+TOML is the only configuration format.
 
 ## Example TOML File
+
+This is a complete `solver.toml` for a model with a scalar `employee_idx`
+variable:
 
 ```toml
 environment_mode = "non_reproducible"
@@ -112,7 +150,7 @@ hard_regression_policy = "never_accept_hard_regression"
 
 [phases.move_selector]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 value_candidate_limit = 32
 
 [phases.termination]
@@ -142,12 +180,13 @@ Controls candidate evaluation in the compiled runtime's acceptor-forager local
 search, independently of partitioned search's `thread_count`.
 
 ```toml
-move_thread_count = { count = 4 }  # Request up to four evaluators
-move_thread_count = "auto"         # Sequential (default)
-move_thread_count = "none"         # Sequential
+move_thread_count = { count = 4 }    # Request up to four evaluators
+# move_thread_count = "auto"         # Sequential (default)
+# move_thread_count = "none"         # Sequential
 ```
 
-These are alternative values for one setting, not three simultaneous keys.
+The commented lines are alternative values for the same key; a file may set it
+once.
 `auto`, `none`, and explicit counts 0 or 1 use the sequential loop. A count of
 at least 2 resolves to `min(count, rayon::current_num_threads(), 32)` evaluators,
 including the main score director; the others are persistent replicas. The
@@ -213,10 +252,11 @@ specialized list construction, named grouped `FirstFit` for required assignment
 rows followed by grouped `CheapestInsertion` for optional rows, and single-slot
 construction for remaining non-assignment-owned scalars. One streaming default
 local-search phase is eligible only when top-level termination contains an
-effective parsed limit. Missing termination, an empty termination object, or an
-invalid score-only limit leaves omitted phases construction-only. This is
-separate from omitting `move_selector` inside an explicit local-search phase.
-VND is never prepended implicitly.
+effective parsed limit. Missing termination or an empty termination object
+leaves omitted phases construction-only. A `best_score_limit` that does not
+parse as the model's score fails the solve. This is separate from omitting
+`move_selector` inside an explicit local-search phase. VND is never prepended
+implicitly.
 
 See [Phases](/docs/solverforge/solver/phases/) for all phase types and their options.
 
@@ -294,7 +334,7 @@ Every non-composite leaf selector accepts an optional `selection_order`:
 ```toml
 [phases.move_selector]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 selection_order = "sorted"
 selection_metric = "assignment_priority"
 ```
@@ -363,7 +403,7 @@ selected_count_limit = 24
 
 [phases.move_selector.selector]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 ```
 
 That cap applies to the wrapped neighborhood itself. It is separate from the
@@ -374,6 +414,19 @@ Scalar `change_move_selector`, `nearby_change_move_selector`,
 `pillar_change_move_selector`, and `ruin_recreate_move_selector` accept
 `value_candidate_limit`. Scalar `cheapest_insertion` requires a bounded
 candidate source: either `candidate_values` on the model or this config limit.
+
+Numeric selector and construction values are range-checked when the config is
+compiled, before any phase runs; a value outside its range fails the job at its
+key path. Every candidate, group, move, match, and repair limit is at least 1
+when set, as are `max_nearby` on nearby selectors and `selected_count_limit`.
+Ranges are `1 <= min_sublist_size <= max_sublist_size`,
+`2 <= min_window_size <= max_window_size <= 8`,
+`1 <= min_ruin_count <= max_ruin_count`, k-opt `k` from 2 to 5 with
+`min_segment_len >= 1`, and pillar sizes either both 0 (whole pillars) or
+`1 <= minimum_sub_pillar_size <= maximum_sub_pillar_size`. Acceptor and forager
+values are checked the same way: tabu and late-acceptance sizes and the
+accepted-count `limit` must be positive, and simulated annealing needs one
+temperature per score level.
 
 Grouped scalar construction and grouped scalar local search use `group_name`
 when the model provides a scalar group through the generated model support
@@ -471,11 +524,11 @@ local_search_type = "variable_neighborhood_descent"
 
 [[phases.neighborhoods]]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 
 [[phases.neighborhoods]]
 type = "swap_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 ```
 
 The `variable_neighborhood_descent` mode uses ordered `neighborhoods` and rejects
@@ -547,15 +600,22 @@ let config = SolverConfig::new()
 
 ## Per-Solution Overlays
 
-Macro-generated retained solves can layer runtime policy on top of the loaded
-`solver.toml` by using `config = "..."` on `#[planning_solution]`:
+Retained solves can layer per-solution policy on top of the embedded
+`solver.toml` with `config = "..."` on `#[planning_solution]`:
 
 ```rust
 #[planning_solution(
     constraints = "define_constraints",
+    solver_toml = "../../solver.toml",
     config = "solver_config_for_solution"
 )]
 pub struct Schedule {
+    #[problem_fact_collection]
+    pub employees: Vec<Employee>,
+    #[problem_fact_collection]
+    pub rooms: Vec<Room>,
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
     #[planning_score]
     pub score: Option<HardSoftScore>,
     pub time_limit_secs: u64,
@@ -566,8 +626,12 @@ fn solver_config_for_solution(solution: &Schedule, config: SolverConfig) -> Solv
 }
 ```
 
-The callback receives the already loaded `solver.toml` config, so it should
-decorate that base config rather than replace it from scratch.
+The callback receives the embedded `solver.toml` config, or
+`SolverConfig::default()` when the solution names no file, and returns the
+config the job runs. Decorate the base config rather than replace it, unless
+the callback loads a file of its own. `with_termination_seconds` sets
+`seconds_spent_limit` and keeps the other termination keys, so with the example
+file above a solution with `time_limit_secs = 2` stops after two seconds.
 
 ## See Also
 

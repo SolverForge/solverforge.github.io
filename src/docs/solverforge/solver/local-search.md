@@ -31,8 +31,8 @@ value_candidate_limit = 32
 
 When `phases` are omitted, one streaming local-search phase follows state-aware
 construction only if top-level termination contains an effective parsed limit.
-Absent termination, an empty termination object, or invalid score-only
-termination leaves the solve construction-only. Omitted selector/acceptor/forager
+Absent termination or an empty termination object leaves the solve
+construction-only; a `best_score_limit` that does not parse fails the solve. Omitted selector/acceptor/forager
 defaults inside an explicit local-search phase are a separate policy. VND must
 be selected explicitly; it is never inserted before default local search.
 
@@ -64,9 +64,9 @@ score-calculation budgets. Trials evaluated ahead of the decision point but not
 consumed are recorded separately as `moves_speculative`, with candidate-trace
 disposition `DiscardedSpeculative`; they do not inflate consumed-work counters.
 
-This parallel path belongs to the compiled runtime, not the lower-level
-`LocalSearchPhase`. That phase, VND, construction, exhaustive search, and
-partitioned child solves evaluate sequentially.
+This parallel path belongs to the compiled runtime. The lower-level phase that
+`solverforge::local_search(...)` builds for custom search, VND, construction,
+exhaustive search, and partitioned child solves evaluate sequentially.
 
 ## Acceptor
 
@@ -110,9 +110,7 @@ for an acceptance, the candidate score is used. A slot is replaced when that
 score is worse than the slot, or when it is better than both the slot and the
 current step score. Exact occurrence counts track the worst history score;
 when its last occurrence disappears the ring is rescanned. DLAS has no
-best-score percentage `tolerance` setting. The lower-level constructor is
-`DiversifiedLateAcceptanceAcceptor::new(late_acceptance_size)`; the default
-history size is 400.
+best-score percentage `tolerance` setting. The default history size is 400.
 
 ## Tabu Identity
 
@@ -120,9 +118,9 @@ Tabu search tracks scoped entity and destination-value tokens plus exact move
 and reverse-move identities. Descriptor, variable, and source scopes distinguish
 otherwise equal row/value indexes. A committed candidate hands its signature
 to `Acceptor::step_ended` by ownership; rejected trials do not enter the tabu
-memories. Self-undoing moves use `MoveUndoIdentity::SameAsMoveId`, whose
-`undo_id()` resolves to the actual move ID; other moves carry an explicit
-reverse ID. Tabu IDs are opaque implementation tokens, not candidate-trace
+memories. Self-undoing moves build their signature with
+`MoveTabuSignature::new_self_undoing(...)`, so `undo_id()` returns the move ID;
+other moves pass an explicit reverse ID to `MoveTabuSignature::new(...)`. Tabu IDs are opaque implementation tokens, not candidate-trace
 identities or a cross-release interchange format.
 
 Custom `Move` implementations return `Cow<'_, MoveTabuSignature>` from

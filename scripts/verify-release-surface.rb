@@ -393,9 +393,9 @@ crates.io on 2026-10-14",
     "solverforge-py v0.7.2"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.23.0",
+    "solverforge 0.24.0",
     "solverforge-ui 0.9.0",
-    "solverforge-cli 3.7.1"
+    "is not\nmove-for-move exact"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
     "`3.1.0` | 2026-09-16",

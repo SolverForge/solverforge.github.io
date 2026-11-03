@@ -82,11 +82,9 @@ still applies across the whole model.
 
 ### Stable list-source identity
 
-Generated `usize` list models supply a stable element-source key automatically.
-Lower-level `ListConstructionPhaseBuilder`, `ListCheapestInsertionPhase`,
-`ListRegretInsertionPhase`, and `ListClarkeWrightPhase` callers must provide an
-`element_source_key` that maps declared elements, current assignments, and
-precedence successors to the same unique `usize` identity.
+Generated `usize` list models supply a stable element-source key
+automatically: declared elements, current assignments, and precedence
+successors map to the same unique `usize` identity.
 
 SolverForge freezes that declaration binding before a reached construction node
 does candidate work. Duplicate declarations, unknown assigned keys, duplicate

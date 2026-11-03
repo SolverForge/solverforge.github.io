@@ -194,6 +194,18 @@ fn controls(solution: Schedule) {
     // end page
     assert!(matches!(terminal(&mut rx), SolverEvent::Cancelled { .. }));
 
+    // A terminal job rejects new problem changes.
+    let late = MANAGER.add_problem_change(
+        job_id,
+        ClosureProblemChange::<Schedule, _>::new("too late", |director| {
+            director.working_solution_mut().shifts[0].weight += 1;
+        }),
+    );
+    assert!(
+        matches!(late, Err(SolverManagerError::InvalidStateTransition { action: "add_problem_change", .. })),
+        "terminal job must reject problem changes: {late:?}"
+    );
+
     // A terminal job stays retained until it is deleted.
     assert_eq!(MANAGER.active_job_count(), 1);
     // page: src/docs/solverforge/solver/solver-manager.md delete
@@ -220,8 +232,9 @@ fn resume_before_paused_is_rejected(solution: Schedule) {
             println!("pause settled before resume: {other:?}");
         }
     }
-    MANAGER.cancel(job_id).ok();
-    terminal(&mut rx);
+    // A job that is pausing or paused can be cancelled.
+    MANAGER.cancel(job_id).expect("cancel should be accepted while pausing or paused");
+    assert!(matches!(terminal(&mut rx), SolverEvent::Cancelled { .. }));
     MANAGER.delete(job_id).expect("delete terminal job");
 }
 
@@ -245,6 +258,18 @@ fn paused_time_is_not_charged(solution: Schedule) {
     let charged = after.telemetry.elapsed.saturating_sub(before.telemetry.elapsed);
     println!("1.5 s paused charged {charged:?}");
     assert!(charged < Duration::from_millis(200), "paused time charged: {charged:?}");
+    // A paused job is not mutated: a queued change waits for resume().
+    let change = MANAGER
+        .add_problem_change(
+            job_id,
+            solverforge::ClosureProblemChange::<Schedule, _>::new("while paused", |director| {
+                director.working_solution_mut().shifts[1].weight += 1;
+            }),
+        )
+        .expect("a paused job accepts problem changes");
+    std::thread::sleep(Duration::from_millis(300));
+    let still = MANAGER.get_status(job_id).expect("status");
+    assert_eq!(still.telemetry.problem_changes_applied, 0, "applied while paused");
     MANAGER.resume(job_id).expect("resume should be accepted");
     let next = loop {
         let event = rx.blocking_recv().expect("event");
@@ -256,6 +281,11 @@ fn paused_time_is_not_charged(solution: Schedule) {
         next.metadata().telemetry.step_count >= before.telemetry.step_count,
         "resume continues from the paused step count"
     );
+    let deadline = Instant::now() + Duration::from_secs(30);
+    while MANAGER.get_status(job_id).expect("status").telemetry.problem_changes_applied < change.get() {
+        assert!(Instant::now() < deadline, "queued change never applied after resume");
+        std::thread::sleep(Duration::from_millis(20));
+    }
     MANAGER.cancel(job_id).expect("cancel should be accepted");
     terminal(&mut rx);
     MANAGER.delete(job_id).expect("delete terminal job");

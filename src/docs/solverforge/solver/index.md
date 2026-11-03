@@ -38,9 +38,12 @@ while let Some(event) = rx.blocking_recv() {
 MANAGER.delete(job_id).expect("delete retained job");
 ```
 
-The stock generated solve path loads `solver.toml` automatically from the
-current working directory. `solverforge-config` also exposes parsing APIs when
-you want to inspect or construct configs directly.
+A solve reads the `solver.toml` that the solution names with
+`#[planning_solution(solver_toml = "../../solver.toml")]`, embedded at compile
+time; without it the solve starts from `SolverConfig::default()`. Nothing is
+read from the working directory. The `solverforge` facade also exposes the
+parsing APIs for inspecting or building configs directly; see
+[Configuration](/docs/solverforge/solver/configuration/).
 
 The current release resolves one `RuntimeModel` per planning model and compiles
 it into one immutable graph before solving. Native, dynamic, scalar-only,
@@ -57,9 +60,9 @@ job as `Failed` instead of returning a partial plan.
 
 With `phases` omitted, state-aware construction runs first and one default
 local-search phase is eligible only when top-level termination contains an
-effective parsed limit. Missing termination, an empty object, or invalid
-score-only termination leaves the solve construction-only. VND is explicit,
-not an implicit default phase.
+effective parsed limit. Missing termination or an empty termination object
+leaves the solve construction-only. VND is explicit, not an implicit default
+phase.
 
 Local search uses capability-matched streaming defaults when `move_selector` is
 omitted. Scalar candidate limits, assignment-backed grouped scalar selectors,
@@ -69,9 +72,9 @@ annealing are expressed in `solver.toml`.
 
 The facade exports the configuration surface directly from
 `solverforge`, including `SolverConfig`, `PhaseConfig`, `MoveSelectorConfig`,
-`AcceptorConfig`, `ForagerConfig`, `SolverConfigOverride`, and related enums.
-Application code no longer needs a separate `solverforge-config` dependency for
-normal configuration construction or parsing.
+`AcceptorConfig`, `ForagerConfig`, `SolverConfigOverride`, and related enums,
+with every configuration type under `solverforge::config`. Application code
+needs no separate `solverforge-config` dependency to build or parse configs.
 
 Assignment-backed grouped scalar construction is available for required
 nullable scalar slots through named `ScalarGroup::assignment(...)`
@@ -99,7 +102,7 @@ display-only derived values.
 
 ## Sections
 
-- **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, selector policy, candidate tracing, `solver.toml`, and YAML parsing
+- **[Configuration](/docs/solverforge/solver/configuration/)** — `SolverConfig`, selector policy, candidate tracing, and `solver.toml`
 - **[Construction](/docs/solverforge/solver/construction/)** — construction heuristics, nullable obligations, grouped scalar construction, and stable list sources
 - **[Local Search](/docs/solverforge/solver/local-search/)** — acceptors, foragers, selector ordering, union weighting, and score-level annealing
 - **[Phases](/docs/solverforge/solver/phases/)** — Construction heuristic, local search, VND, typed exact search, and partitioned search

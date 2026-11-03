@@ -47,12 +47,12 @@ variable_name = "visits"
 
 ## Relocation And Swap
 
-| Selector | Move type | Use |
-| -------- | --------- | --- |
-| `list_change_move_selector` | `ListChangeMove` | move one list element to another position |
-| `nearby_list_change_move_selector` | `ListChangeMove` | distance-pruned relocation |
-| `list_swap_move_selector` | `ListSwapMove` | swap two list elements |
-| `nearby_list_swap_move_selector` | `ListSwapMove` | distance-pruned swaps |
+| Selector | Use |
+| -------- | --- |
+| `list_change_move_selector` | move one list element to another position |
+| `nearby_list_change_move_selector` | distance-pruned relocation |
+| `list_swap_move_selector` | swap two list elements |
+| `nearby_list_swap_move_selector` | distance-pruned swaps |
 
 ```toml
 [phases.move_selector]
@@ -69,17 +69,21 @@ local search remains reproducible.
 Sublist selectors move or swap contiguous list segments. They are useful when a
 run of adjacent visits or tasks should stay together while moving elsewhere.
 
-| Selector | Move type |
-| -------- | --------- |
-| `sublist_change_move_selector` | `SublistChangeMove` |
-| `sublist_swap_move_selector` | `SublistSwapMove` |
+| Selector | Use |
+| -------- | --- |
+| `sublist_change_move_selector` | move a contiguous segment to another position |
+| `sublist_swap_move_selector` | swap two contiguous segments |
 
 ```toml
 [phases.move_selector]
 type = "sublist_change_move_selector"
 variable_name = "visits"
+min_sublist_size = 1
 max_sublist_size = 4
 ```
+
+Both sublist selectors require `min_sublist_size` and `max_sublist_size`, with
+`1 <= min_sublist_size <= max_sublist_size`.
 
 ## Permutation and Precedence
 
@@ -131,7 +135,13 @@ Performs K-opt route reconnection for routing-style list variables.
 type = "k_opt_move_selector"
 variable_name = "visits"
 k = 3
+min_segment_len = 1
+max_nearby = 0
 ```
+
+`k` (2 to 5), `min_segment_len` (at least 1), and `max_nearby` are required.
+`max_nearby = 0` enumerates every cut; a positive value uses distance-pruned
+nearby k-opt candidates.
 
 K-opt improvement uses the route-local hook bundle declared on
 `#[planning_list_variable]`. Stock CVRP lists can use `domain = "cvrp"`; that
@@ -177,20 +187,6 @@ bounds do not imply that payloads are cloned on the mutation path.
 Compiled list cursors borrow their immutable list declaration instead of cloning
 it into every emitter. Nearby and nearby k-opt pulls read the lent live solution;
 open-time positional/index activation remains an explicit cursor contract.
-
-## Move Types
-
-| Move type | Selector family |
-| --------- | --------------- |
-| `ListChangeMove` | list change and nearby list change |
-| `ListSwapMove` | list swap and nearby list swap |
-| `ListPermuteMove` | list permute |
-| `SublistChangeMove` | sublist change |
-| `SublistSwapMove` | sublist swap |
-| `ListReverseMove` | list reverse |
-| `KOptMove` | K-opt |
-| `ListRuinMove` | list ruin |
-| `ListMoveUnion` support moves | list precedence |
 
 ## See Also
 

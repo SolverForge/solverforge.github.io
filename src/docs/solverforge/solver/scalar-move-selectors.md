@@ -109,9 +109,16 @@ share a compatible value.
 ```toml
 [phases.move_selector]
 type = "pillar_change_move_selector"
-variable_name = "team_idx"
+variable_name = "employee_idx"
+minimum_sub_pillar_size = 0
+maximum_sub_pillar_size = 0
 value_candidate_limit = 16
 ```
+
+Both pillar selectors require `minimum_sub_pillar_size` and
+`maximum_sub_pillar_size`. `0` and `0` move whole pillars; otherwise
+`1 <= minimum_sub_pillar_size <= maximum_sub_pillar_size` bounds the size of
+the sub-pillar a move takes.
 
 ## Ruin/Recreate
 
@@ -126,8 +133,13 @@ type = "ruin_recreate_move_selector"
 variable_name = "employee_idx"
 min_ruin_count = 2
 max_ruin_count = 8
+recreate_heuristic_type = "first_fit"
 value_candidate_limit = 32
 ```
+
+`min_ruin_count`, `max_ruin_count`, and `recreate_heuristic_type` are required.
+`recreate_heuristic_type` is `first_fit` (first doable value) or
+`cheapest_insertion` (best-scoring value); `moves_per_step` defaults to 10.
 
 ## Grouped Scalar
 
@@ -153,8 +165,7 @@ max_moves_per_step = 256
 require_hard_improvement = true
 ```
 
-The underlying `CompoundScalarMove` applies multiple scalar edits atomically
-with exact undo, affected-entity reporting, tabu identity, duplicate filtering,
+Each grouped move applies multiple scalar edits atomically with exact undo, affected-entity reporting, tabu identity, duplicate filtering,
 not-doable filtering, and hard-delta handling.
 
 Assignment-backed groups use the same selector. If the group was declared with
@@ -245,18 +256,6 @@ Available selectors:
 Constraint keys match exact scoring metadata. Use
 `ConstraintRef::full_name()` for package-qualified constraints and the short
 name for package-less constraints.
-
-## Move Types
-
-| Move type | Selector family |
-| --------- | --------------- |
-| `ChangeMove` | `change_move_selector`, `nearby_change_move_selector` |
-| `SwapMove` | `swap_move_selector`, `nearby_swap_move_selector` |
-| `PillarChangeMove` | `pillar_change_move_selector` |
-| `PillarSwapMove` | `pillar_swap_move_selector` |
-| `RuinRecreateMove` | `ruin_recreate_move_selector` |
-| `CompoundScalarMove` | grouped scalar assignment and compound conflict repair |
-| `ConflictRepairMove` | conflict-repair selectors |
 
 ## See Also
 

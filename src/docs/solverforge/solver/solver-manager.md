@@ -3,19 +3,21 @@ title: "SolverManager"
 linkTitle: "SolverManager"
 weight: 50
 description: >
-  Run retained solver jobs with lifecycle-complete streaming, snapshots, and exact pause/resume.
+  Run retained solver jobs with lifecycle-complete streaming, snapshots, pause/resume, and problem changes.
 ---
 
 `SolverManager` is the retained runtime API for running solver jobs. It owns the
 authoritative lifecycle state, streams `SolverEvent` values, retains snapshots
-for later inspection, and exposes exact in-process pause/resume.
+for later inspection, and exposes in-process pause/resume, cancellation, and
+real-time problem changes.
 
 ## Creating a SolverManager
 
-`SolverManager::new()` is a `const fn` that takes no arguments. It's designed to be used as a static:
+`SolverManager::new()` is a `const fn` that takes no arguments. It's designed to
+be used as a static. It is not in the prelude; import it from the crate root:
 
 ```rust
-use solverforge::prelude::*;
+use solverforge::SolverManager;
 
 static MANAGER: SolverManager<Schedule> = SolverManager::new();
 ```
@@ -23,13 +25,15 @@ static MANAGER: SolverManager<Schedule> = SolverManager::new();
 ## Solving
 
 Call `.solve()` with your planning solution. It returns a `Result` containing a
-`(job_id, Receiver)` tuple:
+`(job_id, SolverEventReceiver)` tuple:
 
 ```rust
 let (job_id, rx) = MANAGER.solve(solution).expect("solver job should start");
 ```
 
-The receiver yields `SolverEvent<S>` values, not raw `(solution, score)` tuples.
+The receiver yields `SolverEvent<S>` values, not raw `(solution, score)` tuples:
+`blocking_recv()` waits on a plain thread, `recv().await` waits in async code,
+and `try_recv()` returns a buffered event without waiting.
 Each event carries `SolverEventMetadata` with the job id, event sequence,
 lifecycle state, telemetry, current/best score, and the latest
 `snapshot_revision` when one exists.
@@ -198,12 +202,21 @@ Use lifecycle controls when you need interactive job management:
 
 ```rust
 MANAGER.pause(job_id).expect("pause should be accepted");
+
+// resume() is accepted once the job has settled in Paused.
+while let Some(event) = rx.blocking_recv() {
+    if let SolverEvent::Paused { metadata } = event {
+        println!("paused at snapshot {:?}", metadata.snapshot_revision);
+        break;
+    }
+}
 MANAGER.resume(job_id).expect("resume should be accepted");
-MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
 
 `pause()` is not a best-effort hint. The runtime settles it at a safe boundary,
-emits `Paused`, and only then allows `resume()`. Once mandatory construction is
+emits `Paused`, and only then allows `resume()`. Until then the job is
+`PauseRequested`, and `resume()` returns
+`SolverManagerError::InvalidStateTransition { action: "resume", state: PauseRequested, .. }`. Once mandatory construction is
 complete, the pause also retains a checkpoint-backed solution snapshot. Before
 that gate opens, the in-process state remains resumable but the `Paused` event
 has no `snapshot_revision`, `checkpoint_available` remains false, and
@@ -218,8 +231,46 @@ config termination unwind without app-side watchdog code.
 
 Resume and cancellation clear the pause request and notify the condition
 variable while holding the worker's pause gate. Resume continues the retained
-working solution, RNG, selector, acceptor, forager, phase position, and budget
-state; it does not restart from the best solution.
+in-process job with its working solution, phase position, step count, and
+remaining budget; it does not restart from the best solution. It is not
+move-for-move exact: in `reproducible` mode, a job paused inside a local-search
+step and then resumed can finish with a different solution and score than the
+same job run without a pause.
+
+Cancel a solving or paused job from code:
+
+```rust
+MANAGER.cancel(job_id).expect("cancel should be accepted");
+```
+
+Its event stream then ends with `Cancelled`.
+
+## Problem Changes
+
+A `Solving`, `PauseRequested`, or `Paused` job accepts real-time problem
+changes. The runtime applies queued changes in submission order at its next
+safe point, starting from the best solution, rescores from scratch, and
+restarts its phases so construction assigns new work before local search
+resumes. A paused job applies its queue after `resume()`.
+
+```rust
+use solverforge::ClosureProblemChange;
+
+let change = MANAGER
+    .add_problem_change(
+        job_id,
+        ClosureProblemChange::<Schedule, _>::new("raise shift 0 weight", |director| {
+            director.working_solution_mut().shifts[0].weight += 5;
+        }),
+    )
+    .expect("problem change should be queued");
+```
+
+The change is applied once an event's `telemetry.problem_changes_applied` is at
+least `change.get()`; the next `BestSolution` carries the changed problem and
+may score lower than earlier ones. Implement `ProblemChange<S>` for reusable
+changes. A cancelled or terminal job rejects new changes with
+`InvalidStateTransition`.
 
 ## Snapshots and Analysis
 
@@ -268,7 +319,7 @@ Deleting a retained terminal job is what frees the slot for reuse.
 
 ## Active Jobs
 
-Check how many jobs are currently running:
+Check how many jobs the manager currently retains:
 
 ```rust
 let count = MANAGER.active_job_count();
@@ -279,10 +330,29 @@ not been deleted yet.
 
 ## Detached Solves and Failure Isolation
 
-`SolverRuntime::detached()` supports synchronous configured solving without a
-retained manager receiver. Its lifecycle slot is reused per solution type per
-thread and reset to pristine state for each solve; telemetry, snapshots,
-terminal status, and pause flags do not carry into the next detached run.
+## Solving Without a Manager
+
+`#[planning_solution(constraints = "...")]` also generates
+`solve_with_config`, which solves on the calling thread with exactly the given
+config and returns the best solution or a `RuntimeBuildError`. Neither the
+embedded `solver_toml` nor the `config` callback is applied:
+
+```rust
+let config = SolverConfig::from_toml_str(r#"
+    random_seed = 7
+
+    [termination]
+    seconds_spent_limit = 1
+"#)
+.expect("config should parse");
+
+let solved = problem.solve_with_config(config).expect("solve should finish");
+println!("best score: {:?}", solved.score);
+```
+
+Detached solves reuse one lifecycle slot per solution type per thread, reset
+for each solve; telemetry, snapshots, terminal status, and pause flags do not
+carry into the next run.
 
 A retained worker panic becomes a `Failed` job with its error and any already
 retained structurally complete snapshot. Other jobs keep independent lifecycle

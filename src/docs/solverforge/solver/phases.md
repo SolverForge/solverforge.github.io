@@ -15,8 +15,9 @@ specialized list construction, named grouped `FirstFit` for required assignment
 rows followed by grouped `CheapestInsertion` for optional rows, and single-slot
 construction for remaining non-assignment-owned scalars. One streaming default
 local-search phase is eligible only when top-level termination contains an
-effective parsed limit. Missing termination, an empty termination object, or an
-invalid score-only limit leaves omitted phases construction-only. This is
+effective parsed limit. Missing termination or an empty termination object
+leaves omitted phases construction-only; a `best_score_limit` that does not
+parse as the model's score fails the solve. This is
 separate from omitting `move_selector` inside an explicit local-search phase.
 VND is never prepended implicitly.
 
@@ -145,7 +146,7 @@ late_acceptance_size = 400
 
 [phases.move_selector]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 
 [phases.forager]
 type = "accepted_count"
@@ -224,11 +225,11 @@ local_search_type = "variable_neighborhood_descent"
 
 [[phases.neighborhoods]]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 
 [[phases.neighborhoods]]
 type = "swap_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 ```
 
 When one neighborhood needs a hard move cap, wrap that neighborhood itself with
@@ -241,7 +242,7 @@ selected_count_limit = 48
 
 [phases.neighborhoods.selector]
 type = "change_move_selector"
-variable_name = "employee_id"
+variable_name = "employee_idx"
 ```
 
 ## Typed Exact Search
