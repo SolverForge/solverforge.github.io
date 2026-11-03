@@ -22,6 +22,9 @@ jobs:
     # A wedged step must fail the run, not sit on it. The default is six hours,
     # which is how a hanging browser check burned a deploy instead of reporting.
     timeout-minutes: 35
+    # The tutorial replays build two release apps on a cold cache, so the bound
+    # leaves room for that and nothing more.
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
@@ -126,6 +129,16 @@ jobs:
           path: ~/.cache/ui-gate-target
           key: ui-gate-${{ hashFiles('src/docs/solverforge-ui/getting-started.md') }}
           restore-keys: ui-gate-
+      # Tutorial replay gates install the published CLI into this cache
+      # (scripts/lib/tutorial_replay.rb) and share Cargo output across runs.
+      - name: Cache the tutorial replay toolchain
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/solverforge-cli
+            ~/.cache/tutorial-target
+          key: tutorial-replay-${{ hashFiles('scripts/verify-hospital-tutorial.rb', 'scripts/lib/tutorial_replay.rb') }}
+          restore-keys: tutorial-replay-
 
       - uses: ruby/setup-ruby@v1
         with:
@@ -153,7 +166,7 @@ jobs:
           SOLVERFORGE_USECASES_REPO: ${{ github.workspace }}/.ci/solverforge-usecases
           SOLVERFORGE_BENCH_REPO: ${{ github.workspace }}/.ci/solverforge-bench
           PLAYWRIGHT_CHANNEL: chrome
-        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" SOLVERFORGE_UI_GATE_TARGET_DIR="$HOME/.cache/ui-gate-target" make ci-local
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" SOLVERFORGE_UI_GATE_TARGET_DIR="$HOME/.cache/ui-gate-target" TUTORIAL_REPLAY_TARGET_DIR="$HOME/.cache/tutorial-target" make ci-local
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'

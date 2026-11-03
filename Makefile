@@ -41,6 +41,7 @@ help:
 	@printf '  make verify-rust-snippets       Compile Rust library doc blocks against crates.io solverforge, run shown outputs\n'
 	@printf '  make verify-rust-snippets-legacy Compile-check Rust snippets on pages not yet in that scope\n'
 	@printf '  make verify-hospital-tutorial   Run portable tutorial contract checks\n'
+	@printf '  make verify-hospital-tutorial   Replay, build, and solve both hospital tutorial paths\n'
 	@printf '  make verify-lessons-tutorial    Run portable lessons contract checks\n'
 	@printf '  make verify-deliveries-tutorial Run portable deliveries contract checks\n'
 	@printf '  make verify-fsr-tutorial        Run portable FSR tutorial contract checks\n'
@@ -94,8 +95,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-release-surface.rb
 	$(call status,Verifying use-case showcase contract)
 	@ruby scripts/verify-use-cases-page.rb
-	$(call status,Verifying hospital tutorial contract)
-	@ruby scripts/verify-hospital-tutorial.rb
+	$(call status,Verifying hospital tutorial page contract)
+	@ruby scripts/verify-hospital-tutorial.rb --static
 	$(call status,Verifying lessons tutorial contract)
 	@ruby scripts/verify-lessons-tutorial.rb
 	$(call status,Verifying deliveries tutorial contract)
@@ -159,7 +160,7 @@ verify-rust-snippets-legacy:
 	@ruby scripts/verify-rust-snippets-legacy.rb
 
 verify-hospital-tutorial:
-	$(call status,Verifying hospital tutorial contract)
+	$(call status,Replaying and solving both hospital tutorial paths)
 	@ruby scripts/verify-hospital-tutorial.rb
 
 verify-lessons-tutorial:

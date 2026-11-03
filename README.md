@@ -57,9 +57,16 @@ Direct Bridgetown commands:
 8. `ruby scripts/verify-deliveries-tutorial.rb`
 9. `bundle exec bridgetown start -P 4017`
 
-`make verify-hospital-tutorial` always runs site-local copy and snippet checks.
-When `SOLVERFORGE_CLI_REPO` or `SOLVERFORGE_HOSPITAL_REPO` point to local
-product checkouts, it also runs the CLI scaffold and live hospital app checks.
+`make verify-hospital-tutorial` replays the hospital use-case page with the
+published CLI: it installs `solverforge-cli` at the version the page documents
+into `~/.cache/solverforge-cli/<version>` (override with
+`SOLVERFORGE_CLI_CACHE`), runs the page's scaffold commands and writes the
+complete files the page shows, then builds, boots and solves the result; it
+also clones the Hugging Face Space the page names, runs the page's validation
+commands there, boots and solves it, and checks the page's facts against that
+clone. `make test` runs only its static page checks (`--static`). Set
+`TUTORIAL_REPLAY_TARGET_DIR` to share Cargo build output between runs. The
+replay harness is `scripts/lib/tutorial_replay.rb`.
 The Make target is the stable public workflow; the Ruby script is an
 implementation detail behind that target.
 
