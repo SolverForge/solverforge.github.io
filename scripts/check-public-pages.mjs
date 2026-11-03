@@ -1466,7 +1466,20 @@ async function checkBenchmarksDocs(origin) {
   return failures;
 }
 
+// Current versions come from the single pin file the Ruby gates compare with
+// crates.io, so a rendered page and the source gates cannot disagree.
+function releasePins() {
+  const source = readFileSync(resolve("scripts/release_pins.rb"), "utf8");
+  const pin = (crate) => {
+    const match = source.match(new RegExp(`"${crate}" => "([0-9.]+)"`));
+    if (!match) throw new Error(`scripts/release_pins.rb has no pin for ${crate}`);
+    return match[1];
+  };
+  return { core: pin("solverforge"), cli: pin("solverforge-cli") };
+}
+
 async function checkReleaseDocs(origin) {
+  const pins = releasePins();
   const browser = await chromium.launch(chromiumOptions());
   const page = await browser.newPage();
   const failures = [];
@@ -1475,12 +1488,16 @@ async function checkReleaseDocs(origin) {
     { path: "/docs/solverforge/solver/configuration/", required: ["Sequential (default)", "min(count, rayon::current_num_threads(), 32)"] },
     { path: "/docs/solverforge/solver/local-search/", required: ["DiscardedSpeculative", "trajectory can depend on evaluator count"] },
     { path: "/docs/solverforge/solver/phases/", required: ["SolverTelemetry::phases", "every started phase in execution order"] },
-    { path: "/docs/solverforge-cli/", required: ["solverforge-cli 3.7.1 interface", "Fresh scaffolds target solverforge 0.23.0", "the default auto setting stays sequential"] },
+    { path: "/docs/solverforge-cli/", required: [`solverforge-cli ${pins.cli} interface`, `Fresh scaffolds target solverforge ${pins.core}`, "the default auto setting stays sequential"] },
+    { path: "/docs/solverforge-cli/getting-started/", required: [`CLI version: ${pins.cli}`, `SolverForge crate target ${pins.core}`, "\"lifecycleState\":\"FAILED\"", "it does not compile the project"] },
     { path: "/docs/solverforge-python/", required: ["solverforge 0.7.2", "solverforge-py v0.7.2", "solverforge 0.23.0", "parallel move evaluation"] },
     { path: "/docs/solverforge-python/modeling/", required: ["Entity Pinning", "planning_pin()", "planning_variable(pinning=True) is not supported", "mandatory planning work incomplete"] },
     { path: "/docs/solverforge-python/solving-and-runtime/", required: ["moves_speculative", "discarded_speculative", "phases", "GIL", "Callback Errors And Interrupts", "KeyboardInterrupt", "AttributeError", "SolverPanicPayload", "FAILED"] },
     { path: "/blog/releases/2026/10/27/solverforge-python-0-7-x/", required: ["SolverForge Python 0.7.x follows solverforge 0.6.15", "32 evaluators", "releases the GIL", "phases", "discarded_speculative", "solverforge 0.7.2", "0.7.1", "KeyboardInterrupt", "previous hook"] },
-    { path: "/docs/status-and-roadmap/", required: ["documentation tracks the solverforge 0.23.0 release", "Linux/Windows CI passed, macOS CI failed", "solverforge-cli 3.7.1", "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0", "solverforge-flightcrew@0.2.0"] },
+    { path: "/docs/status-and-roadmap/", required: [`documentation tracks the solverforge ${pins.core} release`, `cargo add solverforge installs ${pins.core}`, `The independently published CLI line is solverforge-cli ${pins.cli}`, "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0", "solverforge-flightcrew@0.3.0", "solverforge-fleet@0.2.0"] },
+    { path: "/blog/releases/2026/11/01/solverforge-0-24-x/", required: ["solverforge 0.24.x follows solverforge 0.23.0", "weight_multiplier", "solver_toml"] },
+    { path: "/blog/releases/2026/11/03/solverforge-cli-3-8-x/", required: [`solverforge-cli ${pins.cli} was published on November 3, 2026`, "Windows failed", "BendableScore"] },
+    { path: "/blog/releases/2026/11/03/solverforge-usecases-3-0/", required: ["solverforge-hospital@3.0.0", "weightMultiplier", "make install-e2e"] },
     { path: "/docs/solverforge-cli/configuration/", required: ["move_thread_count.count 4", "RAYON_NUM_THREADS", "32", "auto", "none"] },
     { path: "/docs/solverforge-cli/project-anatomy/", required: ["phases", "movesSpeculative", "discarded_speculative"] },
     { path: "/blog/releases/2026/10/27/solverforge-cli-3-7-x/", required: ["solverforge-cli 3.7.1", "solverforge 0.23.0", "phases", "movesSpeculative", "Windows failed", "test_new_creates_neutral_project_files"] },
