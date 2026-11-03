@@ -75,6 +75,20 @@ implementation detail behind that target.
 snippets, then adds source-level and live app checks when
 `SOLVERFORGE_DELIVERIES_REPO` points to the app checkout.
 
+`make verify-lessons-tutorial` replays the Lessons use-case page the way a
+reader follows it (`scripts/lib/use_case_tutorial.rb` on the shared
+`scripts/lib/tutorial_replay.rb`). It installs the pinned published
+`solverforge-cli`, runs the page's Getting Started commands in page order with
+the complete files the page shows, builds, boots with the page's run command,
+runs the page's `curl` commands, and solves; then it clones the Hugging Face
+Space the page names, solves it, compares the page's dependency, metadata,
+solver, path, constraint, and dataset claims with the clone, and runs the
+page's validation commands there (Docker targets excepted). `make test` runs
+the static half (`--static`). `TUTORIAL_REPLAYS` lists the replays `make
+ci-local` runs; GitHub Actions runs them in the `tutorials` job, with
+`SOLVERFORGE_CLI_CACHE`, `TUTORIAL_REPLAY_TARGET_DIR` and
+`TUTORIAL_REPLAY_OSM_CACHE` pointing at cached directories.
+
 `make verify-maintenance-walkthrough` holds the agent-skill walkthrough to
 what it teaches and never skips. It replays the page's command block with the
 installed `solverforge` (or `SOLVERFORGE_BIN`), overlays the hand-written files

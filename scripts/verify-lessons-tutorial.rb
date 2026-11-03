@@ -1,124 +1,61 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-SCRIPT_DIR = File.expand_path(__dir__)
-SITE_ROOT = File.expand_path("..", SCRIPT_DIR)
-EXPECTED_RUNTIME_VERSION = "0.23.0"
-EXPECTED_UI_VERSION = "0.9.0"
-EXPECTED_CLI_VERSION = "2.2.2"
-EXPECTED_APP_VERSION = "2.0.14"
+# Holds the Lessons use-case page to what its reader gets.
+#
+#   ruby scripts/verify-lessons-tutorial.rb            # static + live replay
+#   ruby scripts/verify-lessons-tutorial.rb --static   # page contract only
+#
+# The live replay installs solverforge-cli at CLI_VERSION, builds and solves
+# the page's CLI timetable, clones the Hugging Face Space the page names,
+# solves it, compares the page's claims with the clone, and runs the page's
+# validation commands there (see scripts/lib/use_case_tutorial.rb).
 
-def log(message)
-  puts "[verify-lessons-tutorial] #{message}"
+require_relative "lib/use_case_tutorial"
+
+SITE_ROOT = File.expand_path("..", __dir__)
+CLI_VERSION = "3.8.0"
+
+def site_file(path)
+  File.join(SITE_ROOT, path)
 end
 
-def fail!(message)
-  warn "[verify-lessons-tutorial] ERROR: #{message}"
-  exit 1
-end
-
-def discover_repo(env_name, candidates)
-  configured = ENV[env_name]
-
-  if configured && !configured.empty?
-    path = File.expand_path(configured)
-    fail!("#{env_name} points to missing repo: #{configured}") unless Dir.exist?(path)
-
-    return path
+navigation = lambda do |_text, gate|
+  {
+    "src/docs/getting-started/index.md" => "SolverForge Lessons Use Case",
+    "src/docs/index.md" => "Lessons Use Case",
+    "src/_data/docs_nav.yml" => "/docs/getting-started/solverforge-lessons-use-case/",
+    "src/_components/shared/search_surface.rb" => "SolverForge Lessons Use Case"
+  }.each do |path, needle|
+    gate.fail!("#{path} no longer links the lessons page (#{needle})") unless File.read(site_file(path)).include?(needle)
   end
-
-  candidates.each do |candidate|
-    path = File.expand_path(candidate)
-    return path if Dir.exist?(path)
-  end
-
-  nil
 end
 
-def read_file(path)
-  fail!("missing file: #{path}") unless File.file?(path)
-
-  File.read(path)
-end
-
-def assert_file_contains(path, needle)
-  text = read_file(path)
-  fail!("#{path} is missing: #{needle}") unless text.include?(needle)
-end
-
-def assert_rendered_h1_count
-  rendered_doc = File.join(SITE_ROOT, "output/docs/getting-started/solverforge-lessons-use-case/index.html")
-
-  unless File.file?(rendered_doc)
-    log "Skipping rendered H1 check; build output not found at #{rendered_doc}"
-    return
-  end
-
-  count = File.read(rendered_doc).scan(/<h1(?:\s|>)/i).size
-  fail!("rendered lessons tutorial should have exactly one H1, found #{count}") unless count == 1
-end
-
-doc_page = File.join(SITE_ROOT, "src/docs/getting-started/solverforge-lessons-use-case.md")
-hub_page = File.join(SITE_ROOT, "src/docs/getting-started/index.md")
-docs_index = File.join(SITE_ROOT, "src/docs/index.md")
-docs_nav = File.join(SITE_ROOT, "src/_data/docs_nav.yml")
-search_surface = File.join(SITE_ROOT, "src/_components/shared/search_surface.rb")
-
-log "Checking public copy and tutorial anchors"
-assert_file_contains(doc_page, "SolverForge Lessons Use Case")
-assert_file_contains(doc_page, "Browser test servers honor `CARGO_TARGET_DIR`")
-assert_file_contains(doc_page, "`solverforge-cli 3.7.1` scaffolds `solverforge 0.23.0`")
-assert_file_contains(doc_page, "https://huggingface.co/spaces/SolverForge/solverforge-lessons")
-assert_file_contains(doc_page, "solverforge #{EXPECTED_RUNTIME_VERSION}")
-assert_file_contains(doc_page, "solverforge-ui #{EXPECTED_UI_VERSION}")
-assert_file_contains(doc_page, "solverforge-lessons@#{EXPECTED_APP_VERSION}")
-assert_file_contains(doc_page, "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
-assert_file_contains(doc_page, "tokio = { version = \"1.52.1\", features = [\"full\"] }")
-assert_file_contains(doc_page, "tower-http = { version = \"0.6.8\", features = [\"fs\", \"cors\"] }")
-assert_file_contains(doc_page, "HardMediumSoftScore")
-assert_file_contains(doc_page, "300 lessons")
-assert_file_contains(doc_page, "40 weekly timeslots")
-assert_file_contains(doc_page, "10 typed rooms")
-assert_file_contains(doc_page, "assign_timeslot")
-assert_file_contains(doc_page, "repeated_subject_day")
-assert_file_contains(doc_page, "solverforge generate constraint room_kind --join --soft")
-assert_file_contains(doc_page, "verifies that its default id is present")
-assert_file_contains(doc_page, "leaves Solve disabled")
-assert_file_contains(doc_page, "make test-slow")
-assert_file_contains(hub_page, "SolverForge Lessons Use Case")
-assert_file_contains(docs_index, "Lessons Use Case")
-assert_file_contains(docs_nav, "/docs/getting-started/solverforge-lessons-use-case/")
-assert_file_contains(search_surface, "SolverForge Lessons Use Case")
-
-usecases_repo = discover_repo("SOLVERFORGE_USECASES_REPO", [
-  File.join(Dir.home, "dev/solverforge/solverforge-usecases"),
-  "/srv/lab/dev/solverforge/solverforge-usecases",
-  File.join(SITE_ROOT, "../solverforge-usecases"),
-  File.join(SITE_ROOT, "../../solverforge-usecases")
-])
-
-if usecases_repo
-  log "Using use-case bundle repo: #{usecases_repo}"
-  lessons_root = File.join(usecases_repo, "uc-lessons")
-  assert_file_contains(File.join(lessons_root, "Makefile"), "CARGO_TARGET_DIR")
-  assert_file_contains(File.join(lessons_root, "solverforge.app.toml"), "runtime_source = \"crates.io: solverforge #{EXPECTED_RUNTIME_VERSION}\"")
-  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "version = \"#{EXPECTED_APP_VERSION}\"")
-  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "solverforge = { version = \"#{EXPECTED_RUNTIME_VERSION}\"")
-  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "solverforge-ui = { version = \"#{EXPECTED_UI_VERSION}\"")
-  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "tokio = { version = \"1.52.1\", features = [\"full\"] }")
-  assert_file_contains(File.join(lessons_root, "Cargo.toml"), "tower-http = { version = \"0.6.8\", features = [\"fs\", \"cors\"] }")
-  assert_file_contains(File.join(lessons_root, "src/constraints/room_kind.rs"), "HardMediumSoftScore::of_soft(1)")
-  assert_file_contains(File.join(lessons_root, "solverforge.app.toml"), "cli_version = \"#{EXPECTED_CLI_VERSION}\"")
-  assert_file_contains(File.join(lessons_root, "solverforge.app.toml"), "score = \"HardMediumSoftScore\"")
-  assert_file_contains(File.join(lessons_root, "solver.toml"), "construction_heuristic_type = \"cheapest_insertion\"")
-  assert_file_contains(File.join(lessons_root, "src/data/data_seed/vocabulary.rs"), "TIMESLOT_COUNT: usize = 40")
-  assert_file_contains(File.join(lessons_root, "src/data/data_seed/vocabulary.rs"), "GROUP_COUNT: usize = 12")
-  assert_file_contains(File.join(lessons_root, "src/data/data_seed/vocabulary.rs"), "ROOM_COUNT: usize = 10")
-  assert_file_contains(File.join(lessons_root, "src/domain/lesson.rs"), "pub timeslot_idx: Option<usize>")
-  assert_file_contains(File.join(lessons_root, "src/domain/lesson.rs"), "pub room_idx: Option<usize>")
-else
-  log "Skipping bundle metadata checks; set SOLVERFORGE_USECASES_REPO to enable them."
-end
-
-assert_rendered_h1_count
-log "Lessons tutorial contract checks passed"
+UseCaseTutorial.run(
+  UseCaseTutorial::Config.new(
+    name: "verify-lessons-tutorial",
+    page: site_file("src/docs/getting-started/solverforge-lessons-use-case.md"),
+    page_url: "docs/getting-started/solverforge-lessons-use-case",
+    cli_version: CLI_VERSION,
+    runtime_version: "0.24.0",
+    space_url: "https://huggingface.co/spaces/SolverForge/solverforge-lessons",
+    app: "lessons",
+    cli_section: "Build a Timetable from the CLI",
+    clone_section: "Run the Finished Example",
+    constraints_section: "Writing Constraints",
+    validation_section: "Testing and Validation",
+    docker_commands: ["make ci-local", "make space-build", "make space-run"],
+    dataset_table: {
+      "Lessons" => UseCaseTutorial.count("lessons"),
+      "Groups" => UseCaseTutorial.count("groups"),
+      "Timeslots" => UseCaseTutorial.count("timeslots"),
+      "Rooms" => UseCaseTutorial.count("rooms")
+    },
+    cli_score_prefix: "0hard",
+    banned: {
+      "It is runnable" => "the neutral scaffold solves nothing until the page's code is in"
+    },
+    osm_cache: false,
+    extra_static: navigation
+  )
+)

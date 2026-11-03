@@ -167,6 +167,9 @@ jobs:
           SOLVERFORGE_BENCH_REPO: ${{ github.workspace }}/.ci/solverforge-bench
           PLAYWRIGHT_CHANNEL: chrome
         run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" SOLVERFORGE_GETTING_STARTED_TARGET_DIR="$HOME/.cache/getting-started-target" SOLVERFORGE_SNIPPETS_TARGET_DIR="$HOME/.cache/rust-snippets-target" SOLVER_CONFIG_TARGET_DIR="$HOME/.cache/solver-config-target" SOLVERFORGE_UI_GATE_TARGET_DIR="$HOME/.cache/ui-gate-target" TUTORIAL_REPLAY_TARGET_DIR="$HOME/.cache/tutorial-target" make ci-local
+        # The use-case tutorial replays build two apps each and run their
+        # test suites, so they run in the `tutorials` job below instead.
+        run: SOLVERFORGE_WALKTHROUGH_TARGET_DIR="$HOME/.cache/walkthrough-target" make ci-local TUTORIAL_REPLAYS=
 
       - name: Configure Pages
         if: github.event_name != 'pull_request'
@@ -178,9 +181,60 @@ jobs:
         with:
           path: output
 
+  # Each use-case page is replayed the way a reader follows it: the published
+  # CLI builds and solves the page's app, the Hugging Face Space it names is
+  # cloned, solved, compared with the page, and validated with the page's own
+  # commands. See scripts/lib/use_case_tutorial.rb.
+  tutorials:
+    if: ${{ github.server_url == 'https://github.com' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        page: [lessons]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust 1.95
+        run: |
+          rustup toolchain install 1.95.0 --profile minimal --component rustfmt,clippy
+          rustup default 1.95.0
+
+      - name: Cache the tutorial toolchain and builds
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ~/.cache/solverforge-cli
+            ~/.cache/tutorial-target
+            ~/.cache/tutorial-osm
+          key: tutorial-${{ matrix.page }}-${{ hashFiles(format('src/docs/getting-started/solverforge-{0}-use-case.md', matrix.page), 'scripts/lib/*.rb') }}
+          restore-keys: tutorial-${{ matrix.page }}-
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Replay the ${{ matrix.page }} tutorial
+        env:
+          # The Space's browser tests use the runner's Chrome instead of
+          # downloading Playwright's Chromium.
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE: /usr/bin/google-chrome
+        run: |
+          export TUTORIAL_REPLAY_TARGET_DIR="$HOME/.cache/tutorial-target"
+          export TUTORIAL_REPLAY_OSM_CACHE="$HOME/.cache/tutorial-osm"
+          make verify-${{ matrix.page }}-tutorial
+
   deploy:
     if: ${{ github.server_url == 'https://github.com' && github.event_name != 'pull_request' }}
-    needs: build
+    needs: [build, tutorials]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment:

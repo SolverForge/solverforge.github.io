@@ -43,6 +43,7 @@ help:
 	@printf '  make verify-hospital-tutorial   Run portable tutorial contract checks\n'
 	@printf '  make verify-hospital-tutorial   Replay, build, and solve both hospital tutorial paths\n'
 	@printf '  make verify-lessons-tutorial    Run portable lessons contract checks\n'
+	@printf '  make verify-lessons-tutorial    Replay the lessons page: CLI build, Space clone, solves\n'
 	@printf '  make verify-deliveries-tutorial Run portable deliveries contract checks\n'
 	@printf '  make verify-fsr-tutorial        Run portable FSR tutorial contract checks\n'
 	@printf '  make verify-maintenance-walkthrough Replay, test, and solve the agent-skill walkthrough\n'
@@ -99,6 +100,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-hospital-tutorial.rb --static
 	$(call status,Verifying lessons tutorial contract)
 	@ruby scripts/verify-lessons-tutorial.rb
+	$(call status,Verifying lessons tutorial page contract)
+	@ruby scripts/verify-lessons-tutorial.rb --static
 	$(call status,Verifying deliveries tutorial contract)
 	@ruby scripts/verify-deliveries-tutorial.rb
 	$(call status,Verifying FSR tutorial contract)
@@ -131,6 +134,11 @@ check-public-pages:
 	@node scripts/check-public-pages.mjs
 
 ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page verify-rust-snippets-legacy verify-solver-config verify-companion-docs verify-ui-getting-started verify-python-docs
+# Use-case pages replayed end to end (CLI build, Space clone, solves, the
+# page's validation commands). CI runs them in their own job.
+TUTORIAL_REPLAYS ?= verify-lessons-tutorial
+
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets build check-public-pages verify-hospital-tutorial $(TUTORIAL_REPLAYS) verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-serio-page
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -164,7 +172,7 @@ verify-hospital-tutorial:
 	@ruby scripts/verify-hospital-tutorial.rb
 
 verify-lessons-tutorial:
-	$(call status,Verifying lessons tutorial contract)
+	$(call status,Replaying, building, and solving the lessons tutorial)
 	@ruby scripts/verify-lessons-tutorial.rb
 
 verify-deliveries-tutorial:
