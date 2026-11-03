@@ -452,6 +452,33 @@ fn generate_plan(group_count: usize) -> Plan {
 }
 ```
 
+The scaffold's `solver.toml` declares no phases, so the runtime picks a
+default pipeline. Replace it with the finished app's policy: cheapest-insertion
+construction places each lesson where it adds the least penalty, then late
+acceptance improves the timetable until 30 seconds have passed (see
+[Solver Policy](#solver-policy)):
+
+```toml
+# file: solver.toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "cheapest_insertion"
+construction_obligation = "assign_when_candidate_exists"
+value_candidate_limit = 40
+
+[[phases]]
+type = "local_search"
+[phases.acceptor]
+type = "late_acceptance"
+late_acceptance_size = 400
+[phases.forager]
+type = "accepted_count"
+limit = 4
+
+[termination]
+seconds_spent_limit = 30
+```
+
 Build the app and start the server:
 
 ```bash
@@ -470,7 +497,7 @@ curl -s http://localhost:7860/jobs/0
 curl -s http://localhost:7860/jobs/0/analysis
 ```
 
-The scaffold's `solver.toml` stops each solve after 30 seconds. The job then
+The policy stops each solve after 30 seconds. The job then
 reports `"lifecycleState":"COMPLETED"` with a `0hard` score: every lesson has a
 timeslot and a room, and no teacher, group, or room is double-booked. The
 analysis lists each rule by its module name with its `weightMultiplier`, score,
