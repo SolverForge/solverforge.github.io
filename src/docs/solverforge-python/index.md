@@ -63,12 +63,12 @@ make develop
 | Fixed input state | [`planning_pin()`](/docs/solverforge-python/modeling/#entity-pinning) on the whole entity |
 | Constraints | `@constraint_provider`, `ConstraintFactory`, `joiner` |
 | Grouped scalar repair | `scalar_assignment_group`, `ScalarGroupLimits`, `@scalar_group`, `@conflict_repair` |
-| Candidate ordering | `@candidate_metric`, `selection_order`, `selection_metric` |
+| Candidate ordering (the `selection_order` and `selection_metric` selector config keys name a metric) | `@candidate_metric` |
 | List metadata | `ListRouteHooks`, `ListSavingsHooks`, `RowField`, `SolutionField`, `EntityCallback`, `SolutionCallback` |
 | Scores | `SoftScore`, `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore` |
 | Direct solve | `Solver.solve(...)`, `Solver.analyze(...)` |
-| Retained jobs | `SolverManager`, `telemetry_detail(...)`, `QualifiedCandidateTraceProvenance` |
-| Runtime config | `SolverConfig`, dictionaries, or `solver.toml`; `move_thread_count` controls evaluators |
+| Retained jobs | `SolverManager`, `SolverManager.telemetry_detail(...)`, `QualifiedCandidateTraceProvenance` |
+| Runtime config, also accepted as a dictionary or a `solver.toml` file; the `move_thread_count` key controls evaluators | `SolverConfig` |
 | Embedded UI assets | `solverforge.ui.asset(...)`, `solverforge.ui.asset_paths()` |
 
 ## Package Details

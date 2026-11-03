@@ -17,7 +17,7 @@ Clone the repository when you want to run the full demo app.
 
 - Python domain modules for employees, shifts, availability, and skills
 - `HardSoftDecimalScore` constraints
-- Unary, joined, grouped, and balance constraints
+- Unary, joined, and balance constraints
 - 688 initially unassigned shifts in the canonical `LARGE` fixture
 - A row candidate callback that removes employees without the required skill or
   with overlapping unavailability before construction
@@ -114,32 +114,45 @@ evaluator counts. See
 
 ## Run The Demo
 
+The app lives in the tagged source checkout:
+
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
 git checkout v0.7.2
-make develop
-make hospital-run
 ```
 
-For a terminal solve:
+### With The Published Package
 
-```bash
-make hospital-solve
-```
-
-To run the tagged example against the published package instead of an editable
-binding, keep the source checkout for the app and install the examples extra:
+Install the published binding with the examples extra (FastAPI and Uvicorn)
+into a separate venv and start the app:
 
 ```bash
 python3.14 -m venv .venv-examples
 . .venv-examples/bin/activate
 python -m pip install "solverforge[examples]==0.7.2"
-python -m examples.solverforge_hospital
+python -m examples.solverforge_hospital --port 7860
 ```
 
+Open `http://127.0.0.1:7860/`. `GET /demo-data/LARGE` serves the canonical
+dataset, and a `POST /jobs` with it starts a retained job that reaches
+`COMPLETED` after the 30-second limit or 5 seconds without improvement. `--host` changes the bind address. For a terminal solve
+that prints the score and every assignment, run
+`python -m examples.solverforge_hospital --solve`.
+
 The wheel includes the binding and shared UI assets, not the repository's
-`examples` package.
+`examples` package, so run these commands from the checkout.
+
+### From Source
+
+`make develop` compiles the binding with Rust 1.95.0 into `.venv`; the run
+targets serve on `http://127.0.0.1:7860/` unless `PORT` is set:
+
+```bash
+make develop
+make hospital-run
+make hospital-solve
+```
 
 The Rust reference application is documented separately in the
 [SolverForge Hospital Use Case](/docs/getting-started/solverforge-hospital-use-case/).

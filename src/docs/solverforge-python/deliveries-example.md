@@ -148,8 +148,10 @@ To use the published binding with the tagged source-checkout app:
 python3.14 -m venv .venv-examples
 . .venv-examples/bin/activate
 python -m pip install "solverforge[examples]==0.7.2"
-python -m examples.solverforge_deliveries
+python -m examples.solverforge_deliveries --port 7861
 ```
+
+Then open `http://127.0.0.1:7861`.
 
 The wheel supplies the binding and shared UI assets; the `examples` package
 still comes from the source checkout.

@@ -97,11 +97,65 @@ the selected phase needs them. Nearby candidate and distance metadata accepts
 either a callback or a row field name. Each property has exactly one source;
 declaring both is rejected during schema compilation.
 
+`candidate_values` is a callable that receives one entity and returns the list
+of values that entity may take, drawn from the solution-level value range:
+`(entity) -> list[int]` for an integer range. The binding calls it for every
+entity row when it imports the solution.
+
 `candidate_values` is also the native hard domain for that entity row. Every
 scalar mutation path, including swaps and assignment-group moves, checks the
 imported row candidate set before applying a value. A selector therefore cannot
 move a value into a row merely because it exists in the solution-level value
 range when that row's candidate callback excluded it.
+
+In this complete example the soft rule prefers nurse 20 everywhere, but the
+second shift's candidates exclude it:
+
+```python
+from solverforge import (
+    ConstraintFactory, HardSoftScore, SoftScore, Solver, constraint_provider,
+    planning_entity, planning_solution, planning_variable,
+)
+
+
+def qualified_nurses(shift) -> list[int]:
+    return shift.qualified
+
+
+@planning_entity
+class QualifiedShift:
+    nurse = planning_variable(value_range_provider="nurses", candidate_values=qualified_nurses)
+
+    def __init__(self, qualified: list[int], nurse: int | None = None):
+        self.qualified = qualified
+        self.nurse = nurse
+
+
+@constraint_provider
+def prefer_nurse_20(factory: ConstraintFactory):
+    return [
+        factory.for_each(QualifiedShift)
+        .filter(lambda shift: shift.nurse != 20)
+        .penalize(SoftScore.of(1))
+        .named("prefer nurse 20"),
+    ]
+
+
+@planning_solution(score=HardSoftScore, constraints=prefer_nurse_20)
+class Roster:
+    shifts: list[QualifiedShift]
+
+    def __init__(self):
+        self.nurses = [10, 20, 30]
+        self.shifts = [QualifiedShift([10, 20]), QualifiedShift([10, 30])]
+        self.score = None
+
+
+solved = Solver.solve(Roster(), {"termination": {"step_count_limit": 50}})
+assert solved.shifts[0].nurse == 20
+assert solved.shifts[1].nurse in (10, 30)
+assert solved.score["levels"] == [0, -1]
+```
 
 Assignment-aware grouped scalar construction and local search use
 `scalar_assignment_group(...)` metadata passed to the solution decorator:
@@ -210,9 +264,11 @@ when its entity is pinned; its constraints still contribute to the score.
 
 ## Candidate Metrics
 
-Use `@candidate_metric("name")` when a leaf selector uses `selection_order =
-"sorted"` or `"probabilistic"`. Register the decorated function on the
-solution:
+Use `@candidate_metric("name")` when a leaf selector's config sets the
+`selection_order` key to `"sorted"` or `"probabilistic"` and names the metric in
+its `selection_metric` key (see
+[Candidate Ordering](/docs/solverforge-python/solving-and-runtime/#candidate-ordering)).
+Register the decorated function on the solution:
 
 ```python
 from solverforge import candidate_metric

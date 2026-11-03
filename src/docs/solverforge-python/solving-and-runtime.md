@@ -111,10 +111,13 @@ The effective count is bounded by the solve's Rayon thread count and the
 Construction and variable neighborhood descent remain sequential. The binding
 passes this config to the core; it does not create a Python thread pool.
 
-With the `Schedule` class from [Getting Started](/docs/solverforge-python/getting-started/#a-minimal-model),
-run a fixed-step solve as follows:
+This fixed-step solve reuses the `Schedule` and `Shift` classes from
+[Getting Started](/docs/solverforge-python/getting-started/#a-minimal-model).
+Run it from the directory that holds that page's `schedule.py`; importing the
+module also runs and prints that page's solves first:
 
 ```python
+from schedule import Schedule, Shift
 from solverforge import Solver, SolverConfig
 
 config = SolverConfig.from_dict({
@@ -352,6 +355,45 @@ Selector combinators available to Python dynamic models:
 - `limited_neighborhood`
 - `union_move_selector`
 - two-child `cartesian_product_move_selector`
+
+### Required Selector Fields
+
+Every selector config takes a `type` key. These selectors also require the
+listed keys; the solver rejects a config without them as `invalid solver config:
+missing field`. `entity_class` and `variable_name` are optional and pick the
+planning variable when a model has more than one.
+
+| Selector `type` | Required keys |
+| --- | --- |
+| `change_move_selector` | none |
+| `swap_move_selector` | none |
+| `nearby_change_move_selector` | `max_nearby` |
+| `nearby_swap_move_selector` | `max_nearby` |
+| `pillar_change_move_selector` | `minimum_sub_pillar_size`, `maximum_sub_pillar_size` |
+| `pillar_swap_move_selector` | `minimum_sub_pillar_size`, `maximum_sub_pillar_size` |
+| `ruin_recreate_move_selector` | `min_ruin_count`, `max_ruin_count`, `recreate_heuristic_type` |
+| `grouped_scalar_move_selector` | `group_name` |
+| `conflict_repair_move_selector` | `constraints` |
+| `compound_conflict_repair_move_selector` | `constraints` |
+| `list_change_move_selector` | none |
+| `nearby_list_change_move_selector` | `max_nearby` |
+| `list_swap_move_selector` | none |
+| `nearby_list_swap_move_selector` | `max_nearby` |
+| `sublist_change_move_selector` | `min_sublist_size`, `max_sublist_size` |
+| `sublist_swap_move_selector` | `min_sublist_size`, `max_sublist_size` |
+| `list_reverse_move_selector` | none |
+| `list_permute_move_selector` | `min_window_size`, `max_window_size` |
+| `list_precedence_move_selector` | none |
+| `k_opt_move_selector` | `k`, `min_segment_len`, `max_nearby` |
+| `list_ruin_move_selector` | `min_ruin_count`, `max_ruin_count` |
+| `limited_neighborhood` | `selected_count_limit`, `selector` |
+| `union_move_selector` | `selectors` |
+| `cartesian_product_move_selector` | `selectors` |
+
+`recreate_heuristic_type` is `first_fit` or `cheapest_insertion`. `k_opt`
+`max_nearby = 0` enumerates every reconnection.
+
+### Callbacks, Ownership, And Cursors
 
 Grouped scalar and conflict-repair selectors require Python callbacks declared
 on the solution with `@scalar_group(...)` and `@conflict_repair(...)`.
