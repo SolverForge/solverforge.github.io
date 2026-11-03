@@ -13,8 +13,10 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.23.0` crate and current
-release workspace.
+This map is aligned with the published `solverforge 0.24.0` crate and its
+release workspace. The facade does not re-export `solverforge-bridge`, and
+`solverforge::console` (behind the `console` feature) exposes only `init()`;
+depend on those crates directly for anything else.
 
 The facade re-exports the normal modeling, scoring, projection, configuration,
 custom-search, and retained runtime surface, including
@@ -48,7 +50,7 @@ lower-level solver internals directly.
 | `solverforge-core`    | score types, descriptors, domain traits, and dynamic capability contracts | you are extending lower-level abstractions or implementing core-facing helpers |
 | `solverforge-macros`  | `#[planning_solution]`, `#[planning_entity]`, `#[problem_fact]`, `#[solverforge_constraints]` | you need derive behavior, model glue, or constraint-function compilation |
 | `solverforge-scoring` | constraint streams, typed relational operators and terminals, incremental scoring, and shared grouped node state | you are working directly on scoring internals or advanced scoring extensions |
-| `solverforge-config`  | TOML/YAML parsing, resolved selector policy, candidate-trace config, acceptors, and builders | you need direct config construction or parsing outside the stock solve path    |
+| `solverforge-config`  | TOML parsing, resolved selector policy, candidate-trace config, acceptors, and builders | you need direct config construction or parsing outside the stock solve path    |
 | `solverforge-solver`  | runtime compiler, phases, cursor selectors, retained lifecycle, and telemetry | you are building custom runtime behavior beyond facade-level use               |
 | `solverforge-bridge`  | dynamic binding contracts, logical IDs, scores, explicit slot capabilities, and the compiled runner | you are implementing or maintaining a binding layer |
 | `solverforge-console` | tracing-driven console output                                            | you want the standard terminal UX or progress formatting                       |
@@ -59,8 +61,7 @@ lower-level solver internals directly.
 Fluent cross joins and same-collection unique combinations score through
 `constraint::relational::OperatorTerminal`. Cross joins nest `JoinNode`s;
 same-collection combinations use `SelfJoinNode` with an identity-preserving
-filter. The old `cross_bi_incremental`, `cross_tri_incremental`, and per-arity
-self-join incremental constraint modules are no longer the implementation.
+filter; there are no per-arity incremental constraint modules.
 Every grouped stream — unary, cross-join, projected, and complemented — lowers
 onto the one `stream::relational::operator::GroupNode` accumulator; chained
 terminals over a shared group share that operator owner through
@@ -105,10 +106,10 @@ per hop; buffers can still grow when more handles are needed. Relational
 operators reuse retired link, flattened
 child-handle, and hash-bucket vectors, and internal index maps use the private
 `stream/relational/hash.rs` deterministic fast hasher while ordered and interval
-side-tables use generation-checked `HandleMap`s; `v0.19.12` kept occupied hash
-buckets and surviving existence match lists in place during unlinking, and
-`v0.19.13` replaced the linked existence engine with per-key occurrence counts
-(dense tables for `usize` planning-id keys, hash tables otherwise), leaving
+side-tables use generation-checked `HandleMap`s. Occupied hash buckets and
+surviving existence match lists are updated in place during unlinking, and
+existence membership comes from per-key occurrence counts (dense tables for
+`usize` planning-id keys, hash tables otherwise), leaving
 `JoinerExistenceNode` as the compiled-plan semi/anti engine for residual
 predicates and moving complement default restoration to retained plan keys
 (`KeyOf`). Buffer reuse does not bypass old-key removal, generational checks,
@@ -132,7 +133,7 @@ kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.23.0/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.24.0/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Parallel Evaluation and Dynamic Scores
@@ -148,7 +149,7 @@ that replica descriptor. Configured native and bridge entry points accept the
 constructor and share the same runtime path. See
 [Extend the Solver](/reference/extend-solver/#evaluator-replicas-and-solve-entry-points).
 
-`solverforge-bridge::DynamicScore` is a plain `{ hard, medium, soft }` value.
+`solverforge_bridge::DynamicScore` is a plain `{ hard, medium, soft }` value.
 Equality, ordering, hashing, zero, and arithmetic depend only on those three
 levels. Unused levels stay zero; decimal hard/soft levels use a scale of
 100,000. `DynamicScore::of`, `soft`, and `hard_soft` construct values;

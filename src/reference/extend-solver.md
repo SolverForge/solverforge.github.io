@@ -197,7 +197,9 @@ constraint state from it. Macro-generated solves supply that constructor.
 
 For lower-level scoring, `ScoreDirector<S, C, Desc = SolutionDescriptor>` accepts
 an owned descriptor or a `ReplicaDescriptor::new(&descriptor, constraints)` via
-`with_descriptor`. `Director::fork_replica()` returns an initialized independent
+`with_descriptor`. Those two constructors score with every constraint weight
+at 1; `new_weighted` and `with_descriptor_weighted` apply the solution's bound
+constraint weights. `Director::fork_replica()` returns an initialized independent
 replica only for the borrowed replica descriptor; owned-descriptor directors
 return `None`. `DirectorDescriptor` and `ReplicaDescriptor` are exported by
 `solverforge-scoring`; they are not a second configured solve path.
