@@ -54,8 +54,8 @@ A feasible solution with the best possible soft score. May be impractical to fin
 The fluent API for defining constraints. Streams start from
 `ConstraintFactory::<Solution, Score>::new()`, then usually
 `for_each(...)` with a generated solution source such as `Schedule::shifts()`
-or `Schedule::employees()`. Use `solverforge::stream::vec(...)` for lower-level
-custom extractors.
+or `Schedule::employees()`. A lower-level custom extractor wraps a `fn`
+pointer with `solverforge::stream::source(...)`.
 
 ## Algorithms
 

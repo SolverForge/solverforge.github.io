@@ -20,7 +20,7 @@ solverforge
 ├── solverforge-core     score types, descriptors, domain traits
 ├── solverforge-macros   planning derive macros, planning_model!, and constraint compiler
 ├── solverforge-scoring  constraint streams and SERIO scoring
-├── solverforge-config   TOML/YAML config model and builders
+├── solverforge-config   TOML config model and builders
 ├── solverforge-solver   phases, moves, selectors, runtime, manager
 ├── solverforge-bridge   dynamic host-language binding contracts
 ├── solverforge-console  tracing-driven console output

@@ -29,8 +29,14 @@ moves.
 Take two rules for a shift schedule: one employee must not work two
 overlapping shifts, and an unassigned shift costs a soft point.
 
+<!-- rust: crate=serio file=src/constraints.rs -->
 ```rust
-fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
+use solverforge::prelude::*;
+use solverforge::stream::joiner::equal;
+
+use crate::domain::{Schedule, Shift};
+
+pub fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
     type Streams = ConstraintFactory<Schedule, HardSoftScore>;
     (
         Streams::new()
@@ -47,6 +53,51 @@ fn define_constraints() -> impl ConstraintSet<Schedule, HardSoftScore> {
             .penalize(HardSoftScore::ONE_SOFT)
             .named("Unassigned shift"),
     )
+}
+```
+
+They score this model, `src/domain/model.rs`, registered by
+`src/domain/mod.rs`:
+
+<!-- rust: crate=serio file=src/domain/model.rs -->
+```rust
+use solverforge::prelude::*;
+
+#[problem_fact]
+pub struct Employee {
+    #[planning_id]
+    pub id: usize,
+}
+
+#[planning_entity]
+pub struct Shift {
+    #[planning_id]
+    pub id: usize,
+    pub start: usize,
+    pub end: usize,
+    #[planning_variable(value_range_provider = "employees", allows_unassigned = true)]
+    pub employee_idx: Option<usize>,
+}
+
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
+pub struct Schedule {
+    #[planning_entity_collection]
+    pub shifts: Vec<Shift>,
+    #[problem_fact_collection]
+    pub employees: Vec<Employee>,
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+```
+
+<!-- rust: crate=serio file=src/domain/mod.rs -->
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Employee, Schedule, Shift};
 }
 ```
 
@@ -135,8 +186,7 @@ from scratch and stops on the first difference, naming the checkpoint where the
 kept score drifted.
 
 [Score analysis](/docs/solverforge/constraints/score-analysis/) reads the same
-constraints: the total for each named constraint, its matches, and the
-entities behind each match.
+constraints: the score and match count of each named constraint.
 
 ## Writing rules that stay incremental
 
