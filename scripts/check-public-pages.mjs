@@ -1520,11 +1520,11 @@ async function checkReleaseDocs(origin) {
     { path: "/blog/releases/2026/10/27/solverforge-cli-3-7-x/", required: ["solverforge-cli 3.7.1", "solverforge 0.23.0", "phases", "movesSpeculative", "Windows failed", "test_new_creates_neutral_project_files"] },
     { path: "/blog/releases/2026/09/27/solverforge-usecases-repository-apps/", required: ["October 27 (core 0.23.0)", "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0", "solverforge-flightcrew@0.2.0", "movesSpeculative", "discarded_speculative", "does not make that pull interruptible"] },
     ...[
-      ["hospital", "2.0.12"], ["lessons", "2.0.14"],
-      ["deliveries", "2.0.13"], ["fsr", "2.0.14"],
-    ].map(([app, version]) => ({
+      ["hospital", "3.0.0", "0.24.0"], ["lessons", "2.0.14", "0.23.0"],
+      ["deliveries", "2.0.13", "0.23.0"], ["fsr", "2.0.14", "0.23.0"],
+    ].map(([app, version, runtime]) => ({
       path: `/docs/getting-started/solverforge-${app}-use-case/`,
-      required: [`solverforge-${app}@${version}`, "solverforge 0.23.0"],
+      required: [`solverforge-${app}@${version}`, `solverforge ${runtime}`],
     })),
     { path: "/blog/releases/2026/10/27/solverforge-0-23-x/", required: ["solverforge 0.23.x follows solverforge 0.22.0", "32 evaluators", "macOS failed", "integration tests were skipped"] },
   ];

@@ -451,8 +451,8 @@ crates.io on 2026-10-14",
     "**Explicit configuration**", "**Constraint weights and problem changes**"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@2.0.12",
-    "solverforge 0.23.0"
+    "solverforge-hospital@3.0.0",
+    "solverforge 0.24.0"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
     "solverforge-lessons@2.0.14",
