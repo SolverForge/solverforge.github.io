@@ -169,7 +169,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        page: [hospital, lessons, deliveries, fsr]
+        # Deliveries and FSR fetch road data from the public Overpass API on
+        # their first solve; its operators block cloud runners, so those two
+        # replays run in `make ci-local` on a workstation, not here.
+        page: [hospital, lessons]
 
     steps:
       - uses: actions/checkout@v4
