@@ -207,6 +207,8 @@ jobs:
         run: |
           export TUTORIAL_REPLAY_TARGET_DIR="$HOME/.cache/tutorial-target"
           export TUTORIAL_REPLAY_OSM_CACHE="$HOME/.cache/tutorial-osm"
+          # The public Overpass API blocks cloud runners; see use_case_tutorial.rb.
+          export TUTORIAL_REPLAY_OVERPASS=0
           make verify-${{ matrix.page }}-tutorial
 
   deploy:

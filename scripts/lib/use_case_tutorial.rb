@@ -291,8 +291,20 @@ module UseCaseTutorial
       boots
     end
 
+    # The finished example of an app with `osm_cache` downloads its demo's road
+    # network from the public Overpass API on the first solve. Its operators
+    # block cloud runners, so CI sets TUTORIAL_REPLAY_OVERPASS=0 and that boot
+    # is reported as not run; `make ci-local` on a workstation runs it.
+    def overpass_blocked?
+      config.osm_cache && ENV["TUTORIAL_REPLAY_OVERPASS"] == "0"
+    end
+
     def boot_and_solve(command, curls, first:)
       dir = @workspace.cwd
+      if !first && overpass_blocked?
+        log "not run: #{command} and its #{curls.size} curl command(s)    (the demo downloads road data from the public Overpass API, which blocks CI runners; run make ci-local on a workstation)"
+        return { dir: dir, command: command }
+      end
       seed_osm_cache(dir)
       record = { dir: dir, command: command }
       TutorialReplay.boot(@workspace, command, port: UseCaseTutorial.port, env: cargo_env, log: method(:log)) do |app|
@@ -366,10 +378,15 @@ module UseCaseTutorial
     def check_clone(boot)
       dir = boot[:dir]
       result = boot[:result]
-      log "Finished example: #{result[:state]} #{result[:score]}"
       check_release_tag(dir)
       check_toml_blocks(dir)
       check_paths(dir)
+      unless result
+        log "not run: finished-example solve, constraint ids, and dataset rows    (no Overpass on CI runners)"
+        return
+      end
+
+      log "Finished example: #{result[:state]} #{result[:score]}"
       check_constraint_ids(dir, boot[:analysis])
       check_dataset_table(boot)
     end
