@@ -46,10 +46,10 @@ The app answers one concrete question:
 
 You will:
 
-- install `solverforge-cli` and scaffold a neutral SolverForge app
-- know when to switch from the learning scaffold to the complete Lessons Space
-  repository
-- keep the checked-in SolverForge 0.23.0 use-case dependency shape
+- install `solverforge-cli` and build a small timetable app from the neutral
+  scaffold, then solve it
+- run the complete Lessons app from its Hugging Face Space repository
+- read the finished app's SolverForge 0.24.0 dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -67,139 +67,51 @@ implementation.
 - `cargo` and a stable Rust toolchain
 - Basic Rust knowledge: structs, enums, traits, modules, derive macros
 - Familiarity with HTTP APIs
-- Node.js if you want frontend syntax and browser validation
-- Docker if you want to run the Hugging Face Space image locally
+- Node.js and npm for the finished app's frontend checks and browser tests
+- Docker if you want to build or run the Hugging Face Space image locally
 
 ---
 
 ## Getting Started
 
-### Start with the Generic CLI Shell
-
-Start from an empty working directory:
+### Install the CLI
 
 ```bash
 cargo install solverforge-cli --force
 solverforge --version
+```
+
+`solverforge --version` prints the CLI version and the runtime it scaffolds.
+This page uses `solverforge-cli 3.8`, which scaffolds `solverforge 0.24.0` and
+`solverforge-ui 0.9.0`.
+
+### Build a Timetable from the CLI
+
+This path builds a small lesson timetable from the neutral scaffold: two
+scalar planning variables, hard, medium, and soft rules, and demo data you can
+solve in the browser. It keeps the finished app's names so you can compare the
+two side by side, but it models less: teachers and groups are plain names on
+each lesson rather than facts with availability calendars.
+
+Start from an empty working directory:
+
+```bash
 solverforge new solverforge-lessons --quiet
 cd solverforge-lessons
-```
-
-Those commands give you the neutral scaffold. It is runnable, but it is not the
-lesson-timetabling app yet. The finished Lessons app specializes that scaffold
-into a school timetable application through manual domain, data, constraint,
-API, and browser code.
-
-Right after scaffolding, the generated project already gives you:
-
-- a runnable Axum server
-- retained `/jobs` routes and solver lifecycle controls
-- a planning solution, score field, solver config, and generated seams
-- `solverforge-ui` integration
-- a neutral frontend shell
-- compiler-owned sample data and codegen markers
-
-Use the fresh scaffold as the learning workspace. Use the finished Space
-repository when you want the complete timetable dataset, constraints, frontend,
-Dockerfile, and validation pipeline.
-
-### Download the Finished Example
-
-Clone the finished app from the Hugging Face Space repository:
-
-```bash
-git clone https://huggingface.co/spaces/SolverForge/solverforge-lessons
-cd solverforge-lessons
-```
-
-The Space source is the reference implementation. It includes the deterministic
-lesson dataset, retained API, timetable browser workspace, score analysis
-surface, Docker build, and validation commands.
-
-### Keep the Published Dependency Shape
-
-The tagged `solverforge-lessons@2.0.14` use-case source targets the published
-SolverForge 0.23.0 line:
-
-```toml
-[dependencies]
-solverforge = { version = "0.23.0", features = [
-  "serde",
-  "console",
-  "verbose-logging",
-] }
-solverforge-ui = { version = "0.9.0" }
-
-# Web server
-axum = "0.8.9"
-tokio = { version = "1.52.1", features = ["full"] }
-tokio-stream = { version = "0.1.18", features = ["sync"] }
-tower-http = { version = "0.6.8", features = ["fs", "cors"] }
-tower = "0.5.3"
-
-# Serialization
-serde = { version = "1.0.228", features = ["derive"] }
-serde_json = "1.0.149"
-
-# Utilities
-uuid = { version = "1.23.1", features = ["v4", "serde"] }
-parking_lot = "0.12.5"
-chrono = { version = "0.4.44", features = ["serde"] }
-```
-
-The app contract in `solverforge.app.toml` names the app-owned runtime target.
-`solverforge-cli 3.7.1` scaffolds `solverforge 0.23.0`; the finished Lessons app
-records an app-owned `solverforge 0.23.0` runtime target while retaining
-its original `2.2.2` scaffold provenance:
-
-```toml
-[app]
-name = "solverforge-lessons"
-starter = "neutral-shell"
-shell = "web"
-cli_version = "2.2.2"
-
-[runtime]
-target = "solverforge 0.23.0"
-runtime_source = "crates.io: solverforge 0.23.0"
-ui_source = "crates.io: solverforge-ui 0.9.0"
-
-[demo]
-default_size = "LARGE"
-available_sizes = ["LARGE"]
-
-[solution]
-name = "Plan"
-score = "HardMediumSoftScore"
-```
-
-### Generate the Managed Seams
-
-The CLI can create the repeatable app seams:
-
-```bash
 solverforge generate score HardMediumSoftScore
 solverforge generate fact timeslot \
   --field day_of_week:Weekday \
   --field start_time:NaiveTime \
   --field end_time:NaiveTime
-solverforge generate fact teacher \
-  --field name:String \
-  --field "availability:Vec<bool>"
-solverforge generate fact group \
-  --field name:String \
-  --field student_count:usize \
-  --field "availability:Vec<bool>"
 solverforge generate fact room \
-  --field name:String \
   --field kind:RoomKind \
-  --field capacity:usize
+  --field capacity:usize \
+  --field index:usize
 solverforge generate entity lesson \
   --field subject:String \
-  --field group_idx:usize \
+  --field teacher:String \
+  --field group:String \
   --field student_count:usize \
-  --field "teacher_idx:Option<usize>" \
-  --field duration:u32 \
   --field required_room_kind:RoomKind
 solverforge generate variable timeslot_idx \
   --entity Lesson \
@@ -209,43 +121,371 @@ solverforge generate variable room_idx \
   --entity Lesson \
   --kind scalar \
   --range rooms
-
 solverforge generate constraint assign_timeslot --unary --soft
 solverforge generate constraint assign_room --unary --soft
-solverforge generate constraint teacher_availability --join --hard
-solverforge generate constraint group_availability --join --hard
-solverforge generate constraint room_kind --join --soft
-solverforge generate constraint room_capacity --join --hard
 solverforge generate constraint no_teacher_conflict --pair --hard
 solverforge generate constraint no_group_conflict --pair --hard
 solverforge generate constraint no_room_conflict --pair --hard
-solverforge generate constraint late_lesson --join --soft
-solverforge generate constraint repeated_subject_day --pair --soft
-solverforge generate data --mode stub
+solverforge generate constraint room_capacity --join --hard
+solverforge generate constraint room_kind --join --soft
 ```
 
-The constraint generator only emits `--hard` and `--soft` skeletons, so
-`assign_timeslot` and `assign_room` are generated as soft and then hand-edited
-to score at the medium level (`.penalize(|_: &Lesson| HardMediumSoftScore::of_medium(1))`),
-matching the finished app.
+`generate fact` adds `id` and `name` to every fact on its own, so the commands
+pass only the extra fields. `Weekday` and `NaiveTime` come from `chrono`, which
+the CLI imports and adds to `Cargo.toml`. `RoomKind` is this app's own type: the
+CLI warns that it is not defined yet, and the next step defines it. `Room.index`
+is the room's position in `Plan.rooms`, which is the value `Lesson.room_idx`
+stores, so constraints can join a lesson to its room.
 
-Those commands are the learning skeleton, not the full finished app. The
-Lessons repository then supplies the timetable-specific work:
+Define `RoomKind` in its own domain file:
 
-- weekdays, school-day timeslots, teachers, cohorts, rooms, and lesson demand
-- `RoomKind` and subject catalogs that tie lessons to room types
-- `Lesson.timeslot_idx` and `Lesson.room_idx` as scalar planning variables
-- `Plan::rebuild_derived_fields()` to normalize indexes after transport
-- hard rules for teacher, group, room, capacity, and availability conflicts
-- medium rules that push every lesson toward a timeslot and a room
-- soft rules for room-kind fit, late lessons, and repeated same-day subjects
-- a browser workspace with group, room, teacher, raw data, and API views
+```rust
+// file: src/domain/room_kind.rs
+use serde::{Deserialize, Serialize};
 
-### Run the Finished App
+/// The kind of teaching space a subject needs.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash, Serialize, Deserialize)]
+pub enum RoomKind {
+    #[default]
+    Lecture,
+    Laboratory,
+    Computer,
+}
+```
 
-From the finished repository:
+Export it from the planning model manifest. Replace `src/domain/mod.rs` with:
+
+```rust
+// file: src/domain/mod.rs
+solverforge::planning_model! {
+    root = "src/domain";
+
+    // @solverforge:begin domain-exports
+    mod room_kind;
+    mod timeslot;
+    mod room;
+    mod lesson;
+    mod plan;
+
+    pub use room_kind::RoomKind;
+    pub use timeslot::Timeslot;
+    pub use room::Room;
+    pub use lesson::Lesson;
+    pub use plan::Plan;
+    // @solverforge:end domain-exports
+}
+```
+
+Every generated constraint starts with a placeholder that panics, so a solve
+fails until each one is replaced. Replace the seven generated files with the
+rules below.
+
+The two assignment rules score at the medium level. They are generated as soft
+skeletons because the generator emits only `--hard` and `--soft`:
+
+```rust
+// file: src/constraints/assign_timeslot.rs
+use crate::domain::{Lesson, Plan};
+use solverforge::prelude::*;
+use solverforge::IncrementalConstraint;
+
+/// MEDIUM: every lesson needs a timeslot.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .filter(|lesson: &Lesson| lesson.timeslot_idx.is_none())
+        .penalize(|_: &Lesson| HardMediumSoftScore::of_medium(1))
+        .named("assign_timeslot")
+}
+```
+
+```rust
+// file: src/constraints/assign_room.rs
+use crate::domain::{Lesson, Plan};
+use solverforge::prelude::*;
+use solverforge::IncrementalConstraint;
+
+/// MEDIUM: every lesson needs a room.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .filter(|lesson: &Lesson| lesson.room_idx.is_none())
+        .penalize(|_: &Lesson| HardMediumSoftScore::of_medium(1))
+        .named("assign_room")
+}
+```
+
+The three conflict rules self-join lessons that share a timeslot. The joiner
+pairs each two lessons once, and the filter decides whether that pair is a
+conflict:
+
+```rust
+// file: src/constraints/no_teacher_conflict.rs
+use crate::domain::{Lesson, Plan};
+use solverforge::prelude::*;
+use solverforge::IncrementalConstraint;
+
+/// HARD: a teacher teaches one lesson per timeslot.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .filter(|lesson: &Lesson| lesson.timeslot_idx.is_some())
+        .join(joiner::equal(|lesson: &Lesson| lesson.timeslot_idx))
+        .filter(|left: &Lesson, right: &Lesson| left.teacher == right.teacher)
+        .penalize(hard_weight(|_: &Lesson, _: &Lesson| HardMediumSoftScore::of_hard(1)))
+        .named("no_teacher_conflict")
+}
+```
+
+```rust
+// file: src/constraints/no_group_conflict.rs
+use crate::domain::{Lesson, Plan};
+use solverforge::prelude::*;
+use solverforge::IncrementalConstraint;
+
+/// HARD: a student group attends one lesson per timeslot.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .filter(|lesson: &Lesson| lesson.timeslot_idx.is_some())
+        .join(joiner::equal(|lesson: &Lesson| lesson.timeslot_idx))
+        .filter(|left: &Lesson, right: &Lesson| left.group == right.group)
+        .penalize(hard_weight(|_: &Lesson, _: &Lesson| HardMediumSoftScore::of_hard(1)))
+        .named("no_group_conflict")
+}
+```
+
+```rust
+// file: src/constraints/no_room_conflict.rs
+use crate::domain::{Lesson, Plan};
+use solverforge::prelude::*;
+use solverforge::IncrementalConstraint;
+
+/// HARD: a room hosts one lesson per timeslot.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .filter(|lesson: &Lesson| lesson.timeslot_idx.is_some())
+        .join(joiner::equal(|lesson: &Lesson| lesson.timeslot_idx))
+        .filter(|left: &Lesson, right: &Lesson| left.room_idx.is_some() && left.room_idx == right.room_idx)
+        .penalize(hard_weight(|_: &Lesson, _: &Lesson| HardMediumSoftScore::of_hard(1)))
+        .named("no_room_conflict")
+}
+```
+
+The two room rules join each lesson to the room its `room_idx` points at:
+
+```rust
+// file: src/constraints/room_capacity.rs
+use crate::domain::{Lesson, Plan, Room};
+use solverforge::prelude::*;
+use solverforge::stream::joiner::equal_bi;
+use solverforge::IncrementalConstraint;
+
+/// HARD: the room seats every student in the lesson.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .join((
+            Plan::rooms(),
+            equal_bi(|lesson: &Lesson| lesson.room_idx, |room: &Room| Some(room.index)),
+        ))
+        .filter(|lesson: &Lesson, room: &Room| lesson.student_count > room.capacity)
+        .penalize(hard_weight(|_: &Lesson, _: &Room| HardMediumSoftScore::of_hard(1)))
+        .named("room_capacity")
+}
+```
+
+```rust
+// file: src/constraints/room_kind.rs
+use crate::domain::{Lesson, Plan, Room};
+use solverforge::prelude::*;
+use solverforge::stream::joiner::equal_bi;
+use solverforge::IncrementalConstraint;
+
+/// SOFT: the room matches the kind the subject needs.
+pub fn constraint() -> impl IncrementalConstraint<Plan, HardMediumSoftScore> {
+    ConstraintFactory::<Plan, HardMediumSoftScore>::new()
+        .for_each(Plan::lessons())
+        .join((
+            Plan::rooms(),
+            equal_bi(|lesson: &Lesson| lesson.room_idx, |room: &Room| Some(room.index)),
+        ))
+        .filter(|lesson: &Lesson, room: &Room| lesson.required_room_kind != room.kind)
+        .penalize(|_: &Lesson, _: &Room| HardMediumSoftScore::of_soft(1))
+        .named("room_kind")
+}
+```
+
+The generated sample data fills every field with placeholders. Replace it with
+a small weekly timetable: 20 timeslots from Monday to Friday, four rooms, and
+ten lessons per student group (one group for `SMALL`, two for `STANDARD`, three
+for `LARGE`):
+
+```rust
+// file: src/data/data_seed.rs
+use std::str::FromStr;
+
+use chrono::{NaiveTime, Weekday};
+
+use crate::domain::{Lesson, Plan, Room, RoomKind, Timeslot};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DemoData {
+    Small,
+    Standard,
+    Large,
+}
+
+const AVAILABLE_DEMO_DATA: &[DemoData] = &[DemoData::Small, DemoData::Standard, DemoData::Large];
+const DEFAULT_DEMO_DATA: DemoData = DemoData::Standard;
+
+pub fn default_demo_data() -> DemoData {
+    DEFAULT_DEMO_DATA
+}
+
+pub fn available_demo_data() -> &'static [DemoData] {
+    AVAILABLE_DEMO_DATA
+}
+
+impl DemoData {
+    pub fn id(self) -> &'static str {
+        match self {
+            DemoData::Small => "SMALL",
+            DemoData::Standard => "STANDARD",
+            DemoData::Large => "LARGE",
+        }
+    }
+
+    pub fn default_demo_data() -> Self {
+        default_demo_data()
+    }
+
+    pub fn available_demo_data() -> &'static [Self] {
+        available_demo_data()
+    }
+}
+
+impl FromStr for DemoData {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_ascii_uppercase().as_str() {
+            "SMALL" => Ok(DemoData::Small),
+            "STANDARD" => Ok(DemoData::Standard),
+            "LARGE" => Ok(DemoData::Large),
+            _ => Err(()),
+        }
+    }
+}
+
+/// Subjects with the teacher who teaches them, the room kind they need,
+/// and how many lessons each group takes per week.
+const SUBJECTS: &[(&str, &str, RoomKind, usize)] = &[
+    ("Mathematics", "A. Turing", RoomKind::Lecture, 3),
+    ("Physics", "M. Curie", RoomKind::Laboratory, 2),
+    ("Chemistry", "M. Curie", RoomKind::Laboratory, 1),
+    ("Computer Science", "G. Hopper", RoomKind::Computer, 2),
+    ("History", "I. Jones", RoomKind::Lecture, 1),
+    ("English", "J. Austen", RoomKind::Lecture, 1),
+];
+
+const DAYS: [Weekday; 5] = [
+    Weekday::Mon,
+    Weekday::Tue,
+    Weekday::Wed,
+    Weekday::Thu,
+    Weekday::Fri,
+];
+
+pub fn generate(demo: DemoData) -> Plan {
+    match demo {
+        DemoData::Small => generate_plan(1),
+        DemoData::Standard => generate_plan(2),
+        DemoData::Large => generate_plan(3),
+    }
+}
+
+fn generate_plan(group_count: usize) -> Plan {
+    let mut timeslots = Vec::new();
+    for day in DAYS {
+        for hour in 8..12 {
+            let start = NaiveTime::from_hms_opt(hour, 30, 0).unwrap();
+            let end = NaiveTime::from_hms_opt(hour + 1, 30, 0).unwrap();
+            let idx = timeslots.len();
+            timeslots.push(Timeslot::new(
+                format!("timeslot-{idx}"),
+                format!("{day} {start}"),
+                day,
+                start,
+                end,
+            ));
+        }
+    }
+
+    let rooms = vec![
+        Room::new("room-0", "Room A", RoomKind::Lecture, 30, 0),
+        Room::new("room-1", "Room B", RoomKind::Lecture, 30, 1),
+        Room::new("room-2", "Lab", RoomKind::Laboratory, 30, 2),
+        Room::new("room-3", "Computer room", RoomKind::Computer, 30, 3),
+    ];
+
+    let mut lessons = Vec::new();
+    for group in 0..group_count {
+        let group_name = format!("Grade {}", 9 + group);
+        for (subject, teacher, room_kind, per_week) in SUBJECTS {
+            for _ in 0..*per_week {
+                let idx = lessons.len();
+                lessons.push(Lesson::new(
+                    format!("lesson-{idx}"),
+                    subject.to_string(),
+                    teacher.to_string(),
+                    group_name.clone(),
+                    25,
+                    *room_kind,
+                ));
+            }
+        }
+    }
+
+    Plan::new(timeslots, rooms, lessons)
+}
+```
+
+Build the app and start the server:
 
 ```bash
+cargo build
+solverforge server
+```
+
+`solverforge server` listens on port 7860 (`--port` or `PORT` picks another).
+Open `http://localhost:7860` and press Solve, or drive the retained job API
+from a second terminal:
+
+```bash
+curl -s http://localhost:7860/demo-data/STANDARD -o plan.json
+curl -s -X POST -H 'Content-Type: application/json' --data @plan.json http://localhost:7860/jobs
+curl -s http://localhost:7860/jobs/0
+curl -s http://localhost:7860/jobs/0/analysis
+```
+
+The scaffold's `solver.toml` stops each solve after 30 seconds. The job then
+reports `"lifecycleState":"COMPLETED"` with a `0hard` score: every lesson has a
+timeslot and a room, and no teacher, group, or room is double-booked. The
+analysis lists each rule by its module name with its `weightMultiplier`, score,
+and match count.
+
+### Run the Finished Example
+
+The finished app lives in the Hugging Face Space repository. If you are still
+inside the scaffold from the previous section, step out of it first, then
+clone the Space into its own directory and start it:
+
+```bash
+cd ..
+git clone https://huggingface.co/spaces/SolverForge/solverforge-lessons solverforge-lessons-space
+cd solverforge-lessons-space
 make run-release
 ```
 
@@ -255,6 +495,10 @@ Open:
 http://localhost:7860
 ```
 
+The Space source is the reference implementation. It includes the deterministic
+lesson dataset, retained API, timetable browser workspace, score analysis
+surface, Docker build, and validation commands.
+
 The browser first reads `/demo-data`, verifies that its default id is present in
 the advertised catalog, and then loads `/demo-data/LARGE`. It renders retained
 solve controls, score status, cohort timetables, room views, teacher views, raw
@@ -263,7 +507,7 @@ error and leaves Solve disabled instead of guessing a dataset.
 
 ### Inspect Demo Data
 
-List available demos:
+With the finished app running, list the available demos:
 
 ```bash
 curl http://localhost:7860/demo-data
@@ -284,6 +528,75 @@ Current dataset shape:
 The instance starts with every lesson unassigned. Because each lesson has a
 timeslot variable and a room variable, the initial medium score is
 `0hard/-600medium/0soft`.
+
+### Published Dependency Shape
+
+The tagged `solverforge-lessons@3.0.0` release targets the published
+SolverForge 0.24.0 line:
+
+```toml
+[dependencies]
+solverforge = { version = "0.24.0", features = ["serde", "console", "verbose-logging"] }
+solverforge-ui = { version = "0.9.0" }
+# Web server
+axum = "0.8.9"
+tokio = { version = "1.52.1", features = ["full"] }
+tokio-stream = { version = "0.1.18", features = ["sync"] }
+tower-http = { version = "0.6.8", features = ["fs", "cors"] }
+tower = "0.5.3"
+
+# Serialization
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+
+# Utilities
+uuid = { version = "1.23.1", features = ["v4", "serde"] }
+parking_lot = "0.12.5"
+chrono = { version = "0.4.44", features = ["serde"] }
+```
+
+The app contract in `solverforge.app.toml` names the app-owned runtime target.
+The finished app records `solverforge 0.24.0` as its runtime while keeping the
+`2.2.2` CLI version it was first scaffolded with:
+
+```toml
+[app]
+name = "solverforge-lessons"
+starter = "neutral-shell"
+cli_version = "2.2.2"
+shell = "web"
+
+[runtime]
+target = "solverforge 0.24.0"
+runtime_source = "crates.io: solverforge 0.24.0"
+ui_source = "crates.io: solverforge-ui 0.9.0"
+
+[demo]
+default_size = "LARGE"
+available_sizes = [
+    "LARGE",
+]
+
+[solution]
+name = "Plan"
+score = "HardMediumSoftScore"
+```
+
+### What the Finished App Adds
+
+Compared with the CLI build above, the Lessons repository supplies the full
+timetable:
+
+- weekdays, school-day timeslots, teachers, cohorts, rooms, and lesson demand
+- `Teacher` and `Group` facts with weekly availability calendars, joined to
+  lessons by index
+- `RoomKind` and subject catalogs that tie lessons to room types
+- `Plan::rebuild_derived_fields()` to normalize indexes after transport
+- hard rules for teacher, group, room, capacity, and availability conflicts,
+  matched on overlapping times rather than equal timeslot indexes
+- soft rules for room-kind fit, late lessons, and repeated same-day subjects
+- a tuned `solver.toml` and a browser workspace with group, room, teacher, raw
+  data, and API views
 
 ---
 
@@ -558,9 +871,18 @@ The public API includes:
 
 ## Testing and Validation
 
-Browser test servers honor `CARGO_TARGET_DIR`, so a shared Cargo build
-location works as well as the app-local `target` directory.
+Run these from the finished app's directory. The browser tests use the
+Playwright version pinned in the app's own `package-lock.json`; install it once
+per clone:
 
+```bash
+make install-e2e
+```
+
+`make install-e2e` uses the system Chromium at `/usr/bin/chromium` when there is
+one and otherwise downloads Playwright's bundled Chromium. Browser test servers
+honor `CARGO_TARGET_DIR`, so a shared Cargo build location works as well as the
+app-local `target` directory.
 
 Standard validation:
 
@@ -580,9 +902,12 @@ Slow acceptance solve:
 make test-slow
 ```
 
-`make test` runs Rust tests, frontend syntax checks, and a Playwright browser
-smoke. `make ci-local` adds formatting, clippy, release build, and Docker image
-build. `make pre-release` runs `ci-local` plus the slow acceptance solve.
+`make test` runs the Rust tests, frontend syntax checks, the frontend Node
+tests, and a Playwright browser smoke against a release build. `make ci-local`
+adds formatting, clippy, a release build, and the Docker image build, so it
+needs Docker. `make test-slow` solves the `LARGE` instance in the release
+profile and checks that the timetable is feasible. `make pre-release` runs
+`ci-local` plus the slow acceptance solve.
 
 For local Space readiness:
 
@@ -598,8 +923,9 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@2.0.14` |
+| Tagged app release | `solverforge-lessons@3.0.0` |
 | Local run | `make run-release` |
+| Browser test setup | `make install-e2e` |
 | Standard validation | `make test` |
 | Full local validation | `make ci-local` |
 | Slow acceptance solve | `make test-slow` |
