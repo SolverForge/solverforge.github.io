@@ -459,8 +459,8 @@ crates.io on 2026-10-14",
     "solverforge 0.24.0"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@2.0.13",
-    "solverforge 0.23.0"
+    "solverforge-deliveries@3.0.0",
+    "solverforge 0.24.0"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
     "solverforge-fsr@2.0.14",
