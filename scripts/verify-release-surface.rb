@@ -463,8 +463,8 @@ crates.io on 2026-10-14",
     "solverforge 0.24.0"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@2.0.14",
-    "solverforge 0.23.0"
+    "solverforge-fsr@3.0.0",
+    "solverforge 0.24.0"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge #{CORE}` is the current core",
