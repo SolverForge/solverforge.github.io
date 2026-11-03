@@ -454,7 +454,11 @@ module UseCaseTutorial
       outside_cli = text.sub(cli_text, "")
       prose = outside_cli.gsub(/^```.*?^```$/m, "")
       paths = prose.scan(/`([^`\s]+)`/).flatten.uniq.select { |t| t.match?(PATH_TOKEN) }
-      missing = paths.reject { |p| File.exist?(File.join(dir, p.delete_suffix("/"))) }
+      # Files the page has the reader generate (e.g. a new constraint in a
+      # customization step) do not exist in the clone yet.
+      generated = shell_commands(text).filter_map { |c| c[/\Asolverforge generate constraint (\w+)/, 1] }
+      created = generated.map { |name| "src/constraints/#{name}.rs" }
+      missing = paths.reject { |p| created.include?(p) || File.exist?(File.join(dir, p.delete_suffix("/"))) }
       fail!("page names paths the finished example does not have: #{missing.join(", ")}") unless missing.empty?
       log "#{paths.size} file paths exist in the finished example"
     end
