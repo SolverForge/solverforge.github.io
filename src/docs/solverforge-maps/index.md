@@ -8,16 +8,17 @@ description: >
 ---
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-maps 2.1.4` crate. The current
-`solverforge-cli 3.7.1` package also scaffolds
-`solverforge-maps 2.1.4` for the web shell.
+This section tracks the published `solverforge-maps 2.1.4` crate.
+`solverforge-cli` web scaffolds pin the same `solverforge-maps 2.1.4`
+release.
 <% end %>
 
 `solverforge-maps` is SolverForge's Rust library for map-backed routing workflows. It is designed for vehicle routing and similar optimization problems where you need to turn geographic coordinates into travel times, same-path route distances, route geometries, and network diagnostics.
 
 ## What It Provides
 
-- **OSM-backed road networks** loaded from the Overpass API with local caching
+- **OSM-backed road networks** fetched from an Overpass API server (the public
+  `overpass-api.de` instance by default) with in-memory and file caching
 - **Validated geographic primitives** such as `Coord` and `BoundingBox`
 - **Routing on road graphs** for time- or distance-based objectives
 - **Travel-time matrices** with same-path route distances for feeding VRP and dispatch solvers

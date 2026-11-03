@@ -17,8 +17,8 @@ behavior in your app, and optional helpers limited to the problems they solve.
 | `solverforge-bridge` | dynamic binding contracts, logical model IDs, explicit scalar/list capabilities, dynamic score and slot surfaces | Python UX, scaffold templates, a second solver path |
 | `solverforge-cli` | app bootstrap and code generation | runtime truth, UI state, solver lifecycle semantics |
 | `solverforge-py` | Python decorators, explicit model metadata, callback binding, compiled-runtime adapters, retained diagnostics, Python package distribution, embedded UI asset access | a second selector/move engine, Rust crate docs, scaffold generation, generic web UI design, route data ownership |
-| `solverforge-ui` | retained-job UI controls and frontend components | solver search logic, scoring rules, route-cost computation |
-| `solverforge-maps` | routing, map tiles, matrices, and road-network helpers | generic solver lifecycle, scaffold generation |
+| `solverforge-ui` | retained-job UI controls, frontend components, and the optional Leaflet map module that draws OpenStreetMap tiles | solver search logic, scoring rules, route-cost computation |
+| `solverforge-maps` | Overpass road-network fetching and caching, routing, travel-time matrices, and encoded route geometry | map rendering, generic solver lifecycle, scaffold generation |
 | your app | business rules, imports, APIs, persistence, product behavior | generic runtime internals that belong upstream |
 
 ## Good integration patterns
@@ -26,9 +26,9 @@ behavior in your app, and optional helpers limited to the problems they solve.
 ### CLI first
 
 Use `solverforge-cli` to bootstrap the project, then move quickly into ordinary
-application modules and `solverforge` runtime code. Current core documentation
-tracks `solverforge 0.23.0`; the current CLI 3.7.1 line scaffolds core 0.23.0, so
-check `solverforge --version` on the binary you install.
+application modules and `solverforge` runtime code. `solverforge --version`
+prints the runtime crate version the installed CLI scaffolds; the
+[solverforge docs](/docs/solverforge/) state the release they track.
 
 ### Runtime truth
 
@@ -63,8 +63,9 @@ Use `solverforge-py` when the product needs Python model authoring. Python
 classes, decorators, explicit scalar/list metadata, and callbacks describe the
 problem; Rust still owns the indexed working state, compiled search graph,
 cursor execution, safe native score specializations, snapshots, retained jobs,
-candidate traces, and embedded shared UI asset bytes. The Python 0.7.2 line
-and its repository examples use core 0.23.0. An explicit `move_thread_count`
+candidate traces, and embedded shared UI asset bytes. The
+[Python docs](/docs/solverforge-python/) state the core release the published
+package pins. An explicit `move_thread_count`
 enables upstream acceptor-forager evaluator replicas; `auto` stays sequential.
 `Solver.solve` releases the GIL while workers attach to execute callbacks.
 Optional attribute probes preserve non-`AttributeError` failures, including
@@ -72,8 +73,8 @@ Optional attribute probes preserve non-`AttributeError` failures, including
 retained-job failure path without a redundant Rust panic preamble; unrelated
 Rust panics still reach the previously installed hook.
 Retained payloads expose an ordered `phases` list and `moves_speculative`, not a
-single `phase` dictionary. The independently released Rust use-case bundle
-also targets core 0.23.0. Orders and Flight Crew project telemetry through
+single `phase` dictionary. In the Rust use-case apps, Orders and Flight Crew
+project telemetry through
 app-owned camelCase fields such as `movesSpeculative`; Python exposes
 snake_case payloads. The other six Rust apps keep narrower, app-owned
 telemetry summaries rather than exposing every runtime field.
@@ -87,14 +88,17 @@ than rebuilding solver semantics locally.
 ### Maps as a supporting subsystem
 
 `solverforge-maps` belongs in projects where route cost, geometry, or road
-network structure are real business inputs, not as a default dependency.
+network structure are real business inputs, not as a default dependency. It
+fetches OpenStreetMap road data from an Overpass API server, so plan for that
+network dependency or a pre-filled cache. Drawing the map in a browser is the
+job of `solverforge-ui`'s map module.
 
 ## Common architecture shapes
 
 | Product shape | Typical composition |
 |---|---|
 | backend planner service | `solverforge-cli` scaffold + `solverforge` |
-| Python planner service or notebook-backed prototype | PyPI `solverforge` package or the `solverforge-py v0.7.2` source tag |
+| Python planner service or notebook-backed prototype | PyPI `solverforge` package or its tagged `solverforge-py` source |
 | browser-based planning app | `solverforge-cli` + `solverforge` + `solverforge-ui` |
 | fleet or dispatch optimizer | `solverforge-cli` + `solverforge` + `solverforge-maps` |
 | custom research harness | direct `solverforge` plus selected lower-level crates |

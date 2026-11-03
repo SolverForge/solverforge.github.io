@@ -19,7 +19,37 @@ This guide covers the standard `solverforge-maps` workflow:
 
 - Rust stable toolchain
 - An async runtime such as Tokio
-- Internet access the first time a new road network is fetched
+- HTTPS access to an Overpass API server the first time a region is fetched
+
+## The Overpass Dependency
+
+`solverforge-maps` builds road networks from OpenStreetMap data that it
+downloads from an [Overpass API](https://wiki.openstreetmap.org/wiki/Overpass_API)
+server. `NetworkConfig::default()` uses the public instance at
+`https://overpass-api.de/api/interpreter` and stores fetched regions in
+`.osm_cache`, relative to the process's working directory.
+
+The public instance is a shared community service with usage limits: it answers
+busy periods with `429 Too Many Requests` or `503 Service Unavailable`, and
+large regions can take minutes. A failed request on a server error, `429`, or
+`408` is retried up to `2` more times per endpoint, waiting longer after each
+attempt; when every endpoint fails, `load_or_fetch` returns
+`RoutingError::Network`. A region already in `.osm_cache` loads without network
+access.
+
+For production or CI, point the config at your own Overpass server, or list
+fallbacks that are tried in order:
+
+```rust
+use solverforge_maps::NetworkConfig;
+
+let config = NetworkConfig::default()
+    .overpass_endpoints(vec![
+        "https://overpass.example.internal/api/interpreter".to_string(),
+        "https://overpass-api.de/api/interpreter".to_string(),
+    ])
+    .cache_dir("/var/cache/solverforge-maps");
+```
 
 ## Add the Dependency
 
@@ -67,7 +97,7 @@ let network = RoadNetwork::load_or_fetch(&bbox, &config, None).await?;
 
 - reuse the in-memory cache when possible
 - reuse the file cache when the region was fetched before
-- fall back to the Overpass API only when necessary
+- fetch from the configured Overpass endpoints only when the region is not cached
 
 ## Step 4: Compute the Travel-Time Matrix
 
@@ -81,8 +111,7 @@ println!("Distance 0 -> 1: {:?} meters", matrix.distance_meters(0, 1));
 
 This matrix is the bridge between geospatial data and optimization. A VRP solver can use it as the cost model for sequencing stops, estimating arrival times, comparing alternative route plans, and reporting the route distance associated with the fastest-time path.
 
-Since the `2.1.4` release, `TravelTimeMatrix` stores route distances next
-to travel times. `matrix.distance_meters(from, to)` returns meters for the same
+`TravelTimeMatrix` stores route distances next to travel times. `matrix.distance_meters(from, to)` returns meters for the same
 fastest-time path used by `matrix.get(from, to)`. Unreachable pairs return
 `Some(UNREACHABLE)`, and out-of-bounds indices return `None`.
 

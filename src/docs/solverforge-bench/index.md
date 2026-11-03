@@ -32,6 +32,8 @@ result back to the shared framework.
 - **Scalar-variable employee scheduling benchmarks** under
   `scalar-variable/employee-scheduling/`, using the bundled INRC-II nurse
   rostering corpus
+- **Scalar-variable job-shop scheduling benchmarks** under
+  `scalar-variable/job-shop-scheduling/`, using the bundled JSPLIB instances
 - **One shared harness** for solver registration, run matrices, wall-clock
   timing, overshoot calculation, watchdog containment, result rows, CSV files,
   run logs, and solver stdout/stderr capture
@@ -40,9 +42,28 @@ result back to the shared framework.
 - **PostgreSQL warehouse output** for cron-driven and release-tagged runs,
   backed by checked-in SQL migrations and latest-run views
 
+## Prerequisites
+
+The validation targets need only Python. The benchmark targets also build the
+native SolverForge adapters and every comparison adapter in the default solver
+set, so a full run needs:
+
+- `python3.14` (the Makefile's `HOST_PYTHON`) for the repository `.venv`
+- a Rust toolchain with `cargo`, and `maturin` on `PATH`, for the native
+  SolverForge adapters
+- a JDK with `mvn` for the JVM-based comparison adapters
+- `cmake` and a C++ compiler for the native comparison adapters; `curl` and
+  `git` download their sources and release archives
+- `taskset` (util-linux): benchmark runs pin each suite to its own CPU core
+- for the `-db` targets, a PostgreSQL server, `psql`, and `sqlx`
+  (`cargo install sqlx-cli --no-default-features --features postgres`)
+
+The `*-solverforge-*` targets build only the native SolverForge adapter, so
+they need Python, Rust with `maturin`, and `taskset`.
+
 ## Setup
 
-The repository currently targets Python 3.14:
+Create the repository virtualenv with Python 3.14:
 
 ```bash
 python3.14 -m venv .venv
@@ -50,9 +71,10 @@ python3.14 -m venv .venv
 pip install -e .
 ```
 
-The root Makefile uses the same `.venv` for CVRP, employee scheduling,
-normalization, and nightly runs. Use `make install-python-deps` to create or
-refresh it through the repository workflow.
+The root Makefile uses the same `.venv` for CVRP, employee scheduling, job-shop
+scheduling, normalization, and nightly runs. `make install-python-deps` creates
+or refreshes it and installs the pinned published `solverforge` Python package
+into it.
 
 ## Benchmark Families
 
@@ -76,6 +98,7 @@ evidence:
 make validate-cvrp
 make validate-employee-scheduling
 make validate-employee-model-parity
+make validate-job-shop-scheduling
 ```
 
 Run quick smoke benchmarks:
@@ -85,6 +108,8 @@ make bench-cvrp-quick
 make bench-cvrp-solverforge-quick
 make bench-employee-scheduling-quick
 make bench-employee-scheduling-solverforge-quick
+make bench-job-shop-scheduling-quick
+make bench-job-shop-scheduling-solverforge-quick
 ```
 
 Run canonical benchmark sets:
@@ -92,28 +117,38 @@ Run canonical benchmark sets:
 ```bash
 make bench-cvrp
 make bench-employee-scheduling
+make bench-job-shop-scheduling
 ```
 
 The quick CVRP target runs three instances at `1` and `10` seconds. The quick
-employee-scheduling target runs `n005w4` at `1` and `10` seconds. The canonical
-employee-scheduling target uses the `canonical` group from the bundled INRC-II
-manifest and the `1`, `10`, and `60` second budgets.
+employee-scheduling target runs `n005w4` at `1` and `10` seconds. The quick
+job-shop target runs the JSPLIB `quick` group (`ft06` and `la01`) at `1` and
+`10` seconds. The canonical employee-scheduling and job-shop targets use the
+`canonical` group from their bundled manifests (INRC-II and all 162 JSPLIB
+instances) and the `1`, `10`, and `60` second budgets. The
+`*-solverforge-*` targets run the same slices with only native SolverForge.
 
 ## Unified Harness
 
 The Make targets call the same root benchmark entrypoint:
 
 ```bash
-PYTHONPATH=src:list-variable/cvrp/src:scalar-variable/employee-scheduling/src \
+PYTHONPATH=src:list-variable/cvrp/src:scalar-variable/employee-scheduling/src:scalar-variable/job-shop-scheduling/src \
   .venv/bin/python3 scripts/run_benchmark.py cvrp \
   --run-kind quick \
   --num-instances 3 \
   --time-limits 1 10
 
-PYTHONPATH=src:list-variable/cvrp/src:scalar-variable/employee-scheduling/src \
+PYTHONPATH=src:list-variable/cvrp/src:scalar-variable/employee-scheduling/src:scalar-variable/job-shop-scheduling/src \
   .venv/bin/python3 scripts/run_benchmark.py employee-scheduling \
   --run-kind quick \
   --datasets n005w4 \
+  --time-limits 1 10
+
+PYTHONPATH=src:list-variable/cvrp/src:scalar-variable/employee-scheduling/src:scalar-variable/job-shop-scheduling/src \
+  .venv/bin/python3 scripts/run_benchmark.py job-shop-scheduling \
+  --run-kind quick \
+  --dataset-set quick \
   --time-limits 1 10
 ```
 
@@ -133,8 +168,8 @@ Shared options include:
 --capture-solver-output | --no-capture-solver-output
 ```
 
-`cvrp` adds `--num-instances`. `employee-scheduling` adds `--dataset-set` and
-`--datasets`.
+`cvrp` adds `--num-instances`. `employee-scheduling` and `job-shop-scheduling`
+add `--dataset-set` and `--datasets`.
 
 ## Timing Contract
 
@@ -204,17 +239,25 @@ make db-migrate
 
 make bench-cvrp-quick-db
 make bench-employee-scheduling-quick-db
+make bench-job-shop-scheduling-quick-db
 make bench-nightly-db
 ```
 
-`make bench-nightly-db` is the cron entrypoint. It builds both benchmark stacks,
-applies migrations once, then runs full CVRP and canonical employee scheduling
-as one PostgreSQL-saving nightly job.
+`make bench-nightly-db` is the cron entrypoint. It builds all three benchmark
+stacks, applies migrations once, then runs full CVRP, canonical employee
+scheduling, and canonical job-shop scheduling, each pinned to its own core, as
+one PostgreSQL-saving nightly job.
 
 PostgreSQL stores run catalog data, solver versions, and per-result rows.
-Display consumers should read `benchmark_result_facts`,
-`latest_benchmark_runs`, or `latest_benchmark_result_facts` instead of
-reconstructing the run/result join.
+Warehouse diagnostics read `benchmark_result_facts`, `latest_benchmark_runs`,
+or `latest_benchmark_result_facts` instead of reconstructing the run/result
+join. Published results read only `publishable_benchmark_runs`,
+`publishable_benchmark_result_facts`, or their `latest_publishable_benchmark_runs`
+and `latest_publishable_benchmark_result_facts` counterparts: those views admit
+only completed runs from a clean, identified commit with a complete
+expected/observed matrix, valid fair-start witnesses, and complete runtime
+provenance. `benchmark_run_publication_audit` names the criterion that withheld
+a run.
 
 ## Published Results
 
@@ -229,10 +272,9 @@ commit `2f71da41a82308c5f0da2f2c1cea8969991861a1`:
 | Employee scheduling | 37 | 555 | `f3c914f9-9695-446c-aab3-1241b7249021` |
 | Job-shop scheduling | 162 | 2,430 | `e9e294de-0d5c-4db2-a1eb-c77f23171734` |
 
-These runs tested native SolverForge **0.22.0** and Python **0.6.15**.
-Competitors were Timefold **2.7.1**, OR-Tools
-**9.15.6755**, and HiGHS **1.15.1**; CVRP additionally tested PyVRP **0.14.1**
-and PyHygese **0.1.0**. Each matrix covers the 1, 10, and 60 second budgets.
+These runs tested native SolverForge **0.22.0** and Python **0.6.15**; the
+[results page](/benchmarks/) lists every solver and version in each matrix.
+Each matrix covers the 1, 10, and 60 second budgets.
 Official references cover every selected instance in all three problems.
 
 ## Official References
@@ -278,7 +320,7 @@ official value over whatever a run recorded.
 
 Where no official value exists, the run reports that absence rather than
 substituting a bound of its own. The employee-scheduling canonical selection
-now grades the exact scenario, history, and ordered-week combinations covered
+grades the exact scenario, history, and ordered-week combinations covered
 by those 37 official values. Its results report both feasibility and reference
 gaps. On the published results page the coverage is stated per problem, next
 to the numbers.
