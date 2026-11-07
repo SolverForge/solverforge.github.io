@@ -17,7 +17,7 @@ controller:
 3. include the bundled CSS and JS in that page
 4. instantiate components plus the retained-job backend and solver helpers
 
-`solverforge-ui 0.9.0` declares `rust-version = "1.95"`, so use Rust 1.95 or
+`solverforge-ui 0.9.1` declares `rust-version = "1.95"`, so use Rust 1.95 or
 newer.
 
 ## Create the Project
@@ -25,7 +25,7 @@ newer.
 ```bash
 cargo new sf-ui-quickstart
 cd sf-ui-quickstart
-cargo add solverforge-ui@0.9.0 axum@0.8
+cargo add solverforge-ui@0.9.1 axum@0.8
 cargo add tokio@1 --features macros,rt-multi-thread,net
 mkdir static
 ```
@@ -203,7 +203,7 @@ cargo run
 
 Open `http://127.0.0.1:3000/`. The page shows the header with its **Plan** and
 **Gantt** tabs, the status bar, and the active tab panel, and
-`SF.version` in the browser console reports `"0.9.0"`. Set `PORT` to serve on
+`SF.version` in the browser console reports `"0.9.1"`. Set `PORT` to serve on
 another port.
 
 The **Solve** button calls `POST /jobs` through the Axum backend adapter. This

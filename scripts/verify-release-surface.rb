@@ -18,9 +18,9 @@ REQUIRED_TEXT = {
   ],
   "scripts/verify-cli-release.rb" => [
     "EXPECTED_CLI_VERSION = ReleasePins::CLI", "EXPECTED_RUNTIME_VERSION = ReleasePins::RUNTIME",
-    'EXPECTED_MCP_VERSION = "3.8.0"',
-    "e842faa9c774eb342f29de4529de1ca18e91e171",
-    "5f4253813e86c9c19b3df26404f0714608e1623b51104463c16013c4c20bbba3",
+    'EXPECTED_MCP_VERSION = "3.9.0"',
+    "f346415e833091586e0dcec0daf2c8ea4f9e07d4",
+    "d4c4a680248e15e9a002beb6c2f93795d5762973b411be75ef50bb921f682fb3",
     "pub phases: Vec<PhaseTelemetryDto>", "pub moves_speculative: u64",
     "duplicates the built-in", "The project was not compiled.",
     "because source files still reference it"
@@ -42,8 +42,10 @@ REQUIRED_TEXT = {
     NOTE_CLI, NOTE_APPS
   ],
   "src/_posts/releases/2026-11-03-solverforge-cli-3-8-x.md" => [
-    "**solverforge-cli #{CLI} was published on November 3, 2026**",
-    "`3.8.2` | 2026-11-03", "`3.8.1` | 2026-11-03", "`3.8.0` | 2026-11-03",
+    "**solverforge-cli #{CLI} was published on November 7, 2026**",
+    "`3.8.3` | 2026-11-07", "`3.8.2` | 2026-11-03", "`3.8.1` | 2026-11-03", "`3.8.0` | 2026-11-03",
+    "f346415e833091586e0dcec0daf2c8ea4f9e07d4", "d4c4a680248e15e9a002beb6c2f93795d5762973b411be75ef50bb921f682fb3", "42416451385", "42416451305", "42416448853",
+    "`solverforge-ui 0.9.1` and\n`solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell",
     "e842faa9c774eb342f29de4529de1ca18e91e171", "5f4253813e86c9c19b3df26404f0714608e1623b51104463c16013c4c20bbba3", "41718367762", "41718367773", "41718364701",
     "1e14044e924164a9aaf974628135b7a75a1f341f",
     "40e017937e0df564f2c767291bf1dc7eda4bded3f67cd4928b3f7566497851c0",
@@ -284,7 +286,7 @@ crates.io on 2026-10-14",
     "CLI version: #{CLI}",
     "SolverForge crate target #{CORE}",
     "`solverforge-cli #{CLI}` line starts new scaffolds on the published\n`solverforge #{CORE}` runtime",
-    "Scaffold MCP target: rmcp 3.8.0",
+    "Scaffold MCP target: rmcp 3.9.0",
     "solverforge connect"
   ],
   "src/docs/solverforge-cli/generator-commands.md" => [
@@ -323,7 +325,35 @@ crates.io on 2026-10-14",
     "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
   "src/docs/solverforge-maps/index.md" => [
-    "solverforge-maps #{ReleasePins::MAPS}"
+    "This section tracks the published `solverforge-maps #{ReleasePins::MAPS}` crate.",
+    "web scaffolds pin the same `solverforge-maps #{ReleasePins::MAPS}`",
+    "**Car-legal road graphs**", "**Street names on every route**", "**Access-aware snapping**"
+  ],
+  "src/docs/solverforge-maps/routing.md" => [
+    "## Read the Streets Along a Route", "`StreetRun`", "edges_with_names_iter()",
+    "### Snap by Itinerary Role", "compute_matrix_with_access", "SnapAccess::Incoming",
+    "snap_road_index_with_access"
+  ],
+  "src/docs/solverforge-maps/getting-started.md" => [
+    "motorway_link", "`destination` stays open", "route.streets"
+  ],
+  "src/docs/solverforge-maps/caching.md" => ["cache version `7`"],
+  "src/_posts/releases/2026-11-06-solverforge-maps-2-2-2-3-x.md" => [
+    "**solverforge-maps #{ReleasePins::MAPS} was published on November 6, 2026**",
+    "42302645377", "42302643785", "42302638820", "`4ce9dd1`",
+    "`2.3.3` | 2026-11-06", "`2.3.2` | 2026-11-06", "`2.3.1` | 2026-11-06",
+    "`2.3.0` | 2026-11-06", "`2.2.0` | 2026-11-06",
+    "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-maps = { version = \"#{ReleasePins::MAPS}\" }` |"
+  ],
+  "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => [
+    "Historical release note", "/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/",
+    "`2.1.5` | 2026-11-03"
+  ],
+  "src/_posts/releases/2026-11-07-solverforge-ui-0-9-x.md" => [
+    "**solverforge-ui #{ReleasePins::UI} was published on November 7, 2026**",
+    "42411875031", "42411875086", "42411873082", "`94cfd9e`",
+    "`0.9.1` | 2026-11-07", "`0.9.0` | 2026-09-15", "dashArray",
+    "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-ui = { version = \"#{ReleasePins::UI}\" }` |"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
     "SolverForge 0.23.0", "`cp314` ABI, not `cp314t`"
@@ -351,12 +381,13 @@ crates.io on 2026-10-14",
     "--layout covering"
   ],
   "src/docs/solverforge-ui/index.md" => [
-    "solverforge-ui 0.9.0",
-    "/sf/sf.0.9.0.css",
+    "solverforge-ui #{ReleasePins::UI}",
+    "/sf/sf.#{ReleasePins::UI}.css",
     "SF.version"
   ],
   "src/docs/solverforge-ui/integration-assets.md" => [
-    "solverforge-ui 0.9.0",
+    "solverforge-ui #{ReleasePins::UI}",
+    "dashArray",
     "solverforge_ui::assets::version()",
     "SF.version",
     "onFailure",
@@ -374,7 +405,7 @@ crates.io on 2026-10-14",
   "src/docs/solverforge-ui/agent-skill.md" => [
     "solverforge-cli repository",
     "skills/solverforge-ui/",
-    "solverforge-ui 0.9.0"
+    "does not bundle it"
   ],
   "src/_data/docs_nav.yml" => [
     "/docs/solverforge-ui/agent-skill/",
@@ -390,7 +421,7 @@ crates.io on 2026-10-14",
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge 0.24.0",
-    "solverforge-ui 0.9.0",
+    "solverforge-ui #{ReleasePins::UI}",
     "is not\nmove-for-move exact"
   ],
   "src/_posts/releases/2026-09-16-solverforge-cli-3-1-x.md" => [
@@ -425,7 +456,8 @@ crates.io on 2026-10-14",
     "Fresh\nscaffolds target `solverforge #{CORE}`",
     "`solverforge-cli #{CLI}` targets `solverforge #{CORE}`",
     "c114e2d2bfabaada78beb5ee77318b847b964489", "41314986907", "41314989365",
-    "e842faa9c774eb342f29de4529de1ca18e91e171", "41718367762", "41718367773", "41718364701", "41625985949",
+    "f346415e833091586e0dcec0daf2c8ea4f9e07d4", "42416451385", "42416451305", "42416448853", "41625985949",
+    "The current UI line is `solverforge-ui #{ReleasePins::UI}`, and the current maps line is\n`solverforge-maps #{ReleasePins::MAPS}`",
     "solverforge-hospital@3.0.0", "solverforge-lessons@3.0.0", "solverforge-deliveries@3.0.1",
     "solverforge-fsr@3.0.1", "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0",
     "solverforge-fleet@0.2.0", "solverforge-flightcrew@0.3.1", "41718256141",
@@ -563,6 +595,9 @@ crates.io on 2026-10-14",
 }.freeze
 
 FORBIDDEN_TEXT = {
+  "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => ["is the current maps line", "Use the crates.io package pin"],
+  "src/docs/solverforge-maps/routing.md" => ["snaps both endpoints to the nearest graph nodes"],
+  "src/docs/solverforge-maps/getting-started.md" => ["snaps both endpoints to the nearest graph nodes"],
   "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.7.0", "solverforge==0.7.1", "git checkout v0.7.0", "git checkout v0.7.1", "solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
   "src/docs/solverforge-python/solving-and-runtime.md" => ["0.22.0 runtime graph"],
   "src/docs/solverforge/index.md" => [

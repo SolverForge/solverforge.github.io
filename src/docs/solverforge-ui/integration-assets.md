@@ -9,7 +9,7 @@ weight: 4
 # Integration & Assets
 
 <%= render Ui::Callout.new do %>
-The current `solverforge-ui 0.9.0` contract is job-oriented, lifecycle-typed, and
+The current `solverforge-ui 0.9.1` contract is job-oriented, lifecycle-typed, and
 framework-neutral at the asset boundary. New integrations should expose retained
 jobs, explicit `eventType` payloads, exact paused or terminal snapshots,
 null-safe snapshot callbacks, normalized create-job identifiers, and the shipped
@@ -247,8 +247,8 @@ Common assets include:
 
 - `/sf/sf.css`
 - `/sf/sf.js`
-- `/sf/sf.0.9.0.css`
-- `/sf/sf.0.9.0.js`
+- `/sf/sf.0.9.1.css`
+- `/sf/sf.0.9.1.js`
 - `/sf/vendor/fontawesome/css/fontawesome.min.css`
 - `/sf/vendor/fontawesome/css/solid.min.css`
 
@@ -272,7 +272,7 @@ For non-Axum Rust hosts, disable the default feature and serve the same
 embedded assets through the framework-neutral API:
 
 ```toml
-solverforge-ui = { version = "0.9.0", default-features = false }
+solverforge-ui = { version = "0.9.1", default-features = false }
 ```
 
 ```rust
@@ -339,6 +339,14 @@ map.drawRoute({
   ],
   color: "#10b981",
 });
+map.drawRoute({
+  points: [
+    [45.08, 7.7],
+    [45.07, 7.69],
+  ],
+  color: "#10b981",
+  dashArray: "6 8",
+});
 map.drawEncodedRoute({ encoded: "ovarGo}|m@o}@o}@", color: "#3b82f6" });
 map.fitBounds();
 map.highlight("#10b981");
@@ -351,7 +359,9 @@ map.clearAll();
 
 `fitBounds()` fits vehicle and visit markers. Marker bounds come from a Leaflet
 feature group, so marker-only maps can call `fitBounds()` without route
-polylines. `drawEncodedRoute()` takes a Google encoded polyline, the format
+polylines. `drawRoute()` passes an optional `dashArray` to the Leaflet
+polyline for a dashed stroke, such as the closing leg of a round trip.
+`drawEncodedRoute()` takes a Google encoded polyline, the format
 `solverforge-maps` produces for route geometry.
 
 ## Non-Rust Integration Path

@@ -9,6 +9,12 @@ description: >
   and solverforge_ui::assets::version().
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older UI line. The current release is
+`solverforge-ui 0.9.1`; see the
+[0.9.x UI release note](/blog/releases/2026/11/07/solverforge-ui-0-9-x/).
+<% end %>
+
 **solverforge-ui 0.8.0** is published on crates.io, with the matching
 `v0.8.0` source tag. The release keeps the framework-neutral
 `solverforge_ui::assets` API and the Axum `.merge(solverforge_ui::routes())`

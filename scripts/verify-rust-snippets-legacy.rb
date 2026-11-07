@@ -252,6 +252,7 @@ class ProfileResolver
     return HISTORICAL_PROFILES.fetch(path) if HISTORICAL_PROFILES.key?(path)
     return "solverforge-maps-current" if path.start_with?("src/docs/solverforge-maps/")
     return "solverforge-maps-current" if path.end_with?("2026-05-03-solverforge-maps-2-1-x.md")
+    return "solverforge-maps-current" if path.end_with?("2026-11-06-solverforge-maps-2-2-2-3-x.md")
     return "solverforge-ui-current" if path.start_with?("src/docs/solverforge-ui/")
 
     "solverforge-current"
@@ -683,7 +684,7 @@ class SnippetRenderer
       let config = NetworkConfig::default();
       let network = RoadNetwork::new();
       let matrix = TravelTimeMatrix::default();
-      let route = RouteResult { duration_seconds: 0, distance_meters: 0.0, geometry: locations.clone() };
+      let route = RouteResult { duration_seconds: 0, distance_meters: 0.0, geometry: locations.clone(), streets: Vec::new() };
     RS
     prelude + "\n" + wrap_async_result_function(setup + "\n" + code)
   end

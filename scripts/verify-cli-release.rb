@@ -12,14 +12,14 @@ require_relative "release_pins"
 # Provenance of the audited solverforge-cli artifact. A newer publish moves
 # ReleasePins::CLI, and then these two values must be re-audited before the
 # gate passes again.
-EXPECTED_SOURCE_SHA = "e842faa9c774eb342f29de4529de1ca18e91e171"
-EXPECTED_ARTIFACT_SHA256 = "5f4253813e86c9c19b3df26404f0714608e1623b51104463c16013c4c20bbba3"
+EXPECTED_SOURCE_SHA = "f346415e833091586e0dcec0daf2c8ea4f9e07d4"
+EXPECTED_ARTIFACT_SHA256 = "d4c4a680248e15e9a002beb6c2f93795d5762973b411be75ef50bb921f682fb3"
 
 EXPECTED_CLI_VERSION = ReleasePins::CLI
 EXPECTED_RUNTIME_VERSION = ReleasePins::RUNTIME
 EXPECTED_UI_VERSION = ReleasePins::UI
 EXPECTED_MAPS_VERSION = ReleasePins::MAPS
-EXPECTED_MCP_VERSION = "3.8.0"
+EXPECTED_MCP_VERSION = "3.9.0"
 
 def fail!(message)
   warn "[verify-cli-release] ERROR: #{message}"

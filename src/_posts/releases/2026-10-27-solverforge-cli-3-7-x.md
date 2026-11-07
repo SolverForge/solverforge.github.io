@@ -8,7 +8,7 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
-This post records an older CLI line. The current CLI is `solverforge-cli 3.8.2`,
+This post records an older CLI line. The current CLI is `solverforge-cli 3.8.3`,
 which scaffolds `solverforge 0.24.0`; see the
 [3.8.x CLI release note](/blog/releases/2026/11/03/solverforge-cli-3-8-x/).
 <% end %>

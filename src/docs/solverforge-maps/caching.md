@@ -18,6 +18,10 @@ weight: 4
 
 Repeat runs for the same service area can become much faster after the first network build.
 
+The file cache is versioned. A release that changes how the graph is built
+moves the cache version, and regions cached under the old version are fetched
+and rebuilt on first use. `solverforge-maps 2.3.3` writes cache version `7`.
+
 ## Inspect Cache Stats
 
 ```rust

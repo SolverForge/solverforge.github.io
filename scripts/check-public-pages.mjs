@@ -1492,7 +1492,7 @@ function releasePins() {
     if (!match) throw new Error(`scripts/release_pins.rb has no pin for ${crate}`);
     return match[1];
   };
-  return { core: pin("solverforge"), cli: pin("solverforge-cli") };
+  return { core: pin("solverforge"), cli: pin("solverforge-cli"), ui: pin("solverforge-ui"), maps: pin("solverforge-maps") };
 }
 
 async function checkReleaseDocs(origin) {
@@ -1513,7 +1513,10 @@ async function checkReleaseDocs(origin) {
     { path: "/blog/releases/2026/10/27/solverforge-python-0-7-x/", required: ["SolverForge Python 0.7.x follows solverforge 0.6.15", "32 evaluators", "releases the GIL", "phases", "discarded_speculative", "solverforge 0.7.2", "0.7.1", "KeyboardInterrupt", "previous hook"] },
     { path: "/docs/status-and-roadmap/", required: [`documentation tracks the solverforge ${pins.core} release`, `cargo add solverforge installs ${pins.core}`, `The independently published CLI line is solverforge-cli ${pins.cli}`, "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0", "solverforge-flightcrew@0.3.1", "solverforge-fleet@0.2.0"] },
     { path: "/blog/releases/2026/11/01/solverforge-0-24-x/", required: ["solverforge 0.24.x follows solverforge 0.23.0", "weight_multiplier", "solver_toml"] },
-    { path: "/blog/releases/2026/11/03/solverforge-cli-3-8-x/", required: [`solverforge-cli ${pins.cli} was published on November 3, 2026`, "Windows failed", "BendableScore"] },
+    { path: "/blog/releases/2026/11/03/solverforge-cli-3-8-x/", required: [`solverforge-cli ${pins.cli} was published on November 7, 2026`, "Windows failed", "BendableScore", "rmcp 3.9.0"] },
+    { path: "/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/", required: [`solverforge-maps ${pins.maps} was published on November 6, 2026`, "compute_matrix_with_access", "StreetRun", "motorway_link"] },
+    { path: "/blog/releases/2026/11/07/solverforge-ui-0-9-x/", required: [`solverforge-ui ${pins.ui} was published on November 7, 2026`, "dashArray"] },
+    { path: "/docs/solverforge-maps/routing/", required: ["Read the Streets Along a Route", "Snap by Itinerary Role", "SnapAccess::Both"] },
     { path: "/blog/releases/2026/11/03/solverforge-usecases-3-0/", required: ["solverforge-hospital@3.0.0", "weightMultiplier", "make install-e2e"] },
     { path: "/docs/solverforge-cli/configuration/", required: ["move_thread_count.count 4", "RAYON_NUM_THREADS", "32", "auto", "none"] },
     { path: "/docs/solverforge-cli/project-anatomy/", required: ["phases", "movesSpeculative", "discarded_speculative"] },

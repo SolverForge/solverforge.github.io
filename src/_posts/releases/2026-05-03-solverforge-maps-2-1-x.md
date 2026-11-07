@@ -7,8 +7,14 @@ description: >
   matrix data for routing and delivery applications.
 ---
 
-**solverforge-maps 2.1.x** is the current maps line for routing and delivery
-applications. The latest patch, **2.1.5**, is available on
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older maps line. The current release is
+`solverforge-maps 2.3.3`; see the
+[2.2 and 2.3 maps release note](/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/).
+<% end %>
+
+**solverforge-maps 2.1.x** was the maps line for routing and delivery
+applications from May to November 2026. Its last patch, **2.1.5**, is available on
 [crates.io](https://crates.io/crates/solverforge-maps/2.1.5), documented on
 [docs.rs](https://docs.rs/solverforge-maps/2.1.5), and tagged in the
 [source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.1.5).
@@ -38,7 +44,7 @@ access returns `None`.
 
 ## Upgrade
 
-Use the crates.io package pin:
+The last 2.1 package pin was:
 
 ```toml
 [dependencies]

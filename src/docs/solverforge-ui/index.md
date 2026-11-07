@@ -11,12 +11,12 @@ description: >
 <h1>solverforge-ui</h1>
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-ui 0.9.0` crate: retained jobs,
+This section tracks the published `solverforge-ui 0.9.1` crate: retained jobs,
 typed lifecycle events, exact paused snapshots, pause/resume/cancel controls,
 null-safe snapshot callbacks, exact dense scheduling geometry, normalized
 create-job identifiers, optional map helpers, and framework-neutral embedded
 asset access. The agent skill lives in the `solverforge-cli` repository.
-`solverforge-cli` web scaffolds pin `solverforge-ui 0.9.0`, so new projects get
+`solverforge-cli` web scaffolds pin `solverforge-ui 0.9.1`, so new projects get
 these assets directly; an existing app keeps the version its `Cargo.toml` pins
 until it is upgraded.
 <% end %>
@@ -48,19 +48,19 @@ the runtime integration path.
 
 ```toml
 [dependencies]
-solverforge-ui = { version = "0.9.0" }
+solverforge-ui = { version = "0.9.1" }
 
 # Pin a specific GitHub release tag when you need exact reproducibility.
-# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.9.0" }
+# solverforge-ui = { git = "https://github.com/SolverForge/solverforge-ui", tag = "v0.9.1" }
 ```
 
 Use the Git tag form when you need exact source-tag reproducibility instead of
 the crates.io package.
 
-`solverforge-ui 0.9.0` declares `rust-version = "1.95"`.
+`solverforge-ui 0.9.1` declares `rust-version = "1.95"`.
 
 Production cache pinning uses the versioned bundles for the installed crate
-version, `/sf/sf.0.9.0.css` and `/sf/sf.0.9.0.js`. `SF.version` in the loaded
+version, `/sf/sf.0.9.1.css` and `/sf/sf.0.9.1.js`. `SF.version` in the loaded
 JavaScript bundle and `solverforge_ui::assets::version()` both report the crate
 version that produced the embedded asset set.
 

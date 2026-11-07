@@ -8,10 +8,9 @@ weight: 5
 
 # Agent Skill
 
-As of `solverforge-ui 0.9.0`, the `solverforge-ui` agent skill lives with the
-other SolverForge skills in the
+The `solverforge-ui` agent skill lives with the other SolverForge skills in the
 [solverforge-cli repository](https://github.com/SolverForge/solverforge-cli)
-(`skills/solverforge-ui/`); the `solverforge-ui` crate no longer bundles it. The
+(`skills/solverforge-ui/`); the `solverforge-ui` crate does not bundle it. The
 skill teaches a coding agent to extend a thin `solverforge-cli` scaffold into a
 domain-faithful interface using only the shipped `SF.*` components, so the
 planning model stays the single source of truth and the generated backend stays
@@ -40,8 +39,8 @@ timeline, Gantt, map, rail, and table models.
 ## Install
 
 Install the skill from a `solverforge-cli` checkout with that repository's
-installer; see its `skills/README.md`. The `solverforge-ui` crate no longer
-ships an installer of its own. Restart the agent after installing so it rescans
+installer; see its `skills/README.md`. The `solverforge-ui` crate does not
+ship an installer of its own. Restart the agent after installing so it rescans
 skill directories.
 
 ## How The Skill Is Structured

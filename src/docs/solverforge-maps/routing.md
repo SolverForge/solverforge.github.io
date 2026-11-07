@@ -19,7 +19,26 @@ println!("Geometry points: {}", route.geometry.len());
 
 This is the simplest path from validated coordinates to a route result.
 
-`route()` snaps both endpoints to the nearest graph nodes first. That is usually fine for travel-time estimation, but it can shift the visible start or end of the geometry to a nearby intersection.
+`route()` snaps its start to a nearby graph node the route can leave and its end to a nearby node the route can reach. Among the candidates that allow that direction, it prefers the node on the largest connected part of the network, and the plain nearest node wins ties. That is usually fine for travel-time estimation, but it can shift the visible start or end of the geometry to a nearby intersection.
+
+## Read the Streets Along a Route
+
+Every `RouteResult` carries `streets`, the named streets in driving order with
+the meters driven on each:
+
+```rust
+let route = network.route(locations[0], locations[1])?;
+
+for street in &route.streets {
+    println!("{}: {:.0} m", street.name, street.distance_m);
+}
+```
+
+Consecutive edges on the same street merge into one `StreetRun`. Unnamed road
+pieces are left out, and partial first and last edges count only the distance
+actually driven, so the runs read as turn-by-turn directions without a second
+geocoding provider. `network.edges_with_names_iter()` exposes the same names on
+the raw graph edges.
 
 ## Preserve Road-Segment Endpoints
 
@@ -56,6 +75,34 @@ println!("Locations: {}", matrix.size());
 ```
 
 The matrix is the most common output for optimization systems because it lets the solver compare every stop against every other stop using realistic road travel instead of straight-line distance.
+
+`compute_matrix` snaps every location to its exact nearest graph node.
+
+### Snap by Itinerary Role
+
+A location whose nearest node sits on a one-way fragment, or on a closed stub
+such as a parking loop, can make every ordering infeasible: the route can reach
+that node but never leave it, or the reverse. `compute_matrix_with_access`
+takes one `SnapAccess` per location and snaps each to a nearby node it can
+traverse in the required direction:
+
+```rust
+use solverforge_maps::SnapAccess;
+
+let access = vec![SnapAccess::Outgoing, SnapAccess::Both, SnapAccess::Incoming];
+let matrix = network.compute_matrix_with_access(&locations, &access, None).await;
+```
+
+- `SnapAccess::Both` for stops a route arrives at and leaves, including the
+  depot of a round trip
+- `SnapAccess::Outgoing` for a start the route only leaves
+- `SnapAccess::Incoming` for an end the route only reaches
+
+Among the candidates that allow the direction, snapping prefers the one on the
+largest connected part of the network, and the plain nearest node wins ties.
+When no candidate allows the direction, the plain nearest node is kept.
+`network.snap_road_index_with_access(coord, access)` exposes the same snapping
+for a single coordinate.
 
 ### Travel Times and Same-Path Distances
 

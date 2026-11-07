@@ -82,8 +82,8 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.8`, which scaffolds `solverforge 0.24.0` and
-`solverforge-ui 0.9.0`.
+This page uses `solverforge-cli 3.8.3`, which scaffolds `solverforge 0.24.0` and
+`solverforge-ui 0.9.1`.
 
 ### Build a Timetable from the CLI
 

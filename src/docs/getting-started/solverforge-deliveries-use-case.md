@@ -90,8 +90,8 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.8`, which scaffolds `solverforge 0.24.0`,
-`solverforge-ui 0.9.0`, and `solverforge-maps 2.1.5`.
+This page uses `solverforge-cli 3.8.3`, which scaffolds `solverforge 0.24.0`,
+`solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Router from the CLI
 

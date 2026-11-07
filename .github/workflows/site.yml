@@ -51,7 +51,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: SolverForge/solverforge-bench
-          ref: d7ca9e3c56784cc9ee21089af314f085e18eb39b
+          ref: f1e027d26821ccc82bea6f57c1e7e2d327101c6b
           path: .ci/solverforge-bench
 
       - name: Install Rust 1.95
@@ -71,8 +71,8 @@ jobs:
             ~/.cargo/bin/solverforge
             ~/.cache/walkthrough-target
             ~/.cache/getting-started-target
-          key: walkthrough-solverforge-cli-3.8.2-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
-          restore-keys: walkthrough-solverforge-cli-3.8.2-
+          key: walkthrough-solverforge-cli-3.8.3-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
+          restore-keys: walkthrough-solverforge-cli-3.8.3-
 
       # The Rust library pages compile and run against crates.io solverforge;
       # keep that build between runs.
@@ -95,10 +95,10 @@ jobs:
           key: solver-config-${{ hashFiles('scripts/fixtures/solver-config/Cargo.lock') }}-${{ hashFiles('scripts/fixtures/solver-config/src/**') }}
           restore-keys: solver-config-${{ hashFiles('scripts/fixtures/solver-config/Cargo.lock') }}-
 
-      - name: Install solverforge-cli 3.8.2
+      - name: Install solverforge-cli 3.8.3
         run: |
-          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.8.2'; then
-            cargo install solverforge-cli --version 3.8.2 --locked --force
+          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.8.3'; then
+            cargo install solverforge-cli --version 3.8.3 --locked --force
           fi
           solverforge --version
 

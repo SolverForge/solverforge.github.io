@@ -135,7 +135,7 @@ domain.
 | ------- | ------- | ----- |
 | Core runtime | `solverforge 0.24.0` | Rust `1.95`; explicit configuration, constraint weights, problem changes, trimmed API |
 | Previous core runtime | `solverforge 0.23.0` | Parallel evaluation and per-phase telemetry; see the [0.23.x release note](/blog/releases/2026/10/27/solverforge-0-23-x/) |
-| CLI | `solverforge-cli 3.8.2` | Fresh scaffolds target core `0.24.0`; see the [CLI 3.8.x release note](/blog/releases/2026/11/03/solverforge-cli-3-8-x/) |
+| CLI | `solverforge-cli 3.8.3` | Fresh scaffolds target core `0.24.0`; see the [CLI 3.8.x release note](/blog/releases/2026/11/03/solverforge-cli-3-8-x/) |
 | Previous CLI | `solverforge-cli 3.7.1` | Scaffolds core `0.23.0`; existing projects retain their pins |
 | Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Still compiled onto core `0.23.0`; upgrading the Rust core does not retarget these wheels |
 | Worked use cases | November 3 app releases | All eight target core `0.24.0` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |

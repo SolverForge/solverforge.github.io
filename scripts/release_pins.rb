@@ -13,9 +13,9 @@ require "uri"
 module ReleasePins
   CURRENT = {
     "solverforge" => "0.24.0",
-    "solverforge-cli" => "3.8.2",
-    "solverforge-ui" => "0.9.0",
-    "solverforge-maps" => "2.1.5"
+    "solverforge-cli" => "3.8.3",
+    "solverforge-ui" => "0.9.1",
+    "solverforge-maps" => "2.3.3"
   }.freeze
 
   RUNTIME = CURRENT.fetch("solverforge")

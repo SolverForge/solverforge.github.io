@@ -101,6 +101,21 @@ let network = RoadNetwork::load_or_fetch(&bbox, &config, None).await?;
 - reuse the file cache when the region was fetched before
 - fetch from the configured Overpass endpoints only when the region is not cached
 
+The network follows what a car may legally drive:
+
+- `NetworkConfig::default().highway_types` includes the `motorway_link`,
+  `trunk_link`, `primary_link`, `secondary_link` and `tertiary_link` ramps, so
+  motorways can be entered and left.
+- Roundabouts (`junction=roundabout` or `circular`) and motorways are one-way
+  unless tagged otherwise. `oneway=yes`, `true` or `1` runs in drawing
+  direction, `-1` or `reverse` runs against it, and `reversible` or
+  `alternating` ways are left out.
+- Ways closed to cars by `motorcar`, `motor_vehicle`, `vehicle` or `access`
+  are left out, with the most specific tag winning; `destination` stays open.
+- Graph nodes are OSM nodes, so a bridge passing over a road at the same
+  position does not become a junction.
+- Ways carry their `name` tag, which routes report as street runs.
+
 ## Step 4: Compute the Travel-Time Matrix
 
 ```rust
@@ -124,9 +139,17 @@ let route = network.route(locations[0], locations[1])?;
 
 println!("Duration: {} seconds", route.duration_seconds);
 println!("Geometry points: {}", route.geometry.len());
+for street in &route.streets {
+    println!("{}: {:.0} m", street.name, street.distance_m);
+}
 ```
 
-`route()` snaps both endpoints to the nearest graph nodes before routing. That is a good default for travel-time analysis, but it can produce geometries that start and end at nearby intersections instead of the exact stop positions.
+`route.streets` lists the named streets in the order the route drives them.
+Consecutive edges on the same street merge into one run, unnamed road pieces
+are left out, and partial first and last edges count only the distance
+actually driven.
+
+`route()` snaps its start to a nearby graph node the route can leave and its end to a nearby node the route can reach, preferring the node on the largest connected part of the network. That is a good default for travel-time analysis, but it can produce geometries that start and end at nearby intersections instead of the exact stop positions. When both points snap to the same node, the route is that single node.
 
 For frontend rendering where the route should stay on the containing road segments, use edge snapping:
 

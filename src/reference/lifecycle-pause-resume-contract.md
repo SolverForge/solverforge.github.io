@@ -9,7 +9,7 @@ description: "Historical maintainer note for retained-job lifecycle, snapshot id
 This is a historical maintainer note from April 6, 2026. The current public
 contract is documented in the `solverforge 0.24.0` runtime docs
 ([SolverManager](/docs/solverforge/solver/solver-manager/)), the
-`solverforge-cli` CLI docs, and the `solverforge-ui 0.9.0` UI docs; use those
+`solverforge-cli` CLI docs, and the `solverforge-ui 0.9.1` UI docs; use those
 pages for user-facing guidance. Resume in `solverforge 0.24.0` continues the
 retained job rather than restarting from the best solution, but it is not
 move-for-move exact: a reproducible job paused inside a local-search step can

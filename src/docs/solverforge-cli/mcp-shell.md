@@ -13,7 +13,7 @@ surface is a Model Context Protocol server. It shares the same generated core
 (`domain/`, `constraints/`, `solver/`, `data/`, and the DTO contract) as the
 web, API, and CLI shells, so generator commands mutate it identically.
 
-The generated MCP server uses `rmcp 3.8.0` and names its server metadata
+The generated MCP server uses `rmcp 3.9.0` and names its server metadata
 `ServerConfig`. Its stateless HTTP transport does not use legacy sessions,
 and the generated server makes no sampling, elicitation, or roots requests
 to clients. Task-capable and legacy clients use the same retained solver

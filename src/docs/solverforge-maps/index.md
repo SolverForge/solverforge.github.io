@@ -8,8 +8,8 @@ description: >
 ---
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-maps 2.1.5` crate.
-`solverforge-cli` web scaffolds pin the same `solverforge-maps 2.1.5`
+This section tracks the published `solverforge-maps 2.3.3` crate.
+`solverforge-cli` web scaffolds pin the same `solverforge-maps 2.3.3`
 release.
 <% end %>
 
@@ -20,7 +20,13 @@ release.
 - **OSM-backed road networks** fetched from an Overpass API server (the public
   `overpass-api.de` instance by default) with in-memory and file caching
 - **Validated geographic primitives** such as `Coord` and `BoundingBox`
+- **Car-legal road graphs**: motorway and trunk ramps are included,
+  roundabouts and motorways are one-way, and roads closed to cars are left out
 - **Routing on road graphs** for time- or distance-based objectives
+- **Street names on every route**, merged into named runs with the distance
+  driven on each
+- **Access-aware snapping** that keeps itinerary stops off one-way fragments
+  and closed stubs
 - **Travel-time matrices** with same-path route distances for feeding VRP and dispatch solvers
 - **Route geometries** for frontend visualization and polyline transport
 - **Connectivity diagnostics** for debugging unreachable pairs and bad map regions
@@ -60,7 +66,7 @@ async fn main() -> RoutingResult<()> {
 }
 ```
 
-`route()` snaps endpoints to nearby graph nodes. For frontend geometry that should stay anchored to the containing road segments, use `snap_to_edge` with `route_edge_snapped` instead.
+`route()` snaps its start to a nearby node the route can leave and its end to a nearby node the route can reach. For frontend geometry that should stay anchored to the containing road segments, use `snap_to_edge` with `route_edge_snapped` instead.
 
 ## When To Use It
 

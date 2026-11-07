@@ -14,7 +14,7 @@
 require_relative "lib/use_case_tutorial"
 
 SITE_ROOT = File.expand_path("..", __dir__)
-CLI_VERSION = "3.8.2"
+CLI_VERSION = "3.8.3"
 
 def site_file(path)
   File.join(SITE_ROOT, path)
