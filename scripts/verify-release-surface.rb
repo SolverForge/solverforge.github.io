@@ -6,8 +6,8 @@ require_relative "release_pins"
 ROOT = File.expand_path("..", __dir__)
 CORE = ReleasePins::RUNTIME
 CLI = ReleasePins::CLI
-NOTE_CORE = "/blog/releases/2026/11/01/solverforge-0-24-x/"
-NOTE_CLI = "/blog/releases/2026/11/03/solverforge-cli-3-8-x/"
+NOTE_CORE = "/blog/releases/2026/11/09/solverforge-0-25-x/"
+NOTE_CLI = "/blog/releases/2026/11/09/solverforge-cli-3-9-x/"
 NOTE_APPS = "/blog/releases/2026/11/03/solverforge-usecases-3-0/"
 
 REQUIRED_TEXT = {
@@ -33,16 +33,16 @@ REQUIRED_TEXT = {
   ],
   "src/_posts/releases/2026-11-01-solverforge-0-24-x.md" => [
     "**solverforge 0.24.x** follows `solverforge 0.23.0`",
-    "`cargo add solverforge` installs #{CORE}", "docs.rs serves the #{CORE}\nAPI",
+    "At publication `cargo add solverforge` installed 0.24.0", "docs.rs\nserved the 0.24.0 API",
     "`0.24.0` | 2026-11-01",
     "588a097929d85401d12561bda10dd20cdf784aa78abc6b19120b12ab50d9a852",
     "c114e2d2bfabaada78beb5ee77318b847b964489", "41314986907", "41314989365",
     "solver_toml", "weight_multiplier", "ProblemChange", "SingleConstraint",
-    "from_yaml_str", "| CLI | `solverforge-cli #{CLI}` | Fresh scaffolds target core `#{CORE}`",
-    NOTE_CLI, NOTE_APPS
+    "from_yaml_str", "| CLI | `solverforge-cli 3.8.3` | Fresh scaffolds target core `0.24.0`",
+    "/blog/releases/2026/11/03/solverforge-cli-3-8-x/", NOTE_APPS, NOTE_CORE
   ],
   "src/_posts/releases/2026-11-03-solverforge-cli-3-8-x.md" => [
-    "**solverforge-cli #{CLI} was published on November 7, 2026**",
+    "**solverforge-cli 3.8.3 was published on November 7, 2026**",
     "`3.8.3` | 2026-11-07", "`3.8.2` | 2026-11-03", "`3.8.1` | 2026-11-03", "`3.8.0` | 2026-11-03",
     "f346415e833091586e0dcec0daf2c8ea4f9e07d4", "d4c4a680248e15e9a002beb6c2f93795d5762973b411be75ef50bb921f682fb3", "42416451385", "42416451305", "42416448853",
     "`solverforge-ui 0.9.1` and\n`solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell",
@@ -54,8 +54,8 @@ REQUIRED_TEXT = {
     "41640965796", "41640965834", "41640961789",
     "41625988555", "41625988624", "41625985949", "Windows failed",
     "BendableScore", "`solverforge test -- --nocapture`", "PORT",
-    "| CLI | `solverforge-cli #{CLI}` | Fresh scaffolds target `solverforge #{CORE}` |",
-    NOTE_CORE
+    "| CLI | `solverforge-cli 3.8.3` | Fresh scaffolds target `solverforge 0.24.0` |",
+    "/blog/releases/2026/11/01/solverforge-0-24-x/", NOTE_CLI
   ],
   "src/_posts/releases/2026-11-03-solverforge-usecases-3-0.md" => [
     "`solverforge-hospital@3.0.0`", "`solverforge-lessons@3.0.0`",
@@ -141,19 +141,19 @@ REQUIRED_TEXT = {
   ],
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.24.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
+    "0.25.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
   ],
   "src/_posts/releases/2026-06-12-solverforge-0-16-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.24.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
+    "0.25.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
   ],
   "src/_posts/releases/2026-06-15-solverforge-0-17-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.24.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
+    "0.25.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
   ],
   "src/_posts/releases/2026-07-13-solverforge-0-18-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.24.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
+    "0.25.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CORE}`"
   ],
 
   "src/docs/solverforge/solver/phases.md" => [
@@ -164,7 +164,7 @@ REQUIRED_TEXT = {
   ],
   "src/docs/solverforge/solver/local-search.md" => [
     "Parallel Candidate Evaluation", "DiscardedSpeculative",
-    "trajectory can depend on evaluator count",
+    "trajectory can depend on the evaluator count",
     "Cow<'_, MoveTabuSignature>",
     "effective parsed limit",
     "empty termination object",
@@ -246,14 +246,14 @@ crates.io on 2026-10-14",
     "/docs/solverforge/constraints/collectors/"
   ],
   "scripts/lib/rust_pages.rb" => [
-    'RELEASE = "0.24.0"'
+    %(RELEASE = "#{CORE}")
   ],
 
   "src/docs/solverforge/index.md" => [
-    "cargo add solverforge@=0.24.0",
-    "These pages track `solverforge 0.24.0`",
+    "cargo add solverforge@=#{CORE}",
+    "These pages track `solverforge #{CORE}`",
     "The workspace declares Rust `1.95`.",
-    "The `solverforge-cli 3.8` line scaffolds `solverforge 0.24.0`"
+    "The `solverforge-cli #{CLI[/\A\d+\.\d+/]}` line scaffolds `solverforge #{CORE}`"
   ],
 
   "src/docs/solverforge/solver/solver-manager.md" => ["holding the worker's pause gate", "does not restart from the best solution"],
@@ -278,7 +278,7 @@ crates.io on 2026-10-14",
     "This manual documents the `solverforge-cli #{CLI}` interface",
     "Fresh scaffolds target `solverforge #{CORE}`",
     "panics: a solve fails until you\nreplace it",
-    "the default `auto` setting stays sequential",
+    "evaluates local search on up to four evaluators when its measurements say",
     "`web`, `api`, `cli`, or `mcp`"
   ],
   "src/docs/solverforge-cli/command-reference.md" => [
@@ -305,7 +305,7 @@ crates.io on 2026-10-14",
     "target = \"solverforge #{CORE}\"",
     "solver_toml = \"../../solver.toml\"", "does not look for `solver.toml` in the\nworking directory",
     "move_thread_count.count 4", "RAYON_NUM_THREADS", "32",
-    "`\"auto\"`", "`\"none\"`", "non-negative integer"
+    "`\"auto\"`", "`\"none\"`", "one positive integer `count`; `count = 0` is rejected"
   ],
   "src/docs/solverforge-cli/getting-started.md" => [
     "solverforge solverforge-cli #{CLI}", "Scaffold runtime target: SolverForge crate target #{CORE}",
@@ -320,7 +320,7 @@ crates.io on 2026-10-14",
     "cargo run -- demo-data", "`PORT` environment variable"
   ],
   "src/docs/solverforge/solver/configuration.md" => [
-    "Move Thread Count", "`min(count, rayon::current_num_threads(), 32)` evaluators",
+    "Move Thread Count", "`min(N, rayon::current_num_threads(), 32)` evaluators",
     "effective parsed limit", "construction-only",
     "Keeping an optional assignment unassigned completes that group-slot decision"
   ],
@@ -414,13 +414,13 @@ crates.io on 2026-10-14",
     "/docs/solverforge/constraints/shift-group-uniformity/"
   ],
   "src/reference/crate-map.md" => [
-    "solverforge 0.24.0",
+    "solverforge #{CORE}",
     "AcceptedCount(256)",
     "solverforge 0.7.2",
     "solverforge-py v0.7.2"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
-    "solverforge 0.24.0",
+    "solverforge #{CORE}",
     "solverforge-ui #{ReleasePins::UI}",
     "is not\nmove-for-move exact"
   ],
@@ -455,12 +455,13 @@ crates.io on 2026-10-14",
     "The independently published CLI line is `solverforge-cli #{CLI}`",
     "Fresh\nscaffolds target `solverforge #{CORE}`",
     "`solverforge-cli #{CLI}` targets `solverforge #{CORE}`",
-    "c114e2d2bfabaada78beb5ee77318b847b964489", "41314986907", "41314989365",
-    "f346415e833091586e0dcec0daf2c8ea4f9e07d4", "42416451385", "42416451305", "42416448853", "41625985949",
+    "3115b4dd6b40bc72a472b042f5e6b665cb9720c7", "42552915915", "42552934483",
+    "f33d836f6801852fe2d1599eba2f22a1ada65bb6", "42557496537", "42557496534", "42557490301",
     "The current UI line is `solverforge-ui #{ReleasePins::UI}`, and the current maps line is\n`solverforge-maps #{ReleasePins::MAPS}`",
-    "solverforge-hospital@3.0.0", "solverforge-lessons@3.0.0", "solverforge-deliveries@3.0.1",
-    "solverforge-fsr@3.0.1", "solverforge-furnace@3.0.0", "solverforge-orders@0.3.0",
-    "solverforge-fleet@0.2.0", "solverforge-flightcrew@0.3.1", "41718256141",
+    "solverforge-hospital@3.0.1", "solverforge-lessons@3.0.1", "solverforge-deliveries@3.0.2",
+    "solverforge-fsr@3.0.2", "solverforge-furnace@3.0.2", "solverforge-orders@0.3.1",
+    "solverforge-fleet@0.2.1", "solverforge-flightcrew@0.3.2", "42571454634",
+    "- **Termination**",
     NOTE_CORE, NOTE_CLI, NOTE_APPS,
     "- **Parallel local search**", "- **Per-phase telemetry**", "- **List-shadow scoring**",
     "- **Core runtime line**", "- **Joined-tuple grouping**", "- **Guided native scalar search**",
@@ -485,24 +486,24 @@ crates.io on 2026-10-14",
     "**Explicit configuration**", "**Constraint weights and problem changes**"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@3.0.0",
-    "solverforge 0.24.0"
+    "solverforge-hospital@3.0.1",
+    "solverforge #{CORE}"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
-    "solverforge-lessons@3.0.0",
-    "solverforge 0.24.0"
+    "solverforge-lessons@3.0.1",
+    "solverforge #{CORE}"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@3.0.1",
-    "solverforge 0.24.0"
+    "solverforge-deliveries@3.0.2",
+    "solverforge #{CORE}"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@3.0.1",
-    "solverforge 0.24.0"
+    "solverforge-fsr@3.0.2",
+    "solverforge #{CORE}"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.24.x release note",
+    "0.25.x release note",
     "## October 2026 Core Patches (0.19.8–0.19.14)",
     "per-key occurrence counts", "arity-generic cross-join engine", "worker wakeup", "caller-owned buffers",
     "`0.19.13` | 2026-10-11",
@@ -528,7 +529,7 @@ crates.io on 2026-10-14",
     "solverforge 0.19.6",
     "solverforge 0.19.7",
     "`0.19.9` | 2026-10-08",
-    "0.24.x release note",
+    "0.25.x release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",

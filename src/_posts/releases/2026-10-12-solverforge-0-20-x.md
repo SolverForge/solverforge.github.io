@@ -13,7 +13,7 @@ crates.io (2026-10-12 through 2026-10-13). The line starts with accepted-count
 foraging and covers patches through `0.20.4`. Rust `1.95` remains the workspace
 floor. For the current
 manuals, use the [core overview](/docs/solverforge/) and
-[0.24.x release note](/blog/releases/2026/11/01/solverforge-0-24-x/).
+[0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/).
 
 ## What Changed
 

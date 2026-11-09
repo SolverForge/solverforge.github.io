@@ -113,9 +113,43 @@ changes no app; its
 [CI run 41637463799](https://github.com/SolverForge/solverforge-usecases/actions/runs/41637463799)
 passed. That commit is not an app release tag.
 
+### November 9 releases: solverforge 0.25.0
+
+On November 9 all eight apps released patch versions on `solverforge 0.25.0`;
+see the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/).
+Each app's HTTP error mapping answers `409 Conflict` for the new
+`SnapshotAnalysisDisabled` error. Furnace's VND phase sets
+`score_tie_break = "first"`, because 0.25.0's default random tie-break among
+equally scored best moves left its standard demo hard-infeasible. Furnace
+3.0.1 split its test build's debug info so the test binary links; 3.0.2 builds
+tests without debug info, whose generic type names otherwise exceed 2.7 GB.
+The UI and maps dependencies are unchanged.
+
+| App tag | Source commit | Space sync |
+| --- | --- | --- |
+| `solverforge-hospital@3.0.1` | `fda057fed58debcc7a208c61b429c567a8ab5a59` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42564398195) |
+| `solverforge-lessons@3.0.1` | `bc1f5008fd5534f19482a581e65f50404620acaa` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42564403026) |
+| `solverforge-deliveries@3.0.2` | `13185ffedb0688697cb3c14d1002832be24e6e43` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42564377312) |
+| `solverforge-fsr@3.0.2` | `0d75e3daa4aec136ffbe4fcf898795ba974ac956` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42564388464) |
+| `solverforge-furnace@3.0.1` | `7012fd4bc0cb30736c7b1c7fc49e740ab929b7d3` | repository-only |
+| `solverforge-furnace@3.0.2` | `4a14a2803149f5f44491825fec6c1430f35298ee` | repository-only |
+| `solverforge-orders@0.3.1` | `9b6a90ce77f24e217327557eb00392a5e8962d7f` | repository-only |
+| `solverforge-fleet@0.2.1` | `6d35a8d6909e65db1f27c7f6c32ef12d16cba937` | repository-only |
+| `solverforge-flightcrew@0.3.2` | `eff28ad94eb3b7fb3d46bb12c753a33c11d964d4` | repository-only |
+
+Bundle CI at `solverforge-orders@0.3.1`
+([run 42564373829](https://github.com/SolverForge/solverforge-usecases/actions/runs/42564373829)) ran out of disk on the
+hosted runner. The next commit frees the runner's preinstalled SDKs; its
+[run 42567230688](https://github.com/SolverForge/solverforge-usecases/actions/runs/42567230688) was terminated while building
+Furnace's tests, which `solverforge-furnace@3.0.2` fixes. Bundle CI passed at
+that final app tag ([run 42571454634](https://github.com/SolverForge/solverforge-usecases/actions/runs/42571454634)).
+
 ## Upgrade Checklist
 
-- Check out the app's own release tag from the table above.
+- Check out the app's own release tag from the tables above.
+- An app that
+  matches `SolverManagerError` exhaustively needs a `SnapshotAnalysisDisabled`
+  arm on `solverforge 0.25.0`.
 - Update analysis consumers to read the numeric `weightMultiplier` and, for
   Hospital, Lessons, Deliveries, and Field service, to match constraints by
   module id.

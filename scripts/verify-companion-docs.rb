@@ -37,7 +37,7 @@ BOUNDARIES = File.join(SITE_ROOT, "src/reference/integration-surfaces.md")
 BENCH_PAGE = File.join(SITE_ROOT, "src/docs/solverforge-bench/index.md")
 BENCH_URL = "https://github.com/SolverForge/solverforge-bench"
 # The documented solverforge-bench revision. Move it with the page.
-BENCH_REF = "f1e027d26821ccc82bea6f57c1e7e2d327101c6b"
+BENCH_REF = "712a30205590f8aad81ce42bf360a281cd152f0f"
 CACHE = ENV.fetch("SOLVERFORGE_SITE_CACHE", File.join(Dir.home, ".cache", "solverforge-site"))
 USER_AGENT = "solverforge.org docs gate (https://solverforge.org)"
 
