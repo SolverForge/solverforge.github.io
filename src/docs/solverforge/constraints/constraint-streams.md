@@ -469,6 +469,15 @@ let preference = Streams::new()
     .named("Preference missed");
 ```
 
+Every `penalize` and `reward` argument implements `ConstraintWeight<Args, Sc>`,
+exported from `solverforge` beside `FixedWeight` and `HardWeight`. Its
+`score(&self, args)` scores one match from the borrowed row tuple (or key and
+collector result for grouped streams), and `is_hard(&self)` decides the
+constraint's hardness. Built-in score values are fixed weights that are hard
+when their first level is non-zero; closures are soft; `fixed_weight(...)`
+wraps a custom fixed score; `hard_weight(...)` forces hard metadata. Implement
+`ConstraintWeight` for an application-owned weight type when none of these fit.
+
 ## Joined Filter Indexes
 
 Normal `.filter(...)` predicates stay value-oriented. The lower-level retained

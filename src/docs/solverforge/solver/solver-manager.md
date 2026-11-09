@@ -31,6 +31,11 @@ Call `.solve()` with your planning solution. It returns a `Result` containing a
 let (job_id, rx) = MANAGER.solve(solution).expect("solver job should start");
 ```
 
+`solve_with_override(solution, overrides)` starts the same retained job with a
+`SolverConfigOverride` applied to its configuration, for example a different
+solver-level termination for one job. See
+[Runtime Overrides](/docs/solverforge/solver/configuration/#runtime-overrides).
+
 The receiver yields `SolverEvent<S>` values, not raw `(solution, score)` tuples:
 `blocking_recv()` waits on a plain thread, `recv().await` waits in async code,
 and `try_recv()` returns a buffered event without waiting.
@@ -300,6 +305,11 @@ println!("analysis score: {:?}", analysis.analysis.score);
 ```
 
 Analysis is snapshot-bound. You do not analyze the live mutable job directly.
+It uses the constraint provider the job scored with, selected by
+`score_director.constraint_provider`. A job whose configuration sets
+`score_director.constraint_match_enabled = false` rejects analysis with
+`SolverManagerError::SnapshotAnalysisDisabled`; see
+[Score Director](/docs/solverforge/solver/configuration/#score-director).
 
 After `pause()` is accepted, `PauseRequested` is published before any later
 worker-side event already carrying `PauseRequested` state. Treat that ordering

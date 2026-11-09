@@ -11,14 +11,14 @@ static ROUTES: SolverManager<visits::RoutePlan> = SolverManager::new();
 
 pub fn run() {
     time_limits_add_up();
-    fallback_time_guard();
+    no_hidden_time_limit();
     omitted_phases_need_a_limit();
     cancel(Schedule::demo(24, 30));
 }
 
-/// The installed time guard of a retained run, read from its candidate-trace
-/// header: (effective limit in seconds, where it came from).
-fn installed_time_guard<S: solverforge::Solvable>(manager: &'static SolverManager<S>, solution: S, toml: &str) -> (f64, String) {
+/// The installed termination of a retained run, read from its candidate-trace
+/// header: (configured time limit in seconds or `None`, the composition).
+fn installed_termination<S: solverforge::Solvable>(manager: &'static SolverManager<S>, solution: S, toml: &str) -> (Option<f64>, String) {
     probe_config::set(SolverConfig::from_toml_str(toml).expect("probe config"));
     let (job_id, mut rx) = manager.solve(solution).expect("solver job should start");
     let event = terminal(&mut rx);
@@ -37,34 +37,36 @@ fn installed_time_guard<S: solverforge::Solvable>(manager: &'static SolverManage
             .value
             .clone()
     };
-    let nanos: f64 = attribute("effective_time_limit_ns").parse().expect("nanoseconds");
-    (nanos / 1e9, attribute("time_limit_source"))
+    let limit = attribute("configured_time_limit_ns");
+    let seconds = (limit != "none").then(|| limit.parse::<f64>().expect("nanoseconds") / 1e9);
+    (seconds, attribute("termination_composition"))
 }
 
-/// `seconds_spent_limit` and `minutes_spent_limit` are one budget: they add.
+/// `seconds_spent_limit` and `minutes_spent_limit` are one budget: they add,
+/// and every configured criterion is installed.
 fn time_limits_add_up() {
-    let (seconds, source) = installed_time_guard(
+    let (seconds, composition) = installed_termination(
         &PROBE,
         probe::Plan::demo(12),
         "[candidate_trace]\nmax_entries = 1\n\n[termination]\nminutes_spent_limit = 1\nseconds_spent_limit = 30\nstep_count_limit = 50\n",
     );
-    println!("minutes 1 + seconds 30 -> {seconds} s ({source})");
-    assert_eq!(seconds, 90.0);
-    assert_eq!(source, "configured");
+    println!("minutes 1 + seconds 30 -> {seconds:?} s ({composition})");
+    assert_eq!(seconds, Some(90.0));
+    assert_eq!(composition, "time_or_step_count");
 }
 
-/// A work criterion without a time limit runs under a fallback guard: 30 s on
-/// a scalar-only model, 60 s on a model with a list variable.
-fn fallback_time_guard() {
+/// A work criterion without a time limit installs no time limit, on a
+/// scalar-only model and on a model with a list variable.
+fn no_hidden_time_limit() {
     let toml = "[candidate_trace]\nmax_entries = 1\n\n[termination]\nstep_count_limit = 50\n";
-    let (scalar, source) = installed_time_guard(&PROBE, probe::Plan::demo(12), toml);
-    println!("step limit only, scalar model -> {scalar} s ({source})");
-    assert_eq!(scalar, 30.0);
-    assert_eq!(source, "configured_entrypoint_fallback");
-    let (list, source) = installed_time_guard(&ROUTES, visits::RoutePlan::demo(12), toml);
-    println!("step limit only, list model -> {list} s ({source})");
-    assert_eq!(list, 60.0);
-    assert_eq!(source, "configured_entrypoint_fallback");
+    let (scalar, composition) = installed_termination(&PROBE, probe::Plan::demo(12), toml);
+    println!("step limit only, scalar model -> time limit {scalar:?} ({composition})");
+    assert_eq!(scalar, None);
+    assert_eq!(composition, "step_count");
+    let (list, composition) = installed_termination(&ROUTES, visits::RoutePlan::demo(12), toml);
+    println!("step limit only, list model -> time limit {list:?} ({composition})");
+    assert_eq!(list, None);
+    assert_eq!(composition, "step_count");
 }
 
 /// With phases omitted, local search follows construction only when

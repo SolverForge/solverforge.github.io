@@ -56,7 +56,9 @@ Use union when the solver should search several independent neighborhoods in
 one local-search phase. Available union orders are `sequential`, `round_robin`,
 `rotating_round_robin`, `random`, and the default `stratified_random`. Child
 weights can be `equal`, `fixed` through a parallel `weights` vector, or derived
-from `candidate_count`.
+from `candidate_count`. A zero fixed weight disables its child, which is never
+opened and is left out of the union's size; at least one fixed weight must be
+positive.
 
 Union scheduling and leaf candidate ordering are separate policies. Each leaf
 can preserve `original` order, use seeded `random` or `shuffled` order, or use a

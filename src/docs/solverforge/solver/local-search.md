@@ -38,10 +38,17 @@ be selected explicitly; it is never inserted before default local search.
 
 ## Parallel Candidate Evaluation
 
-Set top-level `move_thread_count = { count = 4 }` to request four evaluators
-for compiled acceptor-forager local search. The effective count includes the
-main score director and is capped by the solve's Rayon pool and by 32.
-`auto` (the default), `none`, and counts 0 or 1 stay sequential.
+Top-level `move_thread_count` controls how compiled acceptor-forager local
+search evaluates candidates. The default `"auto"` uses up to four evaluators,
+bounded by the solve's Rayon pool, and decides per step whether to run
+sequentially or in parallel windows from the step's measured trial time, the
+previous step's candidate count, the calibrated cost of one window, and the
+last replica rebuild. It switches mode only after 8 consecutive steps favour
+the other one, and leaving parallel mode releases the replicas.
+`move_thread_count = { count = 4 }` runs every step in parallel windows on four
+evaluators, capped by the Rayon pool and by 32. `"none"` and `{ count = 1 }` stay sequential, and
+`{ count = 0 }` is a configuration error. Each count includes the main score
+director.
 
 The coordinator generates candidates serially in canonical order, evaluates a
 window on the main director and persistent replicas, then consumes results in
@@ -53,9 +60,11 @@ selected move advances every replica to the committed score. External writes
 to the working solution cause replicas to be rebuilt before further trials.
 
 At fixed work and seed, selectors with no cross-step stream state follow the
-sequential trajectory across evaluator counts. Ruin selectors with cross-step
-RNG streams and lazily activated providers observe speculative pulls, so their
-trajectory can depend on evaluator count; it is reproducible for a fixed count.
+sequential trajectory across evaluator counts, so `auto` changes how fast a
+step runs, not which move it selects. Ruin selectors with cross-step RNG
+streams and lazily activated providers observe speculative pulls, so their
+trajectory can depend on the evaluator count and on which steps ran in
+parallel windows; set `"none"` or a fixed count when such a run must repeat.
 A wall-clock-limited run need not return the same result across counts.
 
 `moves_evaluated`, `score_calculations`, and their termination limits count
@@ -64,9 +73,10 @@ score-calculation budgets. Trials evaluated ahead of the decision point but not
 consumed are recorded separately as `moves_speculative`, with candidate-trace
 disposition `DiscardedSpeculative`; they do not inflate consumed-work counters.
 
-This parallel path belongs to the compiled runtime. The lower-level phase that
+This parallel path belongs to the compiled runtime, including the child phases
+of a configured `partitioned_search`. The lower-level phase that
 `solverforge::local_search(...)` builds for custom search, VND, construction,
-exhaustive search, and partitioned child solves evaluate sequentially.
+and exhaustive search evaluate sequentially.
 
 ## Acceptor
 
@@ -78,7 +88,7 @@ The acceptor decides whether a scored candidate can be accepted.
 | `simulated_annealing` | allow controlled regressions while cooling |
 | `tabu_search` | avoid recently visited entities, values, or moves |
 | `late_acceptance` | compare against a historical score window |
-| `great_deluge` | compare against a decaying score boundary |
+| `great_deluge` | accept scores at or above a water level that rises each step |
 | `step_counting_hill_climbing` | hold a boundary for a fixed step interval |
 | `diversified_late_acceptance` | late acceptance with diversification pressure |
 
@@ -138,6 +148,18 @@ policy.
 type = "simulated_annealing"
 level_temperatures = [5.0, 500.0]
 hard_regression_policy = "temperature_controlled"
+```
+
+`level_temperatures` are ordered from highest-priority score level to
+lowest-priority score level. `hard_regression_policy` decides whether hard-score
+regressions can be temperature-controlled or are never accepted.
+
+Without `level_temperatures`, a `calibration` table samples candidate deltas
+and derives the temperatures per level:
+
+```toml
+[phases.acceptor]
+type = "simulated_annealing"
 
 [phases.acceptor.calibration]
 sample_size = 64
@@ -145,9 +167,11 @@ target_acceptance_probability = 0.75
 fallback_temperature = 2.0
 ```
 
-`level_temperatures` are ordered from highest-priority score level to
-lowest-priority score level. `hard_regression_policy` decides whether hard-score
-regressions can be temperature-controlled or are never accepted.
+The two are alternatives: setting both fails the solve at
+`phases[i].local_search.acceptor.calibration`.
+
+`step_counting_hill_climbing.step_count_limit` must be greater than 0, and
+`great_deluge.water_level_increase_ratio` must be positive and finite.
 
 ## Forager
 
@@ -189,7 +213,8 @@ For selector details, start with [Moves](/docs/solverforge/solver/moves/).
 Union selectors can use `sequential`, `round_robin`,
 `rotating_round_robin`, `random`, or `stratified_random` selection order.
 `stratified_random` is the default. Union scheduling can weight children
-equally, by an explicit fixed vector, or by declared candidate count.
+equally, by an explicit fixed vector, or by declared candidate count. A zero
+fixed weight disables its child; at least one fixed weight must be positive.
 
 Leaf selectors separately support `original`, seeded `random`, `shuffled`,
 `sorted`, and `probabilistic` ordering. Sorted and probabilistic leaves require
@@ -197,7 +222,8 @@ a registered named candidate metric. Omitted stock local search uses randomized
 leaves; a multi-family default uses a stratified-random union, while a single
 family uses sequential union order. The phase's seeded `score_tie_break`
 defaults to `random`; choose `first` only when first-equal behavior is part of
-the intended policy.
+the intended policy. VND phases honour the same setting among equally scored
+best improving moves.
 
 Assignment-backed grouped scalar selectors are regular local-search selectors.
 Use them when a model-owned `ScalarGroup::assignment(...)` should repair

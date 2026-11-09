@@ -33,7 +33,7 @@ Configuration has three levels:
 
 | Level | Scope | Typical owner |
 | ----- | ----- | ------------- |
-| Global config | environment mode, random seed, thread count, top-level termination, candidate tracing | app/operator |
+| Global config | environment mode, random seed, thread count, top-level termination, score director, candidate tracing | app/operator |
 | Phase config | construction, local search, score ties, VND via `local_search_type`, partitioned search, custom phase names, phase-specific termination | app/operator |
 | Model capabilities | candidate providers and metrics, nearby hooks, list operations/metadata, construction order keys, scalar groups | Rust model or binding |
 
@@ -165,14 +165,20 @@ Controls reproducibility and assertion levels.
 
 | Mode               | Description                                                         |
 | ------------------ | ------------------------------------------------------------------- |
-| `reproducible`     | Repeatable at fixed input, seed, evaluator count, and deterministic work limits; wall-clock budgets can change the result. |
-| `non_reproducible` | Non-deterministic — fastest mode for production use                 |
-| `fast_assert`      | Enables light assertions for debugging                              |
-| `full_assert`      | Enables all assertions — slowest, for development only              |
+| `non_reproducible` | Default. No checks; without `random_seed` each run draws its seed from the operating system. |
+| `reproducible`     | No checks; without `random_seed` the solve uses the fixed seed `REPRODUCIBLE_RANDOM_SEED`, so step- or move-bounded runs repeat exactly. Wall-clock budgets can still change the result. |
+| `fast_assert`      | As `reproducible`, plus every committed step and best-solution update is checked against a fresh full score calculation; drift panics. |
+| `full_assert`      | As `fast_assert`, plus every score-director calculation is checked, including each evaluated move on the main director and on evaluator replicas. Slowest; for development. |
 
 ```toml
 environment_mode = "non_reproducible"
 ```
+
+Every mode except `non_reproducible` seeds a solve without `random_seed` with
+`REPRODUCIBLE_RANDOM_SEED` (`0`). The assertion modes compare the kept score
+with a fresh full calculation and panic with a `score director drift` message
+that prints both scores; step-level checks also name the check, such as
+`after update_best_solution`.
 
 ### Move Thread Count
 
@@ -181,32 +187,84 @@ search, independently of partitioned search's `thread_count`.
 
 ```toml
 move_thread_count = { count = 4 }    # Request up to four evaluators
-# move_thread_count = "auto"         # Sequential (default)
+# move_thread_count = "auto"         # Default: sequential or parallel per step
 # move_thread_count = "none"         # Sequential
 ```
 
 The commented lines are alternative values for the same key; a file may set it
 once.
-`auto`, `none`, and explicit counts 0 or 1 use the sequential loop. A count of
-at least 2 resolves to `min(count, rayon::current_num_threads(), 32)` evaluators,
-including the main score director; the others are persistent replicas. The
-automatic policy stays sequential. A solve running in a one-thread Rayon pool
-therefore stays sequential even with a larger explicit count.
 
-Only compiled acceptor-forager local search uses this setting. Lower-level
-`LocalSearchPhase`, VND, construction, exhaustive search, and partitioned child
-solves evaluate sequentially. Candidate generation and acceptance stay ordered;
-parallel trials can pull candidates beyond the eventual decision point. See
+| Value | Acceptor-forager local search |
+| ----- | ----------------------------- |
+| `"auto"` (default) | up to `min(4, rayon::current_num_threads())` evaluators; each step runs sequentially or in parallel windows, whichever is faster by the step's measured trial time, the previous step's candidate count, the calibrated cost of one window, and the last replica rebuild |
+| `"none"` | sequential |
+| `{ count = 1 }` | sequential |
+| `{ count = N }`, N ≥ 2 | `min(N, rayon::current_num_threads(), 32)` evaluators |
+
+The evaluator count includes the main score director; each further evaluator
+holds a persistent replica, so `auto` forks at most three working-solution
+replicas. `auto` switches mode only after 8 consecutive steps favour the other
+one, and leaving parallel mode releases the replicas. `{ count = 0 }` is
+rejected when the configuration is read. The thread count is read when the
+local-search phase starts, on the Rayon pool it solves in, so a solve in a
+one-thread pool stays sequential under every value, and compiling a
+configuration starts no thread pool.
+
+Only compiled acceptor-forager local search uses this setting, including the
+child phases of a configured `partitioned_search`, which resolve it on the
+partition's pool. Lower-level `LocalSearchPhase`, VND, construction, and
+exhaustive search evaluate sequentially. Candidate generation and acceptance
+stay ordered; parallel trials can pull candidates beyond the eventual decision
+point. See
 [Parallel Candidate Evaluation](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
 for reproducibility, speculative work, and budget semantics.
 
 ### Random Seed
 
-Set a fixed seed when you want reproducible runs:
+`random_seed` fixes the seed in every environment mode, including
+`non_reproducible`:
 
 ```toml
 random_seed = 42
 ```
+
+Without it, `reproducible`, `fast_assert`, and `full_assert` use
+`REPRODUCIBLE_RANDOM_SEED`, and `non_reproducible` seeds each run from the
+operating system. `SolverConfig::resolved_random_seed()` returns the seed a
+solve uses, or `None` for an operating-system seed.
+
+### Score Director
+
+`[score_director]` selects the constraint provider a solve scores with and
+whether its snapshots can be analyzed:
+
+```toml
+[score_director]
+constraint_provider = "define_constraints"
+constraint_match_enabled = true
+```
+
+`constraint_provider` names a `constraints` or `constraint_provider` path as
+written in `#[planning_solution]`. When it is omitted, the solve scores with
+the `constraints` function. A solution declares further providers with the
+repeatable `constraint_provider = "path"` argument next to `constraints`. A
+name the solution does not declare fails the job before solving with
+`RuntimeBuildError::UnknownConstraintProvider`:
+
+<!-- sf-toml: expect="solve-error" message="unknown constraint provider `define_relaxed_constraints`" -->
+```toml
+[score_director]
+constraint_provider = "define_relaxed_constraints"
+```
+
+Each provider is its own monomorphized solve, and
+`SolverManager::analyze_snapshot` analyzes a job's snapshots with the provider
+the job scored with. `Analyzable::analyze` always uses the `constraints`
+function.
+
+`constraint_match_enabled` defaults to `true`. With `false`,
+`SolverManager::analyze_snapshot` fails for that job with
+`SolverManagerError::SnapshotAnalysisDisabled`.
 
 ### Candidate Trace
 
@@ -304,7 +362,8 @@ The acceptor decides whether a scored candidate can be accepted. The forager
 decides which accepted candidate is committed. The move selector decides which
 candidate moves are pulled. `score_tie_break = "random"` is the seeded default
 for equally scored best candidates; use `first` to retain the first equal best
-candidate instead.
+candidate instead. Variable neighborhood descent applies the same setting to
+equally scored best improving moves of a neighborhood.
 
 ### Move Selectors
 
@@ -349,7 +408,9 @@ Union selectors have their own scheduling policy. `selection_order` can be
 `sequential`, `round_robin`, `rotating_round_robin`, `random`, or the default
 `stratified_random`. `weighting` is `equal` by default, `fixed` with a `weights`
 vector, or `candidate_count` to derive child weights from declared candidate
-counts:
+counts. With `fixed`, a zero weight disables its child: the union never opens
+it and leaves it out of the union's size. At least one weight must be
+positive:
 
 ```toml
 [phases.move_selector]
@@ -424,9 +485,20 @@ Ranges are `1 <= min_sublist_size <= max_sublist_size`,
 `1 <= min_ruin_count <= max_ruin_count`, k-opt `k` from 2 to 5 with
 `min_segment_len >= 1`, and pillar sizes either both 0 (whole pillars) or
 `1 <= minimum_sub_pillar_size <= maximum_sub_pillar_size`. Acceptor and forager
-values are checked the same way: tabu and late-acceptance sizes and the
-accepted-count `limit` must be positive, and simulated annealing needs one
-temperature per score level.
+values are checked the same way: tabu and late-acceptance sizes, the
+accepted-count `limit`, and `step_counting_hill_climbing.step_count_limit`
+must be positive; `great_deluge.water_level_increase_ratio` must be positive
+and finite; simulated annealing needs one temperature per score level, and
+its `level_temperatures` and `calibration` are alternatives that cannot be set
+together.
+
+Construction keys are checked against the heuristic. `group_candidate_limit`
+requires `group_name`. List heuristics (`list_round_robin`,
+`list_cheapest_insertion`, `list_regret_insertion`, `list_clarke_wright`, and
+`list_k_opt`) reject `value_candidate_limit`, `group_candidate_limit`, and any
+`construction_obligation` other than the default. `k` is `2` by default;
+`list_k_opt` accepts 2 to 5, and every other heuristic rejects any value but
+`2`.
 
 Grouped scalar construction and grouped scalar local search use `group_name`
 when the model provides a scalar group through the generated model support
@@ -546,7 +618,33 @@ type = "partitioned_search"
 partitioner = "by_vehicle"
 thread_count = "auto"
 log_progress = true
+
+[[phases.child_phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "list_cheapest_insertion"
+
+[phases.termination]
+seconds_spent_limit = 20
 ```
+
+The search function registers the partitioner with
+`SearchBuilder::partitioner("by_vehicle", |context| partitioner)`, and the
+framework builds and runs the phase. Each partition is solved with the parent
+configuration, `child_phases` as its phases (an empty list runs the default
+phases), and a director forked over that partition. A child phase that does
+not compile fails the solve at its
+`phases[i].partitioned_search.child_phases[j]` path.
+
+`thread_count = "auto"` runs one thread per partition, up to the available
+cores and the partitioner's `recommended_partition_count`; `"none"` runs one
+thread, and `{ count = N }` (N ≥ 1) at most N. The phase's `termination`
+bounds the partitions: its time limit, counted from the phase's start, holds
+for all partitions, and its `step_count_limit` for each partition's solve. A
+partition that reaches the bound keeps its best solution, the partitions are
+merged, and the solve continues with the next phase. `best_score_limit`,
+`unimproved_step_count_limit`, and `unimproved_seconds_spent_limit` need the
+merged solution's score, so a `partitioned_search` termination that sets one
+fails the solve at its `phases[i].partitioned_search.termination.<key>` path.
 
 Custom phases are also compiled into the solution with
 `#[planning_solution(search = "...")]` and selected by name:
@@ -575,7 +673,9 @@ construction_obligation = "assign_when_candidate_exists"
 
 ### Termination
 
-Controls when the solver stops. See [Termination](/docs/solverforge/solver/termination/) for all options.
+Controls when the solver stops. Every configured criterion applies, and the
+first one reached stops the solve; nothing is added that the file does not
+set. See [Termination](/docs/solverforge/solver/termination/) for all options.
 
 ```toml
 [termination]
@@ -632,6 +732,18 @@ config the job runs. Decorate the base config rather than replace it, unless
 the callback loads a file of its own. `with_termination_seconds` sets
 `seconds_spent_limit` and keeps the other termination keys, so with the example
 file above a solution with `time_limit_secs = 2` stops after two seconds.
+
+## Runtime Overrides
+
+`SolverConfigOverride` changes a configuration at run time without editing
+it. `SolverConfig::with_override(&overrides)` replaces each field the override
+sets. Its one field is `termination`, which replaces the solver-level
+`[termination]` and leaves phase terminations unchanged.
+`SolverConfigOverride::with_termination(termination)` builds one.
+`SolverManager::solve_with_override(solution, overrides)` starts a retained job
+whose solve applies the override after the embedded `solver.toml` and the
+`config` callback, before it builds its phases and termination. Jobs started
+with `solve(...)` run their configuration unchanged.
 
 ## See Also
 

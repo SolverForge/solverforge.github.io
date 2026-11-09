@@ -1,4 +1,4 @@
-//! Runs the solver documentation against crates.io solverforge 0.24.0.
+//! Runs the solver documentation against crates.io solverforge 0.25.0.
 //!
 //!   solver-config-fixture check <scalar|grouped|visits|operations|parse> <block.toml>
 //!   solver-config-fixture scenario <name>

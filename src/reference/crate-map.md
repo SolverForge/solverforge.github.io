@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.24.0` crate and its
+This map is aligned with the published `solverforge 0.25.0` crate and its
 release workspace. The facade does not re-export `solverforge-bridge`, and
 `solverforge::console` (behind the `console` feature) exposes only `init()`;
 depend on those crates directly for anything else.
@@ -28,7 +28,9 @@ cross-join `.group_by(|left, right| key, collector)`, cross-join
 `.project(|left, right| row)` projected scoring, row-aware chained cross joins
 through `Bi`, `Tri`, `Quad`, `Penta`, and an arity-free `Chain`, direct cross-join grouped
 complements, symmetric and directed projected self-joins, projected grouped
-complements, score weight helpers such as `fixed_weight` and `hard_weight`,
+complements, the `ConstraintWeight` trait every `penalize`/`reward` weight
+implements with its `FixedWeight`/`fixed_weight` and `HardWeight`/`hard_weight`
+wrappers,
 collector helpers such as `count`, `sum`, `load_balance`, `consecutive_runs`,
 `collect_vec`, and `indexed_presence`, plus advanced grouped-scalar assignment,
 conflict-repair extension types, phase and move-label telemetry, bounded
@@ -133,19 +135,24 @@ kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.24.0/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.25.0/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Parallel Evaluation and Dynamic Scores
 
 The compiled runtime evaluates acceptor-forager local-search windows on the
-main score director plus persistent replicas when `move_thread_count` requests
-at least two evaluators. The count is capped by the solve's Rayon pool and by
-32; `auto` remains sequential. The scoring crate exports `DirectorDescriptor`
-and `ReplicaDescriptor` for a borrowed descriptor plus `fn(&S) -> C`
-constraint-set constructor. `ScoreDirector<S, C, Desc = SolutionDescriptor>`
-forks initialized evaluators through `Director::fork_replica()` only when using
-that replica descriptor. Configured native and bridge entry points accept the
+main score director plus persistent replicas. The default
+`move_thread_count = "auto"` uses up to four evaluators and chooses sequential
+or parallel evaluation per step from measured costs; `{ count = N }` uses up to
+N, capped by the solve's Rayon pool and by 32; `"none"` is sequential. The
+scoring crate exports `DirectorDescriptor` and `ReplicaDescriptor` for a
+borrowed descriptor plus `fn(&S) -> C` constraint-set constructor.
+`ScoreDirector<S, C, Desc = SolutionDescriptor>` forks initialized evaluators
+through `Director::fork_replica()` only when using that replica descriptor.
+`Director::fork_for_solution(solution)` builds an independent director of the
+same kind over another solution, leaving its incremental state to initialize
+on first scoring; configured partitioned search uses it to give each partition
+its own director. Both return `None` for owned-descriptor directors. Configured native and bridge entry points accept the
 constructor and share the same runtime path. See
 [Extend the Solver](/reference/extend-solver/#evaluator-replicas-and-solve-entry-points).
 

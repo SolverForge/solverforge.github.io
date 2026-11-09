@@ -115,7 +115,12 @@ Custom search is compiled into the solution with
 `#[planning_solution(search = "...")]`; `solver.toml` names registered phases
 instead of loading arbitrary runtime classes. Partitioned search similarly
 requires a typed `SolutionPartitioner`, not a partition count guessed from the
-outside.
+outside: the search function registers it with
+`SearchBuilder::partitioner(name, |context| partitioner)`, and the framework
+builds and runs the `partitioned_search` phase that names it.
+`SolutionPartitioner::recommended_partition_count` returns
+`Option<NonZeroUsize>` and caps `thread_count = "auto"`;
+`FunctionalPartitioner::with_recommended_count` takes a `NonZeroUsize`.
 
 ## Committed Mutation and Extension Contracts
 
@@ -183,17 +188,22 @@ for the scoring model.
 ### Evaluator Replicas and Solve Entry Points
 
 Compiled acceptor-forager local search uses top-level `move_thread_count` for
-ordered parallel trials. `auto`, `none`, and counts 0 or 1 stay sequential;
-larger counts are capped by the solve's Rayon pool and one 32-candidate window.
-The main director counts as one evaluator. VND, lower-level `LocalSearchPhase`,
-construction, exhaustive search, and partitioned children remain sequential.
+ordered parallel trials. The default `auto` uses up to four evaluators and
+chooses sequential or parallel windows per step from measured costs; `none` and
+`{ count = 1 }` stay sequential; larger counts are capped by the solve's Rayon
+pool and one 32-candidate window; `{ count = 0 }` is a configuration error. The
+main director counts as one evaluator. The child phases of a configured
+partitioned search follow the same setting. VND, lower-level
+`LocalSearchPhase`, construction, and exhaustive search remain sequential.
 See [Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
 before making cross-count reproducibility assumptions about ruin or lazy sources.
 
-The configured `try_run_solver_with_config_and_search` entry point and bridge
-runner accept a constraint-set constructor `fn(&S) -> C`, not an already-built
-set. Each replica clones the working solution and constructs independent
-constraint state from it. Macro-generated solves supply that constructor.
+The configured `try_run_solver_with_config_and_search` entry point accepts a
+constraint-set constructor `fn(&S) -> C`, not an already-built set; the bridge
+runner accepts named `DynamicConstraintProvider` values that each carry one.
+Each replica clones the working solution and constructs independent
+constraint state from it. Macro-generated solves supply the constructor of the
+provider `score_director.constraint_provider` selects.
 
 For lower-level scoring, `ScoreDirector<S, C, Desc = SolutionDescriptor>` accepts
 an owned descriptor or a `ReplicaDescriptor::new(&descriptor, constraints)` via
@@ -201,7 +211,11 @@ an owned descriptor or a `ReplicaDescriptor::new(&descriptor, constraints)` via
 at 1; `new_weighted` and `with_descriptor_weighted` apply the solution's bound
 constraint weights. `Director::fork_replica()` returns an initialized independent
 replica only for the borrowed replica descriptor; owned-descriptor directors
-return `None`. `DirectorDescriptor` and `ReplicaDescriptor` are exported by
+return `None`. `Director::fork_for_solution(solution)` forks the same way over
+another solution without initializing its incremental state, so a partition
+initializes on the thread that solves it. `Director::set_score_assertion`,
+which `environment_mode = "full_assert"` turns on, makes a `ScoreDirector` and
+its replicas compare every score calculation with a fresh one. `DirectorDescriptor` and `ReplicaDescriptor` are exported by
 `solverforge-scoring`; they are not a second configured solve path.
 
 ### List-Shadow Notifications

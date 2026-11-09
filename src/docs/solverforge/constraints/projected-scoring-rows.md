@@ -101,7 +101,10 @@ Streams::new()
     .named("Projected overtime")
 ```
 
-`MAX_EMITS` is part of the contract. Avoid returning `Vec` from projection
+`MAX_EMITS` is part of the contract. Set it to the real maximum number of rows
+one source row can emit: retained state sizes each source row's row list by
+`MAX_EMITS`, and a projection that emits more rows for one input panics, naming
+the projection and both counts. Avoid returning `Vec` from projection
 closures; the scoring layer expects bounded emission through `ProjectionSink`.
 
 ## Joined-Pair Projection

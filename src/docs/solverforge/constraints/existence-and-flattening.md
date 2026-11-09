@@ -152,7 +152,7 @@ even when several right-side contributions change its count.
 Growth is still possible when a key exceeds the current table length; this is
 not an allocation-free update guarantee. Hash-key storage and the public
 existence methods are unchanged. See the
-[tagged count-state implementation](https://github.com/SolverForge/solverforge/blob/v0.24.0/crates/solverforge-scoring/src/stream/relational/count_state.rs).
+[tagged count-state implementation](https://github.com/SolverForge/solverforge/blob/v0.25.0/crates/solverforge-scoring/src/stream/relational/count_state.rs).
 
 These are internal representation and allocation changes, not a change to
 membership: semi/anti joins still publish left rows according to whether any

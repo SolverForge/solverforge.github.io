@@ -170,7 +170,7 @@ for scoring; the collection itself is not cloned.
 
 ## Complete runnable example
 
-In a binary crate with `cargo add solverforge@=0.24.0`, save this listing as
+In a binary crate with `cargo add solverforge@=0.25.0`, save this listing as
 `src/main.rs`. Run it with `cargo run`. `check()` covers
 uniform and mixed groups, duplicate values, unassigned and empty input,
 separate shift IDs, exact shared blocks, different times and locations, overlap,
@@ -368,4 +368,4 @@ The joined tri/quad/penta grouped builder exposes `penalize` and `reward`, not
 
 - [Constraint Streams](/docs/solverforge/constraints/constraint-streams/) — fluent operations and boundaries
 - [Collectors](/docs/solverforge/constraints/collectors/) — collector input and result shapes
-- [Tagged joined-group implementation](https://github.com/SolverForge/solverforge/blob/v0.24.0/crates/solverforge-scoring/src/stream/group_by_tri.rs)
+- [Tagged joined-group implementation](https://github.com/SolverForge/solverforge/blob/v0.25.0/crates/solverforge-scoring/src/stream/group_by_tri.rs)

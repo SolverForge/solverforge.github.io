@@ -93,7 +93,12 @@ Each `ConstraintAnalysis` contains:
 | `match_count`       | Number of times the constraint matched                          |
 
 `solution.analyze()` returns this summarized view: totals per constraint, not
-the individual matches. For per-match justifications, use the lower-level
+the individual matches. It always scores with the solution's `constraints`
+function. A retained job's `SolverManager::analyze_snapshot` instead uses the
+provider the job scored with (`score_director.constraint_provider`), and fails
+with `SnapshotAnalysisDisabled` when the job ran with
+`score_director.constraint_match_enabled = false`; see
+[Score Director](/docs/solverforge/solver/configuration/#score-director). For per-match justifications, use the lower-level
 `solverforge::analysis` and `solverforge-scoring` APIs directly.
 
 Lower-level scoring metadata uses `ConstraintRef` as the constraint identity.
@@ -114,7 +119,8 @@ Direct pair, chained-join, existence, flattened, unary complemented, and grouped
 terminals use `OperatorTerminal`; a `#[solverforge_constraints]` chain of
 grouped terminals finalizes them onto one shared operator owner through
 `SharedOperatorTerminal`, keeping each named terminal's score, metadata, and
-explanation independent. It retains signed scores by row handle and borrows the
+explanation independent. That shared owner is a grouped operator
+(`GroupedOperator`). It retains signed scores by row handle and borrows the
 complete operator row for scoring and explanation; it does not retain borrowed
 entities or solution references. This execution change does not merge terminal
 identities or change the summarized `solution.analyze()` API.

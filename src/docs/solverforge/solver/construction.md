@@ -126,6 +126,14 @@ value_candidate_limit = 32
 `cheapest_insertion` for scalar construction requires one bounded candidate
 source: either `candidate_values` on the model or a config candidate limit.
 
+`value_candidate_limit`, `group_candidate_limit`, and `construction_obligation`
+shape scalar construction only. A list heuristic (`list_round_robin`,
+`list_cheapest_insertion`, `list_regret_insertion`, `list_clarke_wright`, or
+`list_k_opt`) that sets either limit, or a `construction_obligation` other than
+the default, fails the solve at that key's path. `list_k_opt` accepts `k` from
+2 to 5 and polishes each route with that k-opt; every other heuristic rejects
+any `k` but the default `2`.
+
 ## Construction Order Keys
 
 Scalar construction heuristics that sort entities or values declare those
@@ -308,8 +316,9 @@ group_candidate_limit = 128
 
 `group_name` selects a named model-provided `ScalarGroup`.
 `group_candidate_limit` caps normalized grouped candidates after SolverForge
-removes illegal, duplicate, no-op, and non-frontier edits. Config limits
-override model-owned `ScalarGroup::with_limits(...)` values.
+removes illegal, duplicate, no-op, and non-frontier edits, and requires
+`group_name`. Config limits override model-owned
+`ScalarGroup::with_limits(...)` values.
 
 ## See Also
 

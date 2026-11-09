@@ -180,10 +180,12 @@ costs one bucket out and one bucket in.
 
 A kept score is only correct if every change is reported. Moves report their
 changes through the protocol above. Set `environment_mode = "full_assert"` in
-`solver.toml` to check that while you develop: at its scoring checkpoints,
-including every new best solution, the solver re-evaluates the whole solution
-from scratch and stops on the first difference, naming the checkpoint where the
-kept score drifted.
+`solver.toml` to check that while you develop: every score calculation,
+including each evaluated move and every new best solution, is compared with a
+from-scratch evaluation of the whole solution, and the solver panics on the
+first difference with a `score director drift` message that prints both
+scores. `fast_assert` runs the cheaper part of that check, at committed steps
+and best-solution updates only.
 
 [Score analysis](/docs/solverforge/constraints/score-analysis/) reads the same
 constraints: the score and match count of each named constraint.

@@ -85,7 +85,9 @@ accumulator through the shared relational terminals.
 `SharedNodeDiagnostics`, `SharedNodeId`, and `SharedNodeOperation` are public
 diagnostic vocabulary for shared-node reporting. They describe the node kind,
 terminal consumers, update count, and changed-key count without exposing the
-shared operator internals as modeling API.
+shared operator internals as modeling API. `update_count` counts notifications
+that changed at least one row; `changed_key_count` sums the group keys each
+notification changed.
 
 ## Boundaries
 

@@ -72,7 +72,7 @@ A change to the solution, such as swapping two assignments or changing a single 
 One iteration of the optimization algorithm, consisting of selecting and applying a move.
 
 ### Termination
-The condition that stops the solver (time limit, score target, no improvement, etc.).
+The condition that stops the solver (time limit, score target, no improvement, etc.). Every configured criterion applies; the first one reached stops the solve.
 
 ## Advanced Concepts
 

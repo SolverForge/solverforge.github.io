@@ -45,7 +45,7 @@ fn from_string() {
     "#).expect("config should parse");
     // end page
     assert_eq!(config.environment_mode, EnvironmentMode::Reproducible);
-    assert_eq!(config.move_thread_count, MoveThreadCount::Count(4));
+    assert_eq!(config.move_thread_count, MoveThreadCount::Count(std::num::NonZeroUsize::new(4).unwrap()));
     assert_eq!(config.time_limit(), Some(Duration::from_secs(120)));
     assert_eq!(config.phases.len(), 2);
 }

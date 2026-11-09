@@ -29,6 +29,8 @@ seconds_spent_limit = 300           # Stop after 5 minutes
 
 `minutes_spent_limit` sets the same budget in minutes. The two keys add up:
 `minutes_spent_limit = 1` with `seconds_spent_limit = 30` is a 90-second limit.
+The sum saturates instead of overflowing. A value of `0` is a zero time limit,
+not "no limit".
 
 ### Step-Based
 
@@ -53,14 +55,14 @@ or for a duration:
 unimproved_seconds_spent_limit = 60        # No improvement for 60s
 ```
 
-### Fallback Time Guard
+### No Hidden Time Limit
 
-A step, unimproved, or score criterion without `seconds_spent_limit` or
-`minutes_spent_limit` still runs under a time guard: 30 seconds for a model
-with only scalar variables, 60 seconds for a model with a list variable.
-`step_count_limit = 100000` alone therefore stops after 100000 steps or 30
-seconds on a scalar model, whichever comes first. Set a time limit to choose
-the guard yourself.
+Nothing is added that the configuration does not set. A step, unimproved, or
+score criterion without `seconds_spent_limit` or `minutes_spent_limit` runs
+without a time limit: `step_count_limit = 100000` alone stops after 100000
+steps however long they take, and a `best_score_limit` that is never reached
+runs until the phases end or the job is cancelled. Add a time limit when the
+solve must also stop on the clock.
 
 ### Score-Based
 
@@ -73,19 +75,25 @@ best_score_limit = "0hard/-100soft"    # Stop when feasible with soft ≥ -100
 
 ## Composite Termination
 
-The configured parser combines a time limit with one selected score/work
-criterion. It chooses the first criterion present in this order:
-`best_score_limit`, `step_count_limit`, `unimproved_step_count_limit`, then
-`unimproved_seconds_spent_limit`. It does not OR every populated field
-together. The time guard and selected criterion stop the solver when **either**
-is met:
+Every configured criterion applies, combined with OR: the solve stops at
+whichever is reached first. Phase-level `termination` tables combine their
+criteria the same way.
 
 ```toml
 [termination]
 seconds_spent_limit = 300
 best_score_limit = "0hard/0soft"
-# Stops after 5 minutes OR when a perfect score is found
+unimproved_step_count_limit = 10000
+# Stops after 5 minutes, at a perfect score, or after 10k unimproved steps
 ```
+
+The candidate trace header records the installed policy as
+`solverforge.execution_policy`: one attribute per criterion
+(`configured_time_limit_ns`, `best_score_limit`, `step_count_limit`,
+`unimproved_step_count_limit`, `unimproved_time_limit_ns`, each `none` when
+unset) and `termination_composition`, which names every installed criterion,
+for example `time_or_best_score_or_unimproved_step_count`, or `unbounded`
+when none is set.
 
 A `best_score_limit` must parse as the model's score type. One that does not
 fails the job before any phase runs, naming the key:
@@ -122,6 +130,10 @@ committed step scores at the same boundary. Mandatory omitted construction does
 not install a phase-local overlay, so required completion remains governed by
 the retained lifecycle rather than an accidental internal cutoff.
 
+A `partitioned_search` phase's termination bounds its partitions instead: only
+time and step count limits are accepted there. See
+[Partitioned And Custom Search](/docs/solverforge/solver/configuration/#partitioned-and-custom-search).
+
 ## Parallel Evaluation Budgets
 
 In compiled acceptor-forager local search, move-count and score-calculation
@@ -148,6 +160,10 @@ MANAGER.cancel(job_id).expect("cancel should be accepted");
 ```
 
 The job's event stream then ends with `SolverEvent::Cancelled`.
+
+To give one retained job a different solver-level termination, start it with
+`SolverManager::solve_with_override(solution, SolverConfigOverride::with_termination(termination))`;
+see [Runtime Overrides](/docs/solverforge/solver/configuration/#runtime-overrides).
 
 Configured limits remain binding during mandatory scalar and list construction.
 Their terminal result depends on whether the solution is structurally complete:

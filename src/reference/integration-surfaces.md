@@ -42,9 +42,15 @@ search graph before candidate work starts. Binding layers should surface a
 declaration, compilation, preparation, or execution error rather than install a
 parallel phase builder or fallback runner.
 
-The configured native entry point and
-`try_run_dynamic_solver_with_config_parts` take a constraint-set constructor
+The configured native entry point takes a constraint-set constructor
 `fn(&S) -> C`, called for the working solution and every evaluator replica.
+`try_run_dynamic_solver_with_config_parts` takes a slice of
+`DynamicConstraintProvider { name, constraints, analyze }` values instead:
+`score_director.constraint_provider` selects one by `name` (the first when it
+is omitted), its `constraints` constructor builds each evaluator's constraint
+state, and its `analyze` function backs `SolverManager::analyze_snapshot` for
+the job. A name no provider carries fails the solve with
+`RuntimeBuildError::UnknownConstraintProvider`.
 Parallel candidate scoring uses independent constraint state while preserving
 coordinator acceptance order. A binding with a host global lock must release
 it on the calling thread for the duration of the solve, or worker callbacks
@@ -65,8 +71,9 @@ problem; Rust still owns the indexed working state, compiled search graph,
 cursor execution, safe native score specializations, snapshots, retained jobs,
 candidate traces, and embedded shared UI asset bytes. The
 [Python docs](/docs/solverforge-python/) state the core release the published
-package pins. An explicit `move_thread_count`
-enables upstream acceptor-forager evaluator replicas; `auto` stays sequential.
+package pins, and the binding follows that core's `move_thread_count`
+semantics: on the pinned core, an explicit count enables acceptor-forager
+evaluator replicas and `auto` evaluates sequentially.
 `Solver.solve` releases the GIL while workers attach to execute callbacks.
 Optional attribute probes preserve non-`AttributeError` failures, including
 `KeyboardInterrupt`. Callback errors use the binding's Python exception or

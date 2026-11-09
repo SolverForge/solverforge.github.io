@@ -44,7 +44,7 @@ before any eligible or explicitly configured local search.
 | `list_cheapest_insertion`      | Inserts each element at the score-minimizing position (list variables).                                                                                                |
 | `list_regret_insertion`        | Inserts elements in order of highest placement regret (list variables).                                                                                                |
 | `list_clarke_wright`           | Greedy route merging by savings value (list variables).                                                                                                                |
-| `list_k_opt`                   | Per-route k-opt polishing (list variables).                                                                                                                            |
+| `list_k_opt`                   | Per-route k-opt polishing (list variables); `k` from 2 (the default, 2-opt) to 5. Each route applies improving, route-feasible reconnections by route distance until none is left. |
 
 ```toml
 [[phases]]
@@ -103,9 +103,10 @@ Long phases publish metadata-only pulses. Pause and
 cancel settle both inside large candidate work and around phase/terminal hooks;
 paused time is excluded from active phase elapsed time.
 
-Compiled acceptor-forager local search supports ordered parallel evaluation
-through top-level `move_thread_count`; VND and other phase families remain
-sequential. See [Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
+Compiled acceptor-forager local search evaluates candidates in ordered
+parallel windows according to top-level `move_thread_count`; the default
+`auto` chooses sequential or parallel evaluation per step. VND and other phase
+families evaluate sequentially. See [Local Search](/docs/solverforge/solver/local-search/#parallel-candidate-evaluation)
 for evaluator ceilings, speculative work, and reproducibility boundaries.
 
 ### Acceptors
@@ -182,18 +183,15 @@ rematches.
 type = "simulated_annealing"
 level_temperatures = [5.0, 500.0]
 hard_regression_policy = "temperature_controlled"
-
-[phases.acceptor.calibration]
-sample_size = 64
-target_acceptance_probability = 0.75
-fallback_temperature = 2.0
 ```
 
 Simulated annealing is score-level aware. `level_temperatures` are ordered from
-highest-priority score level to lowest; if they are omitted, calibration can
-sample candidate deltas and derive temperatures per level. Once the configured
-temperature cools to the hill-climbing threshold, worsening moves are rejected
-deterministically.
+highest-priority score level to lowest. Without them, a
+`[phases.acceptor.calibration]` table (`sample_size`,
+`target_acceptance_probability`, `fallback_temperature`) samples candidate
+deltas and derives temperatures per level; setting both is a configuration
+error. Once the configured temperature cools to the hill-climbing threshold,
+worsening moves are rejected deterministically.
 
 **Tabu Search:**
 
@@ -216,7 +214,10 @@ late_acceptance_size = 400
 
 Variable Neighborhood Descent is an ordered-neighborhood local-search type. It
 runs several neighborhoods in sequence and restarts from the first neighborhood
-whenever an improvement is found.
+whenever an improvement is found. Among equally scored best improving moves of
+a neighborhood, the phase's `score_tie_break` decides: the default `random`
+picks one with the step's seeded reservoir selection, and `first` keeps the
+first found.
 
 ```toml
 [[phases]]
@@ -268,7 +269,9 @@ name = "small_exact_search"
 
 Partitioned search is available when the application provides a typed
 `SolutionPartitioner` that splits and merges independent subproblems. SolverForge
-does not infer safe partitions from a count.
+does not infer safe partitions from a count. The solution's search function
+registers the partitioner by name with `SearchBuilder::partitioner`, and the
+framework builds and runs the phase from this configuration:
 
 ```toml
 [[phases]]
@@ -278,10 +281,18 @@ thread_count = "auto"
 log_progress = true
 ```
 
-Partition children inherit cancellation, remaining time, environment mode,
-in-phase limits, and deterministic child seeds. Retained-job publication stays
-on the parent full-solution scope; pause checkpoints are emitted only by the
-parent.
+Each partition is solved by its own runner, compiled from the solve's
+configuration with `child_phases` as its phases (empty runs the default
+phases), over a director forked for that partition. `thread_count = "auto"`
+runs one thread per partition, at most one per available core and at most the
+partitioner's `recommended_partition_count`. The phase's `termination` accepts
+time and step count limits, which bound the partitions; reaching one merges
+the partitions and continues with the next phase. Partition children inherit
+cancellation, remaining time, environment mode, in-phase limits, and
+deterministic child seeds. Retained-job publication stays on the parent
+full-solution scope; pause checkpoints are emitted only by the parent. See
+[Partitioned And Custom Search](/docs/solverforge/solver/configuration/#partitioned-and-custom-search)
+for every key.
 
 ## Typical Phase Configuration
 

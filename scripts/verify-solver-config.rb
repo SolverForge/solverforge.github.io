@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Holds the solver docs to what crates.io solverforge 0.24.0 does.
+# Holds the solver docs to what crates.io solverforge 0.25.0 does.
 #
 # Every ```toml block on the solver pages is parsed with
 # `SolverConfig::from_toml_str` by the fixture crate in
-# scripts/fixtures/solver-config (solverforge = "=0.24.0"), then solved on a
+# scripts/fixtures/solver-config (solverforge = "=0.25.0"), then solved on a
 # fixed model that owns the variables the block names, so a missing field, a
 # repeated key, an unknown key, or a variable name the model does not have
 # fails here. Every ```rust block on those pages must be verbatim in the
@@ -44,8 +44,8 @@ SCENARIOS = {
   "configuration" => ["SolverConfig parsing, builders, solver_toml, and the config callback", []],
   "config-load" => ["SolverConfig::load reads the page's example solver.toml from the working directory", []],
   "cwd-ignored" => ["a solver.toml in the working directory is not read by a retained solve", []],
-  "termination" => ["time limits add up, the fallback guard, omitted phases, cancel",
-                    ["minutes 1 + seconds 30 -> 90 s (configured)"]],
+  "termination" => ["time limits add up, no hidden time limit, omitted phases, cancel",
+                    ["minutes 1 + seconds 30 -> Some(90.0) s (time_or_step_count)"]],
   "solver-manager" => ["events, status, pause -> Paused -> resume, problem change, snapshots, analysis, cancel, delete",
                        ["completed with reason Some(TerminatedByConfig)", "paused at snapshot Some("]]
 }.freeze
@@ -225,7 +225,7 @@ def build_fixture(target)
   _, status = Open3.capture2e("cargo", "--version")
   fail!("cargo is required for the live run") unless status.success?
 
-  log "Building the fixture against crates.io solverforge =0.24.0"
+  log "Building the fixture against crates.io solverforge =0.25.0"
   output, status = cargo!("build", "--locked", "--quiet", chdir: FIXTURE, env: { "CARGO_TARGET_DIR" => target })
   fail!("fixture build failed:\n#{output}") unless status.success?
   binary = File.join(target, "debug", "solver-config-fixture")

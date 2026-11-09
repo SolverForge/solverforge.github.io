@@ -41,8 +41,9 @@ dynamic models therefore use the same compiled lifecycle. Explicit generic
 `FirstFit` and `CheapestInsertion` handle matching list work. Omitted phases use
 state-aware defaults, including matching specialized list construction and
 required/optional assignment passes; default local search is eligible only
-with an effective parsed top-level termination limit. Missing termination, an
-empty object, or invalid score-only termination stays construction-only.
+with an effective parsed top-level termination limit. Missing termination or an
+empty object stays construction-only; a `best_score_limit` that does not parse
+as the model's score fails the solve.
 
 ## Fast rules of thumb
 
