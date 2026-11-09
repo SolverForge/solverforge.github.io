@@ -111,10 +111,12 @@ solverforge connect --port 8080
 
 ## Parallel Evaluation
 
-The MCP shell uses the same app-wide `solver.toml` as the other shells. Run
-`solverforge config set move_thread_count.count 4`, then rebuild the app to
-opt in. Construction stays sequential and every job shares the process's
-Rayon pool. See [Configuration](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
+The MCP shell uses the same app-wide `solver.toml` as the other shells. The
+default `"auto"` may evaluate local search on up to four evaluators; run
+`solverforge config set move_thread_count.count 4` to fix the count, or set
+`move_thread_count = "none"` to keep it sequential, then rebuild the app.
+Construction stays sequential and every job shares the process's Rayon
+pool. See [Configuration](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
 for accepted forms and evaluator caps. Parallel workers do not change the
 stdio transport contract: stdout is reserved for JSON-RPC.
 

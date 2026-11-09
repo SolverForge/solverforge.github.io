@@ -32,10 +32,10 @@ PAGE_URL = "/docs/getting-started/solverforge-hospital-use-case/"
 RENDERED = File.join(SITE_ROOT, "output", PAGE_URL, "index.html")
 
 # The published artifacts this page documents.
-CLI_VERSION = "3.8.3"
-RUNTIME_VERSION = "0.24.0"
+CLI_VERSION = "3.9.0"
+RUNTIME_VERSION = "0.25.0"
 UI_VERSION = "0.9.0"
-APP_VERSION = "3.0.0"
+APP_VERSION = "3.0.1"
 SPACE_URL = "https://huggingface.co/spaces/SolverForge/solverforge-hospital"
 
 SCAFFOLD_SECTIONS = ["Getting Started", "Build the App from the Scaffold"].freeze

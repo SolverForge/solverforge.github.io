@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and build a small dispatcher from the neutral
   scaffold, then solve it
 - run the complete FSR app from its Hugging Face Space repository
-- read the finished app's SolverForge 0.24.0 dependency shape
+- read the finished app's SolverForge 0.25.0 dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -88,7 +88,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.8.3`, which scaffolds `solverforge 0.24.0`,
+This page uses `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0`,
 `solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Dispatcher from the CLI
@@ -654,13 +654,13 @@ Current dataset shape:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-fsr@3.0.1` release targets the published SolverForge
-0.24.0 line:
+The tagged `solverforge-fsr@3.0.2` release targets the published SolverForge
+0.25.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.24.0", features = ["serde", "console", "verbose-logging"] }
-solverforge-core = "0.24.0"
+solverforge = { version = "0.25.0", features = ["serde", "console", "verbose-logging"] }
+solverforge-core = "0.25.0"
 solverforge-ui = { version = "0.9.0" }
 solverforge-maps = { version = "2.1.5" }
 # Web server
@@ -685,7 +685,7 @@ stock `ConstraintFactory` streams over `TechnicianRoute` rows and route shadow
 values; most applications only need the top-level `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-The finished app records `solverforge 0.24.0` as its runtime while keeping the
+The finished app records `solverforge 0.25.0` as its runtime while keeping the
 `2.2.2` CLI version it was first scaffolded with:
 
 ```toml
@@ -696,8 +696,8 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.24.0"
-runtime_source = "crates.io: solverforge 0.24.0"
+target = "solverforge 0.25.0"
+runtime_source = "crates.io: solverforge 0.25.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -1208,7 +1208,7 @@ curl http://localhost:7860/demo-data
 
 | Topic | File |
 | ----- | ---- |
-| Tagged app release | `solverforge-fsr@3.0.1` |
+| Tagged app release | `solverforge-fsr@3.0.2` |
 | App contract | `solverforge.app.toml` |
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |

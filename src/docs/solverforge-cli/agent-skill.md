@@ -121,11 +121,12 @@ rescans skill directories.
 
 ## Parallel Evaluation Guidance
 
-The modeling skill documents opt-in parallel local-search evaluation through
-`solverforge config set move_thread_count.count 4`. It keeps the neutral
-scaffold sequential, explains the shared Rayon pool and 32-evaluator cap, and
-uses fixed-work parity rather than promising better scores or speedups from a
-larger count. See [Configuration](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
+The modeling skill documents parallel local-search evaluation: the runtime
+default `"auto"` uses up to four evaluators and stays sequential on steps where
+parallel windows would not pay off, `"none"` forces sequential evaluation, and
+`solverforge config set move_thread_count.count 4` fixes the evaluator count.
+It explains the shared Rayon pool and 32-evaluator cap, and uses fixed-work
+parity rather than promising better scores or speedups from a larger count. See [Configuration](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
 for the app-wide build-time setting.
 
 ## Solve Smoke Test

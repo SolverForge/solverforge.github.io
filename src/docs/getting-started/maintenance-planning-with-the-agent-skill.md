@@ -53,7 +53,7 @@ so every step below can also be done by hand with the
 ## Before You Start
 
 - Rust stable `1.95+` and Cargo
-- `solverforge-cli 3.8.3`, which scaffolds `solverforge 0.24.0`:
+- `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0`:
 
   ```bash
   cargo install solverforge-cli --locked

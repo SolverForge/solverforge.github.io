@@ -49,13 +49,13 @@ solverforge --version
 output names the CLI and every crate a new project depends on:
 
 ```text
-solverforge solverforge-cli 3.8.3
-CLI version: 3.8.3
-Scaffold runtime target: SolverForge crate target 0.24.0
+solverforge solverforge-cli 3.9.0
+CLI version: 3.9.0
+Scaffold runtime target: SolverForge crate target 0.25.0
 Scaffold UI target: solverforge-ui 0.9.1
 Scaffold maps target: solverforge-maps 2.3.3
 Scaffold MCP target: rmcp 3.9.0
-Runtime source: crates.io: solverforge 0.24.0
+Runtime source: crates.io: solverforge 0.25.0
 UI source: crates.io: solverforge-ui 0.9.1
 Maps source: crates.io: solverforge-maps 2.3.3
 MCP source: crates.io: rmcp 3.9.0

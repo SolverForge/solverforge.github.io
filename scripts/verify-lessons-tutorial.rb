@@ -14,7 +14,7 @@
 require_relative "lib/use_case_tutorial"
 
 SITE_ROOT = File.expand_path("..", __dir__)
-CLI_VERSION = "3.8.3"
+CLI_VERSION = "3.9.0"
 
 def site_file(path)
   File.join(SITE_ROOT, path)
@@ -37,7 +37,7 @@ UseCaseTutorial.run(
     page: site_file("src/docs/getting-started/solverforge-lessons-use-case.md"),
     page_url: "docs/getting-started/solverforge-lessons-use-case",
     cli_version: CLI_VERSION,
-    runtime_version: "0.24.0",
+    runtime_version: "0.25.0",
     space_url: "https://huggingface.co/spaces/SolverForge/solverforge-lessons",
     app: "lessons",
     cli_section: "Build a Timetable from the CLI",

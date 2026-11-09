@@ -102,8 +102,11 @@ count = 4
 ```
 
 `check` and `config set` accept only `"auto"`, `"none"`, or a table containing
-one non-negative integer `count`. Omission and `"auto"` stay sequential;
-`"none"`, count 0, and count 1 also select sequential evaluation. A bare
+one positive integer `count`; `count = 0` is rejected, as the runtime rejects
+it. Omission and `"auto"` use up to four evaluators and run each step
+sequentially or in parallel windows, whichever the runtime's measured trial and
+coordination costs say is faster, so a small model with cheap moves stays
+sequential. `"none"` and count 1 select sequential evaluation. A bare
 `move_thread_count = 4` is invalid. To return a table-valued setting to a string
 mode, edit the top-level entry directly.
 
@@ -128,11 +131,11 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "3.8.3"
+cli_version = "3.9.0"
 
 [runtime]
-target = "solverforge 0.24.0"
-runtime_source = "crates.io: solverforge 0.24.0"
+target = "solverforge 0.25.0"
+runtime_source = "crates.io: solverforge 0.25.0"
 ui_source = "crates.io: solverforge-ui 0.9.1"
 
 [demo]
@@ -144,8 +147,8 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 3.8.3` web scaffold target. Fresh
-web generated apps target `solverforge 0.24.0`, take the CLI's
+This example reflects the `solverforge-cli 3.9.0` web scaffold target. Fresh
+web generated apps target `solverforge 0.25.0`, take the CLI's
 `solverforge-ui 0.9.1` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.
 

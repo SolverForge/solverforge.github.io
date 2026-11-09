@@ -136,7 +136,7 @@ Subcommands:
 `config set` parses values as integer, float, boolean (`true` or `false`), then
 string. Intermediate TOML tables are created when needed. `check` and
 `config set` reject invalid `move_thread_count` forms: use `"auto"`, `"none"`,
-or a table with one non-negative integer `count`, not a bare integer. Invalid
+or a table with one positive integer `count`, not a bare integer. Invalid
 settings are rejected before `config set` writes the file. See
 [parallel evaluation](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
 for the default, pool caps, and rebuild requirement.

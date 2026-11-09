@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and build a small timetable app from the neutral
   scaffold, then solve it
 - run the complete Lessons app from its Hugging Face Space repository
-- read the finished app's SolverForge 0.24.0 dependency shape
+- read the finished app's SolverForge 0.25.0 dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -82,7 +82,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.8.3`, which scaffolds `solverforge 0.24.0` and
+This page uses `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0` and
 `solverforge-ui 0.9.1`.
 
 ### Build a Timetable from the CLI
@@ -558,12 +558,12 @@ timeslot variable and a room variable, the initial medium score is
 
 ### Published Dependency Shape
 
-The tagged `solverforge-lessons@3.0.0` release targets the published
-SolverForge 0.24.0 line:
+The tagged `solverforge-lessons@3.0.1` release targets the published
+SolverForge 0.25.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.24.0", features = ["serde", "console", "verbose-logging"] }
+solverforge = { version = "0.25.0", features = ["serde", "console", "verbose-logging"] }
 solverforge-ui = { version = "0.9.0" }
 # Web server
 axum = "0.8.9"
@@ -583,7 +583,7 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-The finished app records `solverforge 0.24.0` as its runtime while keeping the
+The finished app records `solverforge 0.25.0` as its runtime while keeping the
 `2.2.2` CLI version it was first scaffolded with:
 
 ```toml
@@ -594,8 +594,8 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.24.0"
-runtime_source = "crates.io: solverforge 0.24.0"
+target = "solverforge 0.25.0"
+runtime_source = "crates.io: solverforge 0.25.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -950,7 +950,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@3.0.0` |
+| Tagged app release | `solverforge-lessons@3.0.1` |
 | Local run | `make run-release` |
 | Browser test setup | `make install-e2e` |
 | Standard validation | `make test` |
