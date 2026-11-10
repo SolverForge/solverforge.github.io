@@ -13,9 +13,10 @@ describe_solve_repair:
   duration: "3:32"
   label: SolverForge · describe, solve, repair · 3:32
   copy: >-
-    A bus depot's repair week, described in plain English, becomes a Rust app
-    and a feasible plan in 153 ms. Then a bus breaks down mid-solve and the
-    running plan is repaired in 17 ms.
+    An agent turns a bus depot's repair requirements into a Rust app.
+    Once the app is built and running, its solver finds the first feasible
+    plan in 153 ms. Then a bus breaks down mid-solve and the running plan
+    is repaired in 17 ms.
   note: >-
     One real session with the solverforge-modeling skill, on solverforge 0.25.1
     and solverforge-cli 3.9.0. The current release is newer.

@@ -83,6 +83,12 @@ SESSION_VERSIONS.each do |version|
 end
 failures << "#{SESSION}: the label must carry the length #{session['duration']}" unless session["label"].to_s.end_with?(session["duration"].to_s)
 
+# The first-feasible timing measures the solver, not app generation or build.
+copy = session["copy"].to_s
+unless copy.match?(/Once the app is built and running, its solver finds the first feasible\s+plan in 153 ms\./)
+  failures << "#{SESSION}: scope 153 ms to the solver after the app is built and running"
+end
+
 poster = session["poster"].to_s
 failures << "#{SESSION}: poster not found at #{poster}" unless !poster.empty? && File.file?(source_path(poster))
 

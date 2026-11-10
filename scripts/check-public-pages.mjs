@@ -1683,6 +1683,15 @@ async function checkSessionVideo(origin) {
   const browser = await chromium.launch(chromiumOptions());
   const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
   const failures = [];
+  const solverTiming = "Once the app is built and running, its solver finds the first feasible plan in 153 ms.";
+  const checkTiming = async (selector, path) => {
+    const surface = page.locator(selector);
+    const caption = (await surface.innerText()).replace(/\s+/g, " ");
+    const label = (await surface.locator("video").getAttribute("aria-label") || "").replace(/\s+/g, " ");
+    if (!caption.includes(solverTiming) || !label.includes(solverTiming)) {
+      failures.push({ path, issue: "153 ms must describe the solver after the app is built and running", caption, label });
+    }
+  };
   let path = SESSION_VIDEO.docs;
   try {
     await page.goto(`${origin}${path}`, { waitUntil: "load" });
@@ -1711,6 +1720,7 @@ async function checkSessionVideo(origin) {
       };
     });
     if (stage.stages !== 1) failures.push({ path, issue: "expected exactly one session video player", found: stage.stages });
+    if (stage.stages === 1) await checkTiming("[data-demoscene]", path);
     if (!stage.ran) {
       failures.push({ path, issue: "session video did not load", ...stage });
     } else {
@@ -1755,6 +1765,7 @@ async function checkSessionVideo(origin) {
     });
     if (!home.present) failures.push({ path, issue: "home page has no session video" });
     else {
+      await checkTiming("[data-home-session-video]", path);
       if (!home.afterHero) failures.push({ path, issue: "session video does not follow the hero" });
       if (home.src !== SESSION_VIDEO.video || home.poster !== SESSION_VIDEO.poster) failures.push({ path, issue: "home session video source or poster is wrong", ...home });
       if (!home.links.includes(`${SESSION_VIDEO.docs}#watch-one-session`)) failures.push({ path, issue: "home session video does not link to its scene list", links: home.links });
