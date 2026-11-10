@@ -464,6 +464,10 @@ problem change: the solver applies it to its best plan at the next safe point,
 rescores, and keeps solving the same job. Nothing restarts, and the plan the
 solver already has is the starting point for the repair.
 
+The [describe, solve, repair video](/docs/solverforge-cli/agent-skill/#watch-one-session)
+shows a repair like this one from 1:56, in another session on a similar depot:
+Bus 05 breaks down mid-solve and the running plan is repaired in 17 ms.
+
 The CLI does not generate a route for this, so the step is ordinary code in
 two generated files.
 
