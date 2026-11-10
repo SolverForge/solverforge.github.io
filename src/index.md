@@ -44,7 +44,6 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
       </video>
     </div>
     <div>
-      <p class="page-shell__eyebrow">Watch one session · <%= session["duration"] %></p>
       <h2>From a paragraph of English to a plan that survives a breakdown.</h2>
       <p><%= session["copy"] %></p>
       <p class="home-demoscene__note"><%= session["note"] %></p>
