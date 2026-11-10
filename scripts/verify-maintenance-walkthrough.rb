@@ -5,9 +5,12 @@
 #
 # The page is the source of truth: its command block is replayed, its Rust
 # excerpts must come verbatim from the published fixture files, and its
-# analysis table is the expected solve result. Nothing here skips: a missing
-# tool or build is a failure, because a gate that can skip reports the same
-# green as a pass.
+# analysis table is the expected solve result. Its live-repair section is
+# replayed too: its solver.toml goes into the app, a job is started, the page's
+# breakdown is posted to that running job, and the repaired plan must keep the
+# same job, absorb the breakdown, and reach the page's score. Nothing here
+# skips: a missing tool or build is a failure, because a gate that can skip
+# reports the same green as a pass.
 #
 #   ruby scripts/verify-maintenance-walkthrough.rb            # static + live
 #   ruby scripts/verify-maintenance-walkthrough.rb --static   # page/fixture contract only
@@ -37,6 +40,9 @@ EXPECTED_UNIT_TESTS = 20
 APP_NAME = "depot-maintenance"
 APP_BINARY = "depot_maintenance"
 SOLVE_TIMEOUT_SECONDS = 120
+REPAIR_TIMEOUT_SECONDS = 120
+REPAIR_SECTION = "Repair the Plan Live"
+SOLVED_SCORE = [0, -100]
 
 def log(message)
   puts "[verify-maintenance-walkthrough] #{message}"
@@ -148,6 +154,13 @@ def check_static
   fail!("Solve It analysis table must name every constraint fixture") unless rows.map { |row| row.first.delete("`") }.to_set ==
     sources.keys.select { |path| path.start_with?("src/constraints/") }.map { |path| File.basename(path, ".rs") }.to_set
 
+  log "Checking the live-repair section"
+  repair_contract(page)
+  routes = sources.fetch("src/api/routes.rs") { fail!("no src/api/routes.rs fixture for the breakdown route") }
+  fail!("routes.rs fixture does not register the breakdown route") unless routes.include?(%(.route("/jobs/{id}/breakdowns", post(report_breakdown))))
+  service = sources.fetch("src/solver/service.rs") { fail!("no src/solver/service.rs fixture for the problem-change pass-through") }
+  fail!("service.rs fixture does not forward to SolverManager::add_problem_change") unless service.include?("MANAGER.add_problem_change(parse_job_id(id)?, change)")
+
   log "Checking onboarding wiring"
   assert_contains(File.join(SITE_ROOT, "src/index.md"), %(href="<%= relative_url '/docs/solverforge-cli/agent-skill/' %>" data-home-primary-cta))
   assert_contains(File.join(SITE_ROOT, "src/index.md"), "relative_url '#{PAGE_URL}'")
@@ -171,6 +184,23 @@ def check_static
   fail!("rendered walkthrough should have exactly one H1, found #{h1_count}") unless h1_count == 1
 
   page
+end
+
+# What the live-repair section teaches: the solver.toml a running job needs,
+# the breakdown it posts, and the score the repaired plan reaches.
+def repair_contract(page)
+  text = section(page, REPAIR_SECTION)
+  toml = fenced_blocks(text, "toml").first || fail!("#{REPAIR_SECTION} has no solver.toml block")
+  fail!("#{REPAIR_SECTION} solver.toml must not set a time limit") if toml.match?(/spent_limit/)
+  fail!("#{REPAIR_SECTION} solver.toml must declare its phases") unless toml.include?("[[phases]]")
+  curl = fenced_blocks(text, "bash").join.gsub("\\\n", " ")
+  body = curl[%r{--data '(\{[^']*\})'\s+localhost:7860/jobs/0/breakdowns}, 1] || fail!("#{REPAIR_SECTION} has no breakdown curl")
+  breakdown = JSON.parse(body)
+  %w[busIdx skill earliestDay dueDay].each { |key| fail!("breakdown body has no #{key}") unless breakdown.key?(key) }
+  repaired = text[/The repaired plan settles at\s+`(-?\d+hard\/-?\d+soft)`/m, 1] || fail!("#{REPAIR_SECTION} states no repaired score")
+  fail!("#{REPAIR_SECTION} must wait for the solved score first") unless text.include?("`bestScore` `0hard/-100soft`")
+  fail!("#{REPAIR_SECTION} must show the change acknowledgement") unless text.include?(%(# {"jobId":"0","changeId":1}))
+  { toml: toml, breakdown: breakdown, repaired: parse_score(repaired) }
 end
 
 def command?(name)
@@ -227,10 +257,10 @@ end
 # An independent check of the solved plan. It re-derives every hard rule and
 # the lateness and balance claims from the raw solution instead of trusting the
 # app's own score.
-def check_solution(solution)
+def check_solution(solution, job_count: 20, loads: [5, 5, 5, 5])
   technicians = solution.fetch("technicians")
   jobs = solution.fetch("jobs")
-  fail!("solved plan should hold 20 jobs, found #{jobs.size}") unless jobs.size == 20
+  fail!("solved plan should hold #{job_count} jobs, found #{jobs.size}") unless jobs.size == job_count
   fail!("solved plan should hold 4 technicians, found #{technicians.size}") unless technicians.size == 4
   fail!("solved plan should hold 12 buses, found #{solution.fetch("buses").size}") unless solution.fetch("buses").size == 12
 
@@ -249,8 +279,126 @@ def check_solution(solution)
     buses = on_day.map { |job| job["bus_idx"] }.uniq.size
     fail!("day #{day} has #{buses} buses in the workshop") if buses > 2
   end
-  loads = jobs.group_by { |job| job["technician_idx"] }.transform_values(&:size)
-  fail!("workload is not 5 per technician: #{loads}") unless loads.size == 4 && loads.values.all?(5)
+  actual = jobs.group_by { |job| job["technician_idx"] }.transform_values(&:size)
+  fail!("workload #{actual} is not the split #{loads}") unless actual.values.sort == loads.sort
+end
+
+def post_json(url, body)
+  Net::HTTP.post(URI(url), body.nil? ? "" : JSON.generate(body), "Content-Type" => "application/json")
+end
+
+def stop_server(pid)
+  Process.kill("TERM", pid)
+  Process.wait(pid)
+rescue Errno::ESRCH, Errno::ECHILD
+  nil
+end
+
+def boot_server(binary, app, log_path)
+  port = free_port
+  pid = Process.spawn({ "PORT" => port.to_s }, binary, chdir: app, out: log_path, err: log_path)
+  base_url = "http://127.0.0.1:#{port}"
+  wait_for_health(base_url, pid, log_path)
+  [pid, base_url]
+end
+
+# Polls the job until the block accepts its status or the deadline passes.
+def wait_for_job(base_url, job_id, seconds, what)
+  deadline = Time.now + seconds
+  loop do
+    status = get_json("#{base_url}/jobs/#{job_id}")
+    return status if yield(status)
+    fail!("#{what} within #{seconds}s; last status #{status["lifecycleState"]} #{status["bestScore"]}") if Time.now > deadline
+
+    sleep 0.05
+  end
+end
+
+def phase_types(snapshot)
+  snapshot.fetch("telemetry").fetch("phases").map { |phase| phase["phaseType"] }
+end
+
+# Replays the live-repair section on the overlaid app: the page's solver.toml,
+# one job, the page's breakdown posted to that running job, and the repaired
+# plan checked independently of the app's score.
+def check_repair(page, cli, app, cargo_env, binary, root, git_identity)
+  contract = repair_contract(page)
+
+  log "Writing the page's open-ended solver.toml and rebuilding"
+  File.write(File.join(app, "solver.toml"), contract[:toml])
+  run!(git_identity, [cli, "check"], chdir: app)
+  run!(cargo_env, %w[cargo build --release], chdir: app)
+
+  server_pid, base_url = boot_server(binary, app, File.join(root, "repair-server.log"))
+  begin
+    plan = Net::HTTP.get(URI("#{base_url}/demo-data/STANDARD"))
+    response = Net::HTTP.post(URI("#{base_url}/jobs"), plan, "Content-Type" => "application/json")
+    fail!("POST /jobs returned #{response.code}") unless response.is_a?(Net::HTTPSuccess)
+    job_id = JSON.parse(response.body).fetch("id")
+
+    log "Waiting for job #{job_id} to reach 0hard/-100soft before the breakdown"
+    wait_for_job(base_url, job_id, SOLVE_TIMEOUT_SECONDS, "job never reached 0hard/-100soft") do |status|
+      fail!("open-ended job stopped as #{status["lifecycleState"]}") unless status["lifecycleState"] == "SOLVING"
+      status["bestScore"] && parse_score(status["bestScore"]) == SOLVED_SCORE
+    end
+    before = get_json("#{base_url}/jobs/#{job_id}/snapshot")
+    fail!("pre-breakdown snapshot should hold 20 jobs") unless before.fetch("solution").fetch("jobs").size == 20
+    check_solution(before.fetch("solution"))
+
+    log "Posting the page's breakdown to running job #{job_id}"
+    breakdown = contract[:breakdown]
+    response = post_json("#{base_url}/jobs/#{job_id}/breakdowns", breakdown)
+    fail!("POST /jobs/#{job_id}/breakdowns returned #{response.code}, not 202") unless response.code == "202"
+    ack = JSON.parse(response.body)
+    fail!("breakdown acknowledgement #{ack} does not name job #{job_id} and change 1") unless ack == { "jobId" => job_id, "changeId" => 1 }
+
+    log "Waiting for the repaired plan"
+    after = nil
+    deadline = Time.now + REPAIR_TIMEOUT_SECONDS
+    loop do
+      after = get_json("#{base_url}/jobs/#{job_id}/snapshot")
+      break if after.fetch("solution").fetch("jobs").size == 21 && after["bestScore"] && parse_score(after["bestScore"]) == contract[:repaired]
+      fail!("repaired plan never reached #{contract[:repaired]}; last #{after["bestScore"]} with #{after["solution"]["jobs"].size} jobs") if Time.now > deadline
+
+      sleep 0.05
+    end
+
+    log "Checking that the same job absorbed the breakdown without a restart"
+    status = get_json("#{base_url}/jobs/#{job_id}")
+    fail!("job #{job_id} should still be SOLVING after the repair, found #{status["lifecycleState"]}") unless status["lifecycleState"] == "SOLVING"
+    second = Net::HTTP.get_response(URI("#{base_url}/jobs/#{job_id.to_i + 1}"))
+    fail!("a second job exists (GET /jobs/#{job_id.to_i + 1} returned #{second.code}); the repair must not start a new solve") unless second.code == "404"
+    unless after.fetch("snapshotRevision") > before.fetch("snapshotRevision")
+      fail!("snapshot revision went from #{before["snapshotRevision"]} to #{after["snapshotRevision"]}; the job restarted")
+    end
+    unless after.fetch("telemetry").fetch("elapsedMs") >= before.fetch("telemetry").fetch("elapsedMs")
+      fail!("job clock went backwards across the repair; the job restarted")
+    end
+    phases = phase_types(after)
+    first_search = phases.index("Local Search") || fail!("telemetry has no local search before the repair: #{phases}")
+    unless phases[(first_search + 1)..].include?("Construction Heuristic")
+      fail!("telemetry shows no construction pass after local search, so the change was never applied: #{phases}")
+    end
+
+    log "Re-deriving the repaired plan's feasibility from the snapshot"
+    solution = after.fetch("solution")
+    check_solution(solution, job_count: 21, loads: [6, 5, 5, 5])
+    added = solution.fetch("jobs").last
+    expected = { "bus_idx" => breakdown["busIdx"], "skill" => breakdown["skill"], "earliest_day" => breakdown["earliestDay"], "due_day" => breakdown["dueDay"] }
+    expected.each do |key, value|
+      fail!("breakdown job #{added["id"]} has #{key} #{added[key].inspect}, not #{value.inspect}") unless added[key] == value
+    end
+    original = JSON.parse(plan).fetch("jobs").map { |job| job["id"] }
+    fail!("the repair dropped or renamed original jobs") unless solution.fetch("jobs").first(20).map { |job| job["id"] } == original
+
+    log "Cancelling job #{job_id}; a cancelled job must refuse further changes"
+    fail!("cancel returned an error") unless post_json("#{base_url}/jobs/#{job_id}/cancel", nil).is_a?(Net::HTTPSuccess)
+    wait_for_job(base_url, job_id, 30, "job never reached CANCELLED") { |current| current["lifecycleState"] == "CANCELLED" }
+    late = post_json("#{base_url}/jobs/#{job_id}/breakdowns", breakdown)
+    fail!("a cancelled job accepted a breakdown (#{late.code}), expected 409") unless late.code == "409"
+  ensure
+    stop_server(server_pid)
+  end
 end
 
 def check_live(page)
@@ -336,6 +484,10 @@ def check_live(page)
 
     log "Re-deriving the plan's feasibility from the snapshot"
     check_solution(get_json("#{base_url}/jobs/#{job_id}/snapshot").fetch("solution"))
+
+    stop_server(server_pid)
+    server_pid = nil
+    check_repair(page, cli, app, cargo_env, binary, root, git_identity)
   ensure
     if server_pid
       begin
@@ -354,5 +506,5 @@ if ARGV.include?("--static")
   log "Static walkthrough contract passed"
 else
   check_live(page)
-  log "Walkthrough contract passed: replayed, tested, solved to 0hard/-100soft"
+  log "Walkthrough contract passed: replayed, tested, solved to 0hard/-100soft, repaired live"
 end
