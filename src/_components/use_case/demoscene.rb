@@ -4,10 +4,17 @@ class UseCase::Demoscene < Bridgetown::Component
   # it, and plain captures of the real app. The carousel slide and the case page
   # both render it from here, so the two surfaces cannot disagree.
   #
-  # part: :stage renders the video and cue sheet, :captures the app captures.
+  # part: :stage renders the video and cue sheet (through Media::DemosceneVideo),
+  # :captures the app captures.
   def initialize(use_case:, part:)
     @use_case = use_case
     @part = part
+  end
+
+  # Media::DemosceneVideo, rendered from here, resolves URLs through its view
+  # context's site, which a component only has when it exposes one.
+  def site
+    helpers.site
   end
 
   def stage?

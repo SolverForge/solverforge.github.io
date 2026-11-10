@@ -1,0 +1,43 @@
+<div class="use-case-demoscene" data-demoscene>
+  <figure class="use-case-demoscene__screen">
+    <div class="use-case-demoscene__bezel">
+      <video
+        class="use-case-demoscene__video"
+        controls
+        playsinline
+        preload="metadata"
+        poster="<%= relative_url(poster) %>"
+        aria-label="<%= copy %>"
+        data-demoscene-video
+      >
+        <source src="<%= relative_url(video) %>" type="video/mp4" />
+      </video>
+    </div>
+    <figcaption class="use-case-demoscene__caption">
+      <span class="use-case-demoscene__label"><%= label %></span>
+      <span><%= copy %></span>
+      <% unless note.to_s.empty? %>
+        <span class="use-case-demoscene__note"><%= note %></span>
+      <% end %>
+    </figcaption>
+  </figure>
+
+  <ol class="use-case-demoscene__cues" aria-label="<%= name %> scenes">
+    <% cues.each do |cue| %>
+      <li>
+        <button
+          class="use-case-demoscene__cue"
+          type="button"
+          data-demoscene-cue="<%= cue.fetch("at") %>"
+          aria-label="Play from <%= cue.fetch("label") %>: <%= cue.fetch("text") %>"
+        >
+          <span class="use-case-demoscene__cue-time"><%= cue.fetch("label") %></span>
+          <% unless cue["key"].to_s.empty? %>
+            <kbd class="use-case-demoscene__cue-key"><%= cue["key"] %></kbd>
+          <% end %>
+          <span class="use-case-demoscene__cue-text"><%= cue.fetch("text") %></span>
+        </button>
+      </li>
+    <% end %>
+  </ol>
+</div>

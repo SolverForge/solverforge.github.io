@@ -1,44 +1,12 @@
 <% if stage? %>
-  <div class="use-case-demoscene" data-demoscene>
-    <figure class="use-case-demoscene__screen">
-      <div class="use-case-demoscene__bezel">
-        <video
-          class="use-case-demoscene__video"
-          controls
-          playsinline
-          preload="metadata"
-          poster="<%= relative_url(runtime.fetch("poster")) %>"
-          aria-label="<%= runtime.fetch("copy") %>"
-          data-demoscene-video
-        >
-          <source src="<%= relative_url(runtime.fetch("video")) %>" type="video/mp4" />
-        </video>
-      </div>
-      <figcaption class="use-case-demoscene__caption">
-        <span class="use-case-demoscene__label"><%= runtime.fetch("label") %></span>
-        <span><%= runtime.fetch("copy") %></span>
-      </figcaption>
-    </figure>
-
-    <ol class="use-case-demoscene__cues" aria-label="<%= label %> demo scenes">
-      <% cues.each do |cue| %>
-        <li>
-          <button
-            class="use-case-demoscene__cue"
-            type="button"
-            data-demoscene-cue="<%= cue.fetch("at") %>"
-            aria-label="Play from <%= cue.fetch("label") %>: <%= cue.fetch("text") %>"
-          >
-            <span class="use-case-demoscene__cue-time"><%= cue.fetch("label") %></span>
-            <% unless cue.fetch("key").to_s.empty? %>
-              <kbd class="use-case-demoscene__cue-key"><%= cue.fetch("key") %></kbd>
-            <% end %>
-            <span class="use-case-demoscene__cue-text"><%= cue.fetch("text") %></span>
-          </button>
-        </li>
-      <% end %>
-    </ol>
-  </div>
+  <%= render Media::DemosceneVideo.new(
+    name: "#{label} demo",
+    video: runtime.fetch("video"),
+    poster: runtime.fetch("poster"),
+    label: runtime.fetch("label"),
+    copy: runtime.fetch("copy"),
+    cues: cues
+  ) %>
 <% else %>
   <section class="use-case-demoscene__captures" aria-label="<%= label %> captures of the real app">
     <p class="use-case-eyebrow">The real app</p>
