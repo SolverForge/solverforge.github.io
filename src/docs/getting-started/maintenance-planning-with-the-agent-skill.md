@@ -21,9 +21,10 @@ tags: [quickstart, rust, agent-skill, maintenance, scheduling]
 6. [Writing Constraints](#writing-constraints)
 7. [Demo Data](#demo-data)
 8. [Solve It](#solve-it)
-9. [Decisions to Review](#decisions-to-review)
-10. [Complete Source](#complete-source)
-11. [Where to Go Next](#where-to-go-next)
+9. [Repair the Plan Live](#repair-the-plan-live)
+10. [Decisions to Review](#decisions-to-review)
+11. [Complete Source](#complete-source)
+12. [Where to Go Next](#where-to-go-next)
 
 ---
 
@@ -45,6 +46,8 @@ paragraph to a solved plan:
 - deterministic demo data for the depot
 - a real solve through the API shell, ending at `0hard/-100soft`: no hard
   violations, no late jobs, and the best possible workload balance
+- a live repair: a bus breaks down while the job is solving, and the running
+  job takes the urgent repair into its plan without a restart
 
 The run used Claude Code. The model is ordinary Rust in a CLI-managed project,
 so every step below can also be done by hand with the
@@ -452,10 +455,175 @@ Every hard rule holds, no job is late, and each technician has five jobs. More
 than one schedule reaches this score, so two runs can place jobs on different
 days with the same result.
 
+## Repair the Plan Live
+
+Plans break while they run. Bus 105 breaks down on its route: it needs an
+electrical repair, the parts are on hand from day 1, and the depot wants it
+back by day 2. The job that is already solving can take that new work as a
+problem change: the solver applies it to its best plan at the next safe point,
+rescores, and keeps solving the same job. Nothing restarts, and the plan the
+solver already has is the starting point for the repair.
+
+The CLI does not generate a route for this, so the step is ordinary code in
+two generated files.
+
+### Route the disruption into the running job
+
+`src/solver/service.rs` holds the app's `SolverManager`. Give the service one
+pass-through to `SolverManager::add_problem_change`:
+
+```rust
+    /// Queues a change to the problem of a running or paused job. The solver
+    /// applies it to its best solution at the next safe point and keeps going.
+    pub fn add_problem_change<P>(
+        &self,
+        id: &str,
+        change: P,
+    ) -> Result<ProblemChangeId, SolverManagerError>
+    where
+        P: ProblemChange<Plan> + 'static,
+    {
+        MANAGER.add_problem_change(parse_job_id(id)?, change)
+    }
+```
+
+`src/api/routes.rs` imports the domain types and the change type, and
+registers `POST /jobs/{id}/breakdowns` next to the other job routes:
+
+```rust
+use crate::data::{generate, DemoData};
+use crate::domain::{Job, Plan};
+use crate::solver::SolverService;
+use solverforge::ClosureProblemChange;
+```
+
+```rust
+        .route("/jobs/{id}/cancel", post(cancel_job))
+        .route("/jobs/{id}/breakdowns", post(report_breakdown))
+```
+
+The handler turns the request into a job:
+
+```rust
+/// A bus that broke down in service and needs one urgent job.
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct BreakdownRequest {
+    bus_idx: usize,
+    skill: String,
+    earliest_day: usize,
+    due_day: usize,
+}
+```
+
+```rust
+async fn report_breakdown(
+    State(state): State<Arc<AppState>>,
+    Path(id): Path<String>,
+    Json(request): Json<BreakdownRequest>,
+) -> Result<(StatusCode, Json<ProblemChangeResponse>), StatusCode> {
+    let breakdown = ClosureProblemChange::<Plan, _>::new("bus breakdown", move |director| {
+        let jobs = &mut director.working_solution_mut().jobs;
+        let job_id = format!("job-{}", jobs.len());
+        jobs.push(Job::new(
+            job_id,
+            request.bus_idx,
+            request.skill,
+            request.earliest_day,
+            request.due_day,
+        ));
+    });
+```
+
+`ClosureProblemChange` hands the closure the solver's working solution. The new
+`Job` starts without a technician or a day, so the runtime reruns construction
+to assign it, then local search continues from the repaired plan. The route
+answers with the change's submission number:
+
+```rust
+    let change_id = state
+        .solver
+        .add_problem_change(&id, breakdown)
+        .map_err(status_from_solver_error)?;
+    Ok((
+        StatusCode::ACCEPTED,
+        Json(ProblemChangeResponse {
+            job_id: id,
+            change_id: change_id.get(),
+        }),
+    ))
+}
+```
+
+A job that is cancelled or finished refuses the change, and the route answers
+`409 Conflict`.
+
+### Keep the job open
+
+A job that takes changes runs until you cancel it: the runtime discards a
+change that arrives after a configured limit has stopped the solve. Replace the
+contents of `solver.toml` with the construction and late-acceptance phases that
+the scaffold's own `solver.toml` comment shows, and no time limit:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+
+[[phases]]
+type = "local_search"
+[phases.acceptor]
+type = "late_acceptance"
+late_acceptance_size = 400
+[phases.forager]
+type = "accepted_count"
+limit = 4
+```
+
+The app compiles `solver.toml` in. Stop the server and start it again;
+`solverforge server` rebuilds the app first:
+
+```bash
+solverforge server
+```
+
+### Break a bus mid-solve
+
+Start a job, wait for `bestScore` `0hard/-100soft`, then report the breakdown
+to the same job:
+
+```bash
+curl -s localhost:7860/demo-data/STANDARD > plan.json
+curl -s -X POST -H 'content-type: application/json' --data @plan.json localhost:7860/jobs
+# {"id":"0"}
+curl -s localhost:7860/jobs/0          # bestScore 0hard/-100soft, lifecycleState SOLVING
+curl -s -X POST -H 'content-type: application/json' \
+  --data '{"busIdx":4,"skill":"electrical","earliestDay":1,"dueDay":2}' \
+  localhost:7860/jobs/0/breakdowns
+# {"jobId":"0","changeId":1}
+curl -s localhost:7860/jobs/0/snapshot # 21 jobs, the breakdown job assigned
+curl -s -X POST localhost:7860/jobs/0/cancel
+```
+
+Job `0` keeps its id and its lifecycle: it stays `SOLVING` until you cancel it,
+its telemetry lists a second construction pass after the first local search,
+and its snapshot revisions keep counting up. The repaired plan settles at
+`0hard/-111soft`:
+
+- every hard rule still holds, including the two-bus workshop limit on the day
+  Bus 105 comes in
+- the breakdown job goes to Alice or Chloe, the two technicians with the
+  electrical skill, on day 1 or day 2
+- no job is late, and the 21 jobs split 6, 5, 5, 5 across the technicians,
+  which scores `6² + 3 × 5² = 111`
+
+Local search may also move other jobs to make room. Compare
+`/jobs/0/snapshot` before and after the breakdown to see which ones moved.
+
 ## Decisions to Review
 
-The agent made three choices the prompt did not specify. Check them against
-your own depot before you rely on the plan:
+The agent made three choices the prompt did not specify, and the repair route
+adds a fourth. Check them against your own depot before you rely on the plan:
 
 - **Lateness weight.** One late day costs 10 soft points, so meeting due days
   outranks an even split of work.
@@ -463,11 +631,14 @@ your own depot before you rely on the plan:
   `-100soft` for this dataset.
 - **One dataset for every id.** `SMALL`, `STANDARD`, and `LARGE` all return the
   depot.
+- **Breakdown input is trusted.** The breakdown route does not check that
+  `busIdx` names a bus or that a technician has the `skill`; a skill nobody has
+  leaves the job unassignable and the plan infeasible.
 
 ## Complete Source
 
-The nine hand-written files from this run are published with the site source,
-in the
+The nine hand-written files from the agent run and the two files the live
+repair changes are published with the site source, in the
 [maintenance walkthrough source directory](https://github.com/SolverForge/solverforge.github.io/tree/main/scripts/fixtures/maintenance-walkthrough).
 Copy them over a project produced by the commands in
 [Scaffold and Grow the App](#scaffold-and-grow-the-app) to get the complete app:
@@ -483,6 +654,8 @@ Copy them over a project produced by the commands in
 | `src/constraints/balanced_workload.rs` | workload balance, load balance |
 | `src/data/depot.rs` | depot dataset, `generate`, and feasibility test |
 | `src/data/mod.rs` | demo-data declarations, routing `generate` to the depot |
+| `src/solver/service.rs` | problem-change pass-through |
+| `src/api/routes.rs` | breakdown route, problem change |
 
 ## Where to Go Next
 
