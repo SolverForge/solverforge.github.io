@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and build a small timetable app from the neutral
   scaffold, then solve it
 - run the complete Lessons app from its Hugging Face Space repository
-- read the finished app's SolverForge 0.25.0 dependency shape
+- read the finished app's SolverForge 0.26.0 dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -82,7 +82,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0` and
+This page uses `solverforge-cli 4.0.2`, which scaffolds `solverforge 0.26.0` and
 `solverforge-ui 0.9.1`.
 
 ### Build a Timetable from the CLI
@@ -136,6 +136,10 @@ the CLI imports and adds to `Cargo.toml`. `RoomKind` is this app's own type: the
 CLI warns that it is not defined yet, and the next step defines it. `Room.index`
 is the room's position in `Plan.rooms`, which is the value `Lesson.room_idx`
 stores, so constraints can join a lesson to its room.
+
+Each `generate constraint` writes `src/constraints/<name>.rs`, declares it in
+`src/constraints/mod.rs`, and adds its call to `create_constraints` in
+`src/constraints/assemble.rs`, so the seven rules need no hand wiring.
 
 Define `RoomKind` in its own domain file:
 
@@ -558,12 +562,12 @@ timeslot variable and a room variable, the initial medium score is
 
 ### Published Dependency Shape
 
-The tagged `solverforge-lessons@3.0.1` release targets the published
-SolverForge 0.25.0 line:
+The tagged `solverforge-lessons@3.0.3` release targets the published
+SolverForge 0.26.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.25.0", features = ["serde", "console", "verbose-logging"] }
+solverforge = { version = "0.26.0", features = ["serde", "console", "verbose-logging"] }
 solverforge-ui = { version = "0.9.0" }
 # Web server
 axum = "0.8.9"
@@ -583,7 +587,7 @@ chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-The finished app records `solverforge 0.25.0` as its runtime while keeping the
+The finished app records `solverforge 0.26.0` as its runtime while keeping the
 `2.2.2` CLI version it was first scaffolded with:
 
 ```toml
@@ -594,8 +598,8 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.25.0"
-runtime_source = "crates.io: solverforge 0.25.0"
+target = "solverforge 0.26.0"
+runtime_source = "crates.io: solverforge 0.26.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -664,7 +668,8 @@ The finished app's core path is:
 7. `Lesson.room_idx` is a scalar planning variable.
 8. `Plan` is the planning solution.
 9. `generate_large()` builds the deterministic public plan.
-10. `create_constraints()` assembles the timetable score.
+10. `create_constraints()` in `src/constraints/assemble.rs` assembles the
+    timetable score.
 11. `solver.toml` runs construction plus local search.
 12. `src/solver/service.rs` exposes retained jobs through `SolverManager`.
 13. `src/api/` converts retained jobs into JSON and SSE.
@@ -785,6 +790,9 @@ status, snapshot, analysis, and SSE events instead of blocking on one request.
 ## Writing Constraints
 
 The finished app keeps one timetable rule per file under `src/constraints/`.
+`src/constraints/mod.rs` declares the rule modules, and `create_constraints()`
+in `src/constraints/assemble.rs` calls each one, in the order score analysis
+lists them.
 
 Hard constraints:
 
@@ -950,7 +958,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@3.0.1` |
+| Tagged app release | `solverforge-lessons@3.0.3` |
 | Local run | `make run-release` |
 | Browser test setup | `make install-e2e` |
 | Standard validation | `make test` |
@@ -964,6 +972,7 @@ make space-run
 | Scalar variables | `Lesson.timeslot_idx`, `Lesson.room_idx` |
 | Demo data generator | `src/data/data_seed/` |
 | Constraints | `src/constraints/` |
+| Constraint assembly | `src/constraints/assemble.rs` |
 | Retained API | `src/api/routes.rs` |
 | Solver manager wrapper | `src/solver/service.rs` |
 | Browser workspace | `static/` |

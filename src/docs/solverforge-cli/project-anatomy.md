@@ -52,7 +52,9 @@ my-scheduler/
 | `solver.toml` | Solver search strategy and termination settings |
 | `solverforge.app.toml` | CLI-maintained app metadata, model summary, demo defaults, and UI contract |
 | `src/domain/` | Planning solution, facts, entities, and generator-managed insertion points |
-| `src/constraints/` | Constraint modules plus the shared `create_constraints()` registry |
+| `src/constraints/mod.rs` | Constraint module declarations in the managed `constraint-modules` block, `mod assemble;`, and the `create_constraints` re-export; no code |
+| `src/constraints/assemble.rs` | `create_constraints()`, whose managed `constraint-calls` block calls each module as `super::<id>::constraint()` |
+| `src/constraints/<id>.rs` | One constraint per module, each exposing `pub fn constraint()` |
 | `src/data/data_seed.rs` | Compiler-owned demo-data builder rewritten by `solverforge generate data` |
 | `src/data/mod.rs` | Stable wrapper around the generated demo-data seed module |
 | `src/api/` | Generated retained-job, demo-data, status, analysis, and SSE routes |
@@ -77,7 +79,8 @@ same way.
 | Path | Primary owner | Edit guidance |
 | ---- | ------------- | ------------- |
 | `solver.toml` | You | Safe to edit directly or through `solverforge config set` |
-| `src/constraints/*.rs` | You | Generated skeletons are starting points; replace TODOs with real logic |
+| `src/constraints/<id>.rs` | You | Generated skeletons are starting points; replace the placeholders with real logic |
+| `src/constraints/mod.rs` and `assemble.rs` | Shared | `generate constraint` and `destroy constraint` rewrite their managed blocks; keep the markers intact |
 | `static/app.js` | You | Safe to customize once the shell exists |
 | `src/data/mod.rs` | Shared | Keep it if you want to continue delegating to generated demo seeds |
 | `src/data/data_seed.rs` | CLI | Rewritten by `solverforge generate data`; do not hand-edit if you plan to regenerate |
@@ -110,6 +113,57 @@ You will also see markers like:
 
 Do not delete or duplicate those markers if you want the CLI to keep patching
 the file correctly.
+
+`constraint-modules` lives in `src/constraints/mod.rs` and holds the `mod`
+lines in rustfmt's sorted order. `constraint-calls` lives in
+`src/constraints/assemble.rs` and keeps insertion order, because it is the
+order in which the constraint set evaluates. Every module in one block needs
+its call in the other. A helper module such as `mod shared;` or
+`#[cfg(test)] mod tests;` goes outside the `constraint-modules` block, so it is
+not counted as a constraint.
+
+## Module Roots Hold Declarations Only
+
+Every `mod.rs` and `lib.rs` under `src/` contains only module declarations,
+`use` items, and, in `src/domain/mod.rs`, the `planning_model!` manifest.
+`solverforge check` rejects a module root that holds a function, type, impl,
+constant, static, macro definition, inline `mod name { ... }` body, or an inner
+attribute other than documentation, and `generate constraint` and
+`destroy constraint` refuse to edit a `src/constraints/mod.rs` that holds any of
+them. Put that code in its own file and declare it with `mod`.
+
+After the [Getting Started](/docs/solverforge-cli/getting-started/) project
+runs `generate constraint task_assigned` and then
+`generate constraint balanced_duration`, the two files read as follows, with
+the leading doc comments left out:
+
+```rust
+// src/constraints/mod.rs
+// @solverforge:begin constraint-modules
+mod balanced_duration;
+mod task_assigned;
+// @solverforge:end constraint-modules
+
+mod assemble;
+
+pub use assemble::create_constraints;
+```
+
+```rust
+// src/constraints/assemble.rs
+use crate::domain::Plan;
+use solverforge::prelude::*;
+
+/// Builds the constraint set the solver scores every solution against.
+pub fn create_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
+    // @solverforge:begin constraint-calls
+    (
+        super::task_assigned::constraint(),
+        super::balanced_duration::constraint(),
+    )
+    // @solverforge:end constraint-calls
+}
+```
 
 ## The Neutral Shell
 

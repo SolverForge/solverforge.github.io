@@ -53,7 +53,7 @@ so every step below can also be done by hand with the
 ## Before You Start
 
 - Rust stable `1.95+` and Cargo
-- `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0`:
+- `solverforge-cli 4.0.2`, which scaffolds `solverforge 0.26.0`:
 
   ```bash
   cargo install solverforge-cli --locked
@@ -185,6 +185,9 @@ solverforge check
   entity-fact match, `--pair` for two entities, `--unary` for one entity at a
   time, `--collect-vec` for grouped rows, `--balance` for load balancing. The
   generated file is wiring; the predicate and weight are still yours to write.
+- Each `generate constraint` also declares its module in
+  `src/constraints/mod.rs` and adds its call to `create_constraints` in
+  `src/constraints/assemble.rs`, so the constraint set needs no hand wiring.
 
 Everything these commands generate stays exactly as the CLI wrote it. The agent
 then edited nine files by hand: the seven constraint files and two data files.
@@ -378,14 +381,26 @@ const JOBS: &[(usize, &str, usize, usize)] = &[
     (1, BODYWORK, 0, 3),
 ```
 
-The 20 rows continue through day 9. The stable wrapper in `src/data/mod.rs`
-routes every demo-data id to the depot, and the CLI-owned seed file stays
-untouched so `solverforge generate data` can still regenerate it:
+The 20 rows continue through day 9. `depot.rs` also routes every demo-data id
+to the depot:
 
 ```rust
 pub fn generate(_demo: DemoData) -> Plan {
-    depot::depot_plan()
+    depot_plan()
 }
+```
+
+`src/data/mod.rs` stays a list of declarations, as `solverforge check` requires
+of every module root. It declares `depot` and re-exports its `generate` in
+place of the seed's, and the CLI-owned seed file stays untouched so
+`solverforge generate data` can still regenerate it:
+
+```rust
+mod data_seed;
+mod depot;
+
+pub use data_seed::{available_demo_data, default_demo_data, DemoData};
+pub use depot::generate;
 ```
 
 A `reference_plan_is_feasible` test in `depot.rs` assigns a hand-built schedule
@@ -466,8 +481,8 @@ Copy them over a project produced by the commands in
 | `src/constraints/job_assigned.rs` | every job assigned, unary |
 | `src/constraints/late_job.rs` | lateness, weighted unary |
 | `src/constraints/balanced_workload.rs` | workload balance, load balance |
-| `src/data/depot.rs` | depot dataset and feasibility test |
-| `src/data/mod.rs` | demo-data wrapper |
+| `src/data/depot.rs` | depot dataset, `generate`, and feasibility test |
+| `src/data/mod.rs` | demo-data declarations, routing `generate` to the depot |
 
 ## Where to Go Next
 

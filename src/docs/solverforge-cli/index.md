@@ -11,13 +11,13 @@ description: >
 <h1>solverforge-cli</h1>
 
 <%= render Ui::Callout.new do %>
-This manual documents the `solverforge-cli 3.9.0` interface. Fresh projects use
+This manual documents the `solverforge-cli 4.0.2` interface. Fresh projects use
 the scaffold targets baked into the binary you have installed; run
 `solverforge --version` to confirm the exact runtime, UI, maps, and MCP targets.
-Fresh scaffolds target `solverforge 0.25.0`, matching the
-[core manual](/docs/solverforge/). The default `move_thread_count = "auto"`
-evaluates local search on up to four evaluators when its measurements say
-parallel windows are faster; `"none"` keeps it sequential.
+Fresh scaffolds target `solverforge 0.26.0`. The default
+`move_thread_count = "auto"` evaluates local search on up to four evaluators
+when its measurements say parallel windows are faster; `"none"` keeps it
+sequential.
 <% end %>
 
 `solverforge-cli` is the default entry point for new SolverForge projects. It

@@ -397,7 +397,7 @@ Destroy operations update the same managed surfaces used by generation:
 
 - domain exports
 - planning solution collections
-- constraint registry
+- constraint module declarations and the `create_constraints` call list
 - synchronized app metadata
 - CLI-managed solver config refs for scalar groups and conflict repairs
 

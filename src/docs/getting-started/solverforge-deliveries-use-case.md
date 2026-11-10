@@ -90,7 +90,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0`,
+This page uses `solverforge-cli 4.0.2`, which scaffolds `solverforge 0.26.0`,
 `solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Router from the CLI
@@ -128,6 +128,10 @@ solverforge generate constraint vehicle_capacity --unary --hard
 solverforge generate constraint delivery_time_windows --unary --hard
 solverforge generate constraint total_travel_time --unary --soft
 ```
+
+Each `generate constraint` writes `src/constraints/<name>.rs`, declares it in
+`src/constraints/mod.rs`, and adds its call to `create_constraints` in
+`src/constraints/assemble.rs`.
 
 `generate fact` adds `id` and `name` on its own. `Delivery.index` is the
 delivery's position in `Plan.deliveries`, which is the value a route stores.
@@ -645,12 +649,12 @@ Current dataset sizes:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-deliveries@3.0.2` release uses SolverForge core, UI,
+The tagged `solverforge-deliveries@3.0.4` release uses SolverForge core, UI,
 and Maps from crates.io:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.25.0", features = [
+solverforge = { version = "0.26.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -686,8 +690,8 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.25.0"
-runtime_source = "crates.io: solverforge 0.25.0"
+target = "solverforge 0.26.0"
+runtime_source = "crates.io: solverforge 0.26.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -829,7 +833,7 @@ pub struct Vehicle {
 }
 ```
 
-The CVRP domain profile is stock SolverForge 0.25.0; `solverforge generate
+The CVRP domain profile is stock SolverForge 0.26.0; `solverforge generate
 variable ... --domain cvrp` writes the same attribute. It expands to the
 `VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
 assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
@@ -948,16 +952,20 @@ derived value per route instead of recalculating the route from scratch.
 
 Open `src/constraints/`.
 
-`create_constraints()` assembles four rules:
+`src/constraints/mod.rs` declares one module per rule, and
+`create_constraints()` in `src/constraints/assemble.rs` assembles the four
+rules:
 
 ```rust
 pub fn create_constraints() -> impl ConstraintSet<Plan, HardSoftScore> {
+    // @solverforge:begin constraint-calls
     (
-        all_deliveries_assigned::constraint(),
-        vehicle_capacity::constraint(),
-        delivery_time_windows::constraint(),
-        total_travel_time::constraint(),
+        super::all_deliveries_assigned::constraint(),
+        super::vehicle_capacity::constraint(),
+        super::delivery_time_windows::constraint(),
+        super::total_travel_time::constraint(),
     )
+    // @solverforge:end constraint-calls
 }
 ```
 
@@ -1193,7 +1201,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@3.0.2`       |
+| Tagged app release               | `solverforge-deliveries@3.0.4`       |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |
@@ -1201,7 +1209,8 @@ make test-live-road
 | Delivery fact                    | `src/domain/delivery.rs`            |
 | Vehicle entity and list variable | `src/domain/vehicle.rs`             |
 | Route preparation and CVRP profile data | `src/domain/route_metrics/`         |
-| Constraint assembly              | `src/constraints/mod.rs`            |
+| Constraint module declarations   | `src/constraints/mod.rs`            |
+| Constraint assembly              | `src/constraints/assemble.rs`       |
 | City demo IDs                    | `src/data/data_seed/entrypoints.rs` |
 | API routes                       | `src/api/routes.rs`                 |
 | DTO contract                     | `src/api/dto.rs`                    |

@@ -51,7 +51,7 @@ You will:
 - install `solverforge-cli` and build a small dispatcher from the neutral
   scaffold, then solve it
 - run the complete FSR app from its Hugging Face Space repository
-- read the finished app's SolverForge 0.25.0 dependency shape
+- read the finished app's SolverForge 0.26.0 dependency shape
 - understand why field-service routing uses a list planning variable
 - follow the current `Location`, `ServiceVisit`, `TravelLeg`,
   `TechnicianRoute`, and `FieldServicePlan` model
@@ -88,7 +88,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 3.9.0`, which scaffolds `solverforge 0.25.0`,
+This page uses `solverforge-cli 4.0.2`, which scaffolds `solverforge 0.26.0`,
 `solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Dispatcher from the CLI
@@ -130,6 +130,10 @@ solverforge generate constraint time_windows --unary --hard
 solverforge generate constraint shift_capacity --unary --hard
 solverforge generate constraint minimize_travel --unary --soft
 ```
+
+Each `generate constraint` writes `src/constraints/<name>.rs`, declares it in
+`src/constraints/mod.rs`, and adds its call to `create_constraints` in
+`src/constraints/assemble.rs`.
 
 `generate fact` adds `id` and `name` on its own. Coordinates are integer
 microdegrees, as in the finished app, because fact fields must implement `Eq`
@@ -654,13 +658,13 @@ Current dataset shape:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-fsr@3.0.2` release targets the published SolverForge
-0.25.0 line:
+The tagged `solverforge-fsr@3.0.4` release targets the published SolverForge
+0.26.0 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.25.0", features = ["serde", "console", "verbose-logging"] }
-solverforge-core = "0.25.0"
+solverforge = { version = "0.26.0", features = ["serde", "console", "verbose-logging"] }
+solverforge-core = "0.26.0"
 solverforge-ui = { version = "0.9.0" }
 solverforge-maps = { version = "2.1.5" }
 # Web server
@@ -685,7 +689,7 @@ stock `ConstraintFactory` streams over `TechnicianRoute` rows and route shadow
 values; most applications only need the top-level `solverforge` facade.
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-The finished app records `solverforge 0.25.0` as its runtime while keeping the
+The finished app records `solverforge 0.26.0` as its runtime while keeping the
 `2.2.2` CLI version it was first scaffolded with:
 
 ```toml
@@ -696,8 +700,8 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.25.0"
-runtime_source = "crates.io: solverforge 0.25.0"
+target = "solverforge 0.26.0"
+runtime_source = "crates.io: solverforge 0.26.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -927,7 +931,10 @@ less soft score.
 
 Open `src/constraints/`.
 
-`create_constraints()` assembles ten business-rule modules. The
+`src/constraints/mod.rs` declares the rule modules and a test-only
+`route_metrics_tests` module outside the managed `constraint-modules` block.
+`create_constraints()` in `src/constraints/assemble.rs` assembles the ten
+business-rule modules. The
 `assigned_visits` module expands into separate missing, duplicate, and invalid
 assignment constraints so each failure mode keeps its own score-analysis
 identity: score analysis reports them as `assigned_visits` (missing visits),
@@ -1138,7 +1145,9 @@ Use the generator for the module seam:
 solverforge generate constraint emergency_response --unary --hard
 ```
 
-The generator adds the module to the assembled constraint set. Its placeholder
+The generator declares the module in `src/constraints/mod.rs` and appends
+`super::emergency_response::constraint()` to `create_constraints` in
+`src/constraints/assemble.rs`. Its placeholder
 panics on every solve until you implement the rule in
 `src/constraints/emergency_response.rs`. If the rule needs another whole-route
 measurement, add it to `RouteStats`, copy it through
@@ -1208,7 +1217,7 @@ curl http://localhost:7860/demo-data
 
 | Topic | File |
 | ----- | ---- |
-| Tagged app release | `solverforge-fsr@3.0.2` |
+| Tagged app release | `solverforge-fsr@3.0.4` |
 | App contract | `solverforge.app.toml` |
 | Solver policy | `solver.toml` |
 | Solution root | `src/domain/field_service_plan.rs` |
@@ -1218,6 +1227,7 @@ curl http://localhost:7860/demo-data
 | Road-network matrix facts | `src/domain/travel_leg.rs` |
 | Demo data and route preparation | `src/data/data_seed.rs` |
 | Constraints | `src/constraints/` |
+| Constraint assembly | `src/constraints/assemble.rs` |
 | Retained API | `src/api/routes.rs` |
 | Route geometry DTO | `src/api/route_dto.rs` |
 | Route geometry builder | `src/api/route_geometry.rs` |

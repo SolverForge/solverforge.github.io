@@ -20,7 +20,9 @@ solverforge info [OPTIONS]
 
 Prints the project name, shell, planning solution type, score type, entities,
 facts, scalar and list solvable fields, constraints, model resources, and
-whether `solver.toml` exists. It requires a generated-style `src/domain/`
+whether `solver.toml` exists. The constraint list is the set of modules in the
+`constraint-modules` block of `src/constraints/mod.rs`, so helper modules
+declared outside that block are not listed. It requires a generated-style `src/domain/`
 directory.
 
 ## `solverforge check`
@@ -38,6 +40,8 @@ saying so; run `cargo build` to compile.
 | planning solution parses                             | Errors if no solution is found |
 | entity modules in `src/domain/mod.rs` exist          | Errors for missing files |
 | constraint modules in `src/constraints/mod.rs` exist | Errors for missing files |
+| each declared constraint module has a call in `src/constraints/assemble.rs`, and each call a module | Errors for unwired or unknown modules |
+| every `mod.rs` and `lib.rs` under `src/` holds only declarations | Errors for functions, types, impls, constants, macro definitions, inline module bodies, or non-doc inner attributes |
 | `solver.toml` exists                                 | Warns if missing |
 | `move_thread_count` and candidate-trace settings      | Errors for invalid runtime forms or trace capacity |
 | entities have solvable fields                        | Warns for entities with no scalar or list variable |

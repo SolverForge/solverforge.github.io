@@ -2,6 +2,7 @@
 //! 10 working-day horizon (days 0..=9). Deterministic; a zero-hard plan exists
 //! (see the `reference_plan_is_feasible` test).
 
+use super::DemoData;
 use crate::domain::{Bus, Job, Plan, Technician};
 
 const MECHANICAL: &str = "mechanical";
@@ -69,6 +70,12 @@ pub fn depot_plan() -> Plan {
         .collect();
 
     Plan::new(technicians, buses, jobs)
+}
+
+/// Every demo-data id serves the depot scenario; the generic index-based seed
+/// in `data_seed.rs` stays compiler-owned and is only used for the id catalog.
+pub fn generate(_demo: DemoData) -> Plan {
+    depot_plan()
 }
 
 #[cfg(test)]

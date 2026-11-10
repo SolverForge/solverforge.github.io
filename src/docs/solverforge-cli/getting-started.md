@@ -49,13 +49,13 @@ solverforge --version
 output names the CLI and every crate a new project depends on:
 
 ```text
-solverforge solverforge-cli 3.9.0
-CLI version: 3.9.0
-Scaffold runtime target: SolverForge crate target 0.25.0
+solverforge solverforge-cli 4.0.2
+CLI version: 4.0.2
+Scaffold runtime target: SolverForge crate target 0.26.0
 Scaffold UI target: solverforge-ui 0.9.1
 Scaffold maps target: solverforge-maps 2.3.3
 Scaffold MCP target: rmcp 3.9.0
-Runtime source: crates.io: solverforge 0.25.0
+Runtime source: crates.io: solverforge 0.26.0
 UI source: crates.io: solverforge-ui 0.9.1
 Maps source: crates.io: solverforge-maps 2.3.3
 MCP source: crates.io: rmcp 3.9.0
@@ -152,9 +152,10 @@ solverforge generate constraint task_assigned --unary --hard
 solverforge generate constraint balanced_duration --balance
 ```
 
-Each command writes a module in `src/constraints/` and registers it in
-`src/constraints/mod.rs`. The stream wiring is complete, but the rule itself
-is a placeholder that panics. Until you replace it, every solve fails at once
+Each command writes a module in `src/constraints/`, declares it in
+`src/constraints/mod.rs`, and adds its `constraint()` call to
+`create_constraints` in `src/constraints/assemble.rs`. The stream wiring is
+complete, but the rule itself is a placeholder that panics. Until you replace it, every solve fails at once
 with `"lifecycleState":"FAILED"`, and the server log names the file:
 
 ```text

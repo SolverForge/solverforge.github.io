@@ -232,6 +232,13 @@ solverforge generate constraint required_skill --join --hard
 `employee_idx`, and `required_skill` joins each shift to the employee its
 `employee_idx` points at.
 
+Each command writes `src/constraints/<NAME>.rs`, adds `mod <NAME>;` to the
+`constraint-modules` block of `src/constraints/mod.rs`, and appends
+`super::<NAME>::constraint()` to the `constraint-calls` block of
+`create_constraints` in `src/constraints/assemble.rs`. The command refuses to
+run when `src/constraints/mod.rs` holds code; see
+[Project Anatomy](/docs/solverforge-cli/project-anatomy/#module-roots-hold-declarations-only).
+
 Every skeleton compiles, but its rule is a placeholder that panics. A solve
 fails with `lifecycleState` `FAILED` until you replace it; the panic message
 names the function and file to edit. The
@@ -409,7 +416,7 @@ Subcommands:
 | `entity`     | `solverforge destroy [OPTIONS] entity <NAME>` | Remove a planning entity and unwire its solution collection |
 | `variable`   | `solverforge destroy [OPTIONS] variable --entity <ENTITY_TYPE> <FIELD>` | Remove a planning variable field from an entity |
 | `fact`       | `solverforge destroy [OPTIONS] fact <NAME>` | Remove a problem fact and unwire its solution collection |
-| `constraint` | `solverforge destroy [OPTIONS] constraint <NAME>` | Remove a constraint module and registry entry |
+| `constraint` | `solverforge destroy [OPTIONS] constraint <NAME>` | Remove a constraint file, its `mod` line in `src/constraints/mod.rs`, and its call in `src/constraints/assemble.rs` |
 | `scalar-group` | `solverforge destroy [OPTIONS] scalar-group <NAME>` | Remove a scalar group declaration |
 | `conflict-repair` | `solverforge destroy [OPTIONS] conflict-repair <NAME>` | Remove a conflict repair declaration |
 

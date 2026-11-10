@@ -78,7 +78,7 @@ cargo install solverforge-cli --locked
 solverforge --version
 ```
 
-`solverforge-cli 3.9.0` scaffolds `solverforge 0.25.0` with
+`solverforge-cli 4.0.2` scaffolds `solverforge 0.26.0` with
 `solverforge-ui 0.9.1`; `solverforge --version` prints the targets your binary
 carries.
 
@@ -197,8 +197,9 @@ solverforge generate constraint desired_day --join --soft
 solverforge generate constraint balance_assignments --balance --soft
 ```
 
-Each command writes `src/constraints/<name>.rs` and registers it in
-`src/constraints/mod.rs`. The generated stream is ready; the placeholder
+Each command writes `src/constraints/<name>.rs`, declares it in
+`src/constraints/mod.rs`, and adds its call to `create_constraints` in
+`src/constraints/assemble.rs`. The generated stream is ready; the placeholder
 functions (the condition, and for joins the employee key) call `panic!` until
 you replace them, and a solve fails with that message while any is left.
 Replace each file with the version below.
@@ -816,16 +817,16 @@ another). Open `http://localhost:7860` and press **Solve**.
 
 The Space source is the finished app: it includes the deterministic hospital
 benchmark generator, retained-job API, modular schedule frontend, tests, and
-deployment files. The tagged release is `solverforge-hospital@3.0.1`.
+deployment files. The tagged release is `solverforge-hospital@3.0.3`.
 
 ### Keep the Published Dependency Shape
 
-The finished app runs on `solverforge 0.25.0` and the `solverforge-ui 0.9.0`
+The finished app runs on `solverforge 0.26.0` and the `solverforge-ui 0.9.0`
 web-shell assets. Its `Cargo.toml` dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.25.0", features = [
+solverforge = { version = "0.26.0", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -857,8 +858,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.25.0"
-runtime_source = "crates.io: solverforge 0.25.0"
+target = "solverforge 0.26.0"
+runtime_source = "crates.io: solverforge 0.26.0"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -1149,22 +1150,24 @@ matter only after hard problems are under control.
 
 Open `src/constraints/`.
 
-Each sibling file defines one incremental rule. `create_constraints()` assembles
-those rules into the scoring model:
+Each sibling file defines one incremental rule. `src/constraints/mod.rs`
+declares the rule modules and re-exports `create_constraints`; it holds no
+code. `create_constraints()` in `src/constraints/assemble.rs` assembles the
+rules into the scoring model, in the order score analysis lists them:
 
 ```rust
 pub fn create_constraints() -> impl ConstraintSet<Plan, HardSoftDecimalScore> {
     // @solverforge:begin constraint-calls
     (
-        assigned_shift::constraint(),
-        required_skill::constraint(),
-        overlapping_shift::constraint(),
-        minimum_rest::constraint(),
-        one_shift_per_day::constraint(),
-        unavailable_employee::constraint(),
-        undesired_day::constraint(),
-        desired_day::constraint(),
-        balance_assignments::constraint(),
+        super::assigned_shift::constraint(),
+        super::required_skill::constraint(),
+        super::overlapping_shift::constraint(),
+        super::minimum_rest::constraint(),
+        super::one_shift_per_day::constraint(),
+        super::unavailable_employee::constraint(),
+        super::undesired_day::constraint(),
+        super::desired_day::constraint(),
+        super::balance_assignments::constraint(),
     )
     // @solverforge:end constraint-calls
 }
@@ -1362,7 +1365,8 @@ domain rule layer. A home-hub preference is a soft fact join. From the
 solverforge generate constraint home_hub_match --join --soft
 ```
 
-The CLI writes the module and registers it in `src/constraints/mod.rs`.
+The CLI writes the module, declares it in `src/constraints/mod.rs`, and
+appends `super::home_hub_match::constraint()` to `src/constraints/assemble.rs`.
 Replace its placeholders: join `Shift.employee_idx` to `Employee.index`, keep
 pairs where `employee.home_hub == shift.care_hub`, and reward the match.
 Replace `src/constraints/home_hub_match.rs` with:
@@ -1446,14 +1450,15 @@ state.
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
-| Tagged app release               | `solverforge-hospital@3.0.1`               |
+| Tagged app release               | `solverforge-hospital@3.0.3`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |
 | Employee fact                    | `src/domain/employee.rs`                   |
 | Care hub                         | `src/domain/care_hub.rs`                   |
 | Shift entity and scalar variable | `src/domain/plan.rs`                       |
-| Constraint assembly              | `src/constraints/mod.rs`                   |
+| Constraint module declarations   | `src/constraints/mod.rs`                   |
+| Constraint assembly              | `src/constraints/assemble.rs`              |
 | One scheduling rule              | `src/constraints/*.rs`                     |
 | Public demo-data entrypoints     | `src/data/data_seed/entrypoints.rs`        |
 | Published benchmark generator    | `src/data/data_seed/large.rs` and siblings |

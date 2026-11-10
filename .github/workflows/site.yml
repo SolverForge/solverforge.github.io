@@ -71,8 +71,8 @@ jobs:
             ~/.cargo/bin/solverforge
             ~/.cache/walkthrough-target
             ~/.cache/getting-started-target
-          key: walkthrough-solverforge-cli-3.9.0-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
-          restore-keys: walkthrough-solverforge-cli-3.9.0-
+          key: walkthrough-solverforge-cli-4.0.2-${{ hashFiles('scripts/fixtures/maintenance-walkthrough/**') }}
+          restore-keys: walkthrough-solverforge-cli-4.0.2-
 
       # The Rust library pages compile and run against crates.io solverforge;
       # keep that build between runs.
@@ -95,10 +95,10 @@ jobs:
           key: solver-config-${{ hashFiles('scripts/fixtures/solver-config/Cargo.lock') }}-${{ hashFiles('scripts/fixtures/solver-config/src/**') }}
           restore-keys: solver-config-${{ hashFiles('scripts/fixtures/solver-config/Cargo.lock') }}-
 
-      - name: Install solverforge-cli 3.9.0
+      - name: Install solverforge-cli 4.0.2
         run: |
-          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 3.9.0'; then
-            cargo install solverforge-cli --version 3.9.0 --locked --force
+          if ! solverforge --version 2>/dev/null | grep -q 'CLI version: 4.0.2'; then
+            cargo install solverforge-cli --version 4.0.2 --locked --force
           fi
           solverforge --version
 

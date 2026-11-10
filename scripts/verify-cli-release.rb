@@ -12,11 +12,11 @@ require_relative "release_pins"
 # Provenance of the audited solverforge-cli artifact. A newer publish moves
 # ReleasePins::CLI, and then these two values must be re-audited before the
 # gate passes again.
-EXPECTED_SOURCE_SHA = "f346415e833091586e0dcec0daf2c8ea4f9e07d4"
-EXPECTED_ARTIFACT_SHA256 = "d4c4a680248e15e9a002beb6c2f93795d5762973b411be75ef50bb921f682fb3"
+EXPECTED_SOURCE_SHA = "9a780eaf9d6a77bfb6f311ba943558faced14935"
+EXPECTED_ARTIFACT_SHA256 = "b8e0e989da0e8531d2def434243de35dcc2afa99689bfeb873f3ee82228fe28e"
 
 EXPECTED_CLI_VERSION = ReleasePins::CLI
-EXPECTED_RUNTIME_VERSION = ReleasePins::RUNTIME
+EXPECTED_RUNTIME_VERSION = ReleasePins::CLI_SCAFFOLD_RUNTIME
 EXPECTED_UI_VERSION = ReleasePins::UI
 EXPECTED_MAPS_VERSION = ReleasePins::MAPS
 EXPECTED_MCP_VERSION = "3.9.0"
@@ -160,11 +160,11 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   fail!("telemetry still exposes the old single-phase field") if File.read(telemetry).include?('pub phase: Option<PhaseTelemetryDto>')
 
   original_config = File.read(config)
-  ['"auto"', '"none"', '{ count = 0 }', '{ count = 4 }'].each do |value|
+  ['"auto"', '"none"', '{ count = 4 }'].each do |value|
     File.write(config, "move_thread_count = #{value}\n\n#{original_config}")
     run_command(cli, "check", "--quiet", chdir: app_root)
   end
-  ['4', '"many"', '{ count = -1 }', '{ count = "four" }', '{}', '{ count = 4, threads = 4 }'].each do |value|
+  ['4', '"many"', '{ count = 0 }', '{ count = -1 }', '{ count = "four" }', '{}', '{ count = 4, threads = 4 }'].each do |value|
     File.write(config, "move_thread_count = #{value}\n\n#{original_config}")
     stdout, stderr, status = Open3.capture3(cli, "check", "--quiet", chdir: app_root)
     fail!("check accepted invalid move_thread_count #{value}") if status.success?
@@ -199,6 +199,21 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   run_command(cli, "generate", "score", "HardSoftDecimalScore", "--quiet", chdir: app_root)
   assert_file_contains(File.join(app_root, "src", "constraints", "assigned.rs"), "HardSoftDecimalScore")
   assert_file_contains(File.join(app_root, "solverforge.app.toml"), 'score = "HardSoftDecimalScore"')
+
+  # The two-file constraint layout the CLI pages describe: mod.rs declares the
+  # modules, assemble.rs holds create_constraints, and check rejects code in a
+  # module root.
+  constraints_mod = File.join(app_root, "src", "constraints", "mod.rs")
+  assert_file_contains(constraints_mod, "mod assigned;")
+  assert_file_contains(constraints_mod, "pub use assemble::create_constraints;")
+  fail!("src/constraints/mod.rs still defines create_constraints") if File.read(constraints_mod).include?("fn create_constraints")
+  assert_file_contains(File.join(app_root, "src", "constraints", "assemble.rs"), "super::assigned::constraint()")
+  original_mod = File.read(constraints_mod)
+  File.write(constraints_mod, "#{original_mod}\nfn helper() {}\n")
+  stdout, stderr, status = Open3.capture3(cli, "check", chdir: app_root)
+  File.write(constraints_mod, original_mod)
+  fail!("check accepted a function in src/constraints/mod.rs") if status.success?
+  assert_contains(stdout + stderr, "module roots may hold only module declarations", "module-root diagnostic")
   run_command(cli, "check", "--quiet", chdir: app_root)
   stdout, stderr, status = Open3.capture3(cli, "destroy", "--yes", "entity", "task", chdir: app_root)
   fail!("destroy removed an entity a constraint still reads") if status.success?

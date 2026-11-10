@@ -31,8 +31,8 @@ RENDERED = File.join(SITE_ROOT, "output", PAGE_URL, "index.html")
 FIXTURES = File.join(SITE_ROOT, "scripts/fixtures/maintenance-walkthrough")
 PROMPT = File.join(FIXTURES, "prompt.md")
 
-EXPECTED_CLI_VERSION = "3.9.0"
-EXPECTED_RUNTIME_VERSION = "0.25.0"
+EXPECTED_CLI_VERSION = "4.0.2"
+EXPECTED_RUNTIME_VERSION = "0.26.0"
 EXPECTED_UNIT_TESTS = 20
 APP_NAME = "depot-maintenance"
 APP_BINARY = "depot_maintenance"
@@ -291,6 +291,9 @@ def check_live(page)
       fail!("fixture #{relative} does not replace a generated file") unless File.file?(target) || relative == "src/data/depot.rs"
       File.write(target, source)
     end
+
+    log "Checking the overlaid project with solverforge check"
+    run!(git_identity, [cli, "check"], chdir: app)
 
     cargo_env = { "CARGO_TARGET_DIR" => ENV.fetch("SOLVERFORGE_WALKTHROUGH_TARGET_DIR", File.join(root, "target")) }
 
