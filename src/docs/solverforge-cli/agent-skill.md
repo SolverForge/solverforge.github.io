@@ -15,6 +15,14 @@ has to be decided and what makes a plan valid and good; the agent scaffolds the
 app with this CLI, writes the model and its constraints in Rust, generates demo
 data, and solves it before handing it back.
 
+## Watch One Session
+
+A bus depot's repair week goes from a paragraph of plain English to a running
+Rust app and a feasible plan, and then a bus breaks down while the plan is
+solving. Pick a scene to jump to it.
+
+<%= render Media::DemosceneVideo.from_data(site.data.demo_videos["describe_solve_repair"]) %>
+
 ## Quick Start
 
 1. Install the CLI and check its scaffold targets:

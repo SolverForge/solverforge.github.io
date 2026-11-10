@@ -29,6 +29,31 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
     </div>
   </section>
 
+  <% session = site.data.demo_videos["describe_solve_repair"] %>
+  <section class="home-demoscene home-demoscene--session" data-home-session-video aria-label="<%= session["name"] %> video">
+    <div class="home-demoscene__player">
+      <video
+        class="use-case-demoscene__video"
+        controls
+        playsinline
+        preload="none"
+        poster="<%= relative_url(session["poster"]) %>"
+        aria-label="<%= session["copy"] %>"
+      >
+        <source src="<%= relative_url(session["video"]) %>" type="video/mp4" />
+      </video>
+    </div>
+    <div>
+      <p class="page-shell__eyebrow">Watch one session · <%= session["duration"] %></p>
+      <h2>From a paragraph of English to a plan that survives a breakdown.</h2>
+      <p><%= session["copy"] %></p>
+      <p class="home-demoscene__note"><%= session["note"] %></p>
+      <a class="button button--secondary" href="<%= relative_url '/docs/solverforge-cli/agent-skill/#watch-one-session' %>">
+        Jump to a scene <i class="fa-solid fa-list-ol"></i>
+      </a>
+    </div>
+  </section>
+
   <section class="home-section home-section--split">
     <div>
       <p class="page-shell__eyebrow">Write constraints like you write code</p>

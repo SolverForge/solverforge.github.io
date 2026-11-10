@@ -1,0 +1,49 @@
+# Videos that are not a use case. Each renders through Media::DemosceneVideo:
+# the video, its poster, a caption, and a cue sheet that seeks it.
+#
+# describe_solve_repair replays one session with the solverforge-modeling
+# skill. Every prompt line, transcript line, code excerpt, score and plan on
+# screen comes from that session (solverforge-demoscene, forge_11). The run
+# used solverforge 0.25.1 and solverforge-cli 3.9.0, which the note says; do
+# not move these numbers to the current release.
+describe_solve_repair:
+  name: Describe, solve, repair
+  video: "/videos/demos/solverforge-describe-solve-repair.mp4"
+  poster: "/images/demos/solverforge-describe-solve-repair-poster.png"
+  duration: "3:32"
+  label: SolverForge · describe, solve, repair · 3:32
+  copy: >-
+    A bus depot's repair week, described in plain English, becomes a Rust app
+    and a feasible plan in 153 ms. Then a bus breaks down mid-solve and the
+    running plan is repaired in 17 ms.
+  note: >-
+    One real session with the solverforge-modeling skill, on solverforge 0.25.1
+    and solverforge-cli 3.9.0. The current release is newer.
+  cues:
+    - at: 0
+      label: "0:00"
+      text: SolverForge, and the four steps the video follows.
+    - at: 20
+      label: "0:20"
+      text: "Describe: 12 buses, 4 technicians, 20 repair jobs and 10 days, typed to the agent in plain English."
+    - at: 44
+      label: "0:44"
+      text: "Generate: the agent writes the constraints in Rust with the solverforge-modeling skill."
+    - at: 62
+      label: "1:02"
+      text: "Solve: the app starts on the depot's laptop, with the four technicians and ten days on the board."
+    - at: 89
+      label: "1:29"
+      text: The first feasible plan arrives in 153 ms. No hard rule is broken.
+    - at: 106
+      label: "1:46"
+      text: "Repair: a disruption reaches the plan while it is still solving."
+    - at: 116
+      label: "1:56"
+      text: Bus 05 breaks down in service and needs an urgent electrical repair by day 2.
+    - at: 128
+      label: "2:08"
+      text: The running plan is repaired in 17 ms. Five jobs move, fifteen stay where they were.
+    - at: 172
+      label: "2:52"
+      text: The code stays in the depot's repo, runs on its laptop, and upgrades when the depot says so.
