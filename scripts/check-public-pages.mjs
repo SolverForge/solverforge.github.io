@@ -1667,6 +1667,105 @@ async function checkBrandFilm(origin) {
   return failures;
 }
 
+// The describe, solve, repair session video: the full player with its scene
+// list on the Agent Skill page, and the plain player under the home hero. The
+// source, poster, and cue count are pinned here, the duration is measured from
+// the file, and clicking a scene has to move the video there.
+const SESSION_VIDEO = {
+  video: "/videos/demos/solverforge-describe-solve-repair.mp4",
+  poster: "/images/demos/solverforge-describe-solve-repair-poster.png",
+  duration: 212,
+  cues: 9,
+  docs: "/docs/solverforge-cli/agent-skill/",
+};
+
+async function checkSessionVideo(origin) {
+  const browser = await chromium.launch(chromiumOptions());
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+  const failures = [];
+  let path = SESSION_VIDEO.docs;
+  try {
+    await page.goto(`${origin}${path}`, { waitUntil: "load" });
+    const stage = await page.evaluate(async () => {
+      const stages = document.querySelectorAll("[data-demoscene]");
+      const video = stages[0]?.querySelector("[data-demoscene-video]");
+      if (!video) return { stages: stages.length, ran: false, reason: "no video" };
+      const heading = document.querySelector("h2#watch-one-session");
+      const quickStart = document.querySelector("h2#quick-start");
+      video.muted = true;
+      if (video.readyState < 1) {
+        const ready = await Promise.race([
+          new Promise((resolve) => video.addEventListener("loadedmetadata", () => resolve(true), { once: true })),
+          new Promise((resolve) => setTimeout(() => resolve(false), 8000)),
+        ]);
+        if (!ready) return { stages: stages.length, ran: false, reason: "metadata never loaded", readyState: video.readyState, networkState: video.networkState, error: video.error?.code ?? null, h264: video.canPlayType('video/mp4; codecs="avc1.640028"') };
+      }
+      return {
+        stages: stages.length,
+        ran: true,
+        src: video.querySelector("source")?.getAttribute("src") || "",
+        poster: video.getAttribute("poster") || "",
+        duration: video.duration,
+        cues: [...stages[0].querySelectorAll("[data-demoscene-cue]")].map((cue) => Number(cue.dataset.demosceneCue)),
+        beforeQuickStart: Boolean(heading && quickStart && (heading.compareDocumentPosition(stages[0]) & Node.DOCUMENT_POSITION_FOLLOWING) && (stages[0].compareDocumentPosition(quickStart) & Node.DOCUMENT_POSITION_FOLLOWING)),
+      };
+    });
+    if (stage.stages !== 1) failures.push({ path, issue: "expected exactly one session video player", found: stage.stages });
+    if (!stage.ran) {
+      failures.push({ path, issue: "session video did not load", ...stage });
+    } else {
+      if (stage.src !== SESSION_VIDEO.video) failures.push({ path, issue: "unexpected session video source", src: stage.src });
+      if (stage.poster !== SESSION_VIDEO.poster) failures.push({ path, issue: "session video poster missing or wrong", poster: stage.poster });
+      if (!(Math.abs(stage.duration - SESSION_VIDEO.duration) < 1)) failures.push({ path, issue: "session video is not the full 3:32 cut", duration: stage.duration });
+      if (stage.cues.length !== SESSION_VIDEO.cues) failures.push({ path, issue: `expected ${SESSION_VIDEO.cues} scenes`, found: stage.cues.length });
+      if (!(stage.cues[0] === 0 && stage.cues.every((at, i) => i === 0 || at > stage.cues[i - 1]) && stage.cues.at(-1) < stage.duration)) {
+        failures.push({ path, issue: "scenes must start at 0, increase, and land inside the video", cues: stage.cues, duration: stage.duration });
+      }
+      if (!stage.beforeQuickStart) failures.push({ path, issue: "session video is not under Watch One Session, before Quick Start" });
+
+      const index = Math.min(6, stage.cues.length - 1);
+      await page.locator("[data-demoscene] [data-demoscene-cue]").nth(index).click();
+      await page.waitForTimeout(300);
+      const seek = await page.evaluate(() => {
+        const video = document.querySelector("[data-demoscene-video]");
+        video.pause();
+        return {
+          time: video.currentTime,
+          current: [...document.querySelectorAll("[data-demoscene-cue]")].findIndex((cue) => cue.getAttribute("aria-current") === "true"),
+        };
+      });
+      const target = stage.cues[index];
+      if (!(seek.time >= target - 0.05 && seek.time < target + 2)) failures.push({ path, issue: "scene did not seek the session video", target, time: seek.time });
+      if (seek.current !== index) failures.push({ path, issue: "the clicked scene is not marked as the one on screen", expected: index, current: seek.current });
+    }
+
+    path = "/";
+    await page.goto(`${origin}${path}`, { waitUntil: "load" });
+    const home = await page.evaluate(() => {
+      const band = document.querySelector("[data-home-session-video]");
+      const hero = document.querySelector(".home-hero");
+      const video = band?.querySelector("video");
+      return {
+        present: Boolean(band && video),
+        afterHero: Boolean(band && hero && hero.nextElementSibling === band),
+        src: video?.querySelector("source")?.getAttribute("src") || "",
+        poster: video?.getAttribute("poster") || "",
+        links: [...(band?.querySelectorAll("a") || [])].map((link) => link.getAttribute("href")),
+      };
+    });
+    if (!home.present) failures.push({ path, issue: "home page has no session video" });
+    else {
+      if (!home.afterHero) failures.push({ path, issue: "session video does not follow the hero" });
+      if (home.src !== SESSION_VIDEO.video || home.poster !== SESSION_VIDEO.poster) failures.push({ path, issue: "home session video source or poster is wrong", ...home });
+      if (!home.links.includes(`${SESSION_VIDEO.docs}#watch-one-session`)) failures.push({ path, issue: "home session video does not link to its scene list", links: home.links });
+    }
+  } catch (error) {
+    failures.push({ path, issue: "session video check threw", error: String(error) });
+  }
+  await browser.close();
+  return failures;
+}
+
 const missingLinks = checkInternalLinks();
 const docsIndexTargets = checkDocsIndexTargets();
 const { server, origin } = await startServer();
@@ -1678,6 +1777,7 @@ let benchmarksPage = [];
 let benchmarksDocs = [];
 let releaseDocs = [];
 let brandFilm = [];
+let sessionVideo = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
@@ -1688,6 +1788,7 @@ try {
   benchmarksDocs = await checkBenchmarksDocs(origin);
   releaseDocs = await checkReleaseDocs(origin);
   brandFilm = await checkBrandFilm(origin);
+  sessionVideo = await checkSessionVideo(origin);
 } finally {
   server.close();
 }
@@ -1705,6 +1806,7 @@ const summary = {
   benchmarksDocs,
   releaseDocs,
   brandFilm,
+  sessionVideo,
   layoutFailures,
 };
 
@@ -1721,6 +1823,7 @@ if (
   benchmarksDocs.length ||
   releaseDocs.length ||
   brandFilm.length ||
+  sessionVideo.length ||
   layoutFailures.length
 ) {
   process.exit(1);

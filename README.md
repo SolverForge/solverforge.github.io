@@ -53,9 +53,10 @@ Direct Bridgetown commands:
 4. `bundle exec bridgetown build`
 5. `ruby scripts/verify-cli-release.rb`
 6. `ruby scripts/verify-use-cases-page.rb`
-7. `ruby scripts/verify-hospital-tutorial.rb`
-8. `ruby scripts/verify-deliveries-tutorial.rb`
-9. `bundle exec bridgetown start -P 4017`
+7. `ruby scripts/verify-demo-videos.rb`
+8. `ruby scripts/verify-hospital-tutorial.rb`
+9. `ruby scripts/verify-deliveries-tutorial.rb`
+10. `bundle exec bridgetown start -P 4017`
 
 `make verify-hospital-tutorial` replays the hospital use-case page with the
 published CLI: it installs `solverforge-cli` at the version the page documents

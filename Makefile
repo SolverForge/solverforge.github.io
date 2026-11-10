@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy verify-solver-config verify-ui-getting-started verify-python-docs verify-companion-docs
+.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-demo-videos verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy verify-solver-config verify-ui-getting-started verify-python-docs verify-companion-docs
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -37,6 +37,7 @@ help:
 	@printf '  make verify-release-surface     Verify current package and app version contracts\n'
 	@printf '  make verify-benchmarks          Verify recorded full-run benchmark evidence\n'
 	@printf '  make verify-use-cases           Verify the use-case showcase content and assets\n'
+	@printf '  make verify-demo-videos         Verify the session video, its scenes, and the pages showing it\n'
 	@printf '  make verify-cli-release         Install the published CLI and verify scaffold targets\n'
 	@printf '  make verify-rust-snippets       Compile Rust library doc blocks against crates.io solverforge, run shown outputs\n'
 	@printf '  make verify-rust-snippets-legacy Compile-check Rust snippets on pages not yet in that scope\n'
@@ -94,6 +95,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-release-surface.rb
 	$(call status,Verifying use-case showcase contract)
 	@ruby scripts/verify-use-cases-page.rb
+	$(call status,Verifying the session video contract)
+	@ruby scripts/verify-demo-videos.rb
 	$(call status,Verifying hospital tutorial page contract)
 	@ruby scripts/verify-hospital-tutorial.rb --static
 	$(call status,Verifying lessons tutorial page contract)
@@ -133,7 +136,7 @@ check-public-pages:
 # page's validation commands). CI runs them in their own matrix job.
 TUTORIAL_REPLAYS ?= verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-rust-snippets verify-rust-snippets-legacy verify-solver-config verify-companion-docs build check-public-pages verify-ui-getting-started verify-python-docs verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page $(TUTORIAL_REPLAYS)
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-demo-videos verify-rust-snippets verify-rust-snippets-legacy verify-solver-config verify-companion-docs build check-public-pages verify-ui-getting-started verify-python-docs verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page $(TUTORIAL_REPLAYS)
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -153,6 +156,10 @@ verify-benchmarks:
 verify-use-cases:
 	$(call status,Verifying the use-case showcase contract)
 	@ruby scripts/verify-use-cases-page.rb
+
+verify-demo-videos:
+	$(call status,Verifying the session video contract)
+	@ruby scripts/verify-demo-videos.rb
 
 verify-rust-snippets:
 	$(call status,Compiling and running Rust library documentation blocks)
