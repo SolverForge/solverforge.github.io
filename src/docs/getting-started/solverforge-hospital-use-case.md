@@ -78,7 +78,7 @@ cargo install solverforge-cli --locked
 solverforge --version
 ```
 
-`solverforge-cli 4.0.2` scaffolds `solverforge 0.26.0` with
+`solverforge-cli 4.0.3` scaffolds `solverforge 0.26.0` with
 `solverforge-ui 0.9.1`; `solverforge --version` prints the targets your binary
 carries.
 

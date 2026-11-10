@@ -15,7 +15,7 @@ crates.io on 2026-11-10. The first release is
 floor. `cargo add solverforge` installs 0.26.0, and docs.rs serves the 0.26.0
 API. The public modeling, stream, configuration, and solving APIs are
 unchanged; the one breaking change is in the lower-level
-`solverforge-scoring` score-director constructors. `solverforge-cli 4.0.2`
+`solverforge-scoring` score-director constructors. `solverforge-cli 4.0.3`
 scaffolds 0.26.0, and all eight worked use cases pin it.
 
 ## What Changed
@@ -84,7 +84,7 @@ Public paths and behaviour are unchanged.
 | ------- | ------- | ----- |
 | Core runtime | `solverforge 0.26.0` | Rust `1.95`; replica directors built by `with_replicas*`; proportional stream closure types; documented generated items |
 | Previous core runtime | `solverforge 0.25.1` | Bounded nearby list candidates; see the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) |
-| CLI | `solverforge-cli 4.0.2` | Fresh scaffolds target core `0.26.0`; see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
+| CLI | `solverforge-cli 4.0.3` | Fresh scaffolds target core `0.26.0`; see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
 | Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Compiled onto core `0.23.0`; upgrading the Rust core does not retarget these wheels |
 | Worked use cases | November 10 app releases | All eight pin core `0.26.0` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |
 | UI | `solverforge-ui 0.9.1` | Unchanged |

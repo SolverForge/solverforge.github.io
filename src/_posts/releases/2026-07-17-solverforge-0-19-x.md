@@ -24,7 +24,7 @@ For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
 is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
-The `solverforge-cli 4.0.2` line scaffolds core `0.26.0` (4.0.0 and 4.0.1
+The `solverforge-cli 4.0.3` line scaffolds core `0.26.0` (4.0.0 and 4.0.1
 targeted `0.25.1`, 3.9.0 targeted
 `0.25.0`, 3.8.x targeted `0.24.0`, 3.7.x targeted `0.23.0`, 3.6.0 targeted `0.22.0`; 3.4.0 targeted
 `0.20.4`, 3.5.0 targeted `0.21.0`, 3.5.1 targeted `0.21.2`, and 3.5.2 targeted

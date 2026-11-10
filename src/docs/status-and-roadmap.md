@@ -30,7 +30,7 @@ breaking change and upgrade checklist; the
 the termination, parallel-evaluation, and configuration changes of the
 previous line.
 
-The independently published CLI line is `solverforge-cli 4.0.2`. Fresh
+The independently published CLI line is `solverforge-cli 4.0.3`. Fresh
 scaffolds target `solverforge 0.26.0`, with `solverforge-ui 0.9.1` and
 `solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell.
 A generated project declares its constraint modules in
@@ -39,13 +39,13 @@ every `mod.rs` and `lib.rs` holds only declarations, which `check` enforces.
 A fresh scaffold solves its empty plan through the runtime's default pipeline,
 generated code is rustfmt-clean, `--field` types are imported, and `check`
 states that it does not compile the project. Generated constraint skeletons
-still panic until their placeholders are replaced. The 4.0.2
-[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42809536259)
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42809536103)
+still panic until their placeholders are replaced. The 4.0.3
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42845615766)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42845615729)
 workflows and the exact-commit
-[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42809532226)
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42845606910)
 on Linux, macOS, Windows, and integration tests passed at
-`9a780eaf9d6a77bfb6f311ba943558faced14935`. See the
+`5f2cafaa09a1d27ca4a6aa37e829a42138a2ee07`. See the
 [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
 Apps scaffolded by earlier releases pin older cores (`0.25.1` from 4.0.0 and
 4.0.1, `0.25.0` from 3.9.0,
@@ -83,10 +83,10 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.26.0`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, and replica directors built by `ScoreDirector::with_replicas`; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.2` targets `solverforge 0.26.0`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.3` targets `solverforge 0.26.0`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
 | **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.3`, `solverforge-lessons@3.0.3`, `solverforge-deliveries@3.0.4`, `solverforge-fsr@3.0.4`, plus the repository-only `solverforge-furnace@4.0.1`, `solverforge-orders@0.3.3`, `solverforge-fleet@0.2.3`, and `solverforge-flightcrew@0.3.4`; all eight target `solverforge 0.26.0` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.0.2` scaffolds it directly |
+| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.0.3` scaffolds it directly |
 | **Maps** | Published | `solverforge-maps 2.3.3` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, and identifies its client to Overpass |
 
 ## Try It Today
@@ -195,7 +195,7 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 - **Core runtime line**: these manuals describe `solverforge 0.26.0`, with
   Rust `1.95`. The
-  published `solverforge-cli 4.0.2` package targets `solverforge 0.26.0` for
+  published `solverforge-cli 4.0.3` package targets `solverforge 0.26.0` for
   fresh scaffolds; apps scaffolded by earlier releases pin older cores
   (`0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0, `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
   and an app should

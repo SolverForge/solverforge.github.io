@@ -49,8 +49,8 @@ solverforge --version
 output names the CLI and every crate a new project depends on:
 
 ```text
-solverforge solverforge-cli 4.0.2
-CLI version: 4.0.2
+solverforge solverforge-cli 4.0.3
+CLI version: 4.0.3
 Scaffold runtime target: SolverForge crate target 0.26.0
 Scaffold UI target: solverforge-ui 0.9.1
 Scaffold maps target: solverforge-maps 2.3.3

@@ -2,7 +2,7 @@
 title: Command Reference
 description: >
   Command groups, global options, version reporting, and the full
-  solverforge-cli 4.0.2 command surface.
+  solverforge-cli 4.0.3 command surface.
 weight: 5
 ---
 
@@ -83,15 +83,15 @@ solverforge generate variable --help
 `solverforge -V` prints only the CLI package version:
 
 ```text
-solverforge 4.0.2
+solverforge 4.0.3
 ```
 
 `solverforge --version` reports the CLI package version separately from every
 crate target and source used by newly scaffolded projects:
 
 ```text
-solverforge solverforge-cli 4.0.2
-CLI version: 4.0.2
+solverforge solverforge-cli 4.0.3
+CLI version: 4.0.3
 Scaffold runtime target: SolverForge crate target 0.26.0
 Scaffold UI target: solverforge-ui 0.9.1
 Scaffold maps target: solverforge-maps 2.3.3
@@ -103,7 +103,7 @@ MCP source: crates.io: rmcp 3.9.0
 ```
 
 That output is versioned with the installed CLI. The current
-`solverforge-cli 4.0.2` line starts new scaffolds on the published
+`solverforge-cli 4.0.3` line starts new scaffolds on the published
 `solverforge 0.26.0` runtime, with `solverforge-ui 0.9.1` and
 `solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell.
 The core runtime can move ahead of the scaffold target, so registry installs

@@ -88,7 +88,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 4.0.2`, which scaffolds `solverforge 0.26.0`,
+This page uses `solverforge-cli 4.0.3`, which scaffolds `solverforge 0.26.0`,
 `solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Dispatcher from the CLI

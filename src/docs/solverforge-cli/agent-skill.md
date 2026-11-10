@@ -140,6 +140,11 @@ generated app after an agent edits it:
   panic-free server
 - for CLI shells it validates `demo-data` serialization
 
+The script talks only to the app on `127.0.0.1` and never pipes `curl` output
+into an interpreter: `python3` parses responses saved to files or held in shell
+variables. Agents that scan skill scripts before loading them, such as Hermes
+Agent, load the skill.
+
 It is a development aid, not a replacement for the generated-app test suites
 described in the CLI repository's validation flow.
 
