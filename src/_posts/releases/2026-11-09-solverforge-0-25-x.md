@@ -9,12 +9,20 @@ description: >
   evaluation by default.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core line. The current core release is
+`solverforge 0.26.0`; see the [0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/).
+<% end %>
+
 **solverforge 0.25.x** follows `solverforge 0.24.0`; the line was published on
 crates.io on 2026-11-09. The first release is
 [0.25.0](https://crates.io/crates/solverforge/0.25.0), with a Rust `1.95`
-floor. `cargo add solverforge` installs 0.25.0, and docs.rs serves the 0.25.0
-API. Fresh `solverforge-cli 3.9.x` scaffolds target it; existing applications
-keep their pins until they upgrade.
+floor, and the line closes with
+[0.25.1](https://crates.io/crates/solverforge/0.25.1). At publication
+`cargo add solverforge` installed 0.25.0, and docs.rs served the 0.25.0 API.
+`solverforge-cli 3.9.0` scaffolds target 0.25.0 and `solverforge-cli` 4.0.0
+and 4.0.1 scaffold target 0.25.1; existing applications keep their pins until they
+upgrade.
 
 ## What Changed
 
@@ -132,15 +140,29 @@ See [SolverManager](/docs/solverforge/solver/solver-manager/).
 
 ### Performance
 
-Construction reuses its candidate and value buffers across placements, a solver
+The 0.25.1 patch keeps the nearest destinations of the nearby list change and
+swap cursors in one bounded buffer per cursor, described below. In 0.25.0,
+construction reuses its candidate and value buffers across placements, a solver
 runner keeps its declaration only when it runs partitioned search, and the
 global Rayon pool is no longer initialized while a solver compiles.
+
+### 0.25.1: bounded nearby list candidates
+
+The nearby list change and swap cursors keep only the `max_nearby` nearest
+destinations of a source position in one buffer each cursor owns, ordered by
+ascending distance with offer order between equal distances. That is the same
+set and order the earlier sort-and-truncate produced, so candidate streams
+are unchanged; the buffer is reused across source positions and moves read
+from it directly, with no per-position allocation
+([#228](https://github.com/SolverForge/solverforge/issues/228)). The public
+API is unchanged.
 
 ## Published Version Boundaries
 
 | Surface | Version | Notes |
 | ------- | ------- | ----- |
 | Core runtime | `solverforge 0.25.0` | Rust `1.95`; literal termination, automatic parallel evaluation, framework partitioned search, stricter configuration |
+| Core patch | `solverforge 0.25.1` | Bounded nearby list candidate buffer; API unchanged; scaffolded by `solverforge-cli` 4.0.0 and 4.0.1 |
 | Previous core runtime | `solverforge 0.24.0` | Explicit configuration and constraint weights; see the [0.24.x release note](/blog/releases/2026/11/01/solverforge-0-24-x/) |
 | CLI | `solverforge-cli 3.9.0` | Fresh scaffolds target core `0.25.0` |
 | Previous CLI | `solverforge-cli 3.8.3` | Scaffolds core `0.24.0`; existing projects retain their pins |
@@ -169,10 +191,24 @@ re-ran the CI matrix on Linux, macOS, and Windows with the Miri, MSRV, docs,
 and package jobs, verified the release, published to crates.io, and created
 the GitHub Release; every job succeeded.
 
+All nine workspace crates publish `0.25.1`. The registry records the facade
+crate's publication at `2026-11-09T17:38:50Z`; its artifact SHA-256 is
+`c899657c17ae3a41d67b583ec400e5d79fe253f0ed62a38a2efcb5d04d1171bb`, and
+`.cargo_vcs_info.json` binds it to
+`6069763dffdf57786b703f113e5d290f3695ed02`, the `v0.25.1` tag commit. On that
+commit the [CI run](https://github.com/SolverForge/solverforge/actions/runs/42663097755)
+passed, and the
+[Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42663102655)
+re-ran the CI matrix on Linux, macOS, and Windows with the Miri, MSRV, docs,
+and package jobs, verified the release, published to crates.io, and created
+the [GitHub Release](https://github.com/SolverForge/solverforge/releases/tag/v0.25.1)
+at `2026-11-09T17:39:07Z`; every job succeeded.
+
 ## Patch History
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.25.1` | 2026-11-09 | The nearby list change and swap cursors keep the nearest destinations in one bounded buffer per cursor; candidate streams and API unchanged. |
 | `0.25.0` | 2026-11-09 | Every termination criterion applies with no hidden time limit; automatic measured parallel evaluation; fixed seeds and stronger checks in the assert modes; partitioned search run by the framework; ignored configuration rejected; snapshot analysis gated on `constraint_match_enabled`; configuration overrides. |
 
 ## Upgrade Checklist
@@ -199,6 +235,8 @@ the GitHub Release; every job succeeded.
 Read the [core manual](/docs/solverforge/) and the
 [solver configuration guide](/docs/solverforge/solver/configuration/). The
 [full compare](https://github.com/SolverForge/solverforge/compare/v0.24.0...v0.25.0)
-covers all 54 commits, and the
+covers all 54 commits of 0.25.0, the
+[0.25.1 compare](https://github.com/SolverForge/solverforge/compare/v0.25.0...v0.25.1)
+covers the patch, and the
 [CHANGELOG](https://github.com/SolverForge/solverforge/blob/v0.25.0/CHANGELOG.md)
 lists every breaking change.

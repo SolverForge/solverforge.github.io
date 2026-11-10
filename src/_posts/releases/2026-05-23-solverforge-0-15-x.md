@@ -9,19 +9,20 @@ description: >
   move-level runtime telemetry.
 ---
 
-<%= render Ui::Callout.new(title: "Update, November 9, 2026") do %>
-This is a historical release note. `solverforge 0.25.0` is the current core
-release; its line note is the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/).
+<%= render Ui::Callout.new(title: "Update, November 10, 2026") do %>
+This is a historical release note. `solverforge 0.26.0` is the current core
+release; its line note is the [0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/).
 For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)
 is documented in the [0.19.x line note](/blog/releases/2026/07/17/solverforge-0-19-x/).
-The `solverforge-cli 3.9.0` line scaffolds core `0.25.0` (3.8.x targeted
-`0.24.0`, 3.7.x targeted `0.23.0`, 3.6.0 targeted `0.22.0`; 3.4.0 targeted
+The `solverforge-cli 4.0.2` line scaffolds core `0.26.0` (4.0.0 and 4.0.1
+targeted `0.25.1`, 3.9.0 targeted
+`0.25.0`, 3.8.x targeted `0.24.0`, 3.7.x targeted `0.23.0`, 3.6.0 targeted `0.22.0`; 3.4.0 targeted
 `0.20.4`, 3.5.0 targeted `0.21.0`, 3.5.1 targeted `0.21.2`, and 3.5.2 targeted
 `0.21.3`); Python 0.7.2 targets core 0.23.0 (see the
 [Python line note](/blog/releases/2026/10/27/solverforge-python-0-7-x/)); the
-November 3 Rust app releases target core 0.24.0 (see the
+November 10 app releases target core 0.26.0 (see the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/)).
 <% end %>
 

@@ -144,9 +144,73 @@ hosted runner. The next commit frees the runner's preinstalled SDKs; its
 Furnace's tests, which `solverforge-furnace@3.0.2` fixes. Bundle CI passed at
 that final app tag ([run 42571454634](https://github.com/SolverForge/solverforge-usecases/actions/runs/42571454634)).
 
+### November 10 releases: solverforge 0.25.1 and the CLI 4 layout
+
+On November 10 all eight apps released on `solverforge 0.25.1` and adopted the
+`solverforge-cli 4.0` constraint layout: `src/constraints/mod.rs` declares the
+rule modules and holds no code, and `create_constraints()` in
+`src/constraints/assemble.rs` calls each one as `super::<id>::constraint()`,
+the layout `solverforge generate constraint` edits and `solverforge check`
+validates. Field service also pins `solverforge-core 0.25.1`. The UI and
+maps dependencies are unchanged.
+
+Furnace released `4.0.0`, a breaking change. Its constraint ids are the
+snake_case module names, such as `changeover_gap` instead of `changeoverGap`,
+in score analysis and in `GET /jobs/{id}/analysis/{constraint_name}`. Each of
+its 30 constraints, 22 hard and 8 soft, lives in its own file; `shared.rs`
+keeps only scoring helpers. Its domain holds one type per file, its scalar
+groups and conflict repairs are registered through
+`solverforge generate scalar-group` and `solverforge generate conflict-repair`,
+and its `solver.toml` repair selectors name the new constraint ids.
+
+| App tag | Source commit | Space sync |
+| --- | --- | --- |
+| `solverforge-hospital@3.0.2` | `fad59750ea5870685dcf9bf4c47ffd3be9b4be39` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42736874938) |
+| `solverforge-lessons@3.0.2` | `d65009eabda22ccaab76b68162326412f358388a` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42736880673) |
+| `solverforge-deliveries@3.0.3` | `b085f99a6b8107b9644556ce8d480856f9d89e8b` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42736842886) |
+| `solverforge-fsr@3.0.3` | `e4ed1792721b5504d6250ccb61e5b10e0a715e7f` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42736861096) |
+| `solverforge-furnace@4.0.0` | `d7b4898cdda5410927390d389b92f506c1f1ee11` | repository-only |
+| `solverforge-orders@0.3.2` | `61c1f0c40ed5b6e5e3a2fb88fbfcfeb62ce9d617` | repository-only |
+| `solverforge-fleet@0.2.2` | `e11835da374fdbdb59cb012df8de1819ee97a8f2` | repository-only |
+| `solverforge-flightcrew@0.3.3` | `ded655a9487bf21ddbfa5a4eb88959e5da1a3492` | repository-only |
+
+Bundle CI passed at the final app tag, `solverforge-orders@0.3.2`
+([run 42736837747](https://github.com/SolverForge/solverforge-usecases/actions/runs/42736837747)).
+
+### November 10 releases: solverforge 0.26.0
+
+Later on November 10 all eight apps released on `solverforge 0.26.0`; see the
+[0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/). Each app
+moves its `solverforge` dependency, its lockfile, and the `[runtime]` lines of
+`solverforge.app.toml` to 0.26.0; Field service and Fleet also pin
+`solverforge-core 0.26.0`. The UI and maps dependencies, constraint ids, and
+HTTP contracts are unchanged. On 0.26.0 debug-info type names stay
+proportional to the constraint set, so `solverforge-furnace@4.0.1` builds its
+tests with full debug info again.
+
+| App tag | Source commit | Space sync |
+| --- | --- | --- |
+| `solverforge-hospital@3.0.3` | `944329d87a029aa61696ce74ce9fd660368bb72c` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42810005593) |
+| `solverforge-lessons@3.0.3` | `922eb1d2e8712445572b7bfeb7df2de463009191` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42810012066) |
+| `solverforge-deliveries@3.0.4` | `73dd1cf0fea6cd29fa584ec309d9d72d18c4916b` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42809974394) |
+| `solverforge-fsr@3.0.4` | `93eeb265d050d15a542cb5b04fe225393b63f334` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42809991743) |
+| `solverforge-furnace@4.0.1` | `2992c2f824bf75d393e21a5bd8c09a29de6b13d7` | repository-only |
+| `solverforge-orders@0.3.3` | `48c73d626e0bd0758a2885bf4ef6014a32cb077c` | repository-only |
+| `solverforge-fleet@0.2.3` | `98bd6bfb10072355d4df0068a44e172d755c4d57` | repository-only |
+| `solverforge-flightcrew@0.3.4` | `bdd055e7814ce6974286d209dd7949304aa7cb09` | repository-only |
+
+Bundle CI passed at the final app tag, `solverforge-orders@0.3.3`
+([run 42809967938](https://github.com/SolverForge/solverforge-usecases/actions/runs/42809967938)).
+
 ## Upgrade Checklist
 
 - Check out the app's own release tag from the tables above.
+- Read Furnace score analysis by the snake_case constraint ids of
+  `solverforge-furnace@4.0.0`.
+- An app of your own that still assembles its constraints in
+  `src/constraints/mod.rs` needs the move described in the
+  [CLI 4.0.x release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/#upgrade-checklist)
+  before CLI 4.0.x can edit it.
 - An app that
   matches `SolverManagerError` exhaustively needs a `SnapshotAnalysisDisabled`
   arm on `solverforge 0.25.0`.

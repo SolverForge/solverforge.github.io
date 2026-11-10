@@ -1492,7 +1492,9 @@ function releasePins() {
     if (!match) throw new Error(`scripts/release_pins.rb has no pin for ${crate}`);
     return match[1];
   };
-  return { core: pin("solverforge"), cli: pin("solverforge-cli"), ui: pin("solverforge-ui"), maps: pin("solverforge-maps") };
+  const cliRuntime = source.match(/CLI_SCAFFOLD_RUNTIME = "([0-9.]+)"/);
+  if (!cliRuntime) throw new Error("scripts/release_pins.rb has no CLI_SCAFFOLD_RUNTIME");
+  return { core: pin("solverforge"), cli: pin("solverforge-cli"), cliRuntime: cliRuntime[1], ui: pin("solverforge-ui"), maps: pin("solverforge-maps") };
 }
 
 async function checkReleaseDocs(origin) {
@@ -1501,33 +1503,35 @@ async function checkReleaseDocs(origin) {
   const page = await browser.newPage();
   const failures = [];
   const checks = [
-    { path: "/docs/solverforge/", required: [`cargo add solverforge@=${pins.core}`, `These pages track solverforge ${pins.core}`, `solverforge-cli ${pins.cli.split(".").slice(0, 2).join(".")} line scaffolds solverforge ${pins.core}`] },
+    { path: "/docs/solverforge/", required: [`cargo add solverforge@=${pins.core}`, `These pages track solverforge ${pins.core}`, `solverforge-cli ${pins.cli} scaffolds solverforge ${pins.cliRuntime}; an app`] },
     { path: "/docs/solverforge/solver/configuration/", required: ["\"auto\" (default)", "min(4, rayon::current_num_threads())", "min(N, rayon::current_num_threads(), 32)", "REPRODUCIBLE_RANDOM_SEED", "SnapshotAnalysisDisabled"] },
     { path: "/docs/solverforge/solver/local-search/", required: ["DiscardedSpeculative", "trajectory can depend on the evaluator count"] },
     { path: "/docs/solverforge/solver/phases/", required: ["SolverTelemetry::phases", "every started phase in execution order"] },
-    { path: "/docs/solverforge-cli/", required: [`solverforge-cli ${pins.cli} interface`, `Fresh scaffolds target solverforge ${pins.core}`, "evaluates local search on up to four evaluators when its measurements say"] },
-    { path: "/docs/solverforge-cli/getting-started/", required: [`CLI version: ${pins.cli}`, `SolverForge crate target ${pins.core}`, "\"lifecycleState\":\"FAILED\"", "it does not compile the project"] },
+    { path: "/docs/solverforge-cli/", required: [`solverforge-cli ${pins.cli} interface`, `Fresh scaffolds target solverforge ${pins.cliRuntime}`, "evaluates local search on up to four evaluators when its measurements say"] },
+    { path: "/docs/solverforge-cli/getting-started/", required: [`CLI version: ${pins.cli}`, `SolverForge crate target ${pins.cliRuntime}`, "src/constraints/assemble.rs", "\"lifecycleState\":\"FAILED\"", "it does not compile the project"] },
     { path: "/docs/solverforge-python/", required: ["solverforge 0.7.2", "solverforge-py v0.7.2", "solverforge 0.23.0", "parallel move evaluation"] },
     { path: "/docs/solverforge-python/modeling/", required: ["Entity Pinning", "planning_pin()", "planning_variable(pinning=True) is not supported", "mandatory planning work incomplete"] },
     { path: "/docs/solverforge-python/solving-and-runtime/", required: ["moves_speculative", "discarded_speculative", "phases", "GIL", "Callback Errors And Interrupts", "KeyboardInterrupt", "AttributeError", "SolverPanicPayload", "FAILED"] },
     { path: "/blog/releases/2026/10/27/solverforge-python-0-7-x/", required: ["SolverForge Python 0.7.x follows solverforge 0.6.15", "32 evaluators", "releases the GIL", "phases", "discarded_speculative", "solverforge 0.7.2", "0.7.1", "KeyboardInterrupt", "previous hook"] },
-    { path: "/docs/status-and-roadmap/", required: [`documentation tracks the solverforge ${pins.core} release`, `cargo add solverforge installs ${pins.core}`, `The independently published CLI line is solverforge-cli ${pins.cli}`, "solverforge-furnace@3.0.2", "solverforge-orders@0.3.1", "solverforge-flightcrew@0.3.2", "solverforge-fleet@0.2.1"] },
-    { path: "/blog/releases/2026/11/09/solverforge-0-25-x/", required: ["solverforge 0.25.x follows solverforge 0.24.0", "termination_composition", "REPRODUCIBLE_RANDOM_SEED", "SearchBuilder::partitioner", "SnapshotAnalysisDisabled", "3115b4dd6b40bc72a472b042f5e6b665cb9720c7"] },
-    { path: "/blog/releases/2026/11/09/solverforge-cli-3-9-x/", required: [`solverforge-cli ${pins.cli} was published on November 9, 2026`, "409 Conflict", "f33d836f"] },
+    { path: "/docs/status-and-roadmap/", required: [`documentation tracks the solverforge ${pins.core} release`, `cargo add solverforge installs ${pins.core}`, `The independently published CLI line is solverforge-cli ${pins.cli}`, "solverforge-furnace@4.0.1", "solverforge-orders@0.3.3", "solverforge-flightcrew@0.3.4", "solverforge-fleet@0.2.3", "solverforge-hospital@3.0.3", "solverforge-lessons@3.0.3", "solverforge-deliveries@3.0.4", "solverforge-fsr@3.0.4", "eight apps on solverforge 0.26.0"] },
+    { path: "/blog/releases/2026/11/09/solverforge-0-25-x/", required: ["solverforge 0.25.x follows solverforge 0.24.0", "termination_composition", "REPRODUCIBLE_RANDOM_SEED", "SearchBuilder::partitioner", "SnapshotAnalysisDisabled", "3115b4dd6b40bc72a472b042f5e6b665cb9720c7", "6069763dffdf57786b703f113e5d290f3695ed02", `The current core release is solverforge ${pins.core}`] },
+    { path: "/blog/releases/2026/11/10/solverforge-0-26-x/", required: ["solverforge 0.26.x follows solverforge 0.25.1", `cargo add solverforge installs ${pins.core}`, "ScoreDirector::with_replicas", "share()", "720fdaded42f16a131cdb8820b624b407b275d5f", `solverforge-cli ${pins.cli} scaffolds ${pins.cliRuntime}, and all eight worked use cases pin it`] },
+    { path: "/blog/releases/2026/11/10/solverforge-cli-4-0-x/", required: [`solverforge-cli ${pins.cli} was published on November 10, 2026`, `solverforge-cli ${pins.cli} targets solverforge ${pins.cliRuntime}; 4.0.0 and 4.0.1 target solverforge 0.25.1`, "src/constraints/assemble.rs", "super::<id>::constraint()", "9a780eaf9d6a77bfb6f311ba943558faced14935", "21d405519c41bc773b3bc27ba1280ae0d29081f8", "bd43abb00a4079450b5b8275d0538b47a2da686e"] },
+    { path: "/blog/releases/2026/11/09/solverforge-cli-3-9-x/", required: ["solverforge-cli 3.9.0 was published on November 9, 2026", "409 Conflict", "f33d836f", "Historical release note"] },
     { path: "/docs/solverforge/solver/termination/", required: ["No Hidden Time Limit", "termination_composition"] },
     { path: "/blog/releases/2026/11/01/solverforge-0-24-x/", required: ["solverforge 0.24.x follows solverforge 0.23.0", "weight_multiplier", "solver_toml"] },
     { path: "/blog/releases/2026/11/03/solverforge-cli-3-8-x/", required: ["solverforge-cli 3.8.3 was published on November 7, 2026", "Windows failed", "BendableScore", "rmcp 3.9.0"] },
     { path: "/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/", required: [`solverforge-maps ${pins.maps} was published on November 6, 2026`, "compute_matrix_with_access", "StreetRun", "motorway_link"] },
     { path: "/blog/releases/2026/11/07/solverforge-ui-0-9-x/", required: [`solverforge-ui ${pins.ui} was published on November 7, 2026`, "dashArray"] },
     { path: "/docs/solverforge-maps/routing/", required: ["Read the Streets Along a Route", "Snap by Itinerary Role", "SnapAccess::Both"] },
-    { path: "/blog/releases/2026/11/03/solverforge-usecases-3-0/", required: ["solverforge-hospital@3.0.0", "solverforge-hospital@3.0.1", "weightMultiplier", "make install-e2e"] },
+    { path: "/blog/releases/2026/11/03/solverforge-usecases-3-0/", required: ["solverforge-hospital@3.0.0", "solverforge-hospital@3.0.1", "solverforge-hospital@3.0.2", "solverforge-furnace@4.0.0", "solverforge-hospital@3.0.3", "solverforge-furnace@4.0.1", "November 10 releases: solverforge 0.26.0", "changeover_gap instead of changeoverGap", "weightMultiplier", "make install-e2e"] },
     { path: "/docs/solverforge-cli/configuration/", required: ["move_thread_count.count 4", "RAYON_NUM_THREADS", "32", "auto", "none"] },
-    { path: "/docs/solverforge-cli/project-anatomy/", required: ["phases", "movesSpeculative", "discarded_speculative"] },
+    { path: "/docs/solverforge-cli/project-anatomy/", required: ["phases", "movesSpeculative", "discarded_speculative", "src/constraints/assemble.rs", "Module Roots Hold Declarations Only"] },
     { path: "/blog/releases/2026/10/27/solverforge-cli-3-7-x/", required: ["solverforge-cli 3.7.1", "solverforge 0.23.0", "phases", "movesSpeculative", "Windows failed", "test_new_creates_neutral_project_files"] },
     { path: "/blog/releases/2026/09/27/solverforge-usecases-repository-apps/", required: ["October 27 (core 0.23.0)", "solverforge-furnace@2.0.7", "solverforge-orders@0.2.0", "solverforge-flightcrew@0.2.0", "movesSpeculative", "discarded_speculative", "does not make that pull interruptible"] },
     ...[
-      ["hospital", "3.0.1", pins.core], ["lessons", "3.0.1", pins.core],
-      ["deliveries", "3.0.2", pins.core], ["fsr", "3.0.2", pins.core],
+      ["hospital", "3.0.3", "0.26.0"], ["lessons", "3.0.3", "0.26.0"],
+      ["deliveries", "3.0.4", "0.26.0"], ["fsr", "3.0.4", "0.26.0"],
     ].map(([app, version, runtime]) => ({
       path: `/docs/getting-started/solverforge-${app}-use-case/`,
       required: [`solverforge-${app}@${version}`, `solverforge ${runtime}`],

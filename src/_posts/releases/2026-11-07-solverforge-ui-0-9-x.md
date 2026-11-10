@@ -55,7 +55,7 @@ contract are the same as `0.8.0`.
 | Product | Version | UI dependency |
 | ------- | ------- | ------------- |
 | `solverforge-ui` | `0.9.1` | current |
-| `solverforge-cli` web scaffold | `3.9.0` | `solverforge-ui = { version = "0.9.1" }` |
+| `solverforge-cli` web scaffold | `4.0.2` | `solverforge-ui = { version = "0.9.1" }` |
 | Released use-case apps | `3.0.x` / `0.3.x` | `solverforge-ui 0.9.0` |
 
 ## Patch History

@@ -10,50 +10,59 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.25.0` release and keeps core,
+documentation tracks the `solverforge 0.26.0` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.25.0, and docs.rs serves the 0.25.0 API.
+`cargo add solverforge` installs 0.26.0, and docs.rs serves the 0.26.0 API.
 Rust `1.95` remains the workspace floor.
 
-`v0.25.0` points to `3115b4dd6b40bc72a472b042f5e6b665cb9720c7`. Its
-[CI run](https://github.com/SolverForge/solverforge/actions/runs/42552915915)
-passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42552934483)
+`v0.26.0` points to `720fdaded42f16a131cdb8820b624b407b275d5f`. Its
+[CI run](https://github.com/SolverForge/solverforge/actions/runs/42797763891)
+passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42797767461)
 re-ran CI on Linux, macOS, and Windows with the Miri, MSRV, docs, and package
 jobs, verified the release, published all nine crates to crates.io, and
-created the GitHub Release. The 0.25.x line applies every configured
-termination criterion and adds no hidden time limit, evaluates local search in
-parallel by measured default, seeds and checks the assert modes, runs
-partitioned search in the framework, and rejects configuration that used to be
-ignored. See the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/)
-for the breaking changes and upgrade checklist.
+created the GitHub Release. The 0.26.x line builds replica-forking score
+directors with `ScoreDirector::with_replicas`, keeps stream closure types
+proportional to the constraint set so large apps link with full debug info, and
+documents every public item the planning macros generate. See the
+[0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) for the
+breaking change and upgrade checklist; the
+[0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) covers
+the termination, parallel-evaluation, and configuration changes of the
+previous line.
 
-The independently published CLI line is `solverforge-cli 3.9.0`. Fresh
-scaffolds target `solverforge 0.25.0`, with `solverforge-ui 0.9.1` and
+The independently published CLI line is `solverforge-cli 4.0.2`. Fresh
+scaffolds target `solverforge 0.26.0`, with `solverforge-ui 0.9.1` and
 `solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell.
+A generated project declares its constraint modules in
+`src/constraints/mod.rs` and assembles them in `src/constraints/assemble.rs`;
+every `mod.rs` and `lib.rs` holds only declarations, which `check` enforces.
 A fresh scaffold solves its empty plan through the runtime's default pipeline,
 generated code is rustfmt-clean, `--field` types are imported, and `check`
 states that it does not compile the project. Generated constraint skeletons
-still panic until their placeholders are replaced. The 3.9.0
-[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42557496537)
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42557496534)
+still panic until their placeholders are replaced. The 4.0.2
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42809536259)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42809536103)
 workflows and the exact-commit
-[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42557490301)
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42809532226)
 on Linux, macOS, Windows, and integration tests passed at
-`f33d836f6801852fe2d1599eba2f22a1ada65bb6`. See the
-[3.9.x CLI release note](/blog/releases/2026/11/09/solverforge-cli-3-9-x/).
-Apps scaffolded by earlier lines pin older cores (`0.24.0` from 3.8.x,
-`0.23.0` from 3.7.x, `0.22.0` from 3.6.0), and an app moves to a newer core
-line only when deliberately upgraded and validated.
+`9a780eaf9d6a77bfb6f311ba943558faced14935`. See the
+[4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
+Apps scaffolded by earlier releases pin older cores (`0.25.1` from 4.0.0 and
+4.0.1, `0.25.0` from 3.9.0,
+`0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0) and keep
+constraint assembly in `src/constraints/mod.rs` until moved, and an app moves
+to a newer core line only when deliberately upgraded and validated.
 
-The worked-use-case bundle ships eight apps on `solverforge 0.25.0` and
-`solverforge-ui 0.9.0`: `solverforge-hospital@3.0.1`,
-`solverforge-lessons@3.0.1`, `solverforge-deliveries@3.0.2`,
-`solverforge-fsr@3.0.2`, `solverforge-furnace@3.0.2`,
-`solverforge-orders@0.3.1`, `solverforge-fleet@0.2.1`, and
-`solverforge-flightcrew@0.3.2`. The four Space-backed apps' release-tag sync
+The worked-use-case bundle ships eight apps on `solverforge 0.26.0` and
+`solverforge-ui 0.9.0`, in the CLI 4 constraint layout:
+`solverforge-hospital@3.0.3`, `solverforge-lessons@3.0.3`,
+`solverforge-deliveries@3.0.4`, `solverforge-fsr@3.0.4`,
+`solverforge-furnace@4.0.1`, `solverforge-orders@0.3.3`,
+`solverforge-fleet@0.2.3`, and `solverforge-flightcrew@0.3.4`. Furnace
+reports snake_case constraint ids. The four Space-backed apps' release-tag sync
 workflows succeeded. Bundle CI passed at the final app tag,
-`solverforge-furnace@3.0.2`
-([run 42571454634](https://github.com/SolverForge/solverforge-usecases/actions/runs/42571454634)).
+`solverforge-orders@0.3.3`
+([run 42809967938](https://github.com/SolverForge/solverforge-usecases/actions/runs/42809967938)).
 Furnace, Orders, Fleet, and Flight crew are repository-only. See the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
 
@@ -73,11 +82,11 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.25.0`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, and validated configuration; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 3.9.0` targets `solverforge 0.25.0`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.26.0`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, and replica directors built by `ScoreDirector::with_replicas`; Rust `1.95` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.2` targets `solverforge 0.26.0`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
-| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.1`, `solverforge-lessons@3.0.1`, `solverforge-deliveries@3.0.2`, `solverforge-fsr@3.0.2`, plus the repository-only `solverforge-furnace@3.0.2`, `solverforge-orders@0.3.1`, `solverforge-fleet@0.2.1`, and `solverforge-flightcrew@0.3.2`; all eight target `solverforge 0.25.0` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 3.9.0` scaffolds it directly |
+| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.3`, `solverforge-lessons@3.0.3`, `solverforge-deliveries@3.0.4`, `solverforge-fsr@3.0.4`, plus the repository-only `solverforge-furnace@4.0.1`, `solverforge-orders@0.3.3`, `solverforge-fleet@0.2.3`, and `solverforge-flightcrew@0.3.4`; all eight target `solverforge 0.26.0` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.0.2` scaffolds it directly |
 | **Maps** | Published | `solverforge-maps 2.3.3` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, and identifies its client to Overpass |
 
 ## Try It Today
@@ -184,14 +193,19 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.25.0`, with
+- **Core runtime line**: these manuals describe `solverforge 0.26.0`, with
   Rust `1.95`. The
-  published `solverforge-cli 3.9.0` package targets `solverforge 0.25.0` for
-  fresh scaffolds; apps scaffolded by earlier lines pin older cores (`0.24.0`
-  from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
+  published `solverforge-cli 4.0.2` package targets `solverforge 0.26.0` for
+  fresh scaffolds; apps scaffolded by earlier releases pin older cores
+  (`0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0, `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
   and an app should
   move to a newer core line only when that app is deliberately upgraded and
   validated.
+- **Replica directors**: a lower-level score director that forks evaluator
+  replicas is built with `ScoreDirector::with_replicas` from a borrowed
+  `SolutionDescriptor` and a `fn(&S) -> C` constraint-set constructor; stream
+  closure types stay proportional to the constraint set, so debug info for
+  large constraint sets links.
 - **Termination**: every configured solver-level criterion applies, and the
   first one reached stops the solve. Nothing adds a time limit the
   configuration does not set, and a zero time limit stops at once.
@@ -325,7 +339,9 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
   exactly without a noise allowance; noisy metric medians have a default 5%
   regression tolerance through `BENCH_TOLERANCE_PERCENT`. Both sides share a
   harness package name and equal-length staging paths, and record `.text` SHA-256
-  fingerprints. The paired bootstrap upper bound is diagnostic, not an acceptance
+  fingerprints. Simulated cache metrics are medians across several link
+  layouts, and branch behaviour is graded on the hardware branch-miss counter,
+  so a change in function placement alone does not fail the gate. The paired bootstrap upper bound is diagnostic, not an acceptance
   criterion. This changes internal qualification, not historical site benchmark
   measurements or their tested versions.
 - **Lost resume wakeup fixed**: resume and cancellation clear the pause request

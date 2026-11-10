@@ -9,6 +9,13 @@ description: >
   parallel-evaluation default.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older CLI line. The current CLI is `solverforge-cli 4.0.2`,
+which scaffolds `solverforge 0.26.0` and keeps constraint assembly in
+`src/constraints/assemble.rs`; see the
+[4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
+<% end %>
+
 **solverforge-cli 3.9.0 was published on November 9, 2026**, following
 `3.8.3`, which scaffolds `solverforge 0.24.0`. The 3.9.x packages target
 `solverforge 0.25.0`; the web shell keeps `solverforge-ui 0.9.1` and
