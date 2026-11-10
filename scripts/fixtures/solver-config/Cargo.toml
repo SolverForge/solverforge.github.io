@@ -5,7 +5,7 @@ edition = "2021"
 publish = false
 
 [dependencies]
-solverforge = "=0.25.0"
+solverforge = "=0.26.0"
 
 [profile.dev]
 opt-level = 1

@@ -70,7 +70,7 @@ the short name.
 
 Every example in the Constraints pages runs against this shift-scheduling
 model. Start a binary crate with `cargo new` and
-`cargo add solverforge@=0.25.0`, then add these files.
+`cargo add solverforge@=0.26.0`, then add these files.
 
 `src/domain/mod.rs` registers the model. `planning_model!` accepts only
 `mod name;` and `pub use ...;` items, and every planning type must be

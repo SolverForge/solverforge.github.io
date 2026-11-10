@@ -205,18 +205,30 @@ Each replica clones the working solution and constructs independent
 constraint state from it. Macro-generated solves supply the constructor of the
 provider `score_director.constraint_provider` selects.
 
-For lower-level scoring, `ScoreDirector<S, C, Desc = SolutionDescriptor>` accepts
-an owned descriptor or a `ReplicaDescriptor::new(&descriptor, constraints)` via
-`with_descriptor`. Those two constructors score with every constraint weight
-at 1; `new_weighted` and `with_descriptor_weighted` apply the solution's bound
-constraint weights. `Director::fork_replica()` returns an initialized independent
-replica only for the borrowed replica descriptor; owned-descriptor directors
-return `None`. `Director::fork_for_solution(solution)` forks the same way over
-another solution without initializing its incremental state, so a partition
+For lower-level scoring, `ScoreDirector<S, C, Desc = SolutionDescriptor>` holds
+its descriptor through `DirectorDescriptor`, which is implemented for an owned
+`SolutionDescriptor` and for a borrowed `&SolutionDescriptor`;
+`DirectorDescriptor::share()` returns the descriptor an evaluator replica uses,
+or `None` for an owned one. `new` and `with_descriptor` score with every
+constraint weight at 1; `new_weighted` and `with_descriptor_weighted` apply the
+solution's bound constraint weights.
+
+A director that forks evaluator replicas is built with
+`ScoreDirector::with_replicas(solution, constraints, constraint_builder, &descriptor, entity_counter)`,
+where `constraint_builder` is a `fn(&S) -> C` and `constraints` is normally
+`constraint_builder(&solution)`. `with_replicas_weighted` applies constraint
+weights, and `with_replicas_in_mode` takes the weight mode as a type parameter.
+Each replica shares the borrowed descriptor and gets a constraint set built
+from its own working solution; `reset()` rebuilds the set the same way.
+`Director::fork_replica()` returns an initialized independent replica only for
+a director built by `with_replicas*`; any other director returns `None`.
+`Director::fork_for_solution(solution)` forks the same way over another
+solution without initializing its incremental state, so a partition
 initializes on the thread that solves it. `Director::set_score_assertion`,
 which `environment_mode = "full_assert"` turns on, makes a `ScoreDirector` and
-its replicas compare every score calculation with a fresh one. `DirectorDescriptor` and `ReplicaDescriptor` are exported by
-`solverforge-scoring`; they are not a second configured solve path.
+its replicas compare every score calculation with a fresh one.
+`DirectorDescriptor` is exported by `solverforge-scoring`; these constructors
+are not a second configured solve path.
 
 ### List-Shadow Notifications
 

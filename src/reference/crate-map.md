@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.25.0` crate and its
+This map is aligned with the published `solverforge 0.26.0` crate and its
 release workspace. The facade does not re-export `solverforge-bridge`, and
 `solverforge::console` (behind the `console` feature) exposes only `init()`;
 depend on those crates directly for anything else.
@@ -135,7 +135,7 @@ kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.25.0/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.26.0/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Parallel Evaluation and Dynamic Scores
@@ -145,14 +145,17 @@ main score director plus persistent replicas. The default
 `move_thread_count = "auto"` uses up to four evaluators and chooses sequential
 or parallel evaluation per step from measured costs; `{ count = N }` uses up to
 N, capped by the solve's Rayon pool and by 32; `"none"` is sequential. The
-scoring crate exports `DirectorDescriptor` and `ReplicaDescriptor` for a
-borrowed descriptor plus `fn(&S) -> C` constraint-set constructor.
-`ScoreDirector<S, C, Desc = SolutionDescriptor>` forks initialized evaluators
-through `Director::fork_replica()` only when using that replica descriptor.
+scoring crate builds a replica-forking director with
+`ScoreDirector::with_replicas` (or `with_replicas_weighted` /
+`with_replicas_in_mode`) from a borrowed `&SolutionDescriptor` and a
+`fn(&S) -> C` constraint-set constructor; `DirectorDescriptor` has no type
+parameters, and its `share()` hands each replica the same borrowed descriptor.
+Such a director forks initialized evaluators through `Director::fork_replica()`.
 `Director::fork_for_solution(solution)` builds an independent director of the
 same kind over another solution, leaving its incremental state to initialize
 on first scoring; configured partitioned search uses it to give each partition
-its own director. Both return `None` for owned-descriptor directors. Configured native and bridge entry points accept the
+its own director. Both return `None` for a director not built by
+`with_replicas*`. Configured native and bridge entry points accept the
 constructor and share the same runtime path. See
 [Extend the Solver](/reference/extend-solver/#evaluator-replicas-and-solve-entry-points).
 
