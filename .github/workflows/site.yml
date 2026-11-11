@@ -170,13 +170,17 @@ jobs:
       fail-fast: false
       matrix:
         page: [hospital, lessons, deliveries, fsr]
+    env:
+      # Incremental state is never reused across runs and roughly doubles the
+      # cached target directory.
+      CARGO_INCREMENTAL: "0"
 
     steps:
       - uses: actions/checkout@v4
 
       # A replay builds the scaffold and the cloned Space in debug and release;
-      # with a restored build cache that outgrows the runner's free disk and
-      # the linker dies mid-write. The job never uses these SDKs.
+      # that needs more than the runner's default free disk. The job never
+      # uses these SDKs.
       - name: Free runner disk space
         run: |
           df -h /
@@ -197,8 +201,9 @@ jobs:
             ~/.cache/solverforge-cli
             ~/.cache/tutorial-target
             ~/.cache/tutorial-osm
+          # Exact key only: restoring an older key carried every superseded
+          # release's artifacts forward, and the target grew to 85G.
           key: tutorial-${{ matrix.page }}-${{ hashFiles(format('src/docs/getting-started/solverforge-{0}-use-case.md', matrix.page), 'scripts/lib/*.rb') }}
-          restore-keys: tutorial-${{ matrix.page }}-
 
       - uses: ruby/setup-ruby@v1
         with:
