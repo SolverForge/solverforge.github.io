@@ -32,10 +32,10 @@ PAGE_URL = "/docs/getting-started/solverforge-hospital-use-case/"
 RENDERED = File.join(SITE_ROOT, "output", PAGE_URL, "index.html")
 
 # The published artifacts this page documents.
-CLI_VERSION = "4.0.3"
-RUNTIME_VERSION = "0.26.0"
+CLI_VERSION = "4.0.4"
+RUNTIME_VERSION = "0.26.1"
 UI_VERSION = "0.9.0"
-APP_VERSION = "3.0.3"
+APP_VERSION = "3.0.4"
 SPACE_URL = "https://huggingface.co/spaces/SolverForge/solverforge-hospital"
 
 SCAFFOLD_SECTIONS = ["Getting Started", "Build the App from the Scaffold"].freeze
@@ -176,7 +176,7 @@ def check_static
   log "Checking the finished-example path"
   finished = static_steps(page, FINISHED_SECTIONS)
   finished_commands = finished.select(&:shell?).map(&:text)
-  problem!("finished-example path must clone #{SPACE_URL}") unless finished_commands.include?("git clone #{SPACE_URL}")
+  problem!("finished-example path must clone #{SPACE_URL}") unless finished_commands.include?("git clone --depth 1 #{SPACE_URL}")
   problem!("finished-example path must enter the clone") unless finished_commands.include?("cd solverforge-hospital")
   if finished_commands.include?("make test")
     install_index = finished_commands.index("make install-e2e")

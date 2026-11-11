@@ -807,7 +807,7 @@ penalties, and a schedule UI.
 Clone the Hugging Face Space repository and start the app:
 
 ```bash
-git clone https://huggingface.co/spaces/SolverForge/solverforge-hospital
+git clone --depth 1 https://huggingface.co/spaces/SolverForge/solverforge-hospital
 cd solverforge-hospital
 make run-release
 ```

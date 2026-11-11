@@ -173,7 +173,10 @@ module UseCaseTutorial
           dirs << dir
           projects << dir
         when /\Agit clone /
-          url, target = words[2], words[3]
+          args = words[2..]
+          # Clone options come before the URL; `--depth` takes a value.
+          args = args.first == "--depth" ? args.drop(2) : args.drop(1) while args.first&.start_with?("-")
+          url, target = args[0], args[1]
           fail!("page clones #{url}, expected #{config.space_url}") unless url == config.space_url
           target ||= File.basename(url, ".git")
           dir = cwd + [target]

@@ -515,7 +515,7 @@ clone the Space into its own directory and start it:
 
 ```bash
 cd ..
-git clone https://huggingface.co/spaces/SolverForge/solverforge-lessons solverforge-lessons-space
+git clone --depth 1 https://huggingface.co/spaces/SolverForge/solverforge-lessons solverforge-lessons-space
 cd solverforge-lessons-space
 make run-release
 ```

@@ -601,7 +601,7 @@ clone the Space into its own directory and start it:
 
 ```bash
 cd ..
-git clone https://huggingface.co/spaces/SolverForge/solverforge-deliveries solverforge-deliveries-space
+git clone --depth 1 https://huggingface.co/spaces/SolverForge/solverforge-deliveries solverforge-deliveries-space
 cd solverforge-deliveries-space
 make run-release
 ```

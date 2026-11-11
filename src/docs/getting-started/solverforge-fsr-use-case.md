@@ -608,7 +608,7 @@ clone the Space into its own directory and start it:
 
 ```bash
 cd ..
-git clone https://huggingface.co/spaces/SolverForge/solverforge-fsr solverforge-fsr-space
+git clone --depth 1 https://huggingface.co/spaces/SolverForge/solverforge-fsr solverforge-fsr-space
 cd solverforge-fsr-space
 make run-release
 ```
