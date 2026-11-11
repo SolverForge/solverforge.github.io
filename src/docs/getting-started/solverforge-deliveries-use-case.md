@@ -90,7 +90,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 4.0.3`, which scaffolds `solverforge 0.26.0`,
+This page uses `solverforge-cli 4.0.4`, which scaffolds `solverforge 0.26.1`,
 `solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Router from the CLI
@@ -649,12 +649,12 @@ Current dataset sizes:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-deliveries@3.0.4` release uses SolverForge core, UI,
+The tagged `solverforge-deliveries@3.0.5` release uses SolverForge core, UI,
 and Maps from crates.io:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.26.0", features = [
+solverforge = { version = "0.26.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -690,8 +690,8 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.26.0"
-runtime_source = "crates.io: solverforge 0.26.0"
+target = "solverforge 0.26.1"
+runtime_source = "crates.io: solverforge 0.26.1"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -833,7 +833,7 @@ pub struct Vehicle {
 }
 ```
 
-The CVRP domain profile is stock SolverForge 0.26.0; `solverforge generate
+The CVRP domain profile is stock SolverForge 0.26.1; `solverforge generate
 variable ... --domain cvrp` writes the same attribute. It expands to the
 `VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
 assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
@@ -1201,7 +1201,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@3.0.4`       |
+| Tagged app release               | `solverforge-deliveries@3.0.5`       |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |

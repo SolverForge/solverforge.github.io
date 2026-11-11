@@ -97,8 +97,15 @@ The acceptor decides whether a scored candidate can be accepted.
 `late_acceptance` accepts a candidate whose score is at least the current step
 score or at least the score in the current history slot. Its history starts
 filled with the phase's initial score. Each committed step records its score
-and advances the ring; a new phase-best committed score fills the entire ring
-with that score, re-anchoring the acceptance window.
+and advances the ring. A new phase-best committed score refills the entire ring
+with that score only when one of its hard or medium levels differs from the
+previous best: the hard level of a hard/soft score, the hard or medium level of
+a hard/medium/soft score, or a hard level of a bendable score. Entries from
+before a feasibility change therefore cannot admit moves that keep the new hard
+level but give up the soft levels. A new best that improves only soft levels
+leaves the ring as it is, so the phase keeps accepting moves worse than the
+best for as long as they beat the score `late_acceptance_size` steps back; a
+score with only soft levels never refills the ring.
 
 ## Diversified Late Acceptance
 

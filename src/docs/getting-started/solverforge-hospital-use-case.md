@@ -78,7 +78,7 @@ cargo install solverforge-cli --locked
 solverforge --version
 ```
 
-`solverforge-cli 4.0.3` scaffolds `solverforge 0.26.0` with
+`solverforge-cli 4.0.4` scaffolds `solverforge 0.26.1` with
 `solverforge-ui 0.9.1`; `solverforge --version` prints the targets your binary
 carries.
 
@@ -817,16 +817,16 @@ another). Open `http://localhost:7860` and press **Solve**.
 
 The Space source is the finished app: it includes the deterministic hospital
 benchmark generator, retained-job API, modular schedule frontend, tests, and
-deployment files. The tagged release is `solverforge-hospital@3.0.3`.
+deployment files. The tagged release is `solverforge-hospital@3.0.4`.
 
 ### Keep the Published Dependency Shape
 
-The finished app runs on `solverforge 0.26.0` and the `solverforge-ui 0.9.0`
+The finished app runs on `solverforge 0.26.1` and the `solverforge-ui 0.9.0`
 web-shell assets. Its `Cargo.toml` dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.26.0", features = [
+solverforge = { version = "0.26.1", features = [
   "serde",
   "console",
   "verbose-logging",
@@ -858,8 +858,8 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.26.0"
-runtime_source = "crates.io: solverforge 0.26.0"
+target = "solverforge 0.26.1"
+runtime_source = "crates.io: solverforge 0.26.1"
 ui_source = "crates.io: solverforge-ui 0.9.0"
 
 [demo]
@@ -1450,7 +1450,7 @@ state.
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
-| Tagged app release               | `solverforge-hospital@3.0.3`               |
+| Tagged app release               | `solverforge-hospital@3.0.4`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |

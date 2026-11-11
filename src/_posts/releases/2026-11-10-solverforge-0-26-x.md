@@ -1,26 +1,66 @@
 ---
-title: "solverforge 0.26.x: Replica Directors Without Descriptor Types and Proportional Debug Info"
+title: "solverforge 0.26.x: Replica Directors Without Descriptor Types, Proportional Debug Info, and Late Acceptance That Keeps Its History"
 date: 2026-11-10
 draft: false
 description: >
   The 0.26.x line builds replica-forking score directors with
   ScoreDirector::with_replicas, keeps stream closure types proportional to the
   constraint set so large apps link with full debug info, and documents every
-  public item the planning macros generate.
+  public item the planning macros generate. 0.26.1 keeps the late-acceptance
+  score history across soft-level improvements and draws scalar ruin batches
+  without an entity-sized permutation.
 ---
 
 **solverforge 0.26.x** follows `solverforge 0.25.1`; the line was published on
-crates.io on 2026-11-10. The first release is
-[0.26.0](https://crates.io/crates/solverforge/0.26.0), with a Rust `1.95`
-floor. `cargo add solverforge` installs 0.26.0, and docs.rs serves the 0.26.0
+crates.io from 2026-11-10 through 2026-11-11. The current release is
+[0.26.1](https://crates.io/crates/solverforge/0.26.1), with a Rust `1.95`
+floor. `cargo add solverforge` installs 0.26.1, and docs.rs serves the 0.26.1
 API. The public modeling, stream, configuration, and solving APIs are
-unchanged; the one breaking change is in the lower-level
-`solverforge-scoring` score-director constructors. `solverforge-cli 4.0.3`
-scaffolds 0.26.0, and all eight worked use cases pin it.
+unchanged across the line; the one breaking change, in 0.26.0, is in the
+lower-level `solverforge-scoring` score-director constructors. 0.26.1 changes
+no public API: late acceptance keeps its score history unless a hard or medium
+level of the best score changes, and scalar ruin-and-recreate draws its batches
+without an entity-sized permutation. `solverforge-cli 4.0.4`
+scaffolds 0.26.1, and all eight worked use cases pin it.
 
 ## What Changed
 
-### Replica-forking directors — breaking change
+### Late acceptance keeps its score history (0.26.1)
+
+`late_acceptance` keeps its score history across a new best score unless a
+hard or medium level of the best score changes: the hard level of a hard/soft
+score, the hard and medium levels of a hard/medium/soft score, or a hard level
+of a bendable score. Only then is the history refilled with the new best, so
+entries from before a feasibility change cannot admit moves that keep the new
+hard level but give up the soft levels. An improvement in soft levels alone
+leaves the history as it is, and a score with only soft levels never refills
+it.
+
+Through 0.26.0 the acceptor refilled the whole history on every new best score.
+After the first improvement every entry equalled the best, so only moves at
+least as good as the best were accepted: from then on the phase ran as hill
+climbing with sideways moves, and searches that rely on accepting worse moves
+to leave a local optimum settled early. The configuration is unchanged:
+`late_acceptance_size` still sets the history length, and
+`diversified_late_acceptance` is unaffected.
+
+The fix was contributed by [slapers](https://github.com/slapers) in
+[#242](https://github.com/SolverForge/solverforge/pull/242), together with a
+follow-up that refills the history of a bendable score only on its hard levels.
+
+### Scalar ruin batches without an entity-sized permutation (0.26.1)
+
+`ruin_recreate_move_selector` draws each batch of entities to clear from a
+partial shuffle that records only the positions it displaces, so a batch costs
+time and memory proportional to the ruin count instead of the entity count, and
+opening the move cursor no longer resets an entity-sized permutation for every
+batch. The batches and the random draws they consume are unchanged, so a seed
+selects the same entities as before. In the zero-regression gate's `ruin`
+case, a 15-trial run against 0.26.0 measured 41.8% less wall time and 55.5%
+fewer instructions
+([#249](https://github.com/SolverForge/solverforge/pull/249)).
+
+### Replica-forking directors — breaking change (0.26.0)
 
 `solverforge-scoring` removes `ReplicaDescriptor`. A score director that forks
 evaluator replicas is built with `ScoreDirector::with_replicas`,
@@ -82,18 +122,19 @@ Public paths and behaviour are unchanged.
 
 | Surface | Version | Notes |
 | ------- | ------- | ----- |
-| Core runtime | `solverforge 0.26.0` | Rust `1.95`; replica directors built by `with_replicas*`; proportional stream closure types; documented generated items |
+| Core runtime | `solverforge 0.26.1` | Rust `1.95`; late acceptance keeps its history across soft-level improvements; scalar ruin batches without an entity-sized permutation; replica directors built by `with_replicas*` |
+| First 0.26 release | `solverforge 0.26.0` | Replica directors built by `with_replicas*`; proportional stream closure types; documented generated items |
 | Previous core runtime | `solverforge 0.25.1` | Bounded nearby list candidates; see the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) |
-| CLI | `solverforge-cli 4.0.3` | Fresh scaffolds target core `0.26.0`; see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
+| CLI | `solverforge-cli 4.0.4` | Fresh scaffolds target core `0.26.1` (4.0.2 and 4.0.3 target `0.26.0`); see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
 | Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Compiled onto core `0.23.0`; upgrading the Rust core does not retarget these wheels |
-| Worked use cases | November 10 app releases | All eight pin core `0.26.0` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |
+| Worked use cases | November 11 app releases | All eight pin core `0.26.1` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |
 | UI | `solverforge-ui 0.9.1` | Unchanged |
 | Maps | `solverforge-maps 2.3.3` | Unchanged |
 
 All nine workspace crates (`solverforge`, `solverforge-core`,
 `solverforge-config`, `solverforge-scoring`, `solverforge-solver`,
 `solverforge-macros`, `solverforge-bridge`, `solverforge-console`, and
-`solverforge-cvrp`) publish `0.26.0`.
+`solverforge-cvrp`) publish `0.26.0` and `0.26.1`.
 
 The registry records the facade crate's publication at `2026-11-10T10:33:40Z`.
 Its artifact SHA-256 is
@@ -110,14 +151,35 @@ re-ran the CI matrix on Linux, macOS, and Windows with the Miri, MSRV, docs,
 and package jobs, verified the release, published to crates.io, and created
 the GitHub Release; every job succeeded.
 
+The registry records the 0.26.1 facade publication at `2026-11-11T02:49:52Z`.
+Its artifact SHA-256 is
+`a00f06d8db244d619f556a25165115015bda50f01c811db0d515c9e6e3c28458`;
+`.cargo_vcs_info.json` binds it to
+`f3b41788e7519f3b707f8a9aa450fc545e0d5c08`, the `v0.26.1` tag commit. The
+[GitHub Release](https://github.com/SolverForge/solverforge/releases/tag/v0.26.1)
+was published at `2026-11-11T02:50:11Z`. On that commit the
+[CI run](https://github.com/SolverForge/solverforge/actions/runs/42947324720)
+passed, and every job of the
+[Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42947327153)
+succeeded: the Linux, macOS, Windows, Miri, MSRV, docs, and package jobs,
+release verification, crates.io publication, and the GitHub Release. The
+0.26.1 range also changes the zero-regression gate's own tooling (timed trials
+rotate through the code layouts, and hardware branch misses are reported
+rather than graded); no published crate behaviour depends on it.
+
 ## Patch History
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `0.26.1` | 2026-11-11 | Late acceptance refills its history only when a hard or medium level of the best score changes (contributed by [slapers](https://github.com/slapers) in [#242](https://github.com/SolverForge/solverforge/pull/242)); scalar ruin batches drawn without an entity-sized permutation; no public API change. |
 | `0.26.0` | 2026-11-10 | `ReplicaDescriptor` removed: replica-forking directors are built by `ScoreDirector::with_replicas*`, and `DirectorDescriptor::replica()` becomes `share()`; stream closures built in narrowly generic functions; generated public items documented or hidden; declaration-only module roots. |
 
 ## Upgrade Checklist
 
+- From 0.26.0, move the `solverforge` pin to `0.26.1`; no code changes. A
+  `late_acceptance` phase now keeps accepting worse moves after its first
+  improvement, so re-check solve quality and any tuned `late_acceptance_size`
+  or termination budget on models that use it.
 - Replace
   `ScoreDirector::with_descriptor(solution, constraints, ReplicaDescriptor::new(&descriptor, constraint_builder), entity_counter)`
   with
@@ -135,9 +197,12 @@ the GitHub Release; every job succeeded.
 
 ## Where to read next
 
-Read the [core manual](/docs/solverforge/) and
+Read the [core manual](/docs/solverforge/),
+[Local Search](/docs/solverforge/solver/local-search/#late-acceptance), and
 [Extend the Solver](/reference/extend-solver/). The
-[full compare](https://github.com/SolverForge/solverforge/compare/v0.25.1...v0.26.0)
-covers all 8 commits, and the
-[CHANGELOG](https://github.com/SolverForge/solverforge/blob/v0.26.0/CHANGELOG.md)
-lists the breaking change.
+[0.26.0 compare](https://github.com/SolverForge/solverforge/compare/v0.25.1...v0.26.0)
+covers its 8 commits and the
+[0.26.1 compare](https://github.com/SolverForge/solverforge/compare/v0.26.0...v0.26.1)
+its 8 commits; the
+[CHANGELOG](https://github.com/SolverForge/solverforge/blob/v0.26.1/CHANGELOG.md)
+lists the breaking change and both releases.

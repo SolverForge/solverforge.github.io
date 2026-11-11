@@ -202,6 +202,32 @@ tests with full debug info again.
 Bundle CI passed at the final app tag, `solverforge-orders@0.3.3`
 ([run 42809967938](https://github.com/SolverForge/solverforge-usecases/actions/runs/42809967938)).
 
+### November 11 releases: solverforge 0.26.1
+
+On November 11 all eight apps released on `solverforge 0.26.1`; see the
+[0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/). Each app
+moves its `solverforge` dependency, its lockfile, and the `[runtime]` lines of
+`solverforge.app.toml` to 0.26.1; Field service and Fleet also pin
+`solverforge-core 0.26.1`. The UI and maps dependencies, constraint ids,
+solver configuration, and HTTP contracts are unchanged. Hospital, Lessons,
+Deliveries, Orders, Fleet, and Flight crew configure `late_acceptance` phases,
+which now keep their score history across soft-level improvements. The Flight crew README describes the app as preserving the
+scheduling concepts of the original Java application.
+
+| App tag | Source commit | Space sync |
+| --- | --- | --- |
+| `solverforge-hospital@3.0.4` | `54e37f83e263a3283ab609857e4a9b028db0fc79` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958140633) |
+| `solverforge-lessons@3.0.4` | `c2e40f912ddba49b41ed5a372d888b67e25faecb` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958145776) |
+| `solverforge-deliveries@3.0.5` | `2c1326dbb20ac44e0760bc6fd35a4991471ab36d` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958112416) |
+| `solverforge-fsr@3.0.5` | `3344a74cdb76981dc58143b2d38ee150135cf996` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958131088) |
+| `solverforge-furnace@4.0.2` | `60250351a17358be9ab83731936ba6ffcfffed44` | repository-only |
+| `solverforge-orders@0.3.4` | `28520582d57c012b3df1db64859311ec60186f3e` | repository-only |
+| `solverforge-fleet@0.2.4` | `e02a6877c4382b85a6346b1d7d4d3bb9dcfd9403` | repository-only |
+| `solverforge-flightcrew@0.3.5` | `d1ea42572f6b13115bfcd68029d48d66ef481c3e` | repository-only |
+
+Bundle CI passed at the final app tag, `solverforge-orders@0.3.4`
+([run 42958108105](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958108105)).
+
 ## Upgrade Checklist
 
 - Check out the app's own release tag from the tables above.

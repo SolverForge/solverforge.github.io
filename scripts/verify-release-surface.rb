@@ -7,7 +7,7 @@ ROOT = File.expand_path("..", __dir__)
 CORE = ReleasePins::RUNTIME
 CLI = ReleasePins::CLI
 CLI_RUNTIME = ReleasePins::CLI_SCAFFOLD_RUNTIME
-APP_RUNTIME = "0.26.0"
+APP_RUNTIME = "0.26.1"
 NOTE_CORE = "/blog/releases/2026/11/10/solverforge-0-26-x/"
 NOTE_CORE_25 = "/blog/releases/2026/11/09/solverforge-0-25-x/"
 NOTE_CLI = "/blog/releases/2026/11/10/solverforge-cli-4-0-x/"
@@ -23,8 +23,8 @@ REQUIRED_TEXT = {
   "scripts/verify-cli-release.rb" => [
     "EXPECTED_CLI_VERSION = ReleasePins::CLI", "EXPECTED_RUNTIME_VERSION = ReleasePins::CLI_SCAFFOLD_RUNTIME",
     'EXPECTED_MCP_VERSION = "3.9.0"',
-    "5f2cafaa09a1d27ca4a6aa37e829a42138a2ee07",
-    "e94c83bda45341f815cecd73bad3e80186004f9a2e0de40028170a6a9cdc4745",
+    "5d879665ec375b154d72f00dfcadf8613216b159",
+    "63adb8f592464b8cafe04dbe7556824fd221dc3b83794241b4e5de64bacc39f9",
     "super::assigned::constraint()", "module roots may hold only module declarations",
     "pub phases: Vec<PhaseTelemetryDto>", "pub moves_speculative: u64",
     "duplicates the built-in", "The project was not compiled.",
@@ -52,6 +52,12 @@ REQUIRED_TEXT = {
     "720fdaded42f16a131cdb8820b624b407b275d5f", "42797763891", "42797767461",
     "ScoreDirector::with_replicas", "`DirectorDescriptor::replica()` is replaced by `share()`",
     "from 2.82 GB to 0.37 GB", "compare/v0.25.1...v0.26.0",
+    "`0.26.1` | 2026-11-11", "### Late acceptance keeps its score history (0.26.1)",
+    "keeps its score history across a new best score unless a\nhard or medium level of the best score changes",
+    "[slapers](https://github.com/slapers)", "https://github.com/SolverForge/solverforge/pull/242",
+    "f3b41788e7519f3b707f8a9aa450fc545e0d5c08",
+    "a00f06d8db244d619f556a25165115015bda50f01c811db0d515c9e6e3c28458",
+    "42947324720", "42947327153", "compare/v0.26.0...v0.26.1", "blob/v0.26.1/CHANGELOG.md",
     NOTE_CORE_25, NOTE_CLI, NOTE_APPS
   ],
   "src/_posts/releases/2026-11-09-solverforge-0-25-x.md" => [
@@ -108,8 +114,6 @@ REQUIRED_TEXT = {
     "`solverforge-fleet@0.2.2`", "`solverforge-flightcrew@0.3.3`",
     "42736874938", "42736880673", "42736842886", "42736861096", "42736837747",
     "`changeover_gap` instead of `changeoverGap`", NOTE_CLI,
-    "### November 10 releases: solverforge #{APP_RUNTIME}",
-    "all eight apps released on `solverforge #{APP_RUNTIME}`",
     "| `solverforge-hospital@3.0.3` | `944329d87a029aa61696ce74ce9fd660368bb72c` |",
     "| `solverforge-lessons@3.0.3` | `922eb1d2e8712445572b7bfeb7df2de463009191` |",
     "| `solverforge-deliveries@3.0.4` | `73dd1cf0fea6cd29fa584ec309d9d72d18c4916b` |",
@@ -118,20 +122,37 @@ REQUIRED_TEXT = {
     "| `solverforge-orders@0.3.3` | `48c73d626e0bd0758a2885bf4ef6014a32cb077c` |",
     "| `solverforge-fleet@0.2.3` | `98bd6bfb10072355d4df0068a44e172d755c4d57` |",
     "| `solverforge-flightcrew@0.3.4` | `bdd055e7814ce6974286d209dd7949304aa7cb09` |",
-    "42810005593", "42810012066", "42809974394", "42809991743", "42809967938", NOTE_CORE
+    "42810005593", "42810012066", "42809974394", "42809991743", "42809967938",
+    "### November 10 releases: solverforge 0.26.0",
+    "all eight apps released on `solverforge 0.26.0`",
+    "### November 11 releases: solverforge #{APP_RUNTIME}",
+    "all eight apps released on `solverforge #{APP_RUNTIME}`",
+    "| `solverforge-hospital@3.0.4` | `54e37f83e263a3283ab609857e4a9b028db0fc79` |",
+    "| `solverforge-lessons@3.0.4` | `c2e40f912ddba49b41ed5a372d888b67e25faecb` |",
+    "| `solverforge-deliveries@3.0.5` | `2c1326dbb20ac44e0760bc6fd35a4991471ab36d` |",
+    "| `solverforge-fsr@3.0.5` | `3344a74cdb76981dc58143b2d38ee150135cf996` |",
+    "| `solverforge-furnace@4.0.2` | `60250351a17358be9ab83731936ba6ffcfffed44` |",
+    "| `solverforge-orders@0.3.4` | `28520582d57c012b3df1db64859311ec60186f3e` |",
+    "| `solverforge-fleet@0.2.4` | `e02a6877c4382b85a6346b1d7d4d3bb9dcfd9403` |",
+    "| `solverforge-flightcrew@0.3.5` | `d1ea42572f6b13115bfcd68029d48d66ef481c3e` |",
+    "42958140633", "42958145776", "42958112416", "42958131088", "42958108105", NOTE_CORE
   ],
   "src/_posts/releases/2026-11-10-solverforge-cli-4-0-x.md" => [
-    "**solverforge-cli #{CLI} was published on November 10, 2026**",
+    "**solverforge-cli #{CLI} was published on November 11, 2026**",
     "`solverforge-cli #{CLI}` targets `solverforge #{CLI_RUNTIME}`;\n4.0.0 and 4.0.1 target `solverforge 0.25.1`",
-    "`4.0.3` | 2026-11-10", "`4.0.2` | 2026-11-10", "`4.0.1` | 2026-11-10", "`4.0.0` | 2026-11-10",
+    "`4.0.4` | 2026-11-11", "`4.0.3` | 2026-11-10", "`4.0.2` | 2026-11-10", "`4.0.1` | 2026-11-10", "`4.0.0` | 2026-11-10",
+    "### Fresh scaffolds target SolverForge 0.26.1 (4.0.4)", "issues/17",
+    "5d879665ec375b154d72f00dfcadf8613216b159",
+    "63adb8f592464b8cafe04dbe7556824fd221dc3b83794241b4e5de64bacc39f9",
+    "42960000938", "42960004422", "42960004417",
     "9a780eaf9d6a77bfb6f311ba943558faced14935", "b8e0e989da0e8531d2def434243de35dcc2afa99689bfeb873f3ee82228fe28e",
     "42809532226", "42809536259", "42809536103", NOTE_CORE,
     "5f2cafaa09a1d27ca4a6aa37e829a42138a2ee07",
     "e94c83bda45341f815cecd73bad3e80186004f9a2e0de40028170a6a9cdc4745",
     "42845606910", "42845615766", "42845615729",
     "The `solverforge-modeling` skill loads in agents that scan skills (4.0.3)",
-    "issues/15", "| Previous 4.0 release | `solverforge-cli 4.0.2` |",
-    "from a `solverforge-cli` checkout at `v4.0.3`",
+    "issues/15", "| Previous 4.0 release | `solverforge-cli 4.0.3` | Scaffolds `solverforge 0.26.0`",
+    "from a `solverforge-cli` checkout at `v#{CLI}`",
     "| CLI | `solverforge-cli #{CLI}` | Fresh scaffolds target `solverforge #{CLI_RUNTIME}` |",
     "bd43abb00a4079450b5b8275d0538b47a2da686e",
     "6c78ad746eed5a3088ea2a54342ff0e0cbf3059a57c11d00c06b3215d837b585",
@@ -147,9 +168,6 @@ REQUIRED_TEXT = {
     "**solverforge-cli 3.9.0 was published on November 9, 2026**",
     "`3.9.0` | 2026-11-09", "f33d836f", "42557490301", "42557496537", "42557496534",
     "Historical release note", NOTE_CLI
-  ],
-  "src/_posts/releases/2026-10-27-solverforge-0-23-x.md" => [
-    "The current core release is\n`solverforge #{CORE}`", NOTE_CORE
   ],
   "src/_posts/releases/2026-10-27-solverforge-cli-3-7-x.md" => [
     "The current CLI is `solverforge-cli #{CLI}`,\nwhich scaffolds `solverforge #{CLI_RUNTIME}`", NOTE_CLI,
@@ -217,7 +235,8 @@ REQUIRED_TEXT = {
     "SolverTelemetry.phase", "phases: Vec<PhaseTelemetry>",
     "Cow<'_, MoveTabuSignature>", "list_shadow_elements",
     "active_dynamic_score_family", "not a new swap restriction",
-    "fresh scaffolds target core `0.23.0`"
+    "fresh scaffolds target core `0.23.0`",
+    "The current core release is\n`solverforge #{CORE}`", NOTE_CORE
   ],
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
     "`solverforge #{CORE}` is the current core",
@@ -243,6 +262,8 @@ REQUIRED_TEXT = {
     "construction-only"
   ],
   "src/docs/solverforge/solver/local-search.md" => [
+    "refills the entire ring\nwith that score only when one of its hard or medium levels differs from the\nprevious best",
+    "A new best that improves only soft levels\nleaves the ring as it is",
     "Parallel Candidate Evaluation", "DiscardedSpeculative",
     "trajectory can depend on the evaluator count",
     "Cow<'_, MoveTabuSignature>",
@@ -545,13 +566,15 @@ crates.io on 2026-10-14",
     "Fresh\nscaffolds target `solverforge #{CLI_RUNTIME}`",
     "`solverforge-cli #{CLI}` targets `solverforge #{CLI_RUNTIME}`",
     "720fdaded42f16a131cdb8820b624b407b275d5f", "42797763891", "42797767461",
-    "5f2cafaa09a1d27ca4a6aa37e829a42138a2ee07", "42845615766", "42845615729", "42845606910",
-    "`0.25.1` from 4.0.0 and\n4.0.1",
+    "`v#{CORE}` points to `f3b41788e7519f3b707f8a9aa450fc545e0d5c08`", "42947324720", "42947327153",
+    "refills its window with a new phase best only when a hard or medium level of\n  the best score changes",
+    "5d879665ec375b154d72f00dfcadf8613216b159", "42960004422", "42960004417", "42960000938",
+    "`0.26.0` from 4.0.2 and\n4.0.3", "`0.25.1` from 4.0.0 and 4.0.1",
     "assembled in `src/constraints/assemble.rs`",
     "The current UI line is `solverforge-ui #{ReleasePins::UI}`, and the current maps line is\n`solverforge-maps #{ReleasePins::MAPS}`",
-    "solverforge-hospital@3.0.3", "solverforge-lessons@3.0.3", "solverforge-deliveries@3.0.4",
-    "solverforge-fsr@3.0.4", "solverforge-furnace@4.0.1", "solverforge-orders@0.3.3",
-    "solverforge-fleet@0.2.3", "solverforge-flightcrew@0.3.4", "42809967938",
+    "solverforge-hospital@3.0.4", "solverforge-lessons@3.0.4", "solverforge-deliveries@3.0.5",
+    "solverforge-fsr@3.0.5", "solverforge-furnace@4.0.2", "solverforge-orders@0.3.4",
+    "solverforge-fleet@0.2.4", "solverforge-flightcrew@0.3.5", "42958108105",
     "eight apps on `solverforge #{APP_RUNTIME}`",
     "- **Termination**",
     NOTE_CORE, NOTE_CORE_25, NOTE_CLI, NOTE_APPS,
@@ -578,21 +601,21 @@ crates.io on 2026-10-14",
     "**Explicit configuration**", "**Constraint weights and problem changes**"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
-    "solverforge-hospital@3.0.3",
+    "solverforge-hospital@3.0.4",
     "solverforge #{APP_RUNTIME}",
     "super::assigned_shift::constraint(),", "`src/constraints/assemble.rs`"
   ],
   "src/docs/getting-started/solverforge-lessons-use-case.md" => [
-    "solverforge-lessons@3.0.3",
+    "solverforge-lessons@3.0.4",
     "solverforge #{APP_RUNTIME}", "`src/constraints/assemble.rs`"
   ],
   "src/docs/getting-started/solverforge-deliveries-use-case.md" => [
-    "solverforge-deliveries@3.0.4",
+    "solverforge-deliveries@3.0.5",
     "solverforge #{APP_RUNTIME}",
     "super::all_deliveries_assigned::constraint(),", "`src/constraints/assemble.rs`"
   ],
   "src/docs/getting-started/solverforge-fsr-use-case.md" => [
-    "solverforge-fsr@3.0.4",
+    "solverforge-fsr@3.0.5",
     "solverforge #{APP_RUNTIME}", "`src/constraints/assemble.rs`"
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
@@ -694,7 +717,13 @@ FORBIDDEN_TEXT = {
     "`cargo add solverforge` installs 0.25.0", "docs.rs serves the 0.25.0", "Fresh `solverforge-cli 3.9.x` scaffolds target it"
   ],
   "src/reference/extend-solver.md" => ["ReplicaDescriptor"],
-  "src/reference/crate-map.md" => ["ReplicaDescriptor", "solverforge 0.25.0"],
+  "src/_posts/releases/2026-11-10-solverforge-0-26-x.md" => [
+    "`cargo add solverforge` installs 0.26.0", "docs.rs serves the 0.26.0", "The first release is"
+  ],
+  "src/docs/solverforge/solver/local-search.md" => [
+    "a new phase-best committed score fills the entire ring", "re-anchoring the acceptance window"
+  ],
+  "src/reference/crate-map.md" => ["ReplicaDescriptor", "solverforge 0.25.0", "solverforge 0.26.0", "tree/v0.26.0"],
   "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => ["is the current maps line", "Use the crates.io package pin"],
   "src/docs/solverforge-maps/routing.md" => ["snaps both endpoints to the nearest graph nodes"],
   "src/docs/solverforge-maps/getting-started.md" => ["snaps both endpoints to the nearest graph nodes"],
@@ -702,6 +731,7 @@ FORBIDDEN_TEXT = {
   "src/docs/solverforge-python/solving-and-runtime.md" => ["0.22.0 runtime graph"],
   "src/docs/solverforge/index.md" => [
     "These pages track `solverforge 0.25.0`", "solverforge@=0.25.0", "tree/v0.25.0",
+    "These pages track `solverforge 0.26.0`", "solverforge@=0.26.0", "tree/v0.26.0",
     "These pages track the `solverforge 0.20.1` crate",
     "The `0.20.1` workspace declares Rust `1.95`.",
     "docs.rs/solverforge/0.20.1/",
@@ -781,9 +811,13 @@ FORBIDDEN_TEXT = {
     "--only"
   ],
   "src/docs/status-and-roadmap.md" => [
+    "resets the window on a new phase best",
+    "documentation tracks the `solverforge 0.26.0` release", "`cargo add solverforge` installs 0.26.0",
+    "Native Rust constraint solver published as `solverforge 0.26.0`",
+    "The independently published CLI line is `solverforge-cli 4.0.3`",
     "The independently published CLI line is `solverforge-cli 4.0.2`",
     "The independently published CLI line is `solverforge-cli 4.0.1`",
-    "eight apps on `solverforge 0.25.1`",
+    "eight apps on `solverforge 0.25.1`", "eight apps on `solverforge 0.26.0`",
     "`cargo add solverforge` installs 0.25.0", "documentation tracks the `solverforge 0.25.0` release",
     "Native Rust constraint solver published as `solverforge 0.25.0`",
     "`cargo add solverforge` installs 0.23.0", "docs.rs serves the 0.23.0 API",
@@ -821,10 +855,10 @@ FORBIDDEN_TEXT = {
     "solverforge-deliveries@2.0.6",
     "solverforge-fsr@2.0.7"
   ],
-  "src/docs/getting-started/solverforge-hospital-use-case.md" => ["solverforge-hospital@2.0.6", "solverforge-hospital@3.0.1", "solverforge-hospital@3.0.2", "solverforge 0.25.1", "registers it in"],
-  "src/docs/getting-started/solverforge-lessons-use-case.md" => ["solverforge-lessons@2.0.6", "solverforge-lessons@3.0.1", "solverforge-lessons@3.0.2", "solverforge 0.25.1"],
-  "src/docs/getting-started/solverforge-deliveries-use-case.md" => ["solverforge-deliveries@2.0.6", "solverforge-deliveries@3.0.2", "solverforge-deliveries@3.0.3", "solverforge 0.25.1"],
-  "src/docs/getting-started/solverforge-fsr-use-case.md" => ["solverforge-fsr@2.0.7", "solverforge-fsr@3.0.2", "solverforge-fsr@3.0.3", "solverforge 0.25.1"],
+  "src/docs/getting-started/solverforge-hospital-use-case.md" => ["solverforge-hospital@2.0.6", "solverforge-hospital@3.0.1", "solverforge-hospital@3.0.2", "solverforge-hospital@3.0.3", "solverforge 0.25.1", "solverforge 0.26.0", "registers it in"],
+  "src/docs/getting-started/solverforge-lessons-use-case.md" => ["solverforge-lessons@2.0.6", "solverforge-lessons@3.0.1", "solverforge-lessons@3.0.2", "solverforge-lessons@3.0.3", "solverforge 0.25.1", "solverforge 0.26.0"],
+  "src/docs/getting-started/solverforge-deliveries-use-case.md" => ["solverforge-deliveries@2.0.6", "solverforge-deliveries@3.0.2", "solverforge-deliveries@3.0.3", "solverforge-deliveries@3.0.4", "solverforge 0.25.1", "solverforge 0.26.0"],
+  "src/docs/getting-started/solverforge-fsr-use-case.md" => ["solverforge-fsr@2.0.7", "solverforge-fsr@3.0.2", "solverforge-fsr@3.0.3", "solverforge-fsr@3.0.4", "solverforge 0.25.1", "solverforge 0.26.0"],
   "src/docs/solverforge-cli/project-anatomy.md" => ["shared `create_constraints()` registry"],
   "src/reference/lifecycle-pause-resume-contract.md" => ["solverforge-cli 3.3.1", "solverforge-cli 3.3.2"],
   "src/_posts/releases/2026-09-29-solverforge-cli-3-2-3-3-x.md" => [

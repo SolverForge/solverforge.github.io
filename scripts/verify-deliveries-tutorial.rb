@@ -17,7 +17,7 @@
 require_relative "lib/use_case_tutorial"
 
 SITE_ROOT = File.expand_path("..", __dir__)
-CLI_VERSION = "4.0.3"
+CLI_VERSION = "4.0.4"
 
 def site_file(path)
   File.join(SITE_ROOT, path)
@@ -40,7 +40,7 @@ UseCaseTutorial.run(
     page: site_file("src/docs/getting-started/solverforge-deliveries-use-case.md"),
     page_url: "docs/getting-started/solverforge-deliveries-use-case",
     cli_version: CLI_VERSION,
-    runtime_version: "0.26.0",
+    runtime_version: "0.26.1",
     space_url: "https://huggingface.co/spaces/SolverForge/solverforge-deliveries",
     app: "deliveries",
     cli_section: "Build a Router from the CLI",

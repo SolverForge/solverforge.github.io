@@ -12,8 +12,8 @@ require "uri"
 # to move, so a stale "current" claim cannot stay green.
 module ReleasePins
   CURRENT = {
-    "solverforge" => "0.26.0",
-    "solverforge-cli" => "4.0.3",
+    "solverforge" => "0.26.1",
+    "solverforge-cli" => "4.0.4",
     "solverforge-ui" => "0.9.1",
     "solverforge-maps" => "2.3.3"
   }.freeze
@@ -26,7 +26,7 @@ module ReleasePins
   # The runtime the published CLI scaffolds, read from its
   # src/scaffold_target.rs (RUNTIME_CRATE_VERSION). It moves with the CLI pin,
   # independently of RUNTIME, because the CLI and the core publish separately.
-  CLI_SCAFFOLD_RUNTIME = "0.26.0"
+  CLI_SCAFFOLD_RUNTIME = "0.26.1"
 
   module_function
 

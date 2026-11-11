@@ -119,7 +119,7 @@ stock config surface, the acceptor is configured as a nested object:
 | `hill_climbing`       | Only accepts improving moves. Fast but gets stuck in local optima.           |
 | `simulated_annealing` | Accepts worse moves with decreasing probability. Good exploration.           |
 | `tabu_search`         | Remembers recent moves and forbids reversing them. Strong for many problems. |
-| `late_acceptance`     | Accepts moves better than N steps ago. Simple and effective.                 |
+| `late_acceptance`     | Accepts moves at least as good as the score N steps ago. Simple and effective. |
 | `great_deluge`        | Accepts moves above a rising water level. Steady improvement.                |
 
 ```toml

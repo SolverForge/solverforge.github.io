@@ -96,7 +96,7 @@ Regions cached under an older version are fetched and rebuilt on first use.
 | Product | Version | Maps dependency |
 | ------- | ------- | --------------- |
 | `solverforge-maps` | `2.3.3` | current |
-| `solverforge-cli` web scaffold | `4.0.3` | `solverforge-maps = { version = "2.3.3" }` |
+| `solverforge-cli` web scaffold | `4.0.4` | `solverforge-maps = { version = "2.3.3" }` |
 | `solverforge-deliveries` | `3.0.1` | `solverforge-maps 2.1.5` |
 | `solverforge-fsr` | `3.0.1` | `solverforge-maps 2.1.5` |
 

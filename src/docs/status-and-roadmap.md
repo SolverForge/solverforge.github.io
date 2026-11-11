@@ -10,28 +10,33 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.26.0` release and keeps core,
+documentation tracks the `solverforge 0.26.1` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.26.0, and docs.rs serves the 0.26.0 API.
+`cargo add solverforge` installs 0.26.1, and docs.rs serves the 0.26.1 API.
 Rust `1.95` remains the workspace floor.
 
-`v0.26.0` points to `720fdaded42f16a131cdb8820b624b407b275d5f`. Its
-[CI run](https://github.com/SolverForge/solverforge/actions/runs/42797763891)
-passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42797767461)
+`v0.26.1` points to `f3b41788e7519f3b707f8a9aa450fc545e0d5c08`. Its
+[CI run](https://github.com/SolverForge/solverforge/actions/runs/42947324720)
+passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42947327153)
 re-ran CI on Linux, macOS, and Windows with the Miri, MSRV, docs, and package
 jobs, verified the release, published all nine crates to crates.io, and
-created the GitHub Release. The 0.26.x line builds replica-forking score
-directors with `ScoreDirector::with_replicas`, keeps stream closure types
-proportional to the constraint set so large apps link with full debug info, and
-documents every public item the planning macros generate. See the
+created the GitHub Release. The first 0.26 release, `v0.26.0`
+(`720fdaded42f16a131cdb8820b624b407b275d5f`, [CI](https://github.com/SolverForge/solverforge/actions/runs/42797763891)
+and [Release](https://github.com/SolverForge/solverforge/actions/runs/42797767461)
+passed), builds replica-forking score directors with
+`ScoreDirector::with_replicas`, keeps stream closure types proportional to the
+constraint set so large apps link with full debug info, and documents every
+public item the planning macros generate. 0.26.1 keeps the late-acceptance
+score history unless a hard or medium level of the best score changes, and
+draws scalar ruin batches without an entity-sized permutation. See the
 [0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) for the
 breaking change and upgrade checklist; the
 [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) covers
 the termination, parallel-evaluation, and configuration changes of the
 previous line.
 
-The independently published CLI line is `solverforge-cli 4.0.3`. Fresh
-scaffolds target `solverforge 0.26.0`, with `solverforge-ui 0.9.1` and
+The independently published CLI line is `solverforge-cli 4.0.4`. Fresh
+scaffolds target `solverforge 0.26.1`, with `solverforge-ui 0.9.1` and
 `solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell.
 A generated project declares its constraint modules in
 `src/constraints/mod.rs` and assembles them in `src/constraints/assemble.rs`;
@@ -39,30 +44,30 @@ every `mod.rs` and `lib.rs` holds only declarations, which `check` enforces.
 A fresh scaffold solves its empty plan through the runtime's default pipeline,
 generated code is rustfmt-clean, `--field` types are imported, and `check`
 states that it does not compile the project. Generated constraint skeletons
-still panic until their placeholders are replaced. The 4.0.3
-[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42845615766)
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42845615729)
+still panic until their placeholders are replaced. The 4.0.4
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42960004422)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42960004417)
 workflows and the exact-commit
-[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42845606910)
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42960000938)
 on Linux, macOS, Windows, and integration tests passed at
-`5f2cafaa09a1d27ca4a6aa37e829a42138a2ee07`. See the
+`5d879665ec375b154d72f00dfcadf8613216b159`. See the
 [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
-Apps scaffolded by earlier releases pin older cores (`0.25.1` from 4.0.0 and
-4.0.1, `0.25.0` from 3.9.0,
+Apps scaffolded by earlier releases pin older cores (`0.26.0` from 4.0.2 and
+4.0.3, `0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0,
 `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0) and keep
 constraint assembly in `src/constraints/mod.rs` until moved, and an app moves
 to a newer core line only when deliberately upgraded and validated.
 
-The worked-use-case bundle ships eight apps on `solverforge 0.26.0` and
+The worked-use-case bundle ships eight apps on `solverforge 0.26.1` and
 `solverforge-ui 0.9.0`, in the CLI 4 constraint layout:
-`solverforge-hospital@3.0.3`, `solverforge-lessons@3.0.3`,
-`solverforge-deliveries@3.0.4`, `solverforge-fsr@3.0.4`,
-`solverforge-furnace@4.0.1`, `solverforge-orders@0.3.3`,
-`solverforge-fleet@0.2.3`, and `solverforge-flightcrew@0.3.4`. Furnace
+`solverforge-hospital@3.0.4`, `solverforge-lessons@3.0.4`,
+`solverforge-deliveries@3.0.5`, `solverforge-fsr@3.0.5`,
+`solverforge-furnace@4.0.2`, `solverforge-orders@0.3.4`,
+`solverforge-fleet@0.2.4`, and `solverforge-flightcrew@0.3.5`. Furnace
 reports snake_case constraint ids. The four Space-backed apps' release-tag sync
 workflows succeeded. Bundle CI passed at the final app tag,
-`solverforge-orders@0.3.3`
-([run 42809967938](https://github.com/SolverForge/solverforge-usecases/actions/runs/42809967938)).
+`solverforge-orders@0.3.4`
+([run 42958108105](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958108105)).
 Furnace, Orders, Fleet, and Flight crew are repository-only. See the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
 
@@ -82,11 +87,11 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.26.0`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, and replica directors built by `ScoreDirector::with_replicas`; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.3` targets `solverforge 0.26.0`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.26.1`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, replica directors built by `ScoreDirector::with_replicas`, and late acceptance that keeps its history across soft-level improvements; Rust `1.95` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.4` targets `solverforge 0.26.1`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
-| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.3`, `solverforge-lessons@3.0.3`, `solverforge-deliveries@3.0.4`, `solverforge-fsr@3.0.4`, plus the repository-only `solverforge-furnace@4.0.1`, `solverforge-orders@0.3.3`, `solverforge-fleet@0.2.3`, and `solverforge-flightcrew@0.3.4`; all eight target `solverforge 0.26.0` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.0.3` scaffolds it directly |
+| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.4`, `solverforge-lessons@3.0.4`, `solverforge-deliveries@3.0.5`, `solverforge-fsr@3.0.5`, plus the repository-only `solverforge-furnace@4.0.2`, `solverforge-orders@0.3.4`, `solverforge-fleet@0.2.4`, and `solverforge-flightcrew@0.3.5`; all eight target `solverforge 0.26.1` and `solverforge-ui 0.9.0` |
+| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.0.4` scaffolds it directly |
 | **Maps** | Published | `solverforge-maps 2.3.3` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, and identifies its client to Overpass |
 
 ## Try It Today
@@ -193,11 +198,11 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.26.0`, with
+- **Core runtime line**: these manuals describe `solverforge 0.26.1`, with
   Rust `1.95`. The
-  published `solverforge-cli 4.0.3` package targets `solverforge 0.26.0` for
+  published `solverforge-cli 4.0.4` package targets `solverforge 0.26.1` for
   fresh scaffolds; apps scaffolded by earlier releases pin older cores
-  (`0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0, `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
+  (`0.26.0` from 4.0.2 and 4.0.3, `0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0, `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
   and an app should
   move to a newer core line only when that app is deliberately upgraded and
   validated.
@@ -257,7 +262,8 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 - **Late acceptance**: DLAS compares each evaluated candidate with the step
   score and the exact worst history score, advancing its ring per candidate;
   it has no tolerance parameter. Plain late acceptance advances per step and
-  resets the window on a new phase best.
+  refills its window with a new phase best only when a hard or medium level of
+  the best score changes; soft-only improvements leave the window as it is.
 - **Lending extensions**: move cursor pulls take the live solution; Cartesian
   pulls use `next_candidate_with_director(&mut director)` to discover right
   candidates with the left leg applied, then restore the solution and score
