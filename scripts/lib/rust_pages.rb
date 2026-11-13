@@ -40,7 +40,7 @@ module RustPages
   # The published solverforge release every Rust block compiles against.
   # verify-release-surface.rb holds this line to the current release, and the
   # Rust docs index must tell the reader to install exactly this version.
-  RELEASE = "0.26.1"
+  RELEASE = "0.27.0"
   VERSION_PAGE = "src/docs/solverforge/index.md"
   INSTALL_LINE = "cargo add solverforge@=#{RELEASE}".freeze
 

@@ -1,6 +1,6 @@
-//! Runs the solver documentation against crates.io solverforge 0.26.1.
+//! Runs the solver documentation against crates.io solverforge 0.27.0.
 //!
-//!   solver-config-fixture check <scalar|grouped|visits|operations|parse> <block.toml>
+//!   solver-config-fixture check <scalar|grouped|visits|operations|savings|parse> <block.toml>
 //!   solver-config-fixture scenario <name>
 //!
 //! `check` parses one documentation block with `SolverConfig::from_toml_str`
@@ -13,6 +13,7 @@ mod grouped;
 mod operations;
 mod pages;
 mod probe;
+mod savings;
 mod visits;
 
 /// The config a scenario hands to the probe models' retained solves.
@@ -90,6 +91,9 @@ fn check(model: &str, path: &str) {
             .solve_with_config(config)
             .map(|s| format!("{:?}", s.score)),
         "operations" => operations::JobPlan::demo(12)
+            .solve_with_config(config)
+            .map(|s| format!("{:?}", s.score)),
+        "savings" => savings::VehiclePlan::demo(20)
             .solve_with_config(config)
             .map(|s| format!("{:?}", s.score)),
         other => panic!("unknown model {other}"),

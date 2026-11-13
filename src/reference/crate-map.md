@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.26.1` crate and its
+This map is aligned with the published `solverforge 0.27.0` crate and its
 release workspace. The facade does not re-export `solverforge-bridge`, and
 `solverforge::console` (behind the `console` feature) exposes only `init()`;
 depend on those crates directly for anything else.
@@ -36,9 +36,11 @@ collector helpers such as `count`, `sum`, `load_balance`, `consecutive_runs`,
 conflict-repair extension types, phase and move-label telemetry, bounded
 applied-move and candidate-pull traces, candidate-trace provenance types, and
 CVRP profile helpers such as `domain = "cvrp"`, `route_hooks`,
-`savings_hooks`, `savings_metric_class`, `route_distance`, `route_feasible`, and
-`savings_feasible`. The grouped-scalar construction cursors, runtime model,
-provider, and candidate-metric registries are solver-internal; applications
+`savings_hooks`, `savings_metric_class`, `savings_neighbors`, `route_distance`,
+`route_feasible`, and `savings_feasible`, with the `RouteMetric` trait and its
+`DenseMatrix` and `EuclideanMetric` implementations. The grouped-scalar
+construction cursors, runtime model, provider, and candidate-metric registries
+are solver-internal; applications
 reach grouped construction through `ScalarGroup::assignment(...)`,
 `group_name`, and `grouped_scalar_move_selector` rather than by importing those
 types. That keeps app code on `solverforge` unless it needs to implement
@@ -56,7 +58,7 @@ lower-level solver internals directly.
 | `solverforge-solver`  | runtime compiler, phases, cursor selectors, retained lifecycle, and telemetry | you are building custom runtime behavior beyond facade-level use               |
 | `solverforge-bridge`  | dynamic binding contracts, logical IDs, scores, explicit slot capabilities, and the compiled runner | you are implementing or maintaining a binding layer |
 | `solverforge-console` | tracing-driven console output                                            | you want the standard terminal UX or progress formatting                       |
-| `solverforge-cvrp`    | CVRP-specific helpers and distance utilities                             | your problem is route-centric and the domain benefits from these helpers       |
+| `solverforge-cvrp`    | CVRP-specific helpers, route metrics, and distance utilities             | your problem is route-centric and the domain benefits from these helpers       |
 
 ## Relational scoring internals
 
@@ -135,7 +137,7 @@ kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.26.1/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.27.0/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Parallel Evaluation and Dynamic Scores

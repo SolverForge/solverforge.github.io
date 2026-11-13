@@ -24,7 +24,7 @@ solverforge
 ├── solverforge-solver   phases, moves, selectors, runtime, manager
 ├── solverforge-bridge   dynamic host-language binding contracts
 ├── solverforge-console  tracing-driven console output
-└── solverforge-cvrp     route-centric helpers and distance meters
+└── solverforge-cvrp     route-centric helpers, route metrics, and distance meters
 ```
 
 For most app code, depend on `solverforge` and stay on the facade. Reach for

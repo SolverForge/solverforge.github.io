@@ -63,6 +63,7 @@ owned sequence; do not encode ordered work as a chained scalar predecessor.
 | scalar construction ordering       | declare `construction_entity_order_key` or `construction_value_order_key` on the variable            |
 | required nullable-slot coverage    | declare an assignment-backed `ScalarGroup` and select it from `solver.toml`                          |
 | stock CVRP route ownership         | declare `domain = "cvrp"` on the list variable instead of repeating stock hook paths                 |
+| CVRP legs without a dense matrix   | hold `EuclideanMetric` (or your own `RouteMetric`) in `ProblemData` and name it as `VrpSolution::Metric` |
 | richer scoring context             | add immutable facts or derived helper methods instead of shoving logic into constraints              |
 | validation or import normalization | add app-side builders or conversion layers before solving                                            |
 

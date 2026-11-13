@@ -217,17 +217,36 @@ helpers must see an explicit extra trait on the solution type.
 Stock CVRP route lists can use the built-in domain profile,
 `domain = "cvrp"`. The profile makes the solution implement
 `solverforge::cvrp::VrpSolution`, which hands each vehicle's
-`solverforge::cvrp::ProblemData` (capacity, depot, demands, distance and
-travel-time matrices, time windows) to the stock meters and hooks. A complete
-model, `src/domain/model.rs` with the same `planning_model!` manifest as above:
+`solverforge::cvrp::ProblemData` (capacity, depot, demands, time windows,
+service durations, and a route metric) to the stock meters and hooks. List
+values are location indexes into that data; location `depot` is the depot.
+
+`ProblemData` reads leg distances and travel times from its `metric`, whose
+type the solution names as `VrpSolution::Metric`. Both stock metrics implement
+`solverforge::cvrp::RouteMetric`:
+
+| Metric | Legs | Memory |
+| --- | --- | --- |
+| `DenseMatrix::new(distances, travel_times)` | supplied `[from][to]` tables, such as road-network matrices | quadratic in the locations |
+| `EuclideanMetric::new(coordinates, speed)` | straight-line length between `(x, y)` points, rounded half away from zero (TSPLIB `EUC_2D`); travel time is length / speed, rounded the same way | linear in the locations |
+
+`UNREACHABLE` or a negative leg value marks a leg that cannot be traversed,
+and a location outside the metric (past a `DenseMatrix` row, or without a
+coordinate) makes every route through it structurally invalid.
+`EuclideanMetric::new` panics on a speed that is not finite and positive or on
+a coordinate that is not finite. A custom metric implements `distance`,
+`travel_time`, and `covers`; its provided `nearest` ranks every pair, and
+`EuclideanMetric` overrides it with a spatial grid.
+
+A complete model on `EuclideanMetric`, `src/domain/model.rs`:
 
 <!-- rust: crate=cvrp-routes file=src/domain/model.rs -->
 ```rust
-use solverforge::cvrp::{ProblemData, VrpSolution};
+use solverforge::cvrp::{EuclideanMetric, ProblemData, VrpSolution};
 use solverforge::prelude::*;
 
 #[problem_fact]
-pub struct Visit {
+pub struct Stop {
     #[planning_id]
     pub id: usize,
 }
@@ -236,15 +255,17 @@ pub struct Visit {
 pub struct Vehicle {
     #[planning_id]
     pub id: usize,
-    #[planning_list_variable(element_collection = "visits", domain = "cvrp")]
+    #[planning_list_variable(element_collection = "stop_locations", domain = "cvrp")]
     pub visits: Vec<usize>,
 }
 
 #[planning_solution(constraints = "crate::constraints::define_constraints")]
 pub struct VehicleRoutePlan {
-    pub routing: ProblemData,
+    pub routing: ProblemData<EuclideanMetric>,
     #[problem_fact_collection]
-    pub visits: Vec<Visit>,
+    pub stops: Vec<Stop>,
+    #[planning_list_element_collection(owner = "vehicles")]
+    pub stop_locations: Vec<usize>,
     #[planning_entity_collection]
     pub vehicles: Vec<Vehicle>,
     #[planning_score]
@@ -252,7 +273,9 @@ pub struct VehicleRoutePlan {
 }
 
 impl VrpSolution for VehicleRoutePlan {
-    fn vehicle_data(&self, _vehicle_idx: usize) -> Option<&ProblemData> {
+    type Metric = EuclideanMetric;
+
+    fn vehicle_data(&self, _vehicle_idx: usize) -> Option<&ProblemData<EuclideanMetric>> {
         Some(&self.routing)
     }
 
@@ -270,6 +293,14 @@ impl VrpSolution for VehicleRoutePlan {
 }
 ```
 
+`stop_locations` holds the location of every stop the vehicles must visit;
+each `Stop` fact carries the same location as its `id`. A model on supplied
+tables writes `ProblemData<DenseMatrix>` (the default type parameter, so plain
+`ProblemData` also names it), `type Metric = DenseMatrix;`, and
+`metric: DenseMatrix::new(distances, travel_times)`.
+
+`src/domain/mod.rs`:
+
 <!-- rust: crate=cvrp-routes file=src/domain/mod.rs -->
 ```rust
 solverforge::planning_model! {
@@ -277,38 +308,121 @@ solverforge::planning_model! {
 
     mod model;
 
-    pub use model::{Vehicle, VehicleRoutePlan, Visit};
+    pub use model::{Stop, Vehicle, VehicleRoutePlan};
 }
 ```
+
+`src/constraints.rs` penalizes a stop that no route visits:
 
 <!-- rust: crate=cvrp-routes file=src/constraints.rs -->
 ```rust
 use solverforge::prelude::*;
+use solverforge::stream::joiner::equal_bi;
 
-use crate::domain::{Vehicle, VehicleRoutePlan};
+use crate::domain::{Stop, Vehicle, VehicleRoutePlan};
 
 pub fn define_constraints() -> impl ConstraintSet<VehicleRoutePlan, HardSoftScore> {
-    (
-        ConstraintFactory::<VehicleRoutePlan, HardSoftScore>::new()
-            .for_each(VehicleRoutePlan::vehicles())
-            .penalize(|vehicle: &Vehicle| HardSoftScore::of_soft(vehicle.visits.len() as i64))
-            .named("Route length"),
-    )
+    type Streams = ConstraintFactory<VehicleRoutePlan, HardSoftScore>;
+
+    (Streams::new()
+        .for_each(VehicleRoutePlan::stops())
+        .if_not_exists((
+            Streams::new()
+                .for_each(VehicleRoutePlan::vehicles())
+                .flattened(|vehicle: &Vehicle| &vehicle.visits),
+            equal_bi(|stop: &Stop| stop.id, |location: &usize| *location),
+        ))
+        .penalize(HardSoftScore::ONE_HARD)
+        .named("Unrouted stop"),)
 }
 ```
 
+This program builds routes for two vehicles with one Clarke-Wright
+construction phase. `savings_neighbors = 2` scores a pair of stops only when
+one is among the other's two nearest, which the profile asks the metric for:
+
+<!-- rust: crate=cvrp-routes file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use domain::{Stop, Vehicle, VehicleRoutePlan};
+use solverforge::cvrp::{EuclideanMetric, ProblemData};
+use solverforge::SolverConfig;
+
+fn main() {
+    // Location 0 is the depot; stops 1-3 lie west of it, stops 4-6 east.
+    let coordinates = vec![
+        (0.0, 0.0),
+        (-3.0, 1.0),
+        (-4.0, -1.0),
+        (-6.0, 0.0),
+        (3.0, 1.0),
+        (4.0, -1.0),
+        (6.0, 0.0),
+    ];
+    let locations = coordinates.len();
+    let plan = VehicleRoutePlan {
+        routing: ProblemData {
+            capacity: 3,
+            depot: 0,
+            demands: vec![0, 1, 1, 1, 1, 1, 1],
+            metric: EuclideanMetric::new(coordinates, 1.0),
+            time_windows: vec![(0, i64::MAX); locations],
+            service_durations: vec![0; locations],
+            vehicle_departure_time: 0,
+        },
+        stops: (1..locations).map(|id| Stop { id }).collect(),
+        stop_locations: (1..locations).collect(),
+        vehicles: (0..2).map(|id| Vehicle { id, visits: Vec::new() }).collect(),
+        score: None,
+    };
+
+    let config = SolverConfig::from_toml_str(
+        r#"
+        [[phases]]
+        type = "construction_heuristic"
+        construction_heuristic_type = "list_clarke_wright"
+        savings_neighbors = 2
+        "#,
+    )
+    .expect("config parses");
+
+    let solved = plan.solve_with_config(config).expect("construction solves");
+    for vehicle in &solved.vehicles {
+        println!("vehicle {}: {:?}", vehicle.id, vehicle.visits);
+    }
+    println!("score: {}", solved.score.expect("solved plan is scored"));
+}
+```
+
+`cargo run` prints:
+
+<!-- rust: crate=cvrp-routes output -->
+```text
+vehicle 0: [4, 6, 5]
+vehicle 1: [1, 3, 2]
+score: 0hard/0soft
+```
+
+Each vehicle serves one side of the depot. For models past roughly 10,000
+stops, pair `EuclideanMetric` with
+[bounded savings](/docs/solverforge/solver/construction/#bounded-clarke-wright-savings):
+a dense matrix alone needs 16 bytes per location pair, and unbounded savings
+32 bytes per stop pair.
+
 The profile expands to `solverforge::cvrp::VrpSolution`, the stock
 `MatrixDistanceMeter` and `MatrixIntraDistanceMeter`, `route_hooks`,
-`savings_hooks`, and `savings_metric_class`. Route-local phases such as k-opt
-use strict stock CVRP feasibility: structural validity, capacity, and time
-windows. Clarke-Wright construction uses relaxed savings feasibility: malformed
-owners, data, or visit IDs are rejected, but scoreable capacity and time-window
-violations can still be assigned and compared against unassigned work.
-Unreachable travel-time legs remain strict route-local infeasibilities, and
-unreachable or malformed distance entries become large finite costs so
-construction and local search stay panic-free. `vehicle_data` returning
-`None` for a vehicle is an initialization error: the stock route helpers
-panic on it and the feasibility gates reject the route.
+`savings_hooks`, `savings_metric_class`, and `savings_neighbors`. Route-local
+phases such as k-opt use strict stock CVRP feasibility: structural validity,
+capacity, and time windows. Clarke-Wright construction uses relaxed savings
+feasibility: malformed owners, data, or visit IDs are rejected, but scoreable
+capacity and time-window violations can still be assigned and compared against
+unassigned work. Unreachable travel-time legs remain strict route-local
+infeasibilities, and unreachable or undefined distance legs become large finite
+costs so construction and local search stay panic-free. `vehicle_data`
+returning `None` for a vehicle is an initialization error: the stock route
+helpers panic on it and the feasibility gates reject the route.
 
 ## Custom Route Construction Hooks
 
@@ -321,10 +435,18 @@ For non-CVRP route domains, or for a custom pruning policy, omit
 | `route_hooks` | module path exporting `get`, `set`, `depot`, `distance`, and `feasible` |
 | `savings_hooks` | module path exporting `depot`, `distance`, and `feasible` |
 | `savings_metric_class_fn` | function grouping owners that share construction depot and distance behavior |
+| `savings_neighbors_fn` | function appending each element's nearest other elements, for bounded Clarke-Wright savings |
+
+A `savings_neighbors_fn` has the shape
+`fn(&Solution, owner: usize, values: &[usize], k: usize, out: &mut Vec<usize>)`:
+for each of `values` in order it appends the indexes into `values` of its
+`min(k, values.len() - 1)` nearest other values, nearest first. A phase that
+sets `savings_neighbors` on a list variable without this hook fails the solve
+before construction starts.
 
 The hooks
 receive the route owner, so heterogeneous fleets can score and check routes
-against the correct depot, distance matrix, capacity, and time-window context.
+against the correct depot, distances, capacity, and time-window context.
 Use `savings_metric_class_fn` when several owners share the same construction
 depot and distance behavior. Clarke-Wright computes savings once per savings
 metric class, while savings feasibility is still checked against the candidate

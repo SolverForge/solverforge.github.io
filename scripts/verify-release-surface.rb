@@ -8,7 +8,8 @@ CORE = ReleasePins::RUNTIME
 CLI = ReleasePins::CLI
 CLI_RUNTIME = ReleasePins::CLI_SCAFFOLD_RUNTIME
 APP_RUNTIME = "0.26.1"
-NOTE_CORE = "/blog/releases/2026/11/10/solverforge-0-26-x/"
+NOTE_CORE = "/blog/releases/2026/11/13/solverforge-0-27-x/"
+NOTE_CORE_26 = "/blog/releases/2026/11/10/solverforge-0-26-x/"
 NOTE_CORE_25 = "/blog/releases/2026/11/09/solverforge-0-25-x/"
 NOTE_CLI = "/blog/releases/2026/11/10/solverforge-cli-4-0-x/"
 NOTE_CLI_39 = "/blog/releases/2026/11/09/solverforge-cli-3-9-x/"
@@ -41,10 +42,27 @@ REQUIRED_TEXT = {
   "scripts/fixtures/maintenance-walkthrough/src/data/mod.rs" => [
     "pub use depot::generate;"
   ],
+  "src/_posts/releases/2026-11-13-solverforge-0-27-x.md" => [
+    "**solverforge 0.27.x** follows `solverforge 0.26.1`",
+    "`cargo add solverforge` installs #{CORE}", "docs.rs serves the #{CORE}\nAPI",
+    "| Core runtime | `solverforge #{CORE}` |",
+    "| CLI | `solverforge-cli #{CLI}` | Fresh scaffolds target core `#{CLI_RUNTIME}`",
+    "All eight pin core `#{APP_RUNTIME}`",
+    "`0.27.0` | 2026-11-13",
+    "6ffcacabf117f9a5adf9abd4f4f96c01b9235859",
+    "c8e84a99102b10b9237712d8742595e5634864c0ad088b7c28279581e253febe",
+    "43416730323", "43417890887", "compare/v0.26.1...v0.27.0", "blob/v0.27.0/CHANGELOG.md",
+    "`metric: DenseMatrix::new(distance_matrix, travel_times)`", "`type Metric = DenseMatrix;`",
+    "EuclideanMetric::new(coordinates, speed)", "savings_neighbors = 40", "`savings_neighbors_fn`",
+    "https://github.com/SolverForge/solverforge/pull/256", "https://github.com/SolverForge/solverforge/pull/257",
+    "https://github.com/SolverForge/solverforge/pull/258", "https://github.com/SolverForge/solverforge/pull/259",
+    NOTE_CORE_26, NOTE_CLI, NOTE_APPS
+  ],
   "src/_posts/releases/2026-11-10-solverforge-0-26-x.md" => [
     "**solverforge 0.26.x** follows `solverforge 0.25.1`",
-    "`cargo add solverforge` installs #{CORE}", "docs.rs serves the #{CORE} API",
-    "| Core runtime | `solverforge #{CORE}` |",
+    "The current core release is\n`solverforge #{CORE}`", NOTE_CORE,
+    "At publication `cargo add solverforge` installed 0.26.1",
+    "| Last 0.26 release | `solverforge 0.26.1` |",
     "| CLI | `solverforge-cli #{CLI}` | Fresh scaffolds target core `#{CLI_RUNTIME}`",
     "All eight pin core `#{APP_RUNTIME}`",
     "`solverforge-cli #{CLI}`\nscaffolds #{CLI_RUNTIME}, and all eight worked use cases pin it",
@@ -135,7 +153,7 @@ REQUIRED_TEXT = {
     "| `solverforge-orders@0.3.4` | `28520582d57c012b3df1db64859311ec60186f3e` |",
     "| `solverforge-fleet@0.2.4` | `e02a6877c4382b85a6346b1d7d4d3bb9dcfd9403` |",
     "| `solverforge-flightcrew@0.3.5` | `d1ea42572f6b13115bfcd68029d48d66ef481c3e` |",
-    "42958140633", "42958145776", "42958112416", "42958131088", "42958108105", NOTE_CORE
+    "42958140633", "42958145776", "42958112416", "42958131088", "42958108105", NOTE_CORE_26
   ],
   "src/_posts/releases/2026-11-10-solverforge-cli-4-0-x.md" => [
     "**solverforge-cli #{CLI} was published on November 11, 2026**",
@@ -146,7 +164,7 @@ REQUIRED_TEXT = {
     "63adb8f592464b8cafe04dbe7556824fd221dc3b83794241b4e5de64bacc39f9",
     "42960000938", "42960004422", "42960004417",
     "9a780eaf9d6a77bfb6f311ba943558faced14935", "b8e0e989da0e8531d2def434243de35dcc2afa99689bfeb873f3ee82228fe28e",
-    "42809532226", "42809536259", "42809536103", NOTE_CORE,
+    "42809532226", "42809536259", "42809536103", NOTE_CORE_26,
     "5f2cafaa09a1d27ca4a6aa37e829a42138a2ee07",
     "e94c83bda45341f815cecd73bad3e80186004f9a2e0de40028170a6a9cdc4745",
     "42845606910", "42845615766", "42845615729",
@@ -212,7 +230,9 @@ REQUIRED_TEXT = {
     "swap families ignore it", "pub allowed_employees: Vec<usize>"
   ],
   "src/docs/solverforge/modeling/list-variables.md" => [
-    "list_shadow_elements", "clear_list_shadows", "list_shadow_source"
+    "list_shadow_elements", "clear_list_shadows", "list_shadow_source",
+    "`DenseMatrix::new(distances, travel_times)`", "`EuclideanMetric::new(coordinates, speed)`",
+    "type Metric = EuclideanMetric;", "| `savings_neighbors_fn` |"
   ],
   "src/docs/solverforge/constraints/score-types.md" => [
     "It has no family field", "active_dynamic_score_family()"
@@ -240,19 +260,19 @@ REQUIRED_TEXT = {
   ],
   "src/_posts/releases/2026-05-23-solverforge-0-15-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.26.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
+    "0.27.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
   ],
   "src/_posts/releases/2026-06-12-solverforge-0-16-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.26.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
+    "0.27.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
   ],
   "src/_posts/releases/2026-06-15-solverforge-0-17-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.26.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
+    "0.27.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
   ],
   "src/_posts/releases/2026-07-13-solverforge-0-18-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.26.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
+    "0.27.x release note", "The `solverforge-cli #{CLI}` line scaffolds core `#{CLI_RUNTIME}`", "3.9.0 targeted\n`0.25.0`"
   ],
 
   "src/docs/solverforge/solver/phases.md" => [
@@ -278,7 +298,8 @@ REQUIRED_TEXT = {
   "src/docs/solverforge/solver/construction.md" => [
     "Completed optional roots are skipped before reading their",
     "candidate domains or generating moves",
-    "required augmenting", "retained feasibility evidence"
+    "required augmenting", "retained feasibility evidence",
+    "### Bounded Clarke-Wright savings", "savings_neighbors = 40", "`savings_neighbors_fn`"
   ],
   "src/docs/solverforge/constraints/constraint-streams.md" => [
     "CollectionExtract",
@@ -429,6 +450,7 @@ crates.io on 2026-10-14",
     "cargo run -- demo-data", "`PORT` environment variable"
   ],
   "src/docs/solverforge/solver/configuration.md" => [
+    "### Bounded Clarke-Wright Savings", "`phases[N].construction.savings_neighbors`",
     "Move Thread Count", "`min(N, rayon::current_num_threads(), 32)` evaluators",
     "effective parsed limit", "construction-only",
     "Keeping an optional assignment unassigned completes that group-slot decision"
@@ -565,8 +587,8 @@ crates.io on 2026-10-14",
     "The independently published CLI line is `solverforge-cli #{CLI}`",
     "Fresh\nscaffolds target `solverforge #{CLI_RUNTIME}`",
     "`solverforge-cli #{CLI}` targets `solverforge #{CLI_RUNTIME}`",
-    "720fdaded42f16a131cdb8820b624b407b275d5f", "42797763891", "42797767461",
-    "`v#{CORE}` points to `f3b41788e7519f3b707f8a9aa450fc545e0d5c08`", "42947324720", "42947327153",
+    "`v#{CORE}` points to `6ffcacabf117f9a5adf9abd4f4f96c01b9235859`", "43416730323", "43417890887",
+    "pluggable CVRP route metrics, and bounded Clarke-Wright savings",
     "refills its window with a new phase best only when a hard or medium level of\n  the best score changes",
     "5d879665ec375b154d72f00dfcadf8613216b159", "42960004422", "42960004417", "42960000938",
     "`0.26.0` from 4.0.2 and\n4.0.3", "`0.25.1` from 4.0.0 and 4.0.1",
@@ -577,7 +599,7 @@ crates.io on 2026-10-14",
     "solverforge-fleet@0.2.4", "solverforge-flightcrew@0.3.5", "42958108105",
     "eight apps on `solverforge #{APP_RUNTIME}`",
     "- **Termination**",
-    NOTE_CORE, NOTE_CORE_25, NOTE_CLI, NOTE_APPS,
+    NOTE_CORE, NOTE_CORE_26, NOTE_CLI, NOTE_APPS,
     "- **Parallel local search**", "- **Per-phase telemetry**", "- **List-shadow scoring**",
     "- **Core runtime line**", "- **Joined-tuple grouping**", "- **Guided native scalar search**",
     "- **Score-authoritative grouped search**", "- **Late acceptance**",
@@ -620,7 +642,7 @@ crates.io on 2026-10-14",
   ],
   "src/_posts/releases/2026-07-17-solverforge-0-19-x.md" => [
     "`solverforge #{CORE}` is the current core",
-    "0.26.x release note",
+    "0.27.x release note",
     "## October 2026 Core Patches (0.19.8–0.19.14)",
     "per-key occurrence counts", "arity-generic cross-join engine", "worker wakeup", "caller-owned buffers",
     "`0.19.13` | 2026-10-11",
@@ -646,7 +668,7 @@ crates.io on 2026-10-14",
     "solverforge 0.19.6",
     "solverforge 0.19.7",
     "`0.19.9` | 2026-10-08",
-    "0.26.x release note",
+    "0.27.x release note",
     "`0.19.8` | 2026-10-02",
     "`0.19.6` | 2026-09-25",
     "`0.19.7` | 2026-09-25",
@@ -717,13 +739,15 @@ FORBIDDEN_TEXT = {
     "`cargo add solverforge` installs 0.25.0", "docs.rs serves the 0.25.0", "Fresh `solverforge-cli 3.9.x` scaffolds target it"
   ],
   "src/reference/extend-solver.md" => ["ReplicaDescriptor"],
+  "src/docs/solverforge/modeling/list-variables.md" => ["distance_matrix", "travel-time matrices"],
   "src/_posts/releases/2026-11-10-solverforge-0-26-x.md" => [
-    "`cargo add solverforge` installs 0.26.0", "docs.rs serves the 0.26.0", "The first release is"
+    "`cargo add solverforge` installs 0.26.0", "docs.rs serves the 0.26.0", "The first release is",
+    "`cargo add solverforge` installs 0.26.1", "docs.rs serves the 0.26.1", "| Core runtime | `solverforge 0.26.1` |"
   ],
   "src/docs/solverforge/solver/local-search.md" => [
     "a new phase-best committed score fills the entire ring", "re-anchoring the acceptance window"
   ],
-  "src/reference/crate-map.md" => ["ReplicaDescriptor", "solverforge 0.25.0", "solverforge 0.26.0", "tree/v0.26.0"],
+  "src/reference/crate-map.md" => ["ReplicaDescriptor", "solverforge 0.25.0", "solverforge 0.26.0", "tree/v0.26.0", "solverforge 0.26.1", "tree/v0.26.1"],
   "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => ["is the current maps line", "Use the crates.io package pin"],
   "src/docs/solverforge-maps/routing.md" => ["snaps both endpoints to the nearest graph nodes"],
   "src/docs/solverforge-maps/getting-started.md" => ["snaps both endpoints to the nearest graph nodes"],
@@ -732,6 +756,7 @@ FORBIDDEN_TEXT = {
   "src/docs/solverforge/index.md" => [
     "These pages track `solverforge 0.25.0`", "solverforge@=0.25.0", "tree/v0.25.0",
     "These pages track `solverforge 0.26.0`", "solverforge@=0.26.0", "tree/v0.26.0",
+    "These pages track `solverforge 0.26.1`", "solverforge@=0.26.1", "tree/v0.26.1",
     "These pages track the `solverforge 0.20.1` crate",
     "The `0.20.1` workspace declares Rust `1.95`.",
     "docs.rs/solverforge/0.20.1/",
@@ -813,6 +838,8 @@ FORBIDDEN_TEXT = {
   "src/docs/status-and-roadmap.md" => [
     "resets the window on a new phase best",
     "documentation tracks the `solverforge 0.26.0` release", "`cargo add solverforge` installs 0.26.0",
+    "documentation tracks the `solverforge 0.26.1` release", "`cargo add solverforge` installs 0.26.1",
+    "Native Rust constraint solver published as `solverforge 0.26.1`",
     "Native Rust constraint solver published as `solverforge 0.26.0`",
     "The independently published CLI line is `solverforge-cli 4.0.3`",
     "The independently published CLI line is `solverforge-cli 4.0.2`",

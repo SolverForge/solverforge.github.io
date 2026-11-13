@@ -657,6 +657,33 @@ name = "weekend_repair"
 
 There is no arbitrary `custom_phase_class` loader or erased plugin registry.
 
+### Bounded Clarke-Wright Savings
+
+`list_clarke_wright` scores every pair of unassigned elements by default, so
+its savings list grows with the square of the element count: 32 bytes per
+pair, about 1.6 GB at 10,000 stops. `savings_neighbors` scores a pair only
+when one element is among the other's nearest:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "list_clarke_wright"
+savings_neighbors = 40
+```
+
+The list then holds about `savings_neighbors` entries per element, each pair
+scored once. The neighbours come from the list variable's
+`savings_neighbors_fn` hook; the `domain = "cvrp"` profile supplies one that
+asks the vehicle's `RouteMetric`, and `EuclideanMetric` answers it from a
+spatial grid, so construction memory stays linear in the stops (see
+[List Variables](/docs/solverforge/modeling/list-variables/#cvrp-route-profile)).
+Without the key every pair is scored; a bound of at least the element count
+minus one builds the same routes as no bound. The value must be at least 1
+(`0` does not parse). A solve fails at
+`phases[N].construction.savings_neighbors` when the phase is not
+`list_clarke_wright`, and at `phases[N].construction` when the list variable
+declares no `savings_neighbors_fn`.
+
 ### Construction Obligation
 
 Nullable scalar variables default to `preserve_unassigned`: construction may

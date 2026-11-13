@@ -100,7 +100,7 @@ let sum = a + b; // -1hard/-8soft
 ## Try It
 
 The snippets above come from this program. In a binary crate with
-`cargo add solverforge@=0.26.1`, save it as `src/main.rs`:
+`cargo add solverforge@=0.27.0`, save it as `src/main.rs`:
 
 <!-- rust: crate=score-types file=src/main.rs -->
 ```rust

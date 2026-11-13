@@ -14,17 +14,19 @@ declarative rule definition, and metaheuristic algorithms for optimization.
 ## Installation
 
 ```bash
-cargo add solverforge@=0.26.1
+cargo add solverforge@=0.27.0
 ```
 
-These pages track `solverforge 0.26.1`, and every Rust example on them
+These pages track `solverforge 0.27.0`, and every Rust example on them
 compiles against that release. The workspace declares Rust `1.95`.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow.
 `solverforge-cli 4.0.4` scaffolds `solverforge 0.26.1`; an app
-scaffolded by an earlier CLI pins an older core, so read the `solverforge`
-version in its `Cargo.toml`.
+scaffolded by it or by an earlier CLI pins an older core, so read the
+`solverforge` version in its `Cargo.toml` and see the
+[0.27.x upgrade checklist](/blog/releases/2026/11/13/solverforge-0-27-x/#upgrade-checklist)
+before moving it to 0.27.0.
 
 ```bash
 cargo install solverforge-cli
@@ -53,7 +55,7 @@ local-search phase is added only when termination is configured. See
 
 ## Minimal Example
 
-A binary crate with `cargo add solverforge@=0.26.1` and three files.
+A binary crate with `cargo add solverforge@=0.27.0` and three files.
 `src/domain/mod.rs` registers the model:
 
 <!-- rust: crate=minimal file=src/domain/mod.rs -->
@@ -167,7 +169,7 @@ score Some(HardSoftScore(0, 0))
 
 ## API Reference
 
-Consult the [`v0.26.1` implementation](https://github.com/SolverForge/solverforge/tree/v0.26.1)
+Consult the [`v0.27.0` implementation](https://github.com/SolverForge/solverforge/tree/v0.27.0)
 and the repository `crates/*/WIREFRAME.md` API maps for this source line.
 [docs.rs/solverforge](https://docs.rs/solverforge/) serves published crate APIs;
 select the version matching your dependency.

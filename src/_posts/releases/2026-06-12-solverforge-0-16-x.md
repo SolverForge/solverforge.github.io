@@ -8,9 +8,9 @@ description: >
   line on crates.io.
 ---
 
-<%= render Ui::Callout.new(title: "Update, November 10, 2026") do %>
-This is a historical release note. `solverforge 0.26.1` is the current core
-release; its line note is the [0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/).
+<%= render Ui::Callout.new(title: "Update, November 13, 2026") do %>
+This is a historical release note. `solverforge 0.27.0` is the current core
+release; its line note is the [0.27.x release note](/blog/releases/2026/11/13/solverforge-0-27-x/).
 For the 0.19.x line the 0.19 existence-engine rewrite (per-key occurrence counts
 answering semi/anti joins from retained keys, after the buffered Clarke-Wright
 interruption and in-place relationship bookkeeping of `0.19.11` and `0.19.12`)

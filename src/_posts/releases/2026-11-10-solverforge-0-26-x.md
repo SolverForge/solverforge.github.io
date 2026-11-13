@@ -11,12 +11,17 @@ description: >
   without an entity-sized permutation.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core line. The current core release is
+`solverforge 0.27.0`; see the [0.27.x release note](/blog/releases/2026/11/13/solverforge-0-27-x/).
+<% end %>
+
 **solverforge 0.26.x** follows `solverforge 0.25.1`; the line was published on
-crates.io from 2026-11-10 through 2026-11-11. The current release is
+crates.io from 2026-11-10 through 2026-11-11 and closes with
 [0.26.1](https://crates.io/crates/solverforge/0.26.1), with a Rust `1.95`
-floor. `cargo add solverforge` installs 0.26.1, and docs.rs serves the 0.26.1
-API. The public modeling, stream, configuration, and solving APIs are
-unchanged across the line; the one breaking change, in 0.26.0, is in the
+floor. At publication `cargo add solverforge` installed 0.26.1, and docs.rs
+served the 0.26.1 API. The public modeling, stream, configuration, and solving
+APIs are unchanged across the line; the one breaking change, in 0.26.0, is in the
 lower-level `solverforge-scoring` score-director constructors. 0.26.1 changes
 no public API: late acceptance keeps its score history unless a hard or medium
 level of the best score changes, and scalar ruin-and-recreate draws its batches
@@ -122,9 +127,9 @@ Public paths and behaviour are unchanged.
 
 | Surface | Version | Notes |
 | ------- | ------- | ----- |
-| Core runtime | `solverforge 0.26.1` | Rust `1.95`; late acceptance keeps its history across soft-level improvements; scalar ruin batches without an entity-sized permutation; replica directors built by `with_replicas*` |
+| Last 0.26 release | `solverforge 0.26.1` | Rust `1.95`; late acceptance keeps its history across soft-level improvements; scalar ruin batches without an entity-sized permutation; replica directors built by `with_replicas*` |
 | First 0.26 release | `solverforge 0.26.0` | Replica directors built by `with_replicas*`; proportional stream closure types; documented generated items |
-| Previous core runtime | `solverforge 0.25.1` | Bounded nearby list candidates; see the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) |
+| Previous core line | `solverforge 0.25.1` | Bounded nearby list candidates; see the [0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) |
 | CLI | `solverforge-cli 4.0.4` | Fresh scaffolds target core `0.26.1` (4.0.2 and 4.0.3 target `0.26.0`); see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
 | Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Compiled onto core `0.23.0`; upgrading the Rust core does not retarget these wheels |
 | Worked use cases | November 11 app releases | All eight pin core `0.26.1` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |

@@ -154,8 +154,9 @@ route domains can wire `route_hooks` explicitly. That module exports `get`,
 the contract: distance and feasibility should be evaluated in the vehicle,
 route, or machine context that will own the candidate route. Clarke-Wright
 construction stays on the separate `savings_hooks` module plus optional
-`savings_metric_class_fn`, so construction savings can share a metric class
-without collapsing route-local assignment semantics.
+`savings_metric_class_fn` and `savings_neighbors_fn`, so construction savings
+can share a metric class and stay bounded without collapsing route-local
+assignment semantics.
 
 ## List Ruin
 

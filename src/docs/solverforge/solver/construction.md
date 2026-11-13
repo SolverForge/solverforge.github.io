@@ -51,16 +51,47 @@ construction progress from callbacks or terminal output.
 
 List-specific construction such as Clarke-Wright consumes savings hooks from
 the list variable. Stock CVRP lists can declare `domain = "cvrp"` to get the
-standard `solverforge::cvrp::savings_hooks` and `savings_metric_class` without
-repeating hook paths. Custom route domains can omit the profile and wire
-`savings_hooks` explicitly; the module must export `depot`, `distance`, and
-`feasible`, while optional `savings_metric_class_fn` lets owners with the same
-construction depot and distance behavior share savings rows. Route-local
-behavior stays separate in `route_hooks`, which exports `get`, `set`, `depot`,
-`distance`, and `feasible` for route assignment and k-opt improvement. Stock
-CVRP distance hooks turn unreachable or malformed matrix entries into large
-finite construction costs, and strict route hooks reject unreachable
-travel-time legs before route-local improvements commit them.
+standard `solverforge::cvrp::savings_hooks`, `savings_metric_class`, and
+`savings_neighbors` without repeating hook paths. Custom route domains can omit
+the profile and wire `savings_hooks` explicitly; the module must export
+`depot`, `distance`, and `feasible`, while optional `savings_metric_class_fn`
+lets owners with the same construction depot and distance behavior share
+savings rows, and optional `savings_neighbors_fn` supplies the nearest
+neighbours that bounded savings need. Route-local behavior stays separate in
+`route_hooks`, which exports `get`, `set`, `depot`, `distance`, and `feasible`
+for route assignment and k-opt improvement. Stock CVRP distance hooks turn
+unreachable or undefined legs into large finite construction costs, and strict
+route hooks reject unreachable travel-time legs before route-local
+improvements commit them.
+
+### Bounded Clarke-Wright savings
+
+By default `list_clarke_wright` scores every pair of unassigned elements, so
+its savings list is quadratic in the element count. Set `savings_neighbors` on
+the phase to score a pair only when one element is among the other's nearest
+`savings_neighbors`:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "list_clarke_wright"
+savings_neighbors = 40
+```
+
+The savings list then holds about `savings_neighbors` entries per element.
+Each pair is scored once, so the bounded savings are an ordered subset of the
+full list, and a bound of at least the element count minus one builds the same
+routes as no bound. With the stock CVRP profile on `EuclideanMetric`,
+neighbours come from a spatial grid and construction memory stays linear in
+the stops. See
+[Configuration](/docs/solverforge/solver/configuration/#bounded-clarke-wright-savings)
+for the failure cases.
+
+Merge admission is incremental: each merge attempt rechecks owner feasibility
+only for the merged route, and the stock CVRP profile checks savings
+feasibility once per savings metric class instead of once per owner, because
+its `feasible` hook reads only the owner's `ProblemData`. Explicit hook paths
+keep asking every owner.
 
 ### Clarke-Wright interruption and buffered merges
 

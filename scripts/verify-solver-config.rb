@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# Holds the solver docs to what crates.io solverforge 0.26.1 does.
+# Holds the solver docs to what crates.io solverforge 0.27.0 does.
 #
 # Every ```toml block on the solver pages is parsed with
 # `SolverConfig::from_toml_str` by the fixture crate in
-# scripts/fixtures/solver-config (solverforge = "=0.26.1"), then solved on a
+# scripts/fixtures/solver-config (solverforge = "=0.27.0"), then solved on a
 # fixed model that owns the variables the block names, so a missing field, a
 # repeated key, an unknown key, or a variable name the model does not have
 # fails here. Every ```rust block on those pages must be verbatim in the
@@ -104,6 +104,7 @@ end
 def model_for(text)
   return "grouped" if text.include?('"required_shift_assignment"')
   return "operations" if text.match?(/variable_name = "operations"/)
+  return "savings" if text.include?('"list_clarke_wright"')
   return "visits" if text.match?(/variable_name = "visits"|type = "(?:list_|sublist_|k_opt|nearby_list_)/)
 
   "scalar"
@@ -225,7 +226,7 @@ def build_fixture(target)
   _, status = Open3.capture2e("cargo", "--version")
   fail!("cargo is required for the live run") unless status.success?
 
-  log "Building the fixture against crates.io solverforge =0.26.1"
+  log "Building the fixture against crates.io solverforge =0.27.0"
   output, status = cargo!("build", "--locked", "--quiet", chdir: FIXTURE, env: { "CARGO_TARGET_DIR" => target })
   fail!("fixture build failed:\n#{output}") unless status.success?
   binary = File.join(target, "debug", "solver-config-fixture")

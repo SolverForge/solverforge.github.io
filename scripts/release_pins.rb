@@ -12,7 +12,7 @@ require "uri"
 # to move, so a stale "current" claim cannot stay green.
 module ReleasePins
   CURRENT = {
-    "solverforge" => "0.26.1",
+    "solverforge" => "0.27.0",
     "solverforge-cli" => "4.0.4",
     "solverforge-ui" => "0.9.1",
     "solverforge-maps" => "2.3.3"

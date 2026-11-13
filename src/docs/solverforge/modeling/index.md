@@ -49,7 +49,7 @@ type (`pub use shift::Shift as Duty;`), but solver configuration still names
 the canonical descriptor type, such as `Shift.employee_idx`.
 
 The model these pages build: start a crate with `cargo new`, run
-`cargo add solverforge@=0.26.1`, and add these files.
+`cargo add solverforge@=0.27.0`, and add these files.
 
 `src/domain/mod.rs`:
 

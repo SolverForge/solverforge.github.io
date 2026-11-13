@@ -10,30 +10,26 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.26.1` release and keeps core,
+documentation tracks the `solverforge 0.27.0` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.26.1, and docs.rs serves the 0.26.1 API.
+`cargo add solverforge` installs 0.27.0, and docs.rs serves the 0.27.0 API.
 Rust `1.95` remains the workspace floor.
 
-`v0.26.1` points to `f3b41788e7519f3b707f8a9aa450fc545e0d5c08`. Its
-[CI run](https://github.com/SolverForge/solverforge/actions/runs/42947324720)
-passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/42947327153)
+`v0.27.0` points to `6ffcacabf117f9a5adf9abd4f4f96c01b9235859`. Its
+[CI run](https://github.com/SolverForge/solverforge/actions/runs/43416730323)
+passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/43417890887)
 re-ran CI on Linux, macOS, and Windows with the Miri, MSRV, docs, and package
 jobs, verified the release, published all nine crates to crates.io, and
-created the GitHub Release. The first 0.26 release, `v0.26.0`
-(`720fdaded42f16a131cdb8820b624b407b275d5f`, [CI](https://github.com/SolverForge/solverforge/actions/runs/42797763891)
-and [Release](https://github.com/SolverForge/solverforge/actions/runs/42797767461)
-passed), builds replica-forking score directors with
-`ScoreDirector::with_replicas`, keeps stream closure types proportional to the
-constraint set so large apps link with full debug info, and documents every
-public item the planning macros generate. 0.26.1 keeps the late-acceptance
-score history unless a hard or medium level of the best score changes, and
-draws scalar ruin batches without an entity-sized permutation. See the
-[0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) for the
-breaking change and upgrade checklist; the
-[0.25.x release note](/blog/releases/2026/11/09/solverforge-0-25-x/) covers
-the termination, parallel-evaluation, and configuration changes of the
-previous line.
+created the GitHub Release. 0.27.0 reads CVRP leg distances through a
+pluggable `RouteMetric` (a `DenseMatrix` of supplied tables or an
+`EuclideanMetric` computed from coordinates), bounds Clarke-Wright savings to
+each stop's nearest neighbours with `savings_neighbors`, keeps Clarke-Wright
+owner admission incremental, and opens the scalar swap cursor in linear time.
+See the [0.27.x release note](/blog/releases/2026/11/13/solverforge-0-27-x/)
+for the breaking change and upgrade checklist; the
+[0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) covers
+the replica-director, debug-info, and late-acceptance changes of the previous
+line.
 
 The independently published CLI line is `solverforge-cli 4.0.4`. Fresh
 scaffolds target `solverforge 0.26.1`, with `solverforge-ui 0.9.1` and
@@ -87,7 +83,7 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.26.1`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, replica directors built by `ScoreDirector::with_replicas`, and late acceptance that keeps its history across soft-level improvements; Rust `1.95` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.27.0`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, replica directors built by `ScoreDirector::with_replicas`, late acceptance that keeps its history across soft-level improvements, pluggable CVRP route metrics, and bounded Clarke-Wright savings; Rust `1.95` |
 | **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.4` targets `solverforge 0.26.1`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
 | **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.4`, `solverforge-lessons@3.0.4`, `solverforge-deliveries@3.0.5`, `solverforge-fsr@3.0.5`, plus the repository-only `solverforge-furnace@4.0.2`, `solverforge-orders@0.3.4`, `solverforge-fleet@0.2.4`, and `solverforge-flightcrew@0.3.5`; all eight target `solverforge 0.26.1` and `solverforge-ui 0.9.0` |
@@ -198,7 +194,7 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.26.1`, with
+- **Core runtime line**: these manuals describe `solverforge 0.27.0`, with
   Rust `1.95`. The
   published `solverforge-cli 4.0.4` package targets `solverforge 0.26.1` for
   fresh scaffolds; apps scaffolded by earlier releases pin older cores
@@ -413,13 +409,23 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
   and clamp route-distance arithmetic used by Clarke-Wright and k-opt.
 - **CVRP list profile**: stock CVRP list variables can declare
   `domain = "cvrp"`. The profile supplies the CVRP solution trait, distance
-  meters, strict route-local hooks, relaxed Clarke-Wright savings hooks, and
-  savings metric class.
+  meters, strict route-local hooks, relaxed Clarke-Wright savings hooks,
+  savings metric class, and savings neighbour hook.
+- **Route metrics**: `ProblemData` reads legs from a `RouteMetric` named by
+  `VrpSolution::Metric`: `DenseMatrix` holds supplied distance and travel-time
+  tables, and `EuclideanMetric` computes straight-line legs from coordinates
+  in memory linear in the stops.
+- **Bounded Clarke-Wright savings**: `savings_neighbors = K` on a
+  `list_clarke_wright` phase scores a pair only when one element is among the
+  other's K nearest, so the savings list holds about K entries per element.
+  With `EuclideanMetric` the stock profile finds neighbours on a spatial grid.
 - **Route and savings hooks**: custom routing list variables can still split
   route-local behavior from Clarke-Wright construction explicitly.
   `route_hooks` exports `get`, `set`, `depot`, `distance`, and `feasible`;
   `savings_hooks` exports `depot`, `distance`, and `feasible`;
-  `savings_metric_class_fn` is the optional construction sharing hook.
+  `savings_metric_class_fn` is the optional construction sharing hook and
+  `savings_neighbors_fn` the optional nearest-neighbour hook for bounded
+  savings.
 - **Strict K-opt route feasibility**: stock CVRP route hooks reject capacity and
   time-window violations before k-opt commits a route. The stock savings hooks
   stay relaxed enough for Clarke-Wright construction to assign scoreable
@@ -486,7 +492,8 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
   indexes for direct, grouped, projected, flattened, and higher-arity joins.
 - **CVRP profile and custom hook split**: stock CVRP routes should use
   `domain = "cvrp"`; custom route domains can wire `route_hooks`,
-  `savings_hooks`, and optional `savings_metric_class_fn` explicitly.
+  `savings_hooks`, and optional `savings_metric_class_fn` and
+  `savings_neighbors_fn` explicitly.
   Construction savings can share a metric class without collapsing route-local
   assignment semantics.
 - **Assignment value-pattern neighborhoods**: assignment-backed grouped scalar
