@@ -49,7 +49,7 @@ You will:
 - install `solverforge-cli` and build a small timetable app from the neutral
   scaffold, then solve it
 - run the complete Lessons app from its Hugging Face Space repository
-- read the finished app's SolverForge 0.26.1 dependency shape
+- read the finished app's SolverForge 0.31.2 dependency shape
 - understand why lesson timetabling uses two scalar planning variables
 - follow the current `Timeslot`, `Teacher`, `Group`, `Room`, `Lesson`, and
   `Plan` model
@@ -82,7 +82,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 4.0.4`, which scaffolds `solverforge 0.26.1` and
+This page uses `solverforge-cli 4.2.0`, which scaffolds `solverforge 0.31.2` and
 `solverforge-ui 0.9.1`.
 
 ### Build a Timetable from the CLI
@@ -562,13 +562,13 @@ timeslot variable and a room variable, the initial medium score is
 
 ### Published Dependency Shape
 
-The tagged `solverforge-lessons@3.0.4` release targets the published
-SolverForge 0.26.1 line:
+The tagged `solverforge-lessons@3.0.6` release targets the published
+SolverForge 0.31.2 line:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.26.1", features = ["serde", "console", "verbose-logging"] }
-solverforge-ui = { version = "0.9.0" }
+solverforge = { version = "0.31.2", features = ["serde", "console", "verbose-logging"] }
+solverforge-ui = { version = "0.9.1" }
 # Web server
 axum = "0.8.9"
 tokio = { version = "1.52.1", features = ["full"] }
@@ -581,13 +581,12 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 
 # Utilities
-uuid = { version = "1.23.1", features = ["v4", "serde"] }
 parking_lot = "0.12.5"
 chrono = { version = "0.4.44", features = ["serde"] }
 ```
 
 The app contract in `solverforge.app.toml` names the app-owned runtime target.
-The finished app records `solverforge 0.26.1` as its runtime while keeping the
+The finished app records `solverforge 0.31.2` as its runtime while keeping the
 `2.2.2` CLI version it was first scaffolded with:
 
 ```toml
@@ -598,9 +597,9 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.26.1"
-runtime_source = "crates.io: solverforge 0.26.1"
-ui_source = "crates.io: solverforge-ui 0.9.0"
+target = "solverforge 0.31.2"
+runtime_source = "crates.io: solverforge 0.31.2"
+ui_source = "crates.io: solverforge-ui 0.9.1"
 
 [demo]
 default_size = "LARGE"
@@ -958,7 +957,7 @@ make space-run
 | Surface | File or command |
 | ------- | --------------- |
 | Finished app | [Hugging Face Space](https://huggingface.co/spaces/SolverForge/solverforge-lessons) |
-| Tagged app release | `solverforge-lessons@3.0.4` |
+| Tagged app release | `solverforge-lessons@3.0.6` |
 | Local run | `make run-release` |
 | Browser test setup | `make install-e2e` |
 | Standard validation | `make test` |

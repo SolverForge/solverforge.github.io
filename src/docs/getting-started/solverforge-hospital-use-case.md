@@ -78,7 +78,7 @@ cargo install solverforge-cli --locked
 solverforge --version
 ```
 
-`solverforge-cli 4.0.4` scaffolds `solverforge 0.26.1` with
+`solverforge-cli 4.2.0` scaffolds `solverforge 0.31.2` with
 `solverforge-ui 0.9.1`; `solverforge --version` prints the targets your binary
 carries.
 
@@ -817,21 +817,21 @@ another). Open `http://localhost:7860` and press **Solve**.
 
 The Space source is the finished app: it includes the deterministic hospital
 benchmark generator, retained-job API, modular schedule frontend, tests, and
-deployment files. The tagged release is `solverforge-hospital@3.0.4`.
+deployment files. The tagged release is `solverforge-hospital@3.0.6`.
 
 ### Keep the Published Dependency Shape
 
-The finished app runs on `solverforge 0.26.1` and the `solverforge-ui 0.9.0`
+The finished app runs on `solverforge 0.31.2` and the `solverforge-ui 0.9.1`
 web-shell assets. Its `Cargo.toml` dependencies:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.26.1", features = [
+solverforge = { version = "0.31.2", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.9.0"
+solverforge-ui = "0.9.1"
 rand = "0.10.1"
 
 axum = "0.8.9"
@@ -858,9 +858,9 @@ shell = "web"
 cli_version = "2.2.2"
 
 [runtime]
-target = "solverforge 0.26.1"
-runtime_source = "crates.io: solverforge 0.26.1"
-ui_source = "crates.io: solverforge-ui 0.9.0"
+target = "solverforge 0.31.2"
+runtime_source = "crates.io: solverforge 0.31.2"
+ui_source = "crates.io: solverforge-ui 0.9.1"
 
 [demo]
 default_size = "LARGE"
@@ -1450,7 +1450,7 @@ state.
 
 | Need                             | File or directory                          |
 | -------------------------------- | ------------------------------------------ |
-| Tagged app release               | `solverforge-hospital@3.0.4`               |
+| Tagged app release               | `solverforge-hospital@3.0.6`               |
 | App metadata                     | `solverforge.app.toml`                     |
 | Solver policy                    | `solver.toml`                              |
 | Planning model manifest          | `src/domain/mod.rs`                        |

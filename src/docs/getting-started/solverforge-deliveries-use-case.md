@@ -90,7 +90,7 @@ solverforge --version
 ```
 
 `solverforge --version` prints the CLI version and the runtime it scaffolds.
-This page uses `solverforge-cli 4.0.4`, which scaffolds `solverforge 0.26.1`,
+This page uses `solverforge-cli 4.2.0`, which scaffolds `solverforge 0.31.2`,
 `solverforge-ui 0.9.1`, and `solverforge-maps 2.3.3`.
 
 ### Build a Router from the CLI
@@ -649,18 +649,18 @@ Current dataset sizes:
 
 ### Published Dependency Shape
 
-The tagged `solverforge-deliveries@3.0.5` release uses SolverForge core, UI,
+The tagged `solverforge-deliveries@3.0.7` release uses SolverForge core, UI,
 and Maps from crates.io:
 
 ```toml
 [dependencies]
-solverforge = { version = "0.26.1", features = [
+solverforge = { version = "0.31.2", features = [
   "serde",
   "console",
   "verbose-logging",
 ] }
-solverforge-ui = "0.9.0"
-solverforge-maps = "2.1.5"
+solverforge-ui = "0.9.1"
+solverforge-maps = "2.3.3"
 # Web server
 axum = "0.8.9"
 tokio = { version = "1.52.3", features = ["full"] }
@@ -674,7 +674,6 @@ serde_json = "1.0.149"
 rand = "0.10.1"
 
 # Utilities
-uuid = { version = "1.23.1", features = ["v4", "serde"] }
 parking_lot = "0.12.5"
 ```
 
@@ -690,9 +689,9 @@ cli_version = "2.2.2"
 shell = "web"
 
 [runtime]
-target = "solverforge 0.26.1"
-runtime_source = "crates.io: solverforge 0.26.1"
-ui_source = "crates.io: solverforge-ui 0.9.0"
+target = "solverforge 0.31.2"
+runtime_source = "crates.io: solverforge 0.31.2"
+ui_source = "crates.io: solverforge-ui 0.9.1"
 
 [demo]
 default_size = "PHILADELPHIA"
@@ -833,7 +832,7 @@ pub struct Vehicle {
 }
 ```
 
-The CVRP domain profile is stock SolverForge 0.26.1; `solverforge generate
+The CVRP domain profile is stock SolverForge 0.31.2; `solverforge generate
 variable ... --domain cvrp` writes the same attribute. It expands to the
 `VrpSolution` bound, CVRP distance meters, strict route-local hooks for route
 assignment and k-opt, relaxed Clarke-Wright savings hooks, and the stock savings
@@ -1201,7 +1200,7 @@ make test-live-road
 
 | Need                             | File or directory                   |
 | -------------------------------- | ----------------------------------- |
-| Tagged app release               | `solverforge-deliveries@3.0.5`       |
+| Tagged app release               | `solverforge-deliveries@3.0.7`       |
 | App metadata                     | `solverforge.app.toml`              |
 | Solver policy                    | `solver.toml`                       |
 | Planning model manifest          | `src/domain/mod.rs`                 |

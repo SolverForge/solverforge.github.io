@@ -34,7 +34,8 @@ module UseCaseTutorial
     :page,              # absolute page path
     :page_url,          # site URL of the page, for the rendered-H1 check
     :cli_version,       # pinned published solverforge-cli the gate installs
-    :runtime_version,   # solverforge version the CLI scaffolds and the app uses
+    :runtime_version,   # solverforge version the finished app uses
+    :scaffold_version,  # solverforge version the pinned CLI scaffolds
     :space_url,         # Hugging Face Space clone URL the page must use
     :app,               # use-case name, e.g. "lessons" (release tag solverforge-<app>@X)
     :cli_section,       # heading of the CLI build section
@@ -150,9 +151,10 @@ module UseCaseTutorial
     end
 
     def check_versions
-      fail!("page must state the runtime the CLI scaffolds: solverforge #{config.runtime_version}") unless text.include?("`solverforge #{config.runtime_version}`")
+      fail!("page must state the runtime the CLI scaffolds: solverforge #{config.scaffold_version}") unless text.include?("`solverforge #{config.scaffold_version}`")
+      fail!("page must state the runtime the finished app uses: solverforge #{config.runtime_version}") unless text.include?("solverforge #{config.runtime_version}")
       stale = text.scan(/solverforge(?:-cli)? (\d+\.\d+\.\d+)/).flatten.uniq.reject do |v|
-        [config.runtime_version, config.cli_version].include?(v)
+        [config.runtime_version, config.scaffold_version, config.cli_version].include?(v)
       end
       fail!("page names versions it does not document: #{stale.join(", ")}") unless stale.empty?
     end

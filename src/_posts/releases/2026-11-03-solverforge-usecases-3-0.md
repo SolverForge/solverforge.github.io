@@ -228,6 +228,55 @@ scheduling concepts of the original Java application.
 Bundle CI passed at the final app tag, `solverforge-orders@0.3.4`
 ([run 42958108105](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958108105)).
 
+### November 18 releases: solverforge 0.31.2
+
+On November 18 every app released on `solverforge 0.31.2` and
+`solverforge-ui 0.9.1`, and the bundle gained a ninth app; see the
+[0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/). Each app
+moves its `solverforge` dependency, its lockfile, and the `[runtime]` lines of
+`solverforge.app.toml` to 0.31.2; Field service and Fleet also pin
+`solverforge-core 0.31.2`, and Deliveries and Field service move to
+`solverforge-maps 2.3.3`. Constraint ids, solver configuration, and HTTP
+contracts are unchanged.
+
+- **EV** (`solverforge-ev@0.1.0`, repository-only) routes electric delivery
+  vans around Bergamo under van capacity, delivery windows, road travel, and
+  battery range. Charging stops are not searched: after every route change an
+  exact dynamic program places the stops that minimise range shortfall and
+  then added time, so the list variable holds only customers and the stock
+  `list_clarke_wright` and `list_k_opt` construction works unchanged.
+- **Deliveries** asks for road geometry one read at a time, for the newest
+  snapshot only, and updates the job and revision markers before the read
+  starts, so Pause and Stop are no longer queued behind geometry reads early in
+  a solve.
+- Deliveries, Field service, Lessons, Orders, and Flight crew drop an unused
+  `uuid` dependency; Flight crew also drops an unused `solverforge-maps`.
+- The bundle and every app pin Playwright 1.65.1, which installs Chromium on
+  the Ubuntu 26.04 GitHub runners where 1.60.0 refused to.
+
+| App tag | Source commit | Space sync |
+| --- | --- | --- |
+| `solverforge-hospital@3.0.6` | `67cc197b27eb422032ccf540af9c72658454b895` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/44286407400) |
+| `solverforge-lessons@3.0.6` | `47b88cef9dd7194c0a5cb155ec22c354c8111a63` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/44286416781) |
+| `solverforge-deliveries@3.0.7` | `2612a887130c2f9cbf78e4773f9d3d691d0841f4` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/44286389321) |
+| `solverforge-fsr@3.0.7` | `07589e13da83c8a745c497322df2e8ea928ffc2b` | [passed](https://github.com/SolverForge/solverforge-usecases/actions/runs/44286400504) |
+| `solverforge-furnace@4.0.3` | `66e3928e9c99204fb09241b054721587c6accc85` | repository-only |
+| `solverforge-orders@0.3.5` | `2a8b0361cc590f72270135aebc46759ba8c65687` | repository-only |
+| `solverforge-fleet@0.2.5` | `c37826248cc33513ca609d5731d299b7748931a0` | repository-only |
+| `solverforge-flightcrew@0.3.6` | `34448b933ca916c258f58769f7cfc1c6c0c8537f` | repository-only |
+| `solverforge-ev@0.1.0` | `971ca9fcf793e8b28e45ddf20bced55b553759af` | repository-only |
+
+The first tags of the day (`solverforge-hospital@3.0.5`,
+`solverforge-lessons@3.0.5`, `solverforge-deliveries@3.0.6`, and
+`solverforge-fsr@3.0.6`) never reached their Spaces: their sync runs, and the
+bundle CI run at `solverforge-orders@0.3.5`, stopped at installing Playwright
+1.60.0 on the new runners, before any check ran. The Space apps released
+again after the Playwright fix. The five repository-only apps kept the
+tags above; between those tags and the final one their only changes are the
+Playwright pin, the dropped dependencies, and a Furnace test helper. Bundle
+CI passed at the final app tag, `solverforge-lessons@3.0.6`
+([run 44286382345](https://github.com/SolverForge/solverforge-usecases/actions/runs/44286382345)).
+
 ## Upgrade Checklist
 
 - Check out the app's own release tag from the tables above.
@@ -249,7 +298,7 @@ Bundle CI passed at the final app tag, `solverforge-orders@0.3.4`
 
 ## Where to read next
 
-Inspect all eight in the [use-case showcase](/use-cases/), or follow the
+Inspect eight of the nine apps in the [use-case showcase](/use-cases/), or follow the
 written guides for
 [hospital](/docs/getting-started/solverforge-hospital-use-case/),
 [lessons](/docs/getting-started/solverforge-lessons-use-case/),

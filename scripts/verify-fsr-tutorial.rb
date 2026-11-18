@@ -17,7 +17,7 @@
 require_relative "lib/use_case_tutorial"
 
 SITE_ROOT = File.expand_path("..", __dir__)
-CLI_VERSION = "4.0.4"
+CLI_VERSION = "4.2.0"
 
 def site_file(path)
   File.join(SITE_ROOT, path)
@@ -40,7 +40,8 @@ UseCaseTutorial.run(
     page: site_file("src/docs/getting-started/solverforge-fsr-use-case.md"),
     page_url: "docs/getting-started/solverforge-fsr-use-case",
     cli_version: CLI_VERSION,
-    runtime_version: "0.26.1",
+    runtime_version: "0.31.2",
+    scaffold_version: "0.31.2",
     space_url: "https://huggingface.co/spaces/SolverForge/solverforge-fsr",
     app: "fsr",
     cli_section: "Build a Dispatcher from the CLI",
