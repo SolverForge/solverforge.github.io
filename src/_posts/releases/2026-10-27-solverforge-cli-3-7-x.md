@@ -8,9 +8,9 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
-This post records an older CLI line. The current CLI is `solverforge-cli 4.0.4`,
-which scaffolds `solverforge 0.26.1`; see the
-[4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
+This post records an older CLI line. The current CLI is `solverforge-cli 4.2.0`,
+which scaffolds `solverforge 0.31.2`; see the
+[4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/).
 <% end %>
 
 **solverforge-cli 3.7.1 was published on October 27, 2026**, following

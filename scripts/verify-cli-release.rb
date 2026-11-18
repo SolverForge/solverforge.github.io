@@ -12,8 +12,8 @@ require_relative "release_pins"
 # Provenance of the audited solverforge-cli artifact. A newer publish moves
 # ReleasePins::CLI, and then these two values must be re-audited before the
 # gate passes again.
-EXPECTED_SOURCE_SHA = "5d879665ec375b154d72f00dfcadf8613216b159"
-EXPECTED_ARTIFACT_SHA256 = "63adb8f592464b8cafe04dbe7556824fd221dc3b83794241b4e5de64bacc39f9"
+EXPECTED_SOURCE_SHA = "8a5c3e206fcbcffb5c44f68b5b23f29d263c185d"
+EXPECTED_ARTIFACT_SHA256 = "cedbfb4ff9ab1b08934ac7e1e88255bbba0a0631bae561f0c31d53b6bfe9801f"
 
 EXPECTED_CLI_VERSION = ReleasePins::CLI
 EXPECTED_RUNTIME_VERSION = ReleasePins::CLI_SCAFFOLD_RUNTIME
@@ -156,6 +156,7 @@ Dir.mktmpdir("solverforge-cli-release.") do |tmp_dir|
   telemetry = File.join(app_root, "src", "api", "telemetry.rs")
   assert_file_contains(telemetry, 'pub phases: Vec<PhaseTelemetryDto>')
   assert_file_contains(telemetry, 'pub moves_speculative: u64')
+  assert_file_contains(telemetry, 'pub resolved_phase_plan: Option<CandidateTracePhasePlanDto>')
   assert_file_contains(telemetry, '"discarded_speculative"')
   fail!("telemetry still exposes the old single-phase field") if File.read(telemetry).include?('pub phase: Option<PhaseTelemetryDto>')
 

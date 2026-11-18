@@ -13,7 +13,7 @@ require "uri"
 module ReleasePins
   CURRENT = {
     "solverforge" => "0.31.2",
-    "solverforge-cli" => "4.0.4",
+    "solverforge-cli" => "4.2.0",
     "solverforge-ui" => "0.9.1",
     "solverforge-maps" => "2.3.3"
   }.freeze
@@ -26,7 +26,7 @@ module ReleasePins
   # The runtime the published CLI scaffolds, read from its
   # src/scaffold_target.rs (RUNTIME_CRATE_VERSION). It moves with the CLI pin,
   # independently of RUNTIME, because the CLI and the core publish separately.
-  CLI_SCAFFOLD_RUNTIME = "0.26.1"
+  CLI_SCAFFOLD_RUNTIME = "0.31.2"
 
   module_function
 

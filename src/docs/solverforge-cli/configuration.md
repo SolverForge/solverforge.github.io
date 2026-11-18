@@ -131,11 +131,11 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "4.0.4"
+cli_version = "4.2.0"
 
 [runtime]
-target = "solverforge 0.26.1"
-runtime_source = "crates.io: solverforge 0.26.1"
+target = "solverforge 0.31.2"
+runtime_source = "crates.io: solverforge 0.31.2"
 ui_source = "crates.io: solverforge-ui 0.9.1"
 
 [demo]
@@ -147,8 +147,8 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 4.0.4` web scaffold target. Fresh
-web generated apps target `solverforge 0.26.1`, take the CLI's
+This example reflects the `solverforge-cli 4.2.0` web scaffold target. Fresh
+web generated apps target `solverforge 0.31.2`, take the CLI's
 `solverforge-ui 0.9.1` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.
 

@@ -10,10 +10,10 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
-This post records an older CLI line. The current CLI is `solverforge-cli 4.0.4`,
-which scaffolds `solverforge 0.26.1` and keeps constraint assembly in
+This post records an older CLI line. The current CLI is `solverforge-cli 4.2.0`,
+which scaffolds `solverforge 0.31.2` and keeps constraint assembly in
 `src/constraints/assemble.rs`; see the
-[4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
+[4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/).
 <% end %>
 
 **solverforge-cli 3.9.0 was published on November 9, 2026**, following

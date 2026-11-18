@@ -203,6 +203,11 @@ execution order; it is not a single current-phase object. Run totals and each
 phase expose `movesSpeculative`. Detailed candidate traces remain separate and
 label discarded ahead-of-decision work as `discarded_speculative`. Selector
 and move breakdowns do not invent their own speculative counters.
+`resolvedPhasePlan` carries the policy the solve actually ran (every phase,
+the construction chosen for each default stage with its reason, the move
+families and their limits, the acceptor and forager); it is `null` until the
+solve ends. See
+[Solver Phases](/docs/solverforge/solver/phases/#resolved-phase-plan).
 
 ## `src/data/mod.rs` vs `src/data/data_seed.rs`
 

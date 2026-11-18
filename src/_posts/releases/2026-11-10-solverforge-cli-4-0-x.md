@@ -10,6 +10,12 @@ description: >
   agents that scan skill scripts.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older CLI line. The current CLI is `solverforge-cli 4.2.0`,
+which scaffolds `solverforge 0.31.2` with the same project layout; see the
+[4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/).
+<% end %>
+
 **solverforge-cli 4.0.4 was published on November 11, 2026**, a day after
 `4.0.0`, `4.0.1`, `4.0.2`, and `4.0.3`, which followed `3.9.0`, the line that
 scaffolds `solverforge 0.25.0`. `solverforge-cli 4.0.4` targets `solverforge 0.26.1`;
@@ -115,7 +121,7 @@ modules and calls disagree is reported instead of guessed around
 
 | Surface | Version | Role |
 | ------- | ------- | ---- |
-| CLI | `solverforge-cli 4.0.4` | Fresh scaffolds target `solverforge 0.26.1` |
+| Last 4.0 release | `solverforge-cli 4.0.4` | Scaffolds `solverforge 0.26.1` |
 | Previous 4.0 release | `solverforge-cli 4.0.3` | Scaffolds `solverforge 0.26.0`; same project layout and UI, maps, and MCP targets |
 | Earlier 0.26.0 scaffold | `solverforge-cli 4.0.2` | Scaffolds `solverforge 0.26.0`; its `solverforge-modeling` skill is refused by skill scanners that reject a `curl` pipe into `python3` |
 | Runtime | `solverforge 0.26.1` | 0.26 line; see the [0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) |
