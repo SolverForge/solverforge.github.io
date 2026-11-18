@@ -11,7 +11,7 @@ require "yaml"
 ROOT = File.expand_path("..", __dir__)
 
 DATA_PATH = "src/_data/use_cases.yml"
-EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew planner123].freeze
+EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew ev planner123].freeze
 # Cases with a written guide keep it; the repository-only cases ship the app
 # source instead, and every case has its own page generated from this file.
 EXPECTED_DOCS = {
@@ -21,7 +21,7 @@ EXPECTED_DOCS = {
   "field-service" => ["/docs/getting-started/solverforge-fsr-use-case/", "src/docs/getting-started/solverforge-fsr-use-case.md"]
 }.freeze
 EXPECTED_SPACES = %w[hospital lessons deliveries field-service].freeze
-REPO_CASES = %w[furnace orders fleet flightcrew].freeze
+REPO_CASES = %w[furnace orders fleet flightcrew ev].freeze
 REPO_URL_PATTERN = %r{\Ahttps://github\.com/SolverForge/solverforge-usecases/tree/main/uc-[a-z]+\z}
 # Planner123 is a product, not a web demo: it ships its source, a video with a
 # cue sheet, and plain captures of the real app instead of annotated ones.

@@ -96,7 +96,7 @@ const docsStalePatterns = [
 // Pinned here, not read from the rendered page, so a case that loses or gains
 // the variant fails instead of being re-classified.
 const DEMOSCENE_CASES = { planner123: { video: "/videos/use-cases/planner123-demoscene.mp4", repo: "https://github.com/blackopsrepl/Planner123", cues: 9, minCaptures: 4 } };
-const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "planner123"];
+const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "ev", "planner123"];
 
 function walk(dir, predicate, out = []) {
   for (const name of readdirSync(dir)) {

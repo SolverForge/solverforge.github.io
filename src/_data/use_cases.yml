@@ -854,6 +854,105 @@
           top: 14.4
           left: 4.6
 
+- id: ev
+  label: "EV routing"
+  eyebrow: "Electric-van delivery routing"
+  title: "48 pharmacies. 6 electric vans. 14 chargers. One plan that never runs a battery flat."
+  intro: "EV routing plans one delivery day around Bergamo: which van serves each pharmacy, in what order, and where it stops to charge, with capacity, delivery windows, real road travel, and battery range held together in one score."
+  repo_url: "https://github.com/SolverForge/solverforge-usecases/tree/main/uc-ev"
+  icon: "fa-solid fa-charging-station"
+  teaser_metric: "48 pharmacies / 6 vans / 14 chargers"
+  teaser_copy: "Visit order, van capacity, delivery windows, road travel, and derived charging stops on one route map."
+  metrics:
+    - ["48", "Pharmacies"]
+    - ["6", "Electric vans"]
+    - ["14", "Chargers"]
+    - ["5", "Constraints"]
+    - ["4 / 1", "Hard / soft split"]
+    - ["30 s", "Search budget"]
+  body:
+    - "An electric delivery route is only valid if the van can actually drive it. A route that fits capacity and every delivery window can still run below the battery reserve halfway through, and adding a charging stop moves every later arrival. Visit order, charging, and lateness have to be decided together."
+    - "Charging stops are derived rather than searched: after every route change an exact dynamic program places the stops that minimise range shortfall and then added time, so the list variable holds only pharmacies and the stock Clarke-Wright and k-opt construction works unchanged. The app keeps the route map, the van cards, the schedule, the input tables, score analysis, and the retained job on one surface."
+  constraints:
+    - ["Battery range", "No route runs below the van's reserve after its best charging plan."]
+    - ["Van capacity", "Crates loaded stay within each van's capacity."]
+    - ["Delivery windows", "Every delivery finishes before its window closes, charging delays included."]
+    - ["Road reachability", "Every leg is connected on the OpenStreetMap road network."]
+    - ["Travel time", "Driving, charger detours, and charging time stay a soft cost."]
+    - ["Retained workflow", "Status, snapshots, score analysis, road geometry, and lifecycle actions stay on the stock contract."]
+  runtime:
+    video: "/videos/use-cases/solverforge-ev-demo.mp4"
+    poster: "/images/use-cases/ev-overview.png"
+    label: Runtime walkthrough
+    copy: "Watch the routes form on Bergamo's roads with their charging stops, then read the plan van by van."
+    caption: "Narrated walkthrough (1:59): the unsolved day, the solve on the road network, the van cards, score analysis, the schedule, the data tables, and the REST API."
+  screenshots:
+    - image: "/images/use-cases/ev-overview-unsolved.png"
+      badge: "Unsolved day"
+      alt: "SolverForge EV before solving: fleet figures at zero, six empty van cards, and the Bergamo map with the hub, pharmacies, and chargers."
+      caption: "The unsolved baseline states the day before any route exists: 48 pharmacies, 6 vans at the Stezzano hub, and 14 chargers on the map."
+      callouts:
+        - text: "The fleet figures start at zero: distance, driving, charging stops, shortfall, lateness."
+          top: 18.9
+          left: 3.2
+        - text: "Hub, pharmacies, and public chargers are placed on the real road map."
+          top: 57.8
+          left: 58.7
+    - image: "/images/use-cases/ev-solving.png"
+      badge: "Mid-solve"
+      alt: "SolverForge EV mid-solve: coloured road routes across the Bergamo map while the solver keeps running."
+      caption: "Mid-solve, every pharmacy is already routed on real roads while the search keeps improving the plan."
+      callouts:
+        - text: "The retained job is still solving; Pause and Stop stay available."
+          top: 4.7
+          left: 91.5
+        - text: "Routes follow the road network; legs to and from a charger are dashed."
+          top: 69.4
+          left: 58.7
+    - image: "/images/use-cases/ev-overview.png"
+      badge: "Route plan"
+      alt: "SolverForge EV after solving: van cards with load, distance, charging and lowest charge beside the Bergamo map with coloured routes."
+      caption: "The finished plan is one inspectable surface: a card per van and its route on the map, coloured the same."
+      callouts:
+        - text: "Each card states load, distance, charging stops, lowest charge, and return time."
+          top: 62.5
+          left: 2.8
+        - text: "Pharmacies take their van's colour; used chargers are coloured too."
+          top: 58.7
+          left: 66
+    - image: "/images/use-cases/ev-score-analysis.png"
+      badge: "Score analysis"
+      alt: "SolverForge EV score analysis listing battery shortfall, vehicle capacity, customer time windows, unreachable legs, and total travel time."
+      caption: "Score analysis shows four hard rules at zero and travel time as the only cost the search trades against."
+      callouts:
+        - text: "Battery shortfall is a hard rule, measured in metres below the reserve."
+          top: 49.2
+          left: 31
+        - text: "Total travel time carries the soft cost: driving plus charging."
+          top: 66.3
+          left: 31
+    - image: "/images/use-cases/ev-schedule.png"
+      badge: "Schedule"
+      alt: "SolverForge EV schedule: one lane per van with green delivery blocks and amber charging blocks across the day."
+      caption: "The schedule turns the same plan into time: one lane per van, deliveries in green, charging in amber."
+      callouts:
+        - text: "Charging stops sit in the timeline where the route places them."
+          top: 35.9
+          left: 22.5
+        - text: "Each lane is one van, with its stop and charge counts."
+          top: 35.7
+          left: 3.2
+    - image: "/images/use-cases/ev-data.png"
+      badge: "Plan data"
+      alt: "SolverForge EV data tab with the vans table and the pharmacies table."
+      caption: "The data tab shows the inputs behind the plan: each van's capacity, range, charge at departure, and reserve, and each pharmacy's crates and window."
+      callouts:
+        - text: "Vans differ in capacity, range, starting charge, and recharge time."
+          top: 23.5
+          left: 10.9
+        - text: "Pharmacies carry crates, a delivery window, and an unloading time."
+          top: 76.5
+          left: 10.9
 # Planner123 is the one case that is a product rather than a web demo: a
 # terminal calendar built on SolverForge. `variant: demoscene` swaps the
 # narrated walkthrough and annotated captures for its video from
