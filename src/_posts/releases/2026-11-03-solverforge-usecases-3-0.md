@@ -298,7 +298,7 @@ CI passed at the final app tag, `solverforge-lessons@3.0.6`
 
 ## Where to read next
 
-Inspect eight of the nine apps in the [use-case showcase](/use-cases/), or follow the
+Inspect all nine in the [use-case showcase](/use-cases/), or follow the
 written guides for
 [hospital](/docs/getting-started/solverforge-hospital-use-case/),
 [lessons](/docs/getting-started/solverforge-lessons-use-case/),

@@ -118,10 +118,11 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
 
   <section class="home-section">
     <p class="page-shell__eyebrow">Use cases</p>
-    <h2>Eight planning surfaces you can watch, inspect, and run.</h2>
+    <h2>Nine planning surfaces you can watch, inspect, and run.</h2>
     <p>
       Machine scheduling, warehouse picking, crew rotas, asset readiness, hospital
-      coverage, school timetabling, delivery routing, and field service routing.
+      coverage, school timetabling, delivery routing, field service routing, and
+      electric-van routing with charging stops.
       Each case carries its data shape, its constraints, a narrated walkthrough of
       the running app, and annotated screenshots of the same retained solve.
     </p>
@@ -176,7 +177,7 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
         </li>
         <li>
           <strong>Track record</strong>
-          <span>Nine worked use cases in the <a href="https://github.com/SolverForge/solverforge-usecases">use-case repository</a>, eight of them in the <a href="<%= relative_url '/use-cases/' %>">showcase</a>, the <a href="<%= relative_url '/blog/' %>">release notes</a> for every line, and the full source on GitHub.</span>
+          <span>Nine worked <a href="<%= relative_url '/use-cases/' %>">use cases</a>, the <a href="<%= relative_url '/blog/' %>">release notes</a> for every line, and the full source on GitHub.</span>
         </li>
       </ul>
       <div class="button-row">
