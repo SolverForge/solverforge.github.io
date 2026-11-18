@@ -472,6 +472,7 @@ function:
 | `construction_element_order_key` | the order list construction inserts elements in |
 | `precedence_duration_fn` | each element's duration |
 | `precedence_successors_fn` | each element's fixed successor arcs |
+| `element_group_fn` | the members of each element's group; see [Element Groups](#element-groups) |
 
 `element_owner_fn` returns `Some(owner_index)` when an element is fixed to one
 list owner and `None` when the element is unrestricted. Construction,
@@ -504,6 +505,218 @@ and refreshes affected downstream timings. Unchanged edges remain in the graph,
 so a trial and its undo do not require removing and rebuilding the entire route.
 Use the director's paired before/after notifications for custom mutations; see
 [Extension Contracts](/reference/extend-solver/#precedence-score-notifications).
+
+## Element Groups
+
+Some elements must travel together: the pick-up and drop-off of one ride, or
+every stop of a multi-stop job. Name a hook with
+`element_group_fn` on `#[planning_list_variable]`. It has the signature
+`fn(&Solution, usize, &mut Vec<usize>)` and appends the members of the
+element's group, in order and including the element, or nothing for an element
+without a group. Only groups of two or more members count, and every member
+must report the same group; a conflicting answer panics. Groups are read once
+per step and once per construction phase.
+
+`src/domain/mod.rs`:
+
+<!-- rust: crate=rides file=src/domain/mod.rs -->
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Rides, Stop, Vehicle};
+}
+```
+
+`src/domain/model.rs`. Ride `r` is stops `2r` (pick-up) and `2r + 1`
+(drop-off); a stop without a ride is a single stop:
+
+<!-- rust: crate=rides file=src/domain/model.rs -->
+```rust
+use solverforge::prelude::*;
+
+#[problem_fact]
+pub struct Stop {
+    #[planning_id]
+    pub id: usize,
+    pub ride: Option<usize>,
+    pub pickup: bool,
+    pub location: i64,
+    pub vehicle: Option<usize>,
+    pub index: Option<usize>,
+    pub previous: Option<usize>,
+}
+
+#[planning_entity]
+pub struct Vehicle {
+    #[planning_id]
+    pub id: usize,
+    #[planning_list_variable(element_collection = "stops", element_group_fn = "ride_stops")]
+    pub stops: Vec<usize>,
+}
+
+/// A ride's pick-up and drop-off, in that order; a single stop has no group.
+pub(super) fn ride_stops(plan: &super::Rides, stop: usize, members: &mut Vec<usize>) {
+    if let Some(ride) = plan.stops[stop].ride {
+        members.extend([2 * ride, 2 * ride + 1]);
+    }
+}
+
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
+#[shadow_variable_updates(
+    list_owner = "vehicles",
+    inverse_field = "vehicle",
+    index_field = "index",
+    previous_field = "previous"
+)]
+pub struct Rides {
+    #[planning_entity_collection]
+    pub vehicles: Vec<Vehicle>,
+    #[problem_fact_collection]
+    pub stops: Vec<Stop>,
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+```
+
+A group's members always share one owner. Their order within the route is
+the model's business: a single-element move may reorder a grouped stop inside
+its route, so the constraints below penalize a drop-off before its pick-up.
+
+`src/constraints.rs`:
+
+<!-- rust: crate=rides file=src/constraints.rs -->
+```rust
+use solverforge::prelude::*;
+use solverforge::stream::joiner::equal_bi;
+
+use crate::domain::{Rides, Stop};
+
+pub fn define_constraints() -> impl ConstraintSet<Rides, HardSoftScore> {
+    type Streams = ConstraintFactory<Rides, HardSoftScore>;
+
+    (
+        Streams::new()
+            .for_each(Rides::stops())
+            .filter(|stop: &Stop| stop.vehicle.is_none())
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unassigned stop"),
+        Streams::new()
+            .for_each(Rides::stops())
+            .filter(|stop: &Stop| stop.pickup)
+            .join((
+                Streams::new().for_each(Rides::stops()),
+                equal_bi(|pickup: &Stop| pickup.ride, |stop: &Stop| stop.ride),
+            ))
+            .filter(|pickup: &Stop, dropoff: &Stop| !dropoff.pickup && pickup.index > dropoff.index)
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Drop-off before pick-up"),
+        Streams::new()
+            .for_each(Rides::stops())
+            .join((
+                Streams::new().for_each(Rides::stops()),
+                equal_bi(|stop: &Stop| stop.previous, |before: &Stop| Some(before.id)),
+            ))
+            .penalize(|stop: &Stop, before: &Stop| {
+                HardSoftScore::of_soft((stop.location - before.location).abs())
+            })
+            .named("Driving"),
+        Streams::new()
+            .for_each(Rides::stops())
+            .filter(|stop: &Stop| stop.vehicle.is_some() && stop.previous.is_none())
+            .penalize(|stop: &Stop| HardSoftScore::of_soft(stop.location.abs()))
+            .named("Leaving the depot"),
+    )
+}
+```
+
+`src/main.rs` solves three rides and one single stop on a line with the
+default policy, which constructs a grouped list with `list_cheapest_insertion`
+and searches it with group moves among the other list families:
+
+<!-- rust: crate=rides file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use domain::{Rides, Stop, Vehicle};
+use solverforge::SolverConfig;
+
+fn stop(id: usize, ride: Option<usize>, location: i64) -> Stop {
+    let pickup = ride.is_some() && id % 2 == 0;
+    Stop { id, ride, pickup, location, vehicle: None, index: None, previous: None }
+}
+
+const CONFIG: &str = r#"
+random_seed = 7
+move_thread_count = "none"
+
+[termination]
+step_count_limit = 200
+"#;
+
+fn main() {
+    let mut stops = Vec::new();
+    for (ride, (from, to)) in [(5, 60), (70, 12), (33, 90)].into_iter().enumerate() {
+        stops.push(stop(2 * ride, Some(ride), from));
+        stops.push(stop(2 * ride + 1, Some(ride), to));
+    }
+    stops.push(stop(6, None, 25));
+    let plan = Rides {
+        vehicles: (0..2).map(|id| Vehicle { id, stops: Vec::new() }).collect(),
+        stops,
+        score: None,
+    };
+
+    let config = SolverConfig::from_toml_str(CONFIG).expect("config parses");
+    let solved = plan.solve_with_config(config).expect("solve completes");
+    println!("score {:?}", solved.score);
+    for vehicle in &solved.vehicles {
+        println!("vehicle {}: {:?}", vehicle.id, vehicle.stops);
+    }
+}
+```
+
+`cargo run` prints:
+
+<!-- rust: crate=rides output -->
+```text
+score Some(HardSoftScore(0, -168))
+vehicle 0: [0, 6, 4, 5, 2, 1, 3]
+vehicle 1: []
+```
+
+Every ride rides one vehicle, pick-up first, with other stops between its
+members: ride 2 (stops 4 and 5) sits inside ride 0, as a shared ride needs.
+
+The stock list moves respect groups:
+
+- `list_group_change_move_selector` moves a whole group to positions of one
+  owner, its own included; `max_member_distance` caps the positions from one
+  member to the next.
+- `list_group_swap_move_selector` exchanges two groups of the same size on
+  different owners, member slot for member slot.
+- `list_ruin_move_selector` ruins whole groups and recreates them in one pass,
+  each group jointly at its best placement given the groups placed before it.
+- `list_cheapest_insertion` and `list_regret_insertion` place a group as one
+  unit. A member is never placed alone, and members already assigned pin the
+  rest of their group to that owner.
+- The single-element list moves keep a grouped element on its owner, so they
+  can reorder it within its route but never split a group.
+
+A group moves only to an owner that every member allows under
+`element_owner_fn` and that is not pinned. Placing a group of `m` members
+jointly tries O(L^m) position tuples per owner; `max_member_distance` and
+`max_group_owners` (an owner shortlist, by best contiguous fit) bound it. See
+[List Move Selectors](/docs/solverforge/solver/list-move-selectors/#element-groups)
+for the selectors and their defaults.
+
+`element_group_fn` cannot be combined with precedence hooks, and
+`list_round_robin`, `list_clarke_wright` and the global `first_fit` and
+`cheapest_insertion` construction reject a list with groups, since they place
+elements one at a time. A list without the hook compiles none of this.
 
 ## Stable Element Source Identity
 
@@ -554,6 +767,414 @@ reporting contract when their owner updates write element rows. Custom moves
 must pair before/after owner notifications for both edits and undo; changing
 shadow fields behind the director bypasses incremental stream maintenance.
 
+### Cascading Shadows Across Lists
+
+A cascading shadow is an element value computed from the element's previous
+element in its list and from elements it waits on, which other owners' lists
+may hold: a start time with precedence across machines, employees or
+vehicles. Declare the field, the per-element compute and the dependencies on
+`#[shadow_variable_updates]`, and SolverForge owns the ordering, propagation
+and change reporting.
+
+`src/domain/mod.rs`:
+
+<!-- rust: crate=shop file=src/domain/mod.rs -->
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Machine, Shop, Task};
+}
+```
+
+`src/domain/model.rs`. A task starts once the previous task on its machine and
+the task it waits on have ended:
+
+<!-- rust: crate=shop file=src/domain/model.rs -->
+```rust
+use solverforge::prelude::*;
+
+#[planning_entity]
+pub struct Machine {
+    #[planning_id]
+    pub id: usize,
+    #[planning_list_variable(element_collection = "tasks")]
+    pub tasks: Vec<usize>,
+}
+
+#[problem_fact]
+pub struct Task {
+    #[planning_id]
+    pub id: usize,
+    pub duration: i64,
+    pub waits_on: Option<usize>,
+    pub machine: Option<usize>,
+    pub previous: Option<usize>,
+    pub next: Option<usize>,
+    pub start: Option<i64>,
+}
+
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
+#[shadow_variable_updates(
+    list_owner = "machines",
+    inverse_field = "machine",
+    previous_field = "previous",
+    next_field = "next",
+    cascading_field = "start",
+    cascading_compute = "compute_start",
+    cascading_dependencies = "task_dependencies"
+)]
+pub struct Shop {
+    #[planning_entity_collection]
+    pub machines: Vec<Machine>,
+    #[problem_fact_collection]
+    pub tasks: Vec<Task>,
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+
+impl Shop {
+    fn end(&self, task: usize) -> Option<i64> {
+        let task = &self.tasks[task];
+        task.start.map(|start| start + task.duration)
+    }
+
+    /// After the previous task on the machine and the task it waits on.
+    pub fn compute_start(&self, task: usize) -> Option<i64> {
+        let mut start = 0;
+        if let Some(previous) = self.tasks[task].previous {
+            start = start.max(self.end(previous)?);
+        }
+        if let Some(dependency) = self.tasks[task].waits_on {
+            start = start.max(self.end(dependency)?);
+        }
+        Some(start)
+    }
+
+    pub fn task_dependencies(&self, task: usize) -> Option<usize> {
+        self.tasks[task].waits_on
+    }
+}
+```
+
+- `cascading_field` names an `Option<_>` element field; its value type must
+  implement `PartialEq`.
+- `cascading_compute` names a solution method
+  `fn(&self, element: usize) -> Option<_>`. It runs only for an element held
+  by a list, after the previous element in that list and every dependency
+  hold their final values for the move.
+- `cascading_dependencies` (optional) names a solution method returning the
+  elements `element` waits on, as any `IntoIterator<Item = usize>` (an
+  `Option<usize>`, a slice, a `Vec`). Dependencies are problem facts; moves
+  never change them, and a problem change that does is applied through a
+  reset.
+- `cascading_peers` (optional) names the elements computed together with
+  `element`; see [Joint Groups](#joint-groups).
+- `inverse_field`, `previous_field` and `next_field` are required.
+  `cascading_listener`, `post_update_listener`, `entity_aggregate` and
+  `entity_compute` cannot be combined with a cascading shadow: they run per
+  changed owner and would not see the values a move changes in other owners'
+  lists.
+
+`src/constraints.rs` penalizes an unscheduled task and every task's end:
+
+<!-- rust: crate=shop file=src/constraints.rs -->
+```rust
+use solverforge::prelude::*;
+
+use crate::domain::{Shop, Task};
+
+pub fn define_constraints() -> impl ConstraintSet<Shop, HardSoftScore> {
+    type Streams = ConstraintFactory<Shop, HardSoftScore>;
+
+    (
+        Streams::new()
+            .for_each(Shop::tasks())
+            .filter(|task: &Task| task.start.is_none())
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unscheduled task"),
+        Streams::new()
+            .for_each(Shop::tasks())
+            .penalize(|task: &Task| {
+                HardSoftScore::of_soft(task.start.map_or(0, |start| start + task.duration))
+            })
+            .named("Task end"),
+    )
+}
+```
+
+`src/main.rs` puts a long task on the saw in front of the cut, through the
+same score-director notifications the solver sends for every move:
+
+<!-- rust: crate=shop file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use constraints::define_constraints;
+use domain::{Machine, Shop, Task};
+use solverforge::ScoreDirector;
+
+fn task(id: usize, duration: i64, waits_on: Option<usize>) -> Task {
+    Task { id, duration, waits_on, machine: None, previous: None, next: None, start: None }
+}
+
+fn starts(shop: &Shop) -> Vec<Option<i64>> {
+    shop.tasks.iter().map(|task| task.start).collect()
+}
+
+fn main() {
+    // The saw cuts (task 0); the mill mills the cut part (task 1, which waits
+    // on task 0), then drills (task 2). Task 3 is on no machine yet.
+    let shop = Shop {
+        machines: vec![
+            Machine { id: 0, tasks: vec![0] },
+            Machine { id: 1, tasks: vec![1, 2] },
+        ],
+        tasks: vec![task(0, 4, None), task(1, 3, Some(0)), task(2, 2, None), task(3, 10, None)],
+        score: None,
+    };
+
+    let mut director = ScoreDirector::new(shop, define_constraints());
+    println!("{} {:?}", director.calculate_score(), starts(director.working_solution()));
+
+    // Put task 3 on the saw, in front of the cut.
+    director.before_variable_changed(0, 0);
+    director.working_solution_mut().machines[0].tasks.insert(0, 3);
+    director.after_variable_changed(0, 0);
+    println!("{} {:?}", director.calculate_score(), starts(director.working_solution()));
+}
+```
+
+`cargo run` prints:
+
+<!-- rust: crate=shop output -->
+```text
+-1hard/-20soft [Some(0), Some(4), Some(7), None]
+0hard/-60soft [Some(10), Some(14), Some(17), Some(0)]
+```
+
+Changing the saw's list moved the milling and drilling on the mill: the
+milling waits on the cut, which now ends at 14.
+
+After each move the score director recomputes the downstream cone of the
+changed elements in dependency order: each element once, after its inputs,
+and only when an input changed, so propagation stops where a value is
+unchanged. Every element whose value changes is rescored exactly once, and so
+is every element whose owner, previous or next element changes (or whose
+index changes, when `index_field` is configured); the other elements keep
+their stream rows, so a change near the end of a long route rescores only
+what it touches. An element in no list, or on a dependency cycle a move
+creates (a task that waits on a task queued after it), is unset (`None`),
+which constraints can penalize. Models without a cascading shadow compile
+none of this into their move path.
+
+### Joint Groups
+
+Some elements in different lists must be timed together: a job that needs two
+technicians starts when the later of them arrives, so each technician's visit
+waits on the other's arrival. Declaring that as two dependencies would be a
+cycle. Declare the visits peers with `cascading_peers` instead.
+
+`src/domain/mod.rs`:
+
+<!-- rust: crate=crew file=src/domain/mod.rs -->
+```rust
+solverforge::planning_model! {
+    root = "src/domain";
+
+    mod model;
+
+    pub use model::{Crew, Technician, Visit};
+}
+```
+
+`src/domain/model.rs`:
+
+<!-- rust: crate=crew file=src/domain/model.rs -->
+```rust
+use solverforge::prelude::*;
+
+#[planning_entity]
+pub struct Technician {
+    #[planning_id]
+    pub id: usize,
+    #[planning_list_variable(element_collection = "visits")]
+    pub visits: Vec<usize>,
+}
+
+#[problem_fact]
+pub struct Visit {
+    #[planning_id]
+    pub id: usize,
+    pub duration: i64,
+    /// The other visits of the same job, made by other technicians.
+    pub partners: Vec<usize>,
+    pub technician: Option<usize>,
+    pub previous: Option<usize>,
+    pub next: Option<usize>,
+    pub start: Option<i64>,
+}
+
+#[planning_solution(constraints = "crate::constraints::define_constraints")]
+#[shadow_variable_updates(
+    list_owner = "technicians",
+    inverse_field = "technician",
+    previous_field = "previous",
+    next_field = "next",
+    cascading_field = "start",
+    cascading_compute = "compute_start",
+    cascading_peers = "visit_partners"
+)]
+pub struct Crew {
+    #[planning_entity_collection]
+    pub technicians: Vec<Technician>,
+    #[problem_fact_collection]
+    pub visits: Vec<Visit>,
+    #[planning_score]
+    pub score: Option<HardSoftScore>,
+}
+
+impl Crew {
+    /// When the technician can be at the visit: one unit of travel after the
+    /// previous visit ends.
+    fn arrival(&self, visit: usize) -> Option<i64> {
+        match self.visits[visit].previous {
+            Some(previous) => {
+                let previous = &self.visits[previous];
+                Some(previous.start? + previous.duration + 1)
+            }
+            None => Some(0),
+        }
+    }
+
+    /// When the last assigned technician of the job arrives.
+    pub fn compute_start(&self, visit: usize) -> Option<i64> {
+        let mut start = self.arrival(visit)?;
+        for &partner in &self.visits[visit].partners {
+            if self.visits[partner].technician.is_some() {
+                start = start.max(self.arrival(partner)?);
+            }
+        }
+        Some(start)
+    }
+
+    pub fn visit_partners(&self, visit: usize) -> Vec<usize> {
+        self.visits[visit].partners.clone()
+    }
+}
+```
+
+`src/constraints.rs`:
+
+<!-- rust: crate=crew file=src/constraints.rs -->
+```rust
+use solverforge::prelude::*;
+
+use crate::domain::{Crew, Visit};
+
+pub fn define_constraints() -> impl ConstraintSet<Crew, HardSoftScore> {
+    type Streams = ConstraintFactory<Crew, HardSoftScore>;
+
+    (
+        Streams::new()
+            .for_each(Crew::visits())
+            .filter(|visit: &Visit| visit.start.is_none())
+            .penalize(HardSoftScore::ONE_HARD)
+            .named("Unscheduled visit"),
+        Streams::new()
+            .for_each(Crew::visits())
+            .penalize(|visit: &Visit| {
+                HardSoftScore::of_soft(visit.start.map_or(0, |start| start + visit.duration))
+            })
+            .named("Visit end"),
+    )
+}
+```
+
+`src/main.rs` gives Ann a long visit before the joint one:
+
+<!-- rust: crate=crew file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use constraints::define_constraints;
+use domain::{Crew, Technician, Visit};
+use solverforge::ScoreDirector;
+
+fn visit(id: usize, duration: i64, partners: &[usize]) -> Visit {
+    Visit {
+        id,
+        duration,
+        partners: partners.to_vec(),
+        technician: None,
+        previous: None,
+        next: None,
+        start: None,
+    }
+}
+
+fn starts(crew: &Crew) -> Vec<Option<i64>> {
+    crew.visits.iter().map(|visit| visit.start).collect()
+}
+
+fn main() {
+    // Visits 2 and 3 are one job for two technicians. Ann makes visit 0, then
+    // visit 2; Bob starts with visit 3. Visit 4 is on no route yet.
+    let crew = Crew {
+        technicians: vec![
+            Technician { id: 0, visits: vec![0, 2] },
+            Technician { id: 1, visits: vec![3, 1] },
+        ],
+        visits: vec![
+            visit(0, 4, &[]),
+            visit(1, 3, &[]),
+            visit(2, 6, &[3]),
+            visit(3, 6, &[2]),
+            visit(4, 10, &[]),
+        ],
+        score: None,
+    };
+
+    let mut director = ScoreDirector::new(crew, define_constraints());
+    director.calculate_score();
+    println!("{:?}", starts(director.working_solution()));
+
+    // Ann makes the long visit 4 first.
+    director.before_variable_changed(0, 0);
+    director.working_solution_mut().technicians[0].visits.insert(0, 4);
+    director.after_variable_changed(0, 0);
+    director.calculate_score();
+    println!("{:?}", starts(director.working_solution()));
+}
+```
+
+`cargo run` prints:
+
+<!-- rust: crate=crew output -->
+```text
+[Some(0), Some(12), Some(5), Some(5), None]
+[Some(11), Some(23), Some(16), Some(16), Some(0)]
+```
+
+Bob reaches the joint job at 0 but waits for Ann, who arrives at 5; once Ann
+makes visit 4 first she arrives at 16, and Bob's joint visit and the visit
+after it move with her.
+
+Peers are joined transitively into a joint group, and propagation treats the
+group as one node: it waits until the previous element and every dependency
+of every member hold their final values, then computes the members once each,
+in ascending element order. A member's compute may read those inputs of its
+peers; it must not read a peer's cascading value, which is being computed in
+the same step. Peers are problem facts, like dependencies. A group whose
+members wait on each other through their lists (two members on one route, or
+a member after an element that waits on its peer) is a cycle, and its members
+are unset. A model without peers maps every element to its own node and pays
+nothing for the feature.
+
 ## Generated Runtime Surface
 
 Generated list mutation helpers such as `list_len_static()`,
@@ -587,6 +1208,7 @@ The solver uses specialized moves for list variables:
 | `KOptMove`          | K-opt style moves for routing problems                             |
 | `ListRuinMove`      | Remove list elements and reinsert them (list ruin-and-recreate)    |
 | precedence support  | Critical-path precedence repairs for list variables with precedence hooks |
+| group change / swap | Move a whole element group to one owner, or exchange two groups (lists with `element_group_fn`) |
 
 ## Nearby and K-Opt Search
 
@@ -599,6 +1221,8 @@ solving, that is expressed through `move_selector` variants such as:
 - `list_precedence_move_selector`
 - `k_opt_move_selector`
 - `list_ruin_move_selector`
+- `list_group_change_move_selector` and `list_group_swap_move_selector`, for
+  lists with element groups
 
 For ruin-and-recreate search, the current runtime samples only non-empty list
 owners for the ruin step. That keeps a vehicle with no visits, or a machine

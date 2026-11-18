@@ -314,7 +314,10 @@ effective parsed limit. Missing termination or an empty termination object
 leaves omitted phases construction-only. A `best_score_limit` that does not
 parse as the model's score fails the solve. This is separate from omitting
 `move_selector` inside an explicit local-search phase. VND is never prepended
-implicitly.
+implicitly. [Default Construction](/docs/solverforge/solver/construction/#default-construction)
+lists what each list slot gets, and
+[Default Policy](/docs/solverforge/solver/local-search/#default-policy) lists
+the acceptor and forager for each model shape.
 
 See [Phases](/docs/solverforge/solver/phases/) for all phase types and their options.
 
@@ -437,6 +440,9 @@ permutes a bounded window in one list. `list_precedence_move_selector` targets
 list variables that expose `precedence_duration_fn` and
 `precedence_successors_fn` hooks through `#[planning_list_variable]`; it streams
 critical-path support moves for generic precedence makespan models.
+`list_group_change_move_selector` and `list_group_swap_move_selector` move
+whole element groups on a list that declares `element_group_fn`; see
+[List Move Selectors](/docs/solverforge/solver/list-move-selectors/#element-groups).
 
 ```toml
 [phases.move_selector]
@@ -659,8 +665,8 @@ There is no arbitrary `custom_phase_class` loader or erased plugin registry.
 
 ### Bounded Clarke-Wright Savings
 
-`list_clarke_wright` scores every pair of unassigned elements by default, so
-its savings list grows with the square of the element count: 32 bytes per
+An explicit `list_clarke_wright` phase scores every pair of unassigned
+elements, so its savings list grows with the square of the element count: 32 bytes per
 pair, about 1.6 GB at 10,000 stops. `savings_neighbors` scores a pair only
 when one element is among the other's nearest:
 
@@ -682,7 +688,9 @@ minus one builds the same routes as no bound. The value must be at least 1
 (`0` does not parse). A solve fails at
 `phases[N].construction.savings_neighbors` when the phase is not
 `list_clarke_wright`, and at `phases[N].construction` when the list variable
-declares no `savings_neighbors_fn`.
+declares no `savings_neighbors_fn`. With `phases` omitted, the default
+Clarke-Wright keeps 40 savings per element whenever the hook exists; see
+[Default Construction](/docs/solverforge/solver/construction/#default-construction).
 
 ### Construction Obligation
 

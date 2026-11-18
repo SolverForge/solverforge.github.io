@@ -6,6 +6,7 @@ mod configuration;
 mod dispatch;
 mod events;
 mod index;
+mod phases;
 mod solver_manager;
 mod termination;
 

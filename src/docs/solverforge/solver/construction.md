@@ -66,9 +66,9 @@ improvements commit them.
 
 ### Bounded Clarke-Wright savings
 
-By default `list_clarke_wright` scores every pair of unassigned elements, so
-its savings list is quadratic in the element count. Set `savings_neighbors` on
-the phase to score a pair only when one element is among the other's nearest
+An explicit `list_clarke_wright` phase scores every pair of unassigned
+elements, so its savings list is quadratic in the element count. Set
+`savings_neighbors` on the phase to score a pair only when one element is among the other's nearest
 `savings_neighbors`:
 
 ```toml
@@ -124,6 +124,57 @@ does not recover identity through payload equality or hashing. Later phases
 reuse the frozen declaration but refresh current assignments, so they cannot
 reinsert work accepted by an earlier phase or reread the declaration callback.
 
+## Default Construction
+
+With `phases` omitted, each list slot gets the first construction whose
+declarations it has:
+
+| Slot declares | Construction | Reported `reason` |
+| ------------- | ------------ | ----------------- |
+| element groups (`element_group_fn`) | `list_cheapest_insertion` with `max_group_owners = 4` | `element_groups_declared` |
+| savings hooks (`domain = "cvrp"` or `savings_hooks`) | `list_clarke_wright` | `savings_hooks_declared` |
+| precedence, construction order and ownership | `list_regret_insertion` | `precedence_construction_order_and_ownership_declared` |
+| precedence and construction order | `list_round_robin` | `precedence_and_construction_order_declared` |
+| none of these | `list_cheapest_insertion` | `no_specialized_list_policy_declared` |
+
+The default `list_clarke_wright` keeps 40 savings per element when the slot
+declares a savings neighbour hook (the `domain = "cvrp"` profile does), so its
+memory grows linearly with the stop count; without the hook it scores every
+pair.
+
+Clarke-Wright builds its routes before it knows the fleet. When the savings
+hooks reject merges (capacity or time windows in custom `savings_hooks`) and
+the routes outnumber the vehicles that can take them, the routes that fit stay
+committed and the rest of their elements stay unassigned. The default
+construction then runs `list_cheapest_insertion` over those elements (reason
+`list_elements_remain_unassigned`), so a fixed fleet always ends construction
+with every element placed. An explicit `list_clarke_wright` phase does the
+same partial commit; follow it with a `list_cheapest_insertion` phase on a
+fixed fleet.
+
+After list construction, a slot with route hooks and a non-empty route runs
+`list_k_opt` (reason `route_hooks_declared_and_route_non_empty`). Scalar
+assignment groups get grouped `FirstFit` for required rows
+(`required_assignments_remain`) and grouped `CheapestInsertion` for optional
+rows (`only_optional_assignments_remain`), and remaining scalar variables that
+no assignment group owns use single-slot construction
+(`scalar_slot_outside_assignment_groups`). The final telemetry's
+[resolved phase plan](/docs/solverforge/solver/phases/#resolved-phase-plan)
+reports each choice with its reason.
+
+### Construction and the time limit
+
+Construction and local search share a time-limited budget. Required work is
+not capped: every list element, required assignment and non-optional scalar
+must be placed before local search starts, and a solve whose limits end first
+fails rather than publish a partial plan. The optional assignment pass is the
+one construction step that can run long without being needed, so it stops
+once a fifth of the solve's time limit has passed (rounded up to whole
+seconds) and leaves the rest to local search, whose optional-assignment moves
+keep filling optional rows. The step reports the share it got as
+`time_budget_seconds`. A solve without a time limit runs the pass to
+completion.
+
 ## Nullable Construction Obligation
 
 Nullable scalar variables default to `preserve_unassigned`: construction may
@@ -164,6 +215,38 @@ shape scalar construction only. A list heuristic (`list_round_robin`,
 the default, fails the solve at that key's path. `list_k_opt` accepts `k` from
 2 to 5 and polishes each route with that k-opt; every other heuristic rejects
 any `k` but the default `2`.
+
+### Element Group Placement
+
+On a list with element groups (see
+[List Variables](/docs/solverforge/modeling/list-variables/#element-groups)),
+`list_cheapest_insertion` and `list_regret_insertion` place each group as one
+unit, choosing all of its members' positions together. Both accept the
+joint-placement bounds:
+
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "list_regret_insertion"
+max_member_distance = 5
+max_group_owners = 6
+```
+
+`max_member_distance` caps the positions from one member of a group to the
+next (`1` keeps members adjacent), and `max_group_owners` tries every
+placement only on that many owners, the ones where the group fits best
+contiguously. Both take 1 to 255; omitted, each is unbounded. Other
+heuristics, and lists without groups, reject both keys, and
+`list_round_robin`, `list_clarke_wright` and the global `first_fit` and
+`cheapest_insertion` reject a list with groups:
+
+<!-- sf-toml: expect="solve-error" message="applies only to `list_cheapest_insertion` and `list_regret_insertion` construction" -->
+```toml
+[[phases]]
+type = "construction_heuristic"
+construction_heuristic_type = "first_fit"
+max_group_owners = 2
+```
 
 ## Construction Order Keys
 

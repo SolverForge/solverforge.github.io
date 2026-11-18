@@ -103,6 +103,21 @@ Long phases publish metadata-only pulses. Pause and
 cancel settle both inside large candidate work and around phase/terminal hooks;
 paused time is excluded from active phase elapsed time.
 
+### Resolved Phase Plan
+
+When a solve on the compiled runtime ends, `telemetry.resolved_phase_plan`
+holds the policy it actually ran; it is `None` before the solve ends. It lists
+each phase, the construction each default stage chose and the `reason` for it
+(see [Default Construction](/docs/solverforge/solver/construction/#default-construction)),
+the move families with their limits, the families a slot did not receive and
+the capability each was missing, the family ordering and weighting, and the
+acceptor, forager and effective `forager_accepted_count_limit` (see
+[Default Policy](/docs/solverforge/solver/local-search/#default-policy)). It is
+set whether or not `candidate_trace` is enabled. Together with the per-phase
+`step_count`, `moves_evaluated`, `moves_accepted` and elapsed time in
+`telemetry.phases`, it separates a costly step selection from a lack of useful
+moves.
+
 Compiled acceptor-forager local search evaluates candidates in ordered
 parallel windows according to top-level `move_thread_count`; the default
 `auto` chooses sequential or parallel evaluation per step. VND and other phase

@@ -55,6 +55,9 @@ If `move_selector` is omitted, the stock runtime stays intentionally narrow:
 - scalar slots with nearby value/entity sources receive targeted nearby
   change/swap first; every non-assignment-owned slot still receives targeted
   plain change/swap fallbacks
+- list slots with element groups receive group change and group swap first,
+  and their own list ruin with `max_member_distance = 7` and
+  `max_group_owners = 4`
 - list slots with a cross-position metric receive nearby change and, when set
   access exists, nearby swap; slots without that metric receive the plain
   variants. Sublist, reverse, k-opt, permutation, and precedence repair are
@@ -62,7 +65,11 @@ If `move_selector` is omitted, the stock runtime stays intentionally narrow:
 - mixed models declare list families first, then nearby scalar, grouped scalar,
   compound conflict repair, and ordinary scalar families
 - omitted leaves use seeded random order; multiple families use a
-  stratified-random union and a single family uses sequential union order
+  stratified-random union weighted by candidate cost (list ruin and unbounded
+  k-opt draw weight 1 against 4 for every other family), and a single family
+  uses sequential union order
+- the acceptor and forager follow the model's shape; see
+  [Default Policy](/docs/solverforge/solver/local-search/#default-policy)
 
 Assignment-owned scalar variables stay on their grouped scalar selector path.
 Plain scalar defaults and conflict-repair defaults exclude slots owned by an

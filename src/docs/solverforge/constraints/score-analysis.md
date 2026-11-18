@@ -98,8 +98,105 @@ function. A retained job's `SolverManager::analyze_snapshot` instead uses the
 provider the job scored with (`score_director.constraint_provider`), and fails
 with `SnapshotAnalysisDisabled` when the job ran with
 `score_director.constraint_match_enabled = false`; see
-[Score Director](/docs/solverforge/solver/configuration/#score-director). For per-match justifications, use the lower-level
-`solverforge::analysis` and `solverforge-scoring` APIs directly.
+[Score Director](/docs/solverforge/solver/configuration/#score-director). For
+per-match justifications, read the matches from a score director.
+
+## Constraint Matches
+
+`ScoreDirector::constraint_analyses()` lists every constraint with its
+matches. Each match carries its score and a justification naming the entities
+behind it. This program scores three shifts of the example model: shift 7
+falls on its employee's unavailable day, and shifts 8 and 9 are unassigned:
+
+<!-- rust: crate=score-matches extends=schedule file=src/main.rs -->
+```rust
+mod constraints;
+mod domain;
+
+use constraints::define_constraints;
+use domain::{Employee, Schedule, Shift, Unavailability};
+use solverforge::ScoreDirector;
+
+fn shift(id: usize, date: u32, employee_idx: Option<usize>) -> Shift {
+    Shift {
+        id,
+        date,
+        start: 8,
+        end: 16,
+        required_skill: "nurse".into(),
+        preferred_employee: None,
+        employee_idx,
+    }
+}
+
+fn main() {
+    let solution = Schedule {
+        employees: vec![Employee {
+            index: 0,
+            name: "Amina".into(),
+            skills: vec!["nurse".into()],
+            available_days: vec![1],
+            max_hours: 40,
+        }],
+        unavailability: vec![Unavailability { id: 4, employee_idx: 0, date: 2 }],
+        shifts: vec![shift(7, 2, Some(0)), shift(8, 2, None), shift(9, 3, None)],
+        score: None,
+    };
+
+    let mut director = ScoreDirector::new(solution, define_constraints());
+    println!("Total score: {}", director.calculate_score());
+
+    for analysis in director.constraint_analyses() {
+        for found in &analysis.matches {
+            let entities: Vec<String> = found
+                .justification
+                .entities
+                .iter()
+                .map(|entity| {
+                    let id = entity.planning_id.as_deref().unwrap_or("-");
+                    format!("{} {id}", entity.short_type_name())
+                })
+                .collect();
+            println!("{}: {} [{}]", analysis.name(), found.score, entities.join(", "));
+        }
+    }
+}
+```
+
+`cargo run` prints one line per match:
+
+<!-- rust: crate=score-matches output -->
+```text
+Total score: -3hard/0soft
+Unassigned shift: -1hard/0soft [Shift 8]
+Unassigned shift: -1hard/0soft [Shift 9]
+Unavailable employee: -1hard/0soft [Shift 7]
+```
+
+Each entity in a justification is an `EntityRef`:
+
+| Field | Description |
+| ----- | ----------- |
+| `type_name` | The entity's type name; `short_type_name()` drops the module path |
+| `display` | The entity's `Debug` rendering, for display only |
+| `planning_id` | The entity's `#[planning_id]`, rendered as a string |
+
+`planning_id` is rendered with `Display` when the id type implements it (`7`,
+`anna`), otherwise with `Debug` (a tuple-struct id renders as `ShiftId(7)`).
+Equal ids render equally, so use it to look up the record behind a match
+instead of parsing `display`. An entity streamed from a model collection whose
+type has a `#[planning_id]` field carries it; types without one, and values
+streamed from a hand-built source, report `None`. Ids are read only when
+matches are explained, never while scoring.
+
+A grouped or complemented constraint reports one match per group whose weight
+is not zero, justified by the entities in the group; a complemented key
+without a group is justified by its target entity. A projected row is
+justified by the entities it was projected from. Match scores add up to the
+constraint's score. Analysis keeps no copy of your entities: it records the
+type name and `Debug` rendering, so constraints need entities that implement
+`Debug` (`#[planning_entity]` and `#[problem_fact]` derive it), and no
+constraint requires `Clone`.
 
 Lower-level scoring metadata uses `ConstraintRef` as the constraint identity.
 Analysis views borrow that identity from the owning constraint rather than cloning it into public reporting types. That means

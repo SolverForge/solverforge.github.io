@@ -46,6 +46,9 @@ SCENARIOS = {
   "cwd-ignored" => ["a solver.toml in the working directory is not read by a retained solve", []],
   "termination" => ["time limits add up, no hidden time limit, omitted phases, cancel",
                     ["minutes 1 + seconds 30 -> Some(90.0) s (time_or_step_count)"]],
+  "phases" => ["resolved phase plan after the solve ends; element-group construction, search and ruin defaults",
+               ["construction solverforge.runtime.construction.cheapest_insertion reason element_groups_declared",
+                "local search forager_accepted_count_limit 4"]],
   "solver-manager" => ["events, status, pause -> Paused -> resume, problem change, snapshots, analysis, cancel, delete",
                        ["completed with reason Some(TerminatedByConfig)", "paused at snapshot Some("]]
 }.freeze
@@ -105,6 +108,7 @@ def model_for(text)
   return "grouped" if text.include?('"required_shift_assignment"')
   return "operations" if text.match?(/variable_name = "operations"/)
   return "savings" if text.include?('"list_clarke_wright"')
+  return "rides" if text.match?(/variable_name = "stops"|max_member_distance|max_group_owners|list_group_/)
   return "visits" if text.match?(/variable_name = "visits"|type = "(?:list_|sublist_|k_opt|nearby_list_)/)
 
   "scalar"
@@ -115,6 +119,9 @@ end
 # local-search phase the fragment belongs to.
 CONSTRUCTION = %([[phases]]\ntype = "construction_heuristic"\nconstruction_heuristic_type = "first_fit"\n\n)
 # Assignment-owned slots are constructed through their group.
+# A list with element groups is constructed by an insertion heuristic that
+# places each group as one unit; first_fit rejects it.
+RIDES_CONSTRUCTION = %([[phases]]\ntype = "construction_heuristic"\nconstruction_heuristic_type = "list_cheapest_insertion"\n\n)
 GROUPED_CONSTRUCTION = %([[phases]]\ntype = "construction_heuristic"\nconstruction_heuristic_type = "first_fit"\n) +
                        %(construction_obligation = "assign_when_candidate_exists"\ngroup_name = "required_shift_assignment"\n\n)
 
@@ -128,7 +135,7 @@ def wrap(text, model)
     else
       %([[phases]]\ntype = "local_search"\n\n)
     end
-  construction = model == "grouped" ? GROUPED_CONSTRUCTION : CONSTRUCTION
+  construction = { "grouped" => GROUPED_CONSTRUCTION, "rides" => RIDES_CONSTRUCTION }.fetch(model, CONSTRUCTION)
   [construction + local_search + text, "construction + #{local_search.include?("variable") ? "VND" : "local_search"} phase"]
 end
 

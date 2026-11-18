@@ -175,6 +175,55 @@ max_ruin_count = 8
 The current runtime skips empty owners during list-ruin sampling, so empty
 routes or sequences do not consume ruin attempts.
 
+## Element Groups
+
+A list variable with `element_group_fn` (see
+[List Variables](/docs/solverforge/modeling/list-variables/#element-groups))
+has two selectors that move whole groups:
+
+```toml
+[phases.move_selector]
+type = "union_move_selector"
+
+[[phases.move_selector.selectors]]
+type = "list_group_change_move_selector"
+variable_name = "stops"
+max_member_distance = 4
+
+[[phases.move_selector.selectors]]
+type = "list_group_swap_move_selector"
+variable_name = "stops"
+
+[[phases.move_selector.selectors]]
+type = "list_ruin_move_selector"
+variable_name = "stops"
+min_ruin_count = 1
+max_ruin_count = 3
+max_member_distance = 5
+max_group_owners = 2
+```
+
+- `list_group_change_move_selector` moves a whole group, keeping its members'
+  order, to positions of one owner, its own included. `max_member_distance`
+  caps the positions from one member to the next (`1` keeps members
+  adjacent); omitted, every placement is generated.
+- `list_group_swap_move_selector` exchanges two groups of the same size on
+  different owners, member slot for member slot.
+- `list_ruin_move_selector` ruins whole groups on a grouped list and recreates
+  them in one pass, each group at its best joint placement given the groups
+  placed before it. `max_member_distance` bounds the joint placement and
+  `max_group_owners` tries every placement only on that many owners, the ones
+  where the group fits best contiguously.
+
+Both bounds take 1 to 255. The group selectors, and the ruin bounds, require a
+targeted list with element groups; a selector that finds none fails the
+solve. The other list selectors keep a grouped element on its owner, so they
+reorder it within its route but never split a group.
+
+Omitted `move_selector` defaults give a grouped list group change and group
+swap ahead of its other list families, and its own ruin with
+`max_member_distance = 7` and `max_group_owners = 4`.
+
 ## Ownership Transfer and Exact Undo
 
 List mutation kernels transfer values by ownership through remove/insert, swap,

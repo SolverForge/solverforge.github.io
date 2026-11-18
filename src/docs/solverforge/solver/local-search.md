@@ -36,6 +36,43 @@ construction-only; a `best_score_limit` that does not parse fails the solve. Omi
 defaults inside an explicit local-search phase are a separate policy. VND must
 be selected explicitly; it is never inserted before default local search.
 
+## Default Policy
+
+The default local search, and an explicit `local_search` phase that omits its
+`acceptor` or `forager`, take the acceptor and forager for the model's shape:
+
+| Model | Acceptor | Forager |
+| ----- | -------- | ------- |
+| list variables, precedence moves available | Late Acceptance, history 400 | first last-step-score improving, accepted-count ceiling 32 |
+| list variables | Late Acceptance, history 400 | accepted count 4 |
+| scalar groups, no list variables | Diversified Late Acceptance, history 400 | accepted count 32 |
+| scalar variables with nearby hooks or conflict repairs | Simulated Annealing, auto-calibrated | accepted count 32 |
+| other scalar variables | Simulated Annealing, auto-calibrated | accepted count 1 |
+
+The accepted counts come from five-seed runs of the solverforge-bench CVRP,
+rostering and job-shop suites at a 10 s budget: fewer accepted moves per step
+buy more steps, and each model shape has its own best count. An omitted
+forager after a Tabu Search acceptor is the best-score forager.
+
+An explicit value is used as written. An explicit forager with omitted fields
+uses that forager's own field defaults, not the default policy's:
+`type = "accepted_count"` without `limit` collects 1 accepted move per step,
+while an omitted forager on a list model collects 4. An explicit phase list
+replaces the defaults and adds no construction phase in front, and an explicit
+`local_search` phase without `move_selector` gets the default families.
+
+The default move selector is a union of the families the model's
+declarations support, in a fixed order (see
+[Extend the Solver](/reference/extend-solver/#canonical-selector-defaults)).
+A single family uses `sequential` order; several use `stratified_random`,
+weighted by candidate cost: list ruin and unbounded k-opt rebuild or scan
+whole routes per candidate, so they draw weight 1 against 4 for every other
+family. They stay in the neighborhood for diversification without taking an
+equal share of the step. The
+[resolved phase plan](/docs/solverforge/solver/phases/#resolved-phase-plan)
+reports the acceptor, the forager with its effective
+`forager_accepted_count_limit`, the families, and their `weighting`.
+
 ## Parallel Candidate Evaluation
 
 Top-level `move_thread_count` controls how compiled acceptor-forager local

@@ -1,6 +1,6 @@
 //! Runs the solver documentation against crates.io solverforge 0.31.2.
 //!
-//!   solver-config-fixture check <scalar|grouped|visits|operations|savings|parse> <block.toml>
+//!   solver-config-fixture check <scalar|grouped|visits|operations|savings|rides|parse> <block.toml>
 //!   solver-config-fixture scenario <name>
 //!
 //! `check` parses one documentation block with `SolverConfig::from_toml_str`
@@ -13,6 +13,7 @@ mod grouped;
 mod operations;
 mod pages;
 mod probe;
+mod rides;
 mod savings;
 mod visits;
 
@@ -94,6 +95,9 @@ fn check(model: &str, path: &str) {
             .solve_with_config(config)
             .map(|s| format!("{:?}", s.score)),
         "savings" => savings::VehiclePlan::demo(20)
+            .solve_with_config(config)
+            .map(|s| format!("{:?}", s.score)),
+        "rides" => rides::Rides::demo(8)
             .solve_with_config(config)
             .map(|s| format!("{:?}", s.score)),
         other => panic!("unknown model {other}"),

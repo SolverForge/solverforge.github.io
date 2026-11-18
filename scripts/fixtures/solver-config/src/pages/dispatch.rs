@@ -1,6 +1,6 @@
 //! Runs one scenario by name.
 
-use super::{configuration, index, solver_manager, termination};
+use super::{configuration, index, phases, solver_manager, termination};
 
 pub fn run(name: &str) {
     match name {
@@ -9,6 +9,7 @@ pub fn run(name: &str) {
         "config-load" => configuration::load(),
         "cwd-ignored" => configuration::cwd_ignored(),
         "termination" => termination::run(),
+        "phases" => phases::run(),
         "solver-manager" => solver_manager::run(),
         other => panic!("unknown scenario {other}"),
     }
