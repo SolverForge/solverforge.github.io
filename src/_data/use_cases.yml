@@ -885,7 +885,7 @@
     poster: "/images/use-cases/ev-overview.png"
     label: Runtime walkthrough
     copy: "Watch the routes form on Bergamo's roads with their charging stops, then read the plan van by van."
-    caption: "Narrated walkthrough (1:59): the unsolved day, the solve on the road network, the van cards, score analysis, the schedule, the data tables, and the REST API."
+    caption: "Narrated walkthrough (1:32): the unsolved day, the solve on the road network, the van cards, score analysis, the schedule, the data tables, and the REST API."
   screenshots:
     - image: "/images/use-cases/ev-overview-unsolved.png"
       badge: "Unsolved day"
