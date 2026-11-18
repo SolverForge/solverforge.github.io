@@ -13,7 +13,7 @@ description: >
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
 This post records an older core line. The current core release is
-`solverforge 0.27.0`; see the [0.27.x release note](/blog/releases/2026/11/13/solverforge-0-27-x/).
+`solverforge 0.31.2`; see the [0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/).
 <% end %>
 
 **solverforge 0.26.x** follows `solverforge 0.25.1`; the line was published on
@@ -26,7 +26,7 @@ lower-level `solverforge-scoring` score-director constructors. 0.26.1 changes
 no public API: late acceptance keeps its score history unless a hard or medium
 level of the best score changes, and scalar ruin-and-recreate draws its batches
 without an entity-sized permutation. `solverforge-cli 4.0.4`
-scaffolds 0.26.1, and all eight worked use cases pin it.
+scaffolds 0.26.1, and all eight worked use cases pinned it at publication.
 
 ## What Changed
 

@@ -10,7 +10,7 @@ description: >
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
 This post records an older core release. The current core release is
-`solverforge 0.27.0`; see the [0.27.x release note](/blog/releases/2026/11/13/solverforge-0-27-x/).
+`solverforge 0.31.2`; see the [0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/).
 <% end %>
 
 **solverforge 0.23.x** follows `solverforge 0.22.0`; the line was published on

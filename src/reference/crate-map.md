@@ -13,7 +13,7 @@ own a piece of work.
 For most application code, depend on `solverforge` and stay on the facade until
 you have a concrete reason to go lower-level.
 
-This map is aligned with the published `solverforge 0.27.0` crate and its
+This map is aligned with the published `solverforge 0.31.2` crate and its
 release workspace. The facade does not re-export `solverforge-bridge`, and
 `solverforge::console` (behind the `console` feature) exposes only `init()`;
 depend on those crates directly for anything else.
@@ -127,9 +127,10 @@ composed plans still evaluate residual conditions. See
 Dense existence count updates mark a touched key at most once per event; the
 touched list stays unique and membership settles from final counts. Hash-key
 storage, residual-predicate dispatch, and public authoring methods are
-unchanged. Grouped-scalar default local search forages with
-`AcceptedCount(256)` — the list-model policy — so a step sweeps until the
-limit is accepted and applies the best.
+unchanged. Default local search forages with a measured accepted count per
+model shape: `AcceptedCount(4)` for list models and `AcceptedCount(32)` for
+scalar groups; see
+[Default Policy](/docs/solverforge/solver/local-search/#default-policy).
 
 Specialized unary and projected pair families remain, while grouped shapes —
 including direct cross and projected grouped complements — run on the shared
@@ -137,7 +138,7 @@ kernel above. Existence and keyed
 flattened terminals, and unary complemented groups, use the shared
 `OperatorTerminal`. Reusable grouped-node sharing remains distinct from
 compiler-owned sharing of arbitrary derived consumers. Check the
-[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.27.0/crates/solverforge-scoring/src)
+[tagged scoring implementation](https://github.com/SolverForge/solverforge/tree/v0.31.2/crates/solverforge-scoring/src)
 when extending internals.
 
 ## Parallel Evaluation and Dynamic Scores

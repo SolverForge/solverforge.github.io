@@ -9,15 +9,20 @@ description: >
   owner admission incremental, and opens the scalar swap cursor in linear time.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older core line. The current core release is
+`solverforge 0.31.2`; see the [0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/).
+<% end %>
+
 **solverforge 0.27.x** follows `solverforge 0.26.1`; the line was published on
-crates.io on 2026-11-13. The current release is
+crates.io on 2026-11-13 as
 [0.27.0](https://crates.io/crates/solverforge/0.27.0), with a Rust `1.95`
-floor. `cargo add solverforge` installs 0.27.0, and docs.rs serves the 0.27.0
-API. The one breaking change is in the stock CVRP data: `ProblemData` reads leg
+floor. At publication `cargo add solverforge` installed 0.27.0, and docs.rs
+served the 0.27.0 API. The one breaking change is in the stock CVRP data: `ProblemData` reads leg
 distances and travel times from a `metric` field instead of two matrix fields,
 and `VrpSolution` names the metric type. Models that do not use
-`solverforge::cvrp` upgrade by moving the pin. `solverforge-cli 4.0.4` still
-scaffolds 0.26.1, and the eight worked use cases pin 0.26.1.
+`solverforge::cvrp` upgrade by moving the pin. `solverforge-cli 4.0.4`
+scaffolded 0.26.1 at the time, and the eight worked use cases pinned 0.26.1.
 
 ## What Changed
 
@@ -117,11 +122,11 @@ performance), each compiled against the release by the README example tests.
 
 | Surface | Version | Notes |
 | ------- | ------- | ----- |
-| Core runtime | `solverforge 0.27.0` | Rust `1.95`; `ProblemData` reads legs through a `RouteMetric` (`DenseMatrix`, `EuclideanMetric`); bounded Clarke-Wright savings; incremental owner admission; linear-time scalar swap cursor |
+| Core runtime at publication | `solverforge 0.27.0` | Rust `1.95`; `ProblemData` reads legs through a `RouteMetric` (`DenseMatrix`, `EuclideanMetric`); bounded Clarke-Wright savings; incremental owner admission; linear-time scalar swap cursor |
 | Previous core runtime | `solverforge 0.26.1` | Late acceptance keeps its history across soft-level improvements; see the [0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) |
-| CLI | `solverforge-cli 4.0.4` | Fresh scaffolds target core `0.26.1`; see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
+| CLI at publication | `solverforge-cli 4.0.4` | Scaffolded core `0.26.1`; see the [4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
 | Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Compiled onto core `0.23.0`; upgrading the Rust core does not retarget these wheels |
-| Worked use cases | November 11 app releases | All eight pin core `0.26.1` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |
+| Worked use cases at publication | November 11 app releases | All eight pinned core `0.26.1` and UI `0.9.0`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/) |
 | UI | `solverforge-ui 0.9.1` | Unchanged |
 | Maps | `solverforge-maps 2.3.3` | Unchanged |
 
@@ -173,7 +178,8 @@ the GitHub Release; every job succeeded.
 
 ## Where to read next
 
-Read the [core manual](/docs/solverforge/),
+Read the [0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/)
+for the current line, the [core manual](/docs/solverforge/),
 [List Variables](/docs/solverforge/modeling/list-variables/#cvrp-route-profile),
 and [Construction](/docs/solverforge/solver/construction/#bounded-clarke-wright-savings).
 The [0.27.0 compare](https://github.com/SolverForge/solverforge/compare/v0.26.1...v0.27.0)
