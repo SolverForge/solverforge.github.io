@@ -105,8 +105,8 @@ evaluation, and the page's constraint function must be verbatim in the
 fixture. `make test` runs the static half; `make ci-local` runs the trace.
 
 `make verify-solver-config` holds the solver pages
-(`src/docs/solverforge/solver/` and the lifecycle contract note) to crates.io
-`solverforge =0.24.0`. Every ```` ```toml ```` block is parsed with
+(`src/docs/solverforge/solver/` and the lifecycle contract note) to the crates.io
+`solverforge` release `scripts/lib/rust_pages.rb` pins. Every ```` ```toml ```` block is parsed with
 `SolverConfig::from_toml_str` and solved on a fixture model that owns the
 variables it names (`scripts/fixtures/solver-config/`); a block meant to fail
 carries `<!-- sf-toml: expect="parse-error|solve-error" message="..." -->` and
