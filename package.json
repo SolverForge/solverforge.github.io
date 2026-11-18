@@ -11,7 +11,7 @@
   "devDependencies": {
     "esbuild": "^0.25.11",
     "glob": "^11.0.3",
-    "playwright": "^1.59.1",
+    "playwright": "^1.65.1",
     "postcss": "^8.5.6",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-import": "^16.1.0",
