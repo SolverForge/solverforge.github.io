@@ -10,7 +10,7 @@ class UseCase::Showcase < Bridgetown::Component
     @cases
   end
 
-  # A component nested in this one (UseCase::Demoscene) resolves URLs through its
+  # A component nested in this one (UseCase::Product) resolves URLs through its
   # view context's site, which a component only has when it exposes one.
   def site
     helpers.site
@@ -36,18 +36,18 @@ class UseCase::Showcase < Bridgetown::Component
     !use_case["space_url"].to_s.empty?
   end
 
-  # The demoscene case is a product, not a web demo: it renders its intro video,
-  # a cue sheet, and plain captures through UseCase::Demoscene instead of the
-  # narrated walkthrough and annotated screenshots.
-  def demoscene?(use_case)
-    use_case["variant"] == "demoscene"
+  # A product case is built on SolverForge rather than a web demo: it renders
+  # its video, a cue sheet, and plain captures through UseCase::Product instead
+  # of the narrated walkthrough and annotated screenshots.
+  def product?(use_case)
+    use_case["variant"] == "product"
   end
 
   def selector_class(use_case)
     [
       "use-case-carousel__selector",
       ("use-case-carousel__selector--space" if space?(use_case)),
-      ("use-case-carousel__selector--demoscene" if demoscene?(use_case)),
+      ("use-case-carousel__selector--demoscene" if product?(use_case)),
     ].compact.join(" ")
   end
 end

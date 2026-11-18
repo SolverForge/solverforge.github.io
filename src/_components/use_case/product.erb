@@ -26,8 +26,8 @@
               class="use-case-showcase__image"
               src="<%= relative_url(shot.fetch("image")) %>"
               alt="<%= shot.fetch("alt") %>"
-              width="1920"
-              height="1080"
+              width="<%= capture_size(shot)[0] %>"
+              height="<%= capture_size(shot)[1] %>"
               loading="lazy"
             />
           </button>

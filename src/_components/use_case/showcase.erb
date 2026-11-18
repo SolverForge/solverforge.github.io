@@ -31,8 +31,8 @@
         <% if space?(use_case) %>
           <span class="use-case-carousel__selector-ribbon">Space</span>
         <% end %>
-        <% if demoscene?(use_case) %>
-          <span class="use-case-carousel__selector-ribbon use-case-carousel__selector-ribbon--demoscene">Terminal</span>
+        <% if product?(use_case) %>
+          <span class="use-case-carousel__selector-ribbon use-case-carousel__selector-ribbon--demoscene"><%= use_case.fetch("ribbon") %></span>
         <% end %>
       </a>
     <% end %>
@@ -43,7 +43,7 @@
     # arranged against each other rather than in isolation.
     placed_callouts = {}
     cases.each do |use_case|
-      next if demoscene?(use_case)
+      next if product?(use_case)
       use_case.fetch("screenshots").each do |shot|
         placed_callouts[shot.fetch("image")] = UseCaseCalloutLayout.number(shot.fetch("callouts"))
       end
@@ -53,7 +53,7 @@
   <div class="use-case-carousel__slides">
     <% cases.each_with_index do |use_case, index| %>
       <article
-        class="<%= ["use-case-carousel__slide", ("use-case-carousel__slide--demoscene" if demoscene?(use_case))].compact.join(" ") %>"
+        class="<%= ["use-case-carousel__slide", ("use-case-carousel__slide--demoscene" if product?(use_case))].compact.join(" ") %>"
         id="<%= use_case.fetch("id") %>"
         role="tabpanel"
         aria-labelledby="use-case-tab-<%= use_case.fetch("id") %>"
@@ -81,6 +81,12 @@
                   target: "_blank",
                   rel: "noopener" %>
           <% end %>
+          <% if use_case["catalog_url"] %>
+            <%= link_to "Hermes Marketplace", use_case.fetch("catalog_url"),
+                  class: "use-case-doc-link",
+                  target: "_blank",
+                  rel: "noopener" %>
+          <% end %>
         </div>
 
         <header class="use-case-carousel__header">
@@ -91,8 +97,8 @@
           <p class="use-case-carousel__intro"><%= use_case.fetch("intro") %></p>
         </header>
 
-        <% if demoscene?(use_case) %>
-          <%= render UseCase::Demoscene.new(use_case: use_case, part: :stage) %>
+        <% if product?(use_case) %>
+          <%= render UseCase::Product.new(use_case: use_case, part: :stage) %>
         <% end %>
 
         <div class="use-case-proof">
@@ -123,8 +129,8 @@
           </div>
         </div>
 
-        <% if demoscene?(use_case) %>
-          <%= render UseCase::Demoscene.new(use_case: use_case, part: :captures) %>
+        <% if product?(use_case) %>
+          <%= render UseCase::Product.new(use_case: use_case, part: :captures) %>
         <% else %>
         <figure class="use-case-runtime">
           <div class="use-case-runtime__frame">

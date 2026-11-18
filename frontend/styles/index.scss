@@ -2064,9 +2064,10 @@ body.use-case-lightbox-open {
   justify-content: flex-end;
 }
 
-/* The demoscene case (Planner123): a product, not a web demo. Its intro video
-   sits in a dark phosphor bezel with a cue sheet that seeks it, so the case reads
-   as different at a glance while keeping the shared proof blocks. */
+/* Product cases (Planner123, the Hermes Agent plugins): built on SolverForge,
+   not web demos. Their video sits in a dark phosphor bezel with a cue sheet that
+   seeks it, so a product reads as different at a glance while keeping the shared
+   proof blocks. */
 
 .use-case-carousel__selector--demoscene {
   border-color: rgba(4, 22, 18, 0.9);
@@ -2214,9 +2215,10 @@ body.use-case-lightbox-open {
   margin-top: clamp(2.4rem, 5vw, 4rem);
 }
 
+/* Up to four captures per row; a product with fewer shows them larger. */
 .use-case-demoscene__capture-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
   gap: clamp(0.85rem, 1.6vw, 1.2rem);
 }
 
@@ -2236,6 +2238,12 @@ body.use-case-lightbox-open {
   background: #0b0f14;
   box-shadow: 0 26px 52px -34px rgba(6, 47, 40, 0.45);
   cursor: zoom-in;
+}
+
+/* Product captures keep their own shape: a tall pane or a small dialog is
+   letterboxed in the frame instead of cropped. */
+.use-case-demoscene__capture .use-case-showcase__image {
+  object-fit: contain;
 }
 
 .use-case-demoscene__capture-trigger:focus-visible {
@@ -2349,8 +2357,8 @@ body.use-case-lightbox-open {
   text-transform: uppercase;
 }
 
-/* Home page: Planner123 is featured as a product beside the eight apps rather
-   than counted among them. */
+/* Home page: products are featured beside the apps rather than counted among
+   them. The first gets a wide band; the rest share a row of compact bands. */
 .home-demoscene {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -2419,6 +2427,26 @@ body.use-case-lightbox-open {
 
 .home-demoscene .page-shell__eyebrow {
   color: #6ee7b7;
+}
+
+.home-products {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.home-products .home-demoscene {
+  margin-top: 0;
+}
+
+.home-demoscene--compact {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+}
+
+.home-demoscene--compact h3 {
+  font-size: clamp(1.2rem, 1rem + 0.6vw, 1.45rem);
 }
 
 /* Home page: the describe, solve, repair session plays right under the hero,
@@ -2511,7 +2539,8 @@ body.use-case-lightbox-open {
   }
 
   .use-case-demoscene-stage__header,
-  .home-demoscene {
+  .home-demoscene,
+  .home-products {
     grid-template-columns: 1fr;
   }
 

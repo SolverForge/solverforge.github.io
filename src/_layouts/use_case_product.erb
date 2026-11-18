@@ -16,10 +16,17 @@ layout: default
             App source <i class="fa-brands fa-github"></i>
           </a>
         </li>
+        <% unless use_case["catalog_url"].to_s.empty? %>
+          <li>
+            <a class="use-case-doc-link" href="<%= use_case.fetch("catalog_url") %>" target="_blank" rel="noopener">
+              Hermes Marketplace <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+          </li>
+        <% end %>
       </ul>
     </header>
 
-    <%= render UseCase::Demoscene.new(use_case: use_case, part: :stage) %>
+    <%= render UseCase::Product.new(use_case: use_case, part: :stage) %>
   </section>
 
   <div class="use-case-proof__metrics" aria-label="<%= use_case.fetch("label") %> data shape">
@@ -48,7 +55,7 @@ layout: default
     </div>
   </div>
 
-  <%= render UseCase::Demoscene.new(use_case: use_case, part: :captures) %>
+  <%= render UseCase::Product.new(use_case: use_case, part: :captures) %>
 
   <nav class="use-case-detail__nav" aria-label="Other use cases">
     <p class="use-case-eyebrow">Keep inspecting</p>

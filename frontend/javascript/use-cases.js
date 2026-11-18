@@ -105,7 +105,7 @@ export const initializeUseCaseLightbox = () => {
     image.alt = trigger.dataset.useCaseLightboxAlt || ""
     caption.textContent = trigger.dataset.useCaseLightboxCaption || ""
 
-    // Annotated captures carry markers and a legend; the demoscene case's plain
+    // Annotated captures carry markers and a legend; a product case's plain
     // captures carry neither, so both lists simply come back empty.
     const frame = trigger.closest(".use-case-showcase__item, .use-case-demoscene__capture")
     if (markers) {
@@ -168,7 +168,7 @@ export const initializeUseCaseLightbox = () => {
   })
 }
 
-// The demoscene case pairs its video with a cue sheet. A cue seeks the video to
+// A product case pairs its video with a cue sheet. A cue seeks the video to
 // its scene and plays from there, and the cue for the scene on screen is marked
 // as it plays, so the sheet doubles as a chapter list.
 export const initializeDemosceneCues = () => {

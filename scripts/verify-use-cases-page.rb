@@ -11,7 +11,7 @@ require "yaml"
 ROOT = File.expand_path("..", __dir__)
 
 DATA_PATH = "src/_data/use_cases.yml"
-EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew ev planner123].freeze
+EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew ev planner123 hermes-planner hermes-routing].freeze
 # Cases with a written guide keep it; the repository-only cases ship the app
 # source instead, and every case has its own page generated from this file.
 EXPECTED_DOCS = {
@@ -23,10 +23,22 @@ EXPECTED_DOCS = {
 EXPECTED_SPACES = %w[hospital lessons deliveries field-service].freeze
 REPO_CASES = %w[furnace orders fleet flightcrew ev].freeze
 REPO_URL_PATTERN = %r{\Ahttps://github\.com/SolverForge/solverforge-usecases/tree/main/uc-[a-z]+\z}
-# Planner123 is a product, not a web demo: it ships its source, a video with a
-# cue sheet, and plain captures of the real app instead of annotated ones.
-DEMOSCENE_CASES = { "planner123" => "https://github.com/blackopsrepl/Planner123" }.freeze
-MINIMUM_CAPTURES = 4
+# Products built on SolverForge (Planner123 and the two Hermes Agent plugins)
+# are not web demos: each ships its source, a video with a cue sheet, and plain
+# captures of the real app instead of annotated ones. The plugins also link
+# their Hermes Marketplace entry.
+PRODUCT_CASES = {
+  "planner123" => { repo: "https://github.com/blackopsrepl/Planner123" },
+  "hermes-planner" => {
+    repo: "https://github.com/blackopsrepl/hermes-solverforge-planner",
+    catalog: "https://hermes-agent.nousresearch.com/marketplace/solverforge-planner"
+  },
+  "hermes-routing" => {
+    repo: "https://github.com/blackopsrepl/hermes-solverforge-routing",
+    catalog: "https://hermes-agent.nousresearch.com/marketplace/solverforge-routing"
+  }
+}.freeze
+MINIMUM_CAPTURES = 2
 EXPECTED_METRICS = 6
 EXPECTED_CONSTRAINTS = 6
 MINIMUM_SCREENSHOTS = 6
@@ -96,20 +108,25 @@ cases.each do |use_case|
   else
     failures << "#{id}: repository-only case must not claim a Space" if use_case["space_url"].to_s.strip.length.positive?
     repo_url = use_case["repo_url"].to_s
-    if DEMOSCENE_CASES.key?(id)
-      failures << "#{id}: repo_url #{repo_url.inspect} is not #{DEMOSCENE_CASES[id]}" unless repo_url == DEMOSCENE_CASES[id]
+    if PRODUCT_CASES.key?(id)
+      expected = PRODUCT_CASES[id]
+      failures << "#{id}: repo_url #{repo_url.inspect} is not #{expected[:repo]}" unless repo_url == expected[:repo]
+      unless use_case["catalog_url"] == expected[:catalog]
+        failures << "#{id}: catalog_url #{use_case['catalog_url'].inspect} is not #{expected[:catalog].inspect}"
+      end
     else
       failures << "#{id}: repo_url #{repo_url.inspect} is not this case's directory in solverforge-usecases" unless repo_url.match?(REPO_URL_PATTERN)
     end
   end
 
-  demoscene = use_case["variant"] == "demoscene"
-  if demoscene != DEMOSCENE_CASES.key?(id)
-    failures << "#{id}: variant #{use_case['variant'].inspect} does not match the expected demoscene cases"
+  product = use_case["variant"] == "product"
+  if product != PRODUCT_CASES.key?(id)
+    failures << "#{id}: variant #{use_case['variant'].inspect} does not match the expected product cases"
   end
+  failures << "#{id}: only a product case carries a catalog_url" if !product && use_case.key?("catalog_url")
 
   runtime = use_case["runtime"] || {}
-  runtime_fields = demoscene ? %w[video poster label copy] : %w[video poster label copy caption]
+  runtime_fields = product ? %w[video poster label copy] : %w[video poster label copy caption]
   runtime_fields.each do |field|
     failures << "#{id}: runtime is missing #{field}" if runtime[field].to_s.strip.empty?
   end
@@ -119,12 +136,23 @@ cases.each do |use_case|
     failures << "#{id}: runtime #{field} not found at #{asset}" unless File.file?(source_path(asset))
   end
 
-  if demoscene
+  if product
+    # The selector ribbon and the home band are read from the entry itself.
+    failures << "#{id}: product case needs a ribbon" if use_case["ribbon"].to_s.strip.empty?
+    home = use_case["home"] || {}
+    %w[watch heading copy cta].each do |field|
+      failures << "#{id}: home band is missing #{field}" if home[field].to_s.strip.empty?
+    end
+    # The home band's play badge shows the length from the runtime label.
+    unless runtime["label"].to_s.match?(/ · \d+:\d{2}\z/)
+      failures << "#{id}: runtime label #{runtime['label'].inspect} must end with ' · m:ss'"
+    end
+
     # Each cue seeks the video, so its start must be a real, increasing time
     # and its label must be that time as the reader sees it (m:ss).
     cues = use_case["cues"]
     unless cues.is_a?(Array) && !cues.empty?
-      failures << "#{id}: demoscene case needs a cue sheet"
+      failures << "#{id}: product case needs a cue sheet"
       cues = []
     end
     previous = -1
@@ -153,8 +181,15 @@ cases.each do |use_case|
       end
       image = shot["image"].to_s
       failures << "#{id} capture #{index + 1}: image not found at #{image}" unless image.empty? || File.file?(source_path(image))
+      # A declared size must be the image's own, or the frame letterboxes it
+      # at the wrong shape; an undeclared one is a 1920x1080 frame.
+      path = source_path(image)
+      next unless File.file?(path) && File.binread(path, 8) == "\x89PNG\r\n\x1A\n".b
+      width, height = File.binread(path, 8, 16).unpack("NN")
+      declared = [shot.fetch("width", 1920), shot.fetch("height", 1080)]
+      failures << "#{id} capture #{index + 1}: declared #{declared.join('x')} but #{image} is #{width}x#{height}" unless declared == [width, height]
     end
-    failures << "#{id}: demoscene case must not carry annotated screenshots" if use_case.key?("screenshots")
+    failures << "#{id}: product case must not carry annotated screenshots" if use_case.key?("screenshots")
     next
   end
 
@@ -199,12 +234,12 @@ PAGE_WIRING = {
   "frontend/styles/index.scss" => ["use-case-space-ribbon", "use-case-detail"],
   "src/_layouts/use_cases.erb" => ["page-shell--use-cases"],
   "src/_data/navigation.yml" => ["url: /use-cases/"],
-  "src/index.md" => ["site.data.use_cases", "data-home-demoscene"],
-  "src/_components/use_case/demoscene.erb" => ["Media::DemosceneVideo.new", "use-case-demoscene__capture"],
+  "src/index.md" => ["site.data.use_cases", "data-home-demoscene", "data-home-product"],
+  "src/_components/use_case/product.erb" => ["Media::DemosceneVideo.new", "use-case-demoscene__capture", "capture_size(shot)"],
   "src/_components/media/demoscene_video.erb" => ["data-demoscene", "data-demoscene-video", "data-demoscene-cue"],
-  "src/_layouts/use_case_demoscene.erb" => ["layout: default", "use-case-detail", "data-use-case-lightbox-root", "UseCase::Demoscene.new"],
+  "src/_layouts/use_case_product.erb" => ["layout: default", "use-case-detail", "data-use-case-lightbox-root", "UseCase::Product.new", "catalog_url"],
   "frontend/javascript/use-cases.js" => ["initializeDemosceneCues", ".use-case-demoscene__capture"],
-  EXPECTED_GENERATOR => ["Bridgetown::Generator", "use-cases/", "use_case", "use_case_demoscene"],
+  EXPECTED_GENERATOR => ["Bridgetown::Generator", "use-cases/", "use_case", "use_case_product"],
   "src/_layouts/use_case.erb" => ["layout: default", "use-case-detail", "data-use-case-lightbox-root", "site.data.use_cases"]
 }.freeze
 

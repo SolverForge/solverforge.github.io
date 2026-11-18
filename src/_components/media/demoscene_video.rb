@@ -3,7 +3,7 @@ class Media::DemosceneVideo < Bridgetown::Component
   # chapter list: frontend/javascript/use-cases.js (initializeDemosceneCues)
   # seeks the video on click and marks the scene on screen as it plays.
   #
-  # Planner123's case (UseCase::Demoscene) and the SolverForge
+  # Planner123's case (UseCase::Product) and the SolverForge
   # "describe, solve, repair" video (src/_data/demo_videos.yml) both render
   # through here, so the markup and behaviour cannot drift apart.
   #

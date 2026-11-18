@@ -26,7 +26,7 @@ WIRING = {
   "src/index.md" => ["data-home-session-video", %(site.data.demo_videos["describe_solve_repair"]), "/docs/solverforge-cli/agent-skill/#watch-one-session"],
   "src/docs/getting-started/maintenance-planning-with-the-agent-skill.md" => ["(/docs/solverforge-cli/agent-skill/#watch-one-session)"],
   "src/_components/media/demoscene_video.erb" => ["data-demoscene", "data-demoscene-video", "data-demoscene-cue"],
-  "src/_components/use_case/demoscene.erb" => ["Media::DemosceneVideo.new"]
+  "src/_components/use_case/product.erb" => ["Media::DemosceneVideo.new"]
 }.freeze
 
 failures = []

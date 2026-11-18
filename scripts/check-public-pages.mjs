@@ -91,12 +91,29 @@ const docsStalePatterns = [
   /Hexaly/i,
 ];
 
-// Planner123 is a product rather than a web demo: its slide and page carry a
-// video with a cue sheet and plain captures instead of annotated screenshots.
-// Pinned here, not read from the rendered page, so a case that loses or gains
-// the variant fails instead of being re-classified.
-const DEMOSCENE_CASES = { planner123: { video: "/videos/use-cases/planner123-demoscene.mp4", repo: "https://github.com/blackopsrepl/Planner123", cues: 9, minCaptures: 4 } };
-const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "ev", "planner123"];
+// Products built on SolverForge (Planner123 and the two Hermes Agent plugins)
+// are not web demos: each slide and page carries a video with a cue sheet and
+// plain captures instead of annotated screenshots. Pinned here, not read from
+// the rendered page, so a case that loses or gains the variant fails instead of
+// being re-classified.
+const PRODUCT_CASES = {
+  planner123: { video: "/videos/use-cases/planner123-demoscene.mp4", repo: "https://github.com/blackopsrepl/Planner123", cues: 9, captures: 4 },
+  "hermes-planner": {
+    video: "/videos/use-cases/hermes-solverforge-planner-demo.mp4",
+    repo: "https://github.com/blackopsrepl/hermes-solverforge-planner",
+    catalog: "https://hermes-agent.nousresearch.com/marketplace/solverforge-planner",
+    cues: 11,
+    captures: 4,
+  },
+  "hermes-routing": {
+    video: "/videos/use-cases/hermes-solverforge-routing-demo.mp4",
+    repo: "https://github.com/blackopsrepl/hermes-solverforge-routing",
+    catalog: "https://hermes-agent.nousresearch.com/marketplace/solverforge-routing",
+    cues: 9,
+    captures: 4,
+  },
+};
+const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "ev", "planner123", "hermes-planner", "hermes-routing"];
 
 function walk(dir, predicate, out = []) {
   for (const name of readdirSync(dir)) {
@@ -464,15 +481,16 @@ async function checkUseCaseShowcase(origin) {
       for (const slide of showcase.slides) {
         if (slide.metrics !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 metrics", found: slide.metrics });
         if (slide.constraints !== 6) failures.push({ path, slide: slide.id, issue: "expected 6 constraints", found: slide.constraints });
-        const product = DEMOSCENE_CASES[slide.id];
+        const product = PRODUCT_CASES[slide.id];
         if (product) {
           if (slide.screenshots !== 0 || slide.annotated !== 0) failures.push({ path, slide: slide.id, issue: "product case must not carry annotated screenshots", screenshots: slide.screenshots });
           if (slide.cues !== product.cues) failures.push({ path, slide: slide.id, issue: `expected ${product.cues} video cues`, found: slide.cues });
-          if (slide.captures < product.minCaptures) failures.push({ path, slide: slide.id, issue: `expected at least ${product.minCaptures} app captures`, found: slide.captures });
+          if (slide.captures !== product.captures) failures.push({ path, slide: slide.id, issue: `expected ${product.captures} app captures`, found: slide.captures });
           if (slide.videos.length !== 1 || !slide.videos[0].poster || slide.videos[0].src !== product.video) {
             failures.push({ path, slide: slide.id, issue: "product video missing, unposted, or wrong", videos: slide.videos });
           }
           if (!slide.repoLinks.includes(product.repo)) failures.push({ path, slide: slide.id, issue: "product case does not link its source", links: slide.repoLinks });
+          if (product.catalog && !slide.repoLinks.includes(product.catalog)) failures.push({ path, slide: slide.id, issue: "plugin case does not link its Hermes Marketplace entry", links: slide.repoLinks });
           if (slide.spaceRibbon !== 0 || slide.space) failures.push({ path, slide: slide.id, issue: "product case must not claim a Space" });
           if (slide.casePage !== `/use-cases/${slide.id}/`) failures.push({ path, slide: slide.id, issue: "case page link does not match the case", casePage: slide.casePage });
           continue;
@@ -594,8 +612,8 @@ async function checkUseCaseShowcase(origin) {
         }
       }
 
-      // The product case's video must stop too when the reader moves on.
-      for (const id of Object.keys(DEMOSCENE_CASES)) {
+      // Each product case's video must stop too when the reader moves on.
+      for (const id of Object.keys(PRODUCT_CASES)) {
         await page.goto(`${origin}${path}#${id}`, { waitUntil: "load" });
         const started = await page.evaluate(async (caseId) => {
           const video = document.querySelector(`[data-use-case-case="${caseId}"] video`);
@@ -674,10 +692,10 @@ async function checkUseCaseShowcase(origin) {
   return failures;
 }
 
-// The product case page opens on its video: the cue sheet has to seek it and
+// A product case page opens on its video: the cue sheet has to seek it and
 // mark the scene on screen, and the plain captures open in the viewer.
 async function checkProductPage(page, caseId) {
-  const product = DEMOSCENE_CASES[caseId];
+  const product = PRODUCT_CASES[caseId];
   const path = `/use-cases/${caseId}/`;
   const failures = [];
   const detail = await page.evaluate(() => {
@@ -696,6 +714,10 @@ async function checkProductPage(page, caseId) {
       metrics: root.querySelectorAll(".use-case-proof__metric").length,
       constraints: root.querySelectorAll(".use-case-proof__constraint").length,
       captures: root.querySelectorAll(".use-case-demoscene__capture [data-use-case-lightbox]").length,
+      // A capture whose declared size is not its own is drawn at the wrong shape.
+      misSized: [...root.querySelectorAll(".use-case-demoscene__capture img")]
+        .filter((img) => img.naturalWidth && (img.naturalWidth !== Number(img.getAttribute("width")) || img.naturalHeight !== Number(img.getAttribute("height"))))
+        .map((img) => img.getAttribute("src")),
       annotated: root.querySelectorAll(".use-case-showcase__marker").length,
       links: [...root.querySelectorAll(".use-case-doc-link")].map((link) => link.getAttribute("href")),
       otherCases: root.querySelectorAll(".use-case-detail__nav a").length,
@@ -708,9 +730,11 @@ async function checkProductPage(page, caseId) {
   if (detail.videos !== 1 || !detail.poster || detail.src !== product.video) failures.push({ path, issue: "product video missing, unposted, or wrong", ...detail });
   if (detail.cues.length !== product.cues) failures.push({ path, issue: `expected ${product.cues} video cues`, found: detail.cues.length });
   if (detail.metrics !== 6 || detail.constraints !== 6) failures.push({ path, issue: "expected 6 metrics and 6 constraints", metrics: detail.metrics, constraints: detail.constraints });
-  if (detail.captures < product.minCaptures) failures.push({ path, issue: `expected at least ${product.minCaptures} app captures`, found: detail.captures });
+  if (detail.captures !== product.captures) failures.push({ path, issue: `expected ${product.captures} app captures`, found: detail.captures });
+  if (detail.misSized.length) failures.push({ path, issue: "capture width/height do not match the image", images: detail.misSized });
   if (detail.annotated !== 0) failures.push({ path, issue: "product page must not carry annotation markers", found: detail.annotated });
   if (!detail.links.includes(product.repo)) failures.push({ path, issue: "product page does not link its source", links: detail.links });
+  if (product.catalog && !detail.links.includes(product.catalog)) failures.push({ path, issue: "plugin page does not link its Hermes Marketplace entry", links: detail.links });
   if (detail.otherCases !== ALL_CASES.length - 1) failures.push({ path, issue: `expected links to the other ${ALL_CASES.length - 1} cases`, found: detail.otherCases });
 
   // Media metadata is measured from the file itself, independent of the page:
@@ -789,7 +813,7 @@ async function checkUseCasePages(origin) {
         failures.push({ path: `/use-cases/${caseId}/`, issue: "case page not served", status });
         continue;
       }
-      if (DEMOSCENE_CASES[caseId]) {
+      if (PRODUCT_CASES[caseId]) {
         failures.push(...(await checkProductPage(page, caseId)));
         continue;
       }
@@ -918,22 +942,28 @@ async function checkUseCasePages(origin) {
 
     // The home page has to reach the case pages, not only the carousel.
     await page.goto(`${origin}/`, { waitUntil: "load" });
-    // The eight apps are cards; the product case is featured in its own band.
+    // The apps are cards; each product is featured in its own band.
     const home = await page.evaluate(() => {
       const caseLink = (href) => /^\/use-cases\/[a-z0-9-]+\/$/.test(href || "");
       return {
         cards: [...document.querySelectorAll(".home-section .ui-card a")].map((link) => link.getAttribute("href")).filter(caseLink),
-        band: [...document.querySelectorAll("[data-home-demoscene] a")].map((link) => link.getAttribute("href")),
-        bandPoster: Boolean(document.querySelector("[data-home-demoscene] img")?.getAttribute("src")),
+        bands: [...document.querySelectorAll("[data-home-demoscene]")].map((band) => ({
+          id: band.dataset.homeProduct,
+          links: [...band.querySelectorAll("a")].map((link) => link.getAttribute("href")),
+          poster: Boolean(band.querySelector("img")?.getAttribute("src")),
+        })),
       };
     });
-    const apps = ALL_CASES.filter((id) => !DEMOSCENE_CASES[id]).map((id) => `/use-cases/${id}/`);
+    const apps = ALL_CASES.filter((id) => !PRODUCT_CASES[id]).map((id) => `/use-cases/${id}/`);
     if (JSON.stringify([...home.cards].sort()) !== JSON.stringify([...apps].sort())) {
       failures.push({ path: "/", issue: "home page cards do not link exactly the app case pages", found: home.cards });
     }
-    for (const id of Object.keys(DEMOSCENE_CASES)) {
-      if (!home.band.length || !home.band.every((href) => href === `/use-cases/${id}/`) || !home.bandPoster) {
-        failures.push({ path: "/", issue: `home page does not feature ${id} with its poster`, band: home.band });
+    if (JSON.stringify(home.bands.map((band) => band.id)) !== JSON.stringify(Object.keys(PRODUCT_CASES))) {
+      failures.push({ path: "/", issue: "home page bands do not feature exactly the products, in order", found: home.bands.map((band) => band.id) });
+    }
+    for (const band of home.bands) {
+      if (!band.links.length || !band.links.every((href) => href === `/use-cases/${band.id}/`) || !band.poster) {
+        failures.push({ path: "/", issue: `home page does not feature ${band.id} with its poster`, band });
       }
     }
 

@@ -953,16 +953,19 @@
         - text: "Pharmacies carry crates, a delivery window, and an unloading time."
           top: 76.5
           left: 10.9
-# Planner123 is the one case that is a product rather than a web demo: a
-# terminal calendar built on SolverForge. `variant: demoscene` swaps the
-# narrated walkthrough and annotated captures for its video from
-# solverforge-demoscene (planner123_06), a cue sheet that seeks the video, and
-# plain captures of the real app. Copy describes what the reader sees on
-# screen, never how the video was made. Cue times are
-# seconds into the video; each label is that time rounded to m:ss.
+# Products built on SolverForge, rather than web demos, close the list:
+# Planner123 (a terminal calendar) and the two Hermes Agent plugins.
+# `variant: product` swaps the narrated walkthrough and annotated captures for
+# the product's own video, a cue sheet that seeks it, and plain captures of the
+# real app; `ribbon` names what kind of product it is on the selector tab, and
+# `home` is its band on the home page. Copy describes what the reader sees on
+# screen, never how the video was made. Cue times are seconds into the video;
+# each label is that time rounded to m:ss. Capture `width`/`height` are the
+# image's own pixels, so captures that are not 16:9 keep their shape.
 - id: planner123
   label: "Planner123"
-  variant: demoscene
+  variant: product
+  ribbon: "Terminal"
   eyebrow: "Built on SolverForge · personal planning"
   title: "Your tasks, your meetings, your hours. One week you approve."
   intro: "Planner123 is a keyboard-driven terminal calendar with a SolverForge planner built in. It reads your real calendar, places unscheduled tasks inside the hours you declared, and writes nothing until you approve the proposal."
@@ -992,6 +995,11 @@
     poster: "/images/use-cases/planner123-demoscene-poster.png"
     label: "Planner123 · 1:47"
     copy: "A week planned to a soundtrack: the inbox fills, the planner proposes a slot for every task, and one key writes the plan into the calendar."
+  home:
+    watch: "Watch Planner123 plan a week"
+    heading: "Planner123: a calendar that plans your week."
+    copy: "It runs in your terminal, keeps your events in a local file, and changes nothing until you approve the proposal."
+    cta: "Watch it plan a week"
   cues:
     - { at: 0, label: "0:00", key: "planner123", text: "A CRT powers on and the app redraws the terminal row by row while its database loads." }
     - { at: 7.68, label: "0:08", key: "", text: "The week loads one event per eighth note, with copper bars behind the hour grid." }
@@ -1019,3 +1027,155 @@
       badge: "Proposal"
       alt: "Planner123 proposal preview with four of four tasks scheduled as dashed blocks on next week's grid."
       caption: "The proposal preview: dashed blocks are proposed, not saved, until A applies them."
+
+- id: hermes-planner
+  label: "SolverForge Planner"
+  variant: product
+  ribbon: "Hermes"
+  eyebrow: "Built on SolverForge · Hermes Agent plugin"
+  title: "Your tasks, around your meetings. On your calendar after you say yes."
+  intro: "SolverForge Planner is a Hermes Agent plugin. Ask Hermes to plan your week: it pulls your calendar, a SolverForge engine fits every task into free working time, and the plan reaches your calendar only after you approve it."
+  repo_url: "https://github.com/blackopsrepl/hermes-solverforge-planner"
+  catalog_url: "https://hermes-agent.nousresearch.com/marketplace/solverforge-planner"
+  icon: "fa-solid fa-calendar-check"
+  teaser_metric: "14 constraints / 15 Hermes tools / 0hard before apply"
+  teaser_copy: "A Hermes plugin that plans your tasks into your week around your meetings, deadlines, and focus hours."
+  metrics:
+    - ["14", "Constraints"]
+    - ["10 / 2 / 2", "Hard / medium / soft"]
+    - ["1", "Planning variable"]
+    - ["5 s", "Solve budget"]
+    - ["15", "Hermes tools"]
+    - ["planner.ics", "Local calendar"]
+  body:
+    - "You tell Hermes what needs doing in plain words: durations, deadlines, task order, the hours you work and the hours you focus best. Hermes pulls your cloud calendar as busy time, the engine places every task it can, and the plan card in the chat shows the score and each block on the week. A score of 0hard means no hard rule is broken; when a task cannot fit, you are told which one and why."
+    - "Nothing is written until you approve the exact blocks. Applying puts the plan on the planner's own local calendar; pushing puts it on yours through the calendar tool Hermes already uses. Every block has a fixed event ID, so pushing twice adds nothing, and the planner only ever creates, moves, or deletes its own events. In Hermes Desktop the week and the tasks dock in a pane beside the chat, which opens from the plan card or the status-bar chip."
+  constraints:
+    - ["Busy time", "No task overlaps a pulled calendar event or another task."]
+    - ["Working hours", "Every minute of a task lies inside the hours you declared."]
+    - ["Time bounds", "Never in the past, never before an earliest start, never after a hard deadline."]
+    - ["Task order", "Predecessors are placed and finish first, including blocks already on your plan."]
+    - ["Priority and lateness", "Medium level: unplaced tasks cost by priority, soft-deadline lateness by the minute."]
+    - ["Focus", "Soft level: demanding work prefers your focus window and gets a break after it."]
+  runtime:
+    video: "/videos/use-cases/hermes-solverforge-planner-demo.mp4"
+    poster: "/images/use-cases/hermes-planner-pane.png"
+    label: "SolverForge Planner · 1:24"
+    copy: "A real Hermes Desktop session on a calendar with 14 meetings: four tasks placed at 0hard, approved, and pushed to Google Calendar; asking again adds nothing."
+  home:
+    watch: "Watch SolverForge Planner plan a week in Hermes"
+    heading: "SolverForge Planner: your week, planned by Hermes."
+    copy: "A Hermes Agent plugin. Hermes pulls your calendar, the solver fits your tasks around the meetings, and nothing reaches your calendar until you approve it."
+    cta: "Watch it plan a week"
+  cues:
+    - { at: 0, label: "0:00", key: "", text: "One command installs the plugin." }
+    - { at: 3, label: "0:03", key: "", text: "Your week is a constraint problem: tasks dropped on top of meetings break hard rules." }
+    - { at: 7.5, label: "0:08", key: "", text: "SolverForge moves every task into free time around the meetings." }
+    - { at: 12, label: "0:12", key: "", text: "In Hermes Desktop, you ask in plain words for a week planned around your calendar." }
+    - { at: 17, label: "0:17", key: "", text: "Hermes pulls the calendar, and SolverForge fits every task around the meetings." }
+    - { at: 23, label: "0:23", key: "", text: "The plan card reads 0hard and shows where every task lands: no meeting hit, no deadline missed." }
+    - { at: 32, label: "0:32", key: "", text: "Nothing is written until you approve it." }
+    - { at: 38.5, label: "0:39", key: "", text: "Hermes puts the plan on your Google calendar with your own Google tool." }
+    - { at: 48.5, label: "0:49", key: "", text: "Asked again, it adds nothing: every event has a fixed ID." }
+    - { at: 58.5, label: "0:59", key: "", text: "Next week: your meetings, with the tasks fitted in between." }
+    - { at: 72, label: "1:12", key: "", text: "Every hard rule kept, nothing written without your yes." }
+  captures:
+    - image: "/images/use-cases/hermes-planner-pane.png"
+      width: 1600
+      height: 900
+      badge: "Plan"
+      alt: "Hermes Desktop with a request to plan next week, the plan card scored 0hard/0medium/0soft with four tasks placed, and the Planner pane beside the chat showing the proposal over the week's meetings."
+      caption: "The plan card in the chat, and the proposal over your week in the pane beside it."
+    - image: "/images/use-cases/hermes-planner-approval.png"
+      width: 1600
+      height: 900
+      badge: "Approval"
+      alt: "Hermes asking for approval to put four blocks on the planner's calendar, listing each block with its day and time, with Reject and Run."
+      caption: "Applying asks first and lists the exact blocks it will write."
+    - image: "/images/use-cases/hermes-planner-applied.png"
+      width: 1600
+      height: 900
+      badge: "Applied"
+      alt: "After approval: Hermes confirms the four blocks and offers an .ics file, and the Planner pane shows them on the week among the meetings."
+      caption: "The blocks on the planner's calendar, with an .ics to import anywhere."
+    - image: "/images/use-cases/hermes-planner-tasks.png"
+      width: 1600
+      height: 900
+      badge: "Tasks"
+      alt: "The Tasks tab of the Planner pane: nothing waiting, and four tasks on the calendar by day with duration, priority, and deadline."
+      caption: "What waits for a plan, and what is on your calendar, day by day."
+
+- id: hermes-routing
+  label: "SolverForge Routing"
+  variant: product
+  ribbon: "Hermes"
+  eyebrow: "Built on SolverForge · Hermes Agent plugin"
+  title: "Tell Hermes where you need to go. Get the order, on real roads."
+  intro: "SolverForge Routing is a Hermes Agent plugin for personal multi-stop driving trips. Hermes finds the places, a SolverForge engine orders the stops on OpenStreetMap roads, and the road map opens beside the conversation."
+  repo_url: "https://github.com/blackopsrepl/hermes-solverforge-routing"
+  catalog_url: "https://hermes-agent.nousresearch.com/marketplace/solverforge-routing"
+  icon: "fa-solid fa-route"
+  teaser_metric: "1 list variable / OpenStreetMap roads / 15 Hermes tools"
+  teaser_copy: "A Hermes plugin that orders your stops on real roads and repairs the trip when your plans change."
+  metrics:
+    - ["2", "Constraints"]
+    - ["1 / 1", "Hard / soft"]
+    - ["1", "List variable"]
+    - ["2 s", "Default solve budget"]
+    - ["15", "Hermes tools"]
+    - ["OSM", "Road network"]
+  body:
+    - "You give Hermes the places, a start, and where the day should end. It searches each place, shows the matches with their type, locality, and distance, and adds nothing until you confirm. The engine builds a road graph from OpenStreetMap with solverforge-maps, and the same graph supplies the travel-time matrix and the geometry of each hop, so the map draws the roads you would drive."
+    - "Plans change in the conversation: skip a stop, choose the first visit, add a place, finish somewhere else. The trip is repaired, keeping visited stops, the next visit, and any before rules, and an older solve never overwrites a newer edit. Results are labelled best-found, not proven optimal. The itinerary opens in Google Maps, Apple Maps, or OpenStreetMap, or on your phone through one QR code at a time."
+  constraints:
+    - ["Every stop once", "The list variable holds each remaining visit exactly once."]
+    - ["Drivable hops", "A hop the road graph cannot drive is a hard violation."]
+    - ["Next visit", "A visit you lock as next comes right after the start."]
+    - ["Before rules", "A stop you want visited before another stays before it."]
+    - ["Trip ends", "Back to the start on a round trip, or at the destination you fixed."]
+    - ["Driving time", "Soft level: the directed sum of travel seconds on the road matrix."]
+  runtime:
+    video: "/videos/use-cases/hermes-solverforge-routing-demo.mp4"
+    poster: "/images/use-cases/hermes-routing-trip.png"
+    label: "SolverForge Routing · 1:28"
+    copy: "A day around Cortina d'Ampezzo: six places in a 42.7 km round trip, then skip a stop and visit Vinigo first, and the trip becomes five stops and 44.8 km, ending on the phone handoff."
+  home:
+    watch: "Watch SolverForge Routing plan a day of driving in Hermes"
+    heading: "SolverForge Routing: your stops, in order, on real roads."
+    copy: "A Hermes Agent plugin. Hermes finds the places, the solver orders them on OpenStreetMap roads, and the trip is repaired when your plans change."
+    cta: "Watch it plan a trip"
+  cues:
+    - { at: 0, label: "0:00", key: "", text: "A day around Cortina: six places to visit and a hotel to return to." }
+    - { at: 10, label: "0:10", key: "", text: "The whole trip goes into one message; Hermes finds each place so you can check the match." }
+    - { at: 24, label: "0:24", key: "", text: "With the right places confirmed, you ask for the round trip." }
+    - { at: 34, label: "0:34", key: "", text: "The road map opens beside the conversation, the itinerary underneath." }
+    - { at: 38, label: "0:38", key: "", text: "Six stops, the roads between them, and about 48 minutes of driving back to the hotel." }
+    - { at: 47, label: "0:47", key: "", text: "Plans change: leave out the basilica and go to Vinigo first, without starting over." }
+    - { at: 65, label: "1:05", key: "", text: "The repaired trip starts at Vinigo and still ends at the hotel: five stops, 44.8 km." }
+    - { at: 77, label: "1:17", key: "", text: "Choose the maps app, scan the code, and take the trip with you." }
+    - { at: 84, label: "1:24", key: "", text: "SolverForge Routing, a plugin for Hermes Agent." }
+  captures:
+    - image: "/images/use-cases/hermes-routing-places.png"
+      width: 1600
+      height: 900
+      badge: "Places"
+      alt: "Hermes asking which Darsena is meant, listing three matches with their area and distance from the start, the Navigli basin recommended."
+      caption: "An ambiguous place is a question for you, not a guess."
+    - image: "/images/use-cases/hermes-routing-trip.png"
+      width: 1600
+      height: 900
+      badge: "Trip"
+      alt: "The route pane beside the chat: a road map of Milan with numbered stops, 22 min and 14.6 km for four stops on a round trip, 7 min shorter than the order given."
+      caption: "Four stops on Milan's roads: 22 min, 14.6 km, 7 min shorter than the order you gave."
+    - image: "/images/use-cases/hermes-routing-repaired.png"
+      width: 1600
+      height: 900
+      badge: "Repaired"
+      alt: "After asking to visit Arco della Pace before Castello Sforzesco: the map redrawn and the change listed as two stops changed position, one minute longer."
+      caption: "A before rule, kept: the trip is repaired and the change is listed."
+    - image: "/images/use-cases/hermes-routing-handoff.png"
+      width: 1600
+      height: 900
+      badge: "Handoff"
+      alt: "Google Maps and Apple Maps links under the map, a choice between iPhone and Android, and one QR code that opens the Apple Maps app."
+      caption: "Open the trip in a maps app, or scan one code on your phone."

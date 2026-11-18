@@ -128,28 +128,34 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
     </p>
     <div class="card-grid">
       <% site.data.use_cases.each do |use_case| %>
-        <% next if use_case["variant"] == "demoscene" %>
+        <% next if use_case["variant"] == "product" %>
         <%= render Ui::Card.new(title: use_case["label"], href: relative_url("/use-cases/#{use_case["id"]}/"), eyebrow: use_case["teaser_metric"], icon: use_case["icon"]) do %>
 <%= use_case["teaser_copy"] %>
         <% end %>
       <% end %>
     </div>
-    <% product = site.data.use_cases.find { |use_case| use_case["variant"] == "demoscene" } %>
-    <% if product %>
-      <div class="home-demoscene" data-home-demoscene>
-        <a class="home-demoscene__poster" href="<%= relative_url("/use-cases/#{product["id"]}/") %>" aria-label="Watch <%= product["label"] %> plan a week">
+    <%
+      # Products built on SolverForge are featured beside the apps rather than
+      # counted among them: the first gets the wide band, the rest share a row.
+      products = site.data.use_cases.select { |use_case| use_case["variant"] == "product" }
+    %>
+    <% products.each_with_index do |product, index| %>
+      <% if index == 1 %><div class="home-products"><% end %>
+      <div class="<%= ["home-demoscene", ("home-demoscene--compact" unless index.zero?)].compact.join(" ") %>" data-home-demoscene data-home-product="<%= product["id"] %>">
+        <a class="home-demoscene__poster" href="<%= relative_url("/use-cases/#{product["id"]}/") %>" aria-label="<%= product["home"]["watch"] %>">
           <img src="<%= relative_url(product["runtime"]["poster"]) %>" alt="" width="1280" height="720" loading="lazy" />
-          <span class="home-demoscene__play"><i class="fa-solid fa-play"></i> 1:47</span>
+          <span class="home-demoscene__play"><i class="fa-solid fa-play"></i> <%= product["runtime"]["label"].split(" · ").last %></span>
         </a>
         <div>
-          <p class="page-shell__eyebrow">Built on SolverForge</p>
-          <h3><%= product["label"] %>: a calendar that plans your week.</h3>
-          <p><%= product["teaser_copy"] %> It runs in your terminal, keeps your events in a local file, and changes nothing until you approve the proposal.</p>
+          <p class="page-shell__eyebrow"><%= product["eyebrow"] %></p>
+          <h3><%= product["home"]["heading"] %></h3>
+          <p><%= index.zero? ? "#{product["teaser_copy"]} #{product["home"]["copy"]}" : product["home"]["copy"] %></p>
           <a class="button button--secondary" href="<%= relative_url("/use-cases/#{product["id"]}/") %>">
-            Watch it plan a week <i class="fa-solid fa-play"></i>
+            <%= product["home"]["cta"] %> <i class="fa-solid fa-play"></i>
           </a>
         </div>
       </div>
+      <% if index.positive? && index == products.length - 1 %></div><% end %>
     <% end %>
     <div class="button-row">
       <a class="button button--primary" href="<%= relative_url '/use-cases/' %>">
