@@ -72,7 +72,7 @@ def expected_version_output
     CLI version: #{ReleasePins::CLI}
     Scaffold runtime target: SolverForge crate target #{ReleasePins::CLI_SCAFFOLD_RUNTIME}
     Scaffold UI target: solverforge-ui #{ReleasePins::UI}
-    Scaffold maps target: solverforge-maps #{ReleasePins::MAPS}
+    Scaffold maps target: solverforge-maps #{ReleasePins::CLI_SCAFFOLD_MAPS}
   TEXT
 end
 

@@ -561,7 +561,7 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-maps/index.md" => [
     "This section tracks the published `solverforge-maps #{ReleasePins::MAPS}` crate.",
-    "web scaffolds pin the same `solverforge-maps #{ReleasePins::MAPS}`",
+    "web scaffolds declare `solverforge-maps = \"#{ReleasePins::CLI_SCAFFOLD_MAPS}\"`",
     "**Car-legal road graphs**", "**Street names on every route**", "**Access-aware snapping**"
   ],
   "src/docs/solverforge-maps/routing.md" => [
@@ -574,11 +574,11 @@ crates.io on 2026-10-14",
   ],
   "src/docs/solverforge-maps/caching.md" => ["cache version `7`"],
   "src/_posts/releases/2026-11-06-solverforge-maps-2-2-2-3-x.md" => [
-    "**solverforge-maps #{ReleasePins::MAPS} was published on November 6, 2026**",
-    "42302645377", "42302643785", "42302638820", "`4ce9dd1`",
-    "`2.3.3` | 2026-11-06", "`2.3.2` | 2026-11-06", "`2.3.1` | 2026-11-06",
+    "**solverforge-maps #{ReleasePins::MAPS} was published on November 18, 2026**",
+    "44396715207", "44396715198", "44394585321", "`79edff5`",
+    "`2.3.4` | 2026-11-18", "`2.3.3` | 2026-11-06", "`2.3.2` | 2026-11-06", "`2.3.1` | 2026-11-06",
     "`2.3.0` | 2026-11-06", "`2.2.0` | 2026-11-06",
-    "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-maps = { version = \"#{ReleasePins::MAPS}\" }` |"
+    "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-maps = { version = \"#{ReleasePins::CLI_SCAFFOLD_MAPS}\" }` |"
   ],
   "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => [
     "Historical release note", "/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/",

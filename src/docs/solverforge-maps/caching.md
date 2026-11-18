@@ -18,9 +18,15 @@ weight: 4
 
 Repeat runs for the same service area can become much faster after the first network build.
 
+Both caches also serve a smaller region: when the requested bounding box lies
+inside one already cached, `load_or_fetch` uses the smallest cached region that
+covers it instead of downloading. An itinerary that loses a stop shrinks its
+box and still needs no new fetch; one that reaches past every cached region is
+downloaded.
+
 The file cache is versioned. A release that changes how the graph is built
 moves the cache version, and regions cached under the old version are fetched
-and rebuilt on first use. `solverforge-maps 2.3.3` writes cache version `7`.
+and rebuilt on first use. `solverforge-maps 2.3.4` writes cache version `7`.
 
 ## Inspect Cache Stats
 

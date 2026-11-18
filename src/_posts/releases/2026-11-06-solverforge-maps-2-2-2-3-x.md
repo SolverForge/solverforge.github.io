@@ -8,15 +8,15 @@ description: >
   off one-way fragments and closed stubs.
 ---
 
-**solverforge-maps 2.3.3 was published on November 6, 2026**, following
-`solverforge-maps 2.1.5`. It is available on
-[crates.io](https://crates.io/crates/solverforge-maps/2.3.3), documented on
-[docs.rs](https://docs.rs/solverforge-maps/2.3.3), and tagged in the
-[source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.3.3).
-Its [Publish](https://github.com/SolverForge/solverforge-maps/actions/runs/42302645377),
-[Release](https://github.com/SolverForge/solverforge-maps/actions/runs/42302643785),
-and [CI](https://github.com/SolverForge/solverforge-maps/actions/runs/42302638820)
-workflows passed at `4ce9dd1`.
+**solverforge-maps 2.3.4 was published on November 18, 2026**, following
+`solverforge-maps 2.3.3`. It is available on
+[crates.io](https://crates.io/crates/solverforge-maps/2.3.4), documented on
+[docs.rs](https://docs.rs/solverforge-maps/2.3.4), and tagged in the
+[source repository](https://github.com/SolverForge/solverforge-maps/tree/v2.3.4).
+Its [Publish](https://github.com/SolverForge/solverforge-maps/actions/runs/44396715207),
+[Release](https://github.com/SolverForge/solverforge-maps/actions/runs/44396715198),
+and [CI](https://github.com/SolverForge/solverforge-maps/actions/runs/44394585321)
+workflows passed at `79edff5`.
 
 This note covers the 2.2 and 2.3 lines. Patch releases are folded into it
 instead of published as separate release-note pages.
@@ -95,7 +95,7 @@ Regions cached under an older version are fetched and rebuilt on first use.
 
 | Product | Version | Maps dependency |
 | ------- | ------- | --------------- |
-| `solverforge-maps` | `2.3.3` | current |
+| `solverforge-maps` | `2.3.4` | current |
 | `solverforge-cli` web scaffold | `4.2.0` | `solverforge-maps = { version = "2.3.3" }` |
 | `solverforge-deliveries` | `3.0.1` | `solverforge-maps 2.1.5` |
 | `solverforge-fsr` | `3.0.1` | `solverforge-maps 2.1.5` |
@@ -106,6 +106,7 @@ The released use-case apps keep the maps version their tags pin.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `2.3.4` | 2026-11-18 | An area inside one already cached, in memory or on disk, is served from that cache instead of downloaded again, so an itinerary that loses a stop needs no new Overpass fetch. `BoundingBox::contains_bbox()` is public. |
 | `2.3.3` | 2026-11-06 | Access-aware snapping prefers the candidate on the largest connected component, so a stop beside a closed stub stays reachable. |
 | `2.3.2` | 2026-11-06 | `SnapAccess` is re-exported at the crate root. |
 | `2.3.1` | 2026-11-06 | Adds `SnapAccess`, `compute_matrix_with_access()` and `snap_road_index_with_access()`; `route()` snaps its start as leaving and its end as arriving. |
@@ -116,7 +117,7 @@ The released use-case apps keep the maps version their tags pin.
 
 ```toml
 [dependencies]
-solverforge-maps = "2.3.3"
+solverforge-maps = "2.3.4"
 ```
 
 - Expect different travel times than 2.1 in areas with ramps, roundabouts, or

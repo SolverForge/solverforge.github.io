@@ -80,7 +80,7 @@ and [release/PyPI publication](https://github.com/SolverForge/solverforge-py/act
 passed at `22833923229c008a70c385e05c76072a5d87c75f`. See the
 [0.7.x Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
 The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
-`solverforge-maps 2.3.3`; both SolverForge agent skills live in the
+`solverforge-maps 2.3.4`; both SolverForge agent skills live in the
 `solverforge-cli` repository.
 <% end %>
 

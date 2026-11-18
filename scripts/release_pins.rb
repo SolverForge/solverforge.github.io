@@ -15,7 +15,7 @@ module ReleasePins
     "solverforge" => "0.31.2",
     "solverforge-cli" => "4.2.0",
     "solverforge-ui" => "0.9.1",
-    "solverforge-maps" => "2.3.3"
+    "solverforge-maps" => "2.3.4"
   }.freeze
 
   RUNTIME = CURRENT.fetch("solverforge")
@@ -27,6 +27,11 @@ module ReleasePins
   # src/scaffold_target.rs (RUNTIME_CRATE_VERSION). It moves with the CLI pin,
   # independently of RUNTIME, because the CLI and the core publish separately.
   CLI_SCAFFOLD_RUNTIME = "0.31.2"
+
+  # The maps crate the published CLI's web scaffolds declare, read from its
+  # src/scaffold_target.rs (MAPS_TARGET_LABEL). Like the runtime, it moves with
+  # the CLI pin, not with MAPS: a maps patch publishes on its own.
+  CLI_SCAFFOLD_MAPS = "2.3.3"
 
   module_function
 
