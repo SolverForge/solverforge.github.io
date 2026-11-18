@@ -25,7 +25,7 @@ description: Build inspectable planning, scheduling, routing, and allocation sof
     <div class="home-proof">
       <span>Apache-2.0, no account or licence key</span>
       <span>Scalar and list planning variables</span>
-      <span>Eight worked planning apps</span>
+      <span>Nine worked planning apps</span>
     </div>
   </section>
 
@@ -176,7 +176,7 @@ Inspect the zero-erasure runtime, phases, moves, and score analysis tools.
         </li>
         <li>
           <strong>Track record</strong>
-          <span>Eight worked <a href="<%= relative_url '/use-cases/' %>">use cases</a>, the <a href="<%= relative_url '/blog/' %>">release notes</a> for every line, and the full source on GitHub.</span>
+          <span>Nine worked use cases in the <a href="https://github.com/SolverForge/solverforge-usecases">use-case repository</a>, eight of them in the <a href="<%= relative_url '/use-cases/' %>">showcase</a>, the <a href="<%= relative_url '/blog/' %>">release notes</a> for every line, and the full source on GitHub.</span>
         </li>
       </ul>
       <div class="button-row">

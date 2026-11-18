@@ -10,29 +10,32 @@ weight: 2
 
 <%= render Ui::Callout.new do %>
 SolverForge is a **production-ready constraint solver** written in Rust. This
-documentation tracks the `solverforge 0.27.0` release and keeps core,
+documentation tracks the `solverforge 0.31.2` release and keeps core,
 CLI scaffold targets, UI assets, maps, and Python bindings separate.
-`cargo add solverforge` installs 0.27.0, and docs.rs serves the 0.27.0 API.
+`cargo add solverforge` installs 0.31.2, and docs.rs serves the 0.31.2 API.
 Rust `1.95` remains the workspace floor.
 
-`v0.27.0` points to `6ffcacabf117f9a5adf9abd4f4f96c01b9235859`. Its
-[CI run](https://github.com/SolverForge/solverforge/actions/runs/43416730323)
-passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/43417890887)
+`v0.31.2` points to `78889c3ff9fda158c70e6a1f67f8c7f0fdae922e`. Its
+[CI run](https://github.com/SolverForge/solverforge/actions/runs/44182372301)
+passed, and its [Release workflow](https://github.com/SolverForge/solverforge/actions/runs/44185759448)
 re-ran CI on Linux, macOS, and Windows with the Miri, MSRV, docs, and package
 jobs, verified the release, published all nine crates to crates.io, and
-created the GitHub Release. 0.27.0 reads CVRP leg distances through a
-pluggable `RouteMetric` (a `DenseMatrix` of supplied tables or an
-`EuclideanMetric` computed from coordinates), bounds Clarke-Wright savings to
-each stop's nearest neighbours with `savings_neighbors`, keeps Clarke-Wright
-owner admission incremental, and opens the scalar swap cursor in linear time.
-See the [0.27.x release note](/blog/releases/2026/11/13/solverforge-0-27-x/)
-for the breaking change and upgrade checklist; the
-[0.26.x release note](/blog/releases/2026/11/10/solverforge-0-26-x/) covers
-the replica-director, debug-info, and late-acceptance changes of the previous
-line.
+created the GitHub Release. The 0.31 line moves and constructs list element
+groups as units, computes joint cascading groups together, rescores only the
+list-shadow rows a move changes, completes fixed fleets after Clarke-Wright,
+and picks the default search effort, family weights, and construction budget
+from benchmark runs. Constraint matches name each entity by its planning id
+(0.29.0), describe it without a copy (0.28.0), and cascading list shadows
+follow dependencies across owners (0.30.0). See the
+[0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/) for the
+upgrade checklist; the
+[0.30.x](/blog/releases/2026/11/15/solverforge-0-30-x/),
+[0.29.x](/blog/releases/2026/11/14/solverforge-0-29-x/), and
+[0.28.x](/blog/releases/2026/11/14/solverforge-0-28-x/) release notes cover the
+lines since 0.27.0.
 
-The independently published CLI line is `solverforge-cli 4.0.4`. Fresh
-scaffolds target `solverforge 0.26.1`, with `solverforge-ui 0.9.1` and
+The independently published CLI line is `solverforge-cli 4.2.0`. Fresh
+scaffolds target `solverforge 0.31.2`, with `solverforge-ui 0.9.1` and
 `solverforge-maps 2.3.3` for the web shell and `rmcp 3.9.0` for the MCP shell.
 A generated project declares its constraint modules in
 `src/constraints/mod.rs` and assembles them in `src/constraints/assemble.rs`;
@@ -40,30 +43,32 @@ every `mod.rs` and `lib.rs` holds only declarations, which `check` enforces.
 A fresh scaffold solves its empty plan through the runtime's default pipeline,
 generated code is rustfmt-clean, `--field` types are imported, and `check`
 states that it does not compile the project. Generated constraint skeletons
-still panic until their placeholders are replaced. The 4.0.4
-[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/42960004422)
-and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/42960004417)
+still panic until their placeholders are replaced, and generated telemetry
+carries the resolved phase plan once a solve ends. The 4.2.0
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/44268681409)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/44268681516)
 workflows and the exact-commit
-[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/42960000938)
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/44268676566)
 on Linux, macOS, Windows, and integration tests passed at
-`5d879665ec375b154d72f00dfcadf8613216b159`. See the
-[4.0.x CLI release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/).
-Apps scaffolded by earlier releases pin older cores (`0.26.0` from 4.0.2 and
-4.0.3, `0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0,
+`8a5c3e206fcbcffb5c44f68b5b23f29d263c185d`. See the
+[4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/).
+Apps scaffolded by earlier releases pin older cores (`0.31.1` from 4.1.0, `0.26.1` from
+4.0.4, `0.26.0` from 4.0.2 and 4.0.3, `0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0,
 `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0) and keep
 constraint assembly in `src/constraints/mod.rs` until moved, and an app moves
 to a newer core line only when deliberately upgraded and validated.
 
-The worked-use-case bundle ships eight apps on `solverforge 0.26.1` and
-`solverforge-ui 0.9.0`, in the CLI 4 constraint layout:
-`solverforge-hospital@3.0.4`, `solverforge-lessons@3.0.4`,
-`solverforge-deliveries@3.0.5`, `solverforge-fsr@3.0.5`,
-`solverforge-furnace@4.0.2`, `solverforge-orders@0.3.4`,
-`solverforge-fleet@0.2.4`, and `solverforge-flightcrew@0.3.5`. Furnace
-reports snake_case constraint ids. The four Space-backed apps' release-tag sync
-workflows succeeded. Bundle CI passed at the final app tag,
-`solverforge-orders@0.3.4`
-([run 42958108105](https://github.com/SolverForge/solverforge-usecases/actions/runs/42958108105)).
+The worked-use-case bundle ships nine apps on `solverforge 0.31.2` and
+`solverforge-ui 0.9.1`, in the CLI 4 constraint layout:
+`solverforge-hospital@3.0.6`, `solverforge-lessons@3.0.6`,
+`solverforge-deliveries@3.0.7`, `solverforge-fsr@3.0.7`,
+`solverforge-furnace@4.0.3`, `solverforge-orders@0.3.5`,
+`solverforge-fleet@0.2.5`, `solverforge-flightcrew@0.3.6`, and
+`solverforge-ev@0.1.0`. Furnace reports snake_case constraint ids. The four
+Space-backed apps' release-tag sync workflows succeeded. Bundle CI passed at
+the final app tag, `solverforge-lessons@3.0.6`
+([run 44286382345](https://github.com/SolverForge/solverforge-usecases/actions/runs/44286382345)); see the
+[use-case release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/#november-18-releases-solverforge-0312).
 Furnace, Orders, Fleet, and Flight crew are repository-only. See the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
 
@@ -83,11 +88,11 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 | Component     | Status              | Description |
 | ------------- | ------------------- | ----------- |
-| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.27.0`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, replica directors built by `ScoreDirector::with_replicas`, late acceptance that keeps its history across soft-level improvements, pluggable CVRP route metrics, and bounded Clarke-Wright savings; Rust `1.95` |
-| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.0.4` targets `solverforge 0.26.1`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
+| **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.31.2`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, replica directors built by `ScoreDirector::with_replicas`, late acceptance that keeps its history across soft-level improvements, pluggable CVRP route metrics, bounded Clarke-Wright savings, list element groups, cascading list shadows across owners, constraint matches with planning ids, and a measured default search policy; Rust `1.95` |
+| **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.2.0` targets `solverforge 0.31.2`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
 | **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
-| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.4`, `solverforge-lessons@3.0.4`, `solverforge-deliveries@3.0.5`, `solverforge-fsr@3.0.5`, plus the repository-only `solverforge-furnace@4.0.2`, `solverforge-orders@0.3.4`, `solverforge-fleet@0.2.4`, and `solverforge-flightcrew@0.3.5`; all eight target `solverforge 0.26.1` and `solverforge-ui 0.9.0` |
-| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.0.4` scaffolds it directly |
+| **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.6`, `solverforge-lessons@3.0.6`, `solverforge-deliveries@3.0.7`, `solverforge-fsr@3.0.7`, plus the repository-only `solverforge-furnace@4.0.3`, `solverforge-orders@0.3.5`, `solverforge-fleet@0.2.5`, `solverforge-flightcrew@0.3.6`, and `solverforge-ev@0.1.0`; all nine target `solverforge 0.31.2` and `solverforge-ui 0.9.1` |
+| **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.2.0` scaffolds it directly |
 | **Maps** | Published | `solverforge-maps 2.3.3` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, and identifies its client to Overpass |
 
 ## Try It Today
@@ -194,11 +199,11 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 ## Runtime Notes
 
-- **Core runtime line**: these manuals describe `solverforge 0.27.0`, with
+- **Core runtime line**: these manuals describe `solverforge 0.31.2`, with
   Rust `1.95`. The
-  published `solverforge-cli 4.0.4` package targets `solverforge 0.26.1` for
+  published `solverforge-cli 4.2.0` package targets `solverforge 0.31.2` for
   fresh scaffolds; apps scaffolded by earlier releases pin older cores
-  (`0.26.0` from 4.0.2 and 4.0.3, `0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0, `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
+  (`0.31.1` from 4.1.0, `0.26.1` from 4.0.4, `0.26.0` from 4.0.2 and 4.0.3, `0.25.1` from 4.0.0 and 4.0.1, `0.25.0` from 3.9.0, `0.24.0` from 3.8.x, `0.23.0` from 3.7.x, `0.22.0` from 3.6.0, `0.19.7` from 3.3.x),
   and an app should
   move to a newer core line only when that app is deliberately upgraded and
   validated.
@@ -236,11 +241,13 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 - **List-shadow scoring**: inverse, index, previous, and next shadow writes
   retract and reinsert element rows, including clearing elements that leave all
   lists. Constraints over those rows observe the updated shadows.
-- **Grouped-scalar foraging**: grouped-scalar default local search uses
-  `AcceptedCount(256)`, the same policy as list models —
-  a step sweeps until the limit is accepted (or the union drains) and applies
-  the best. Throughput no longer depends on how fast the first improvement
-  arrives; explicitly configured foragers keep their pinned behavior.
+- **Measured default policy**: default local search collects a measured
+  number of accepted moves per step for each model shape — `AcceptedCount(4)`
+  for list models, `AcceptedCount(32)` for scalar groups and for scalar models
+  with nearby hooks or conflict repairs, 1 for other scalar models, and a
+  precedence forager ceiling of 32 — and weights list ruin and unbounded k-opt
+  1 against 4 for every other family. Explicitly configured foragers keep
+  their pinned behavior.
 - **Joined-tuple grouping**: cross-source and same-source `Tri`, `Quad`, and
   `Penta` streams expose `group_by(key, collector)`. Key closures receive one
   entity argument per binding; collector mappers receive a borrowed tuple;
@@ -419,6 +426,25 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
   `list_clarke_wright` phase scores a pair only when one element is among the
   other's K nearest, so the savings list holds about K entries per element.
   With `EuclideanMetric` the stock profile finds neighbours on a spatial grid.
+  With `phases` omitted, the default Clarke-Wright keeps 40 savings per element
+  whenever the slot declares a savings neighbour hook.
+- **List element groups**: `element_group_fn` on a list variable declares
+  elements that share one owner, such as a pick-up and its drop-off. Group
+  change, group swap, grouped ruin, and joint insertion construction move them
+  as units, bounded by `max_member_distance` and `max_group_owners`.
+- **Cascading list shadows**: `cascading_field`, `cascading_compute`, and
+  `cascading_dependencies` keep a value such as a start time correct across
+  owners after every move, recomputing only the changed elements' downstream
+  cone and rescoring only rows whose value or list structure changed;
+  `cascading_peers` computes joint groups together.
+- **Constraint matches**: `ScoreDirector::constraint_analyses()` reports every
+  constraint's matches, grouped and complemented ones included, with each
+  entity's type name, `Debug` rendering, and planning id; analysis keeps no
+  entity copies and no stream requires `Clone`.
+- **Resolved phase plan**: final telemetry reports the policy a solve ran,
+  with the reason for each default construction choice, in
+  `resolved_phase_plan`. The optional assignment pass of a time-limited solve
+  stops at a fifth of the time limit.
 - **Route and savings hooks**: custom routing list variables can still split
   route-local behavior from Clarke-Wright construction explicitly.
   `route_hooks` exports `get`, `set`, `depot`, `distance`, and `feasible`;
@@ -433,6 +459,9 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
   unassigned.
 - **Clarke-Wright completion**: `ListClarkeWright` completes unmatched
   route elements instead of dropping work when no saving merge can place them.
+  When strict savings hooks leave more routes than a fixed fleet can take, it
+  commits the routes that fit, and the default construction places the rest
+  with `list_cheapest_insertion`.
 - **Dynamic bridge crate**: `solverforge-bridge` carries host-language binding
   contracts for logical entity/fact/variable IDs, dynamic score families, and
   descriptor-resolved scalar/list slots. Python remains the first published
