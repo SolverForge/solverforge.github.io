@@ -286,7 +286,9 @@ SolverForge **0.31.2** at one 300-second budget:
 | Hospital rostering at scale | 1 | 2 | `baeaef42-44a2-4cb9-9786-0902f61e33e1` |
 | Delivery routing at scale | 1 | 2 | `5669e6b7-102d-4dd6-8cee-f40f533ed5fd` |
 
-Their instances are synthetic and carry no reference value.
+Their instances are synthetic and carry no reference value, so the results page
+ranks their solvers by score: fewer hard-constraint violations first, then lower
+soft cost.
 
 ## Official References
 

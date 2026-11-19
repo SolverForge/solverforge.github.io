@@ -20,7 +20,7 @@ module BenchmarkImport
     WITH selected AS MATERIALIZED (
       SELECT DISTINCT ON (benchmark_name)
         id, benchmark_name, completed_at, run_kind, nightly, result_count,
-        git_commit, git_dirty, solvers, time_limits_seconds
+        git_commit, git_dirty, solvers, time_limits_seconds, benchmark_category
       FROM publishable_benchmark_runs r
       WHERE run_kind = 'candidate' AND nightly IS TRUE
         AND EXISTS (SELECT 1 FROM publishable_benchmark_result_facts f WHERE f.run_id = r.id)
@@ -41,6 +41,14 @@ module BenchmarkImport
             (NULLIF(f.run_error, '') IS NOT NULL OR NULLIF(f.validation_error, '') IS NOT NULL) AS error
           FROM publishable_benchmark_result_facts f JOIN selected s ON s.id = f.run_id
         ) public_result),
+      'scale_outcomes', (SELECT json_agg(row_to_json(scale_outcome) ORDER BY benchmark_name, instance, time_limit_seconds, solver)
+        FROM (
+          SELECT f.run_id, f.benchmark_name, f.instance, f.solver, f.time_limit_seconds,
+            COALESCE(f.native_fields #>> '{solver_metadata,fresh_score}', f.native_fields ->> 'native_reported_score') AS score,
+            f.native_fields - 'solver_metadata' AS native
+          FROM publishable_benchmark_result_facts f JOIN selected s ON s.id = f.run_id
+          WHERE s.benchmark_category = 'huge_scale'
+        ) scale_outcome),
       'references', (SELECT json_agg(row_to_json(reference_catalog) ORDER BY benchmark_name, instance)
         FROM (
           SELECT c.benchmark_name, c.dataset, c.instance, c.reference_cost, c.reference_kind,
@@ -56,11 +64,87 @@ module BenchmarkImport
     "cvrp" => ["Capacitated vehicle routing", "Assign customers to vehicle routes while respecting capacity. Lower route cost is better."],
     "employee-scheduling" => ["Employee scheduling", "Assign nurses to shifts while respecting hard rules. Among feasible schedules, lower penalty cost is better."],
     "job-shop-scheduling" => ["Job-shop scheduling", "Sequence jobs on machines while respecting operation order and machine capacity. Lower makespan is better."],
-    "hospital-scale" => ["Hospital rostering at scale", "Roster 100,000 required shifts across 10,000 employees under the hospital ruleset, on one synthetic instance with a single 300-second budget. Every shift must be assigned; among feasible rosters, lower penalty cost is better."],
-    "delivery-scale" => ["Delivery routing at scale", "Route 10,000 deliveries with time windows on a fixed fleet, on one synthetic instance with a single 300-second budget. Among feasible plans, lower total travel time is better."]
+    "hospital-scale" => ["Hospital rostering at scale", "Roster 100,000 required shifts across 10,000 employees under the hospital ruleset, on one synthetic instance with a single 300-second budget."],
+    "delivery-scale" => ["Delivery routing at scale", "Route 10,000 deliveries with time windows on a fixed fleet, on one synthetic instance with a single 300-second budget."]
   }.freeze
 
+  # Large-scale problems compare solvers on the score both solvers optimize:
+  # hard-constraint violations first, then soft cost. Feasibility alone says
+  # nothing when no solver returns a feasible plan in the budget.
+  SCALE_METRICS = {
+    "hospital-scale" => [
+      { "id" => "assigned", "title" => "Shifts assigned", "better" => "higher", "max" => "shifts",
+        "note" => "Required shifts assigned within the budget. Every unassigned shift is a hard-constraint violation, so more is better." }
+    ],
+    "delivery-scale" => [
+      { "id" => "hard_violations", "title" => "Hard-constraint violations", "better" => "lower",
+        "note" => "Broken time windows, capacity, fleet size or delivery coverage in the returned plan. Zero is a feasible plan." },
+      { "id" => "soft_cost", "title" => "Total travel time", "better" => "lower", "unit" => "s",
+        "note" => "Driving seconds over every route, depot to depot. Lower is better." }
+    ]
+  }.freeze
+
+  SCALE_SHAPES = {
+    "hospital-scale" => %w[employees shifts],
+    "delivery-scale" => %w[deliveries vehicles]
+  }.freeze
+
+  SCORE = %r{\A(-?\d+)hard/(-?\d+)soft\z}
+
   module_function
+
+  # Score is hard-first: fewer hard-constraint violations wins, and soft cost
+  # decides only between equal hard scores. A row without a score ranks last.
+  def score_key(row)
+    [row["hard_violations"] || Float::INFINITY, row["soft_cost"] || Float::INFINITY, row.fetch("solver")]
+  end
+
+  def scale_fields(run, rows, outcomes)
+    return {} unless run["benchmark_category"] == "huge_scale"
+
+    name = run.fetch("benchmark_name")
+    outcomes = outcomes.select { |outcome| outcome.fetch("run_id") == run.fetch("id") }
+    key = ->(row) { [row.fetch("instance"), row.fetch("solver"), row.fetch("time_limit_seconds")] }
+    unless outcomes.map(&key).sort == rows.map(&key).sort
+      raise ArgumentError, "Incomplete large-scale outcomes for #{name}"
+    end
+
+    instances = rows.group_by { |row| [row.fetch("instance"), row.fetch("time_limit_seconds")] }.sort.map do |(instance, budget), group|
+      native = nil
+      entries = group.map do |row|
+        outcome = outcomes.find { |candidate| key.call(candidate) == key.call(row) }
+        native = outcome.fetch("native")
+        match = SCORE.match(outcome["score"].to_s)
+        entry = {
+          "solver" => row.fetch("solver"), "version" => row.fetch("solver_version"),
+          "score" => outcome["score"], "feasible" => row.fetch("hard_feasible") == true,
+          "hard_violations" => match && -Integer(match[1]), "soft_cost" => match && -Integer(match[2]),
+          "seconds" => row.fetch("actual_time_seconds")
+        }
+        if native.key?("unassigned_shifts")
+          entry["assigned"] = native.fetch("shifts") - native.fetch("unassigned_shifts")
+        end
+        entry
+      end.sort_by { |entry| score_key(entry) }
+      shape = SCALE_SHAPES.fetch(name).to_h { |field| [field, native.fetch(field)] }
+      metrics = SCALE_METRICS.fetch(name).map do |metric|
+        values = entries.map { |entry| entry[metric.fetch("id")] }.compact
+        metric.merge("max" => metric.key?("max") ? shape.fetch(metric.fetch("max")) : values.max)
+      end
+      { "instance" => instance, "budget" => budget, "shape" => shape, "metrics" => metrics, "rows" => entries }
+    end
+    # Every instance shares the solver set; totals across instances rank the problem.
+    order = run.fetch("solvers").sort_by do |solver|
+      picked = instances.map { |instance| instance.fetch("rows").find { |entry| entry.fetch("solver") == solver } }
+      sum = ->(field) { picked.all? { |entry| entry[field] } ? picked.sum { |entry| entry[field] } : nil }
+      score_key("solver" => solver, "hard_violations" => sum.call("hard_violations"), "soft_cost" => sum.call("soft_cost"))
+    end
+    {
+      "scale" => { "instances" => instances },
+      "solvers" => order,
+      "solver_orders" => run.fetch("time_limits_seconds").to_h { |budget| [budget.to_s, order] }
+    }
+  end
 
   # Gate progression records observed feasibility, not process duration.
   def rank_solvers(summaries, solver_order, budget = nil)
@@ -153,7 +237,7 @@ module BenchmarkImport
         "reference_covers_run" => !run_instances.empty? && covered_run_instances.length == run_instances.length,
         "reference_kinds" => kinds,
         "reference_sources" => sources.map { |source, revision| { "name" => source, "revision" => revision } }
-      )
+      ).merge(scale_fields(run, rows, snapshot["scale_outcomes"] || []))
     end
     unless problems.sum { |problem| problem.fetch("result_count") } == results.length
       raise ArgumentError, "Unexpected rows outside selected runs"

@@ -24,7 +24,8 @@
         1,
         10,
         60
-      ]
+      ],
+      "benchmark_category": "list_variable"
     },
     {
       "id": "5669e6b7-102d-4dd6-8cee-f40f533ed5fd",
@@ -41,7 +42,8 @@
       ],
       "time_limits_seconds": [
         300
-      ]
+      ],
+      "benchmark_category": "huge_scale"
     },
     {
       "id": "d335811a-0d3c-4f4b-a186-9494cd79df71",
@@ -63,7 +65,8 @@
         1,
         10,
         60
-      ]
+      ],
+      "benchmark_category": "scalar_variable"
     },
     {
       "id": "baeaef42-44a2-4cb9-9786-0902f61e33e1",
@@ -80,7 +83,8 @@
       ],
       "time_limits_seconds": [
         300
-      ]
+      ],
+      "benchmark_category": "huge_scale"
     },
     {
       "id": "a2c4a29a-b67d-4daf-9cef-a355e2604bd8",
@@ -102,7 +106,8 @@
         1,
         10,
         60
-      ]
+      ],
+      "benchmark_category": "scalar_variable"
     }
   ],
   "results": [
@@ -91707,6 +91712,74 @@
       "wall_time_over_limit": false,
       "watchdog_killed": false,
       "error": false
+    }
+  ],
+  "scale_outcomes": [
+    {
+      "run_id": "5669e6b7-102d-4dd6-8cee-f40f533ed5fd",
+      "benchmark_name": "delivery-scale",
+      "instance": "ds-s10000",
+      "solver": "solverforge",
+      "time_limit_seconds": 300,
+      "score": "0hard/-1379773soft",
+      "native": {
+        "vehicles": 239,
+        "deliveries": 10000,
+        "score_drift": false,
+        "generator_version": 1,
+        "termination_status": "solution_returned",
+        "validator_model_delta": 0
+      }
+    },
+    {
+      "run_id": "5669e6b7-102d-4dd6-8cee-f40f533ed5fd",
+      "benchmark_name": "delivery-scale",
+      "instance": "ds-s10000",
+      "solver": "timefold",
+      "time_limit_seconds": 300,
+      "score": "-1211hard/-4449251soft",
+      "native": {
+        "vehicles": 239,
+        "deliveries": 10000,
+        "score_drift": false,
+        "generator_version": 1,
+        "termination_status": "solution_returned",
+        "validator_model_delta": null
+      }
+    },
+    {
+      "run_id": "baeaef42-44a2-4cb9-9786-0902f61e33e1",
+      "benchmark_name": "hospital-scale",
+      "instance": "hs-e10000-s100000",
+      "solver": "solverforge",
+      "time_limit_seconds": 300,
+      "score": "-21816hard/-1445916soft",
+      "native": {
+        "shifts": 100000,
+        "employees": 10000,
+        "generator_version": 1,
+        "unassigned_shifts": 21816,
+        "termination_status": "no_solution",
+        "native_reported_score": "-21816hard/-1445916soft",
+        "native_hard_violations": 21816
+      }
+    },
+    {
+      "run_id": "baeaef42-44a2-4cb9-9786-0902f61e33e1",
+      "benchmark_name": "hospital-scale",
+      "instance": "hs-e10000-s100000",
+      "solver": "timefold",
+      "time_limit_seconds": 300,
+      "score": "-36970hard/-309506soft",
+      "native": {
+        "shifts": 100000,
+        "employees": 10000,
+        "generator_version": 1,
+        "unassigned_shifts": 36970,
+        "termination_status": "no_solution",
+        "native_reported_score": "-36970hard/-309506soft",
+        "native_hard_violations": 36970
+      }
     }
   ],
   "references": [

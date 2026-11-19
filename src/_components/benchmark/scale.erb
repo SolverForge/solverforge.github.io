@@ -1,0 +1,64 @@
+<% instances.each do |instance| %>
+<section class="benchmark-scale" data-benchmark-scale="<%= instance.fetch('instance') %>" aria-label="<%= @problem.fetch('title') %>, <%= instance.fetch('instance') %> results">
+  <p class="benchmark-scale__instance">
+    <code><%= instance.fetch('instance') %></code> · <%= shape_text(instance.fetch('shape')) %> · <%= instance.fetch('budget') %>-second budget
+  </p>
+  <p class="benchmark-scale__ranking">Ranked by score: fewer hard-constraint violations first, then lower soft cost. Runtime does not rank solutions.</p>
+
+  <div class="benchmark-scale__metrics">
+    <% instance.fetch('metrics').each do |metric| %>
+      <figure class="benchmark-scale__metric" data-metric="<%= metric.fetch('id') %>">
+        <figcaption>
+          <h3><%= metric.fetch('title') %></h3>
+          <p><%= metric.fetch('note') %></p>
+        </figcaption>
+        <ol class="benchmark-scale__rows">
+          <% instance.fetch('rows').each do |row| %>
+            <% value = row[metric.fetch('id')] %>
+            <% percent = fill(metric, value) %>
+            <li class="benchmark-scale__row<%= ' benchmark-scale__row--solverforge' if solverforge?(row.fetch('solver')) %>" data-solver="<%= row.fetch('solver') %>">
+              <span class="benchmark-scale__label"><%= row.fetch('solver') %> <small><%= row.fetch('version') %></small></span>
+              <span class="benchmark-scale__track">
+                <% if percent %>
+                  <span class="benchmark-scale__bar<%= ' benchmark-scale__bar--zero' if value.zero? %>" style="--benchmark-bar-fill: <%= percent %>%" data-value="<%= value %>"></span>
+                <% end %>
+              </span>
+              <span class="benchmark-scale__value"><%= value_text(metric, value) %></span>
+              <span class="benchmark-scale__context"><%= context_text(metric, instance.fetch('rows'), value) %></span>
+            </li>
+          <% end %>
+        </ol>
+      </figure>
+    <% end %>
+  </div>
+
+  <div class="benchmark-table" data-scale-table role="region" aria-label="<%= @problem.fetch('title') %>, <%= instance.fetch('instance') %> scores" tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Rank</th>
+          <th scope="col">Solver / tested version</th>
+          <th scope="col">Score</th>
+          <th scope="col">Hard violations</th>
+          <% if assigned?(instance) %><th scope="col">Shifts assigned</th><% end %>
+          <th scope="col"><%= soft_label(instance) %></th>
+          <th scope="col">Runtime</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% instance.fetch('rows').each_with_index do |row, index| %>
+          <tr class="<%= solverforge?(row.fetch('solver')) ? 'benchmark-solverforge' : '' %>">
+            <td><%= index + 1 %></td>
+            <th scope="row"><%= row.fetch('solver') %> <small><%= row.fetch('version') %></small></th>
+            <td><code><%= row['score'] || '—' %></code></td>
+            <td><%= row['hard_violations'].nil? ? '—' : delimit(row['hard_violations']) %></td>
+            <% if assigned?(instance) %><td><%= row['assigned'].nil? ? '—' : "#{delimit(row['assigned'])} / #{delimit(instance.fetch('shape').fetch('shifts'))}" %></td><% end %>
+            <td><%= row['soft_cost'].nil? ? '—' : delimit(row['soft_cost']) %></td>
+            <td><%= row['seconds'].nil? ? '—' : format('%.1f s', row['seconds']) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<% end %>

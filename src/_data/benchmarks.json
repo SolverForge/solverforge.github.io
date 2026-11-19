@@ -74,6 +74,7 @@
         10,
         60
       ],
+      "benchmark_category": "list_variable",
       "title": "Capacitated vehicle routing",
       "description": "Assign customers to vehicle routes while respecting capacity. Lower route cost is better.",
       "instances": 100,
@@ -530,6 +531,7 @@
         10,
         60
       ],
+      "benchmark_category": "scalar_variable",
       "title": "Employee scheduling",
       "description": "Assign nurses to shifts while respecting hard rules. Among feasible schedules, lower penalty cost is better.",
       "instances": 37,
@@ -881,6 +883,7 @@
         10,
         60
       ],
+      "benchmark_category": "scalar_variable",
       "title": "Job-shop scheduling",
       "description": "Sequence jobs on machines while respecting operation order and machine capacity. Lower makespan is better.",
       "instances": 162,
@@ -1203,8 +1206,9 @@
       "time_limits_seconds": [
         300
       ],
+      "benchmark_category": "huge_scale",
       "title": "Hospital rostering at scale",
-      "description": "Roster 100,000 required shifts across 10,000 employees under the hospital ruleset, on one synthetic instance with a single 300-second budget. Every shift must be assigned; among feasible rosters, lower penalty cost is better.",
+      "description": "Roster 100,000 required shifts across 10,000 employees under the hospital ruleset, on one synthetic instance with a single 300-second budget.",
       "instances": 1,
       "datasets": [
         "SolverForge hospital-scale synthetic"
@@ -1261,7 +1265,50 @@
       "reference_covered_run_instances": 0,
       "reference_covers_run": false,
       "reference_kinds": [],
-      "reference_sources": []
+      "reference_sources": [],
+      "scale": {
+        "instances": [
+          {
+            "instance": "hs-e10000-s100000",
+            "budget": 300,
+            "shape": {
+              "employees": 10000,
+              "shifts": 100000
+            },
+            "metrics": [
+              {
+                "id": "assigned",
+                "title": "Shifts assigned",
+                "better": "higher",
+                "max": 100000,
+                "note": "Required shifts assigned within the budget. Every unassigned shift is a hard-constraint violation, so more is better."
+              }
+            ],
+            "rows": [
+              {
+                "solver": "solverforge",
+                "version": "0.31.2",
+                "score": "-21816hard/-1445916soft",
+                "feasible": false,
+                "hard_violations": 21816,
+                "soft_cost": 1445916,
+                "seconds": 302.34163932397496,
+                "assigned": 78184
+              },
+              {
+                "solver": "timefold",
+                "version": "2.8.0",
+                "score": "-36970hard/-309506soft",
+                "feasible": false,
+                "hard_violations": 36970,
+                "soft_cost": 309506,
+                "seconds": 307.7935369509505,
+                "assigned": 63030
+              }
+            ]
+          }
+        ]
+      }
     },
     {
       "first_feasible_gates": {
@@ -1289,8 +1336,9 @@
       "time_limits_seconds": [
         300
       ],
+      "benchmark_category": "huge_scale",
       "title": "Delivery routing at scale",
-      "description": "Route 10,000 deliveries with time windows on a fixed fleet, on one synthetic instance with a single 300-second budget. Among feasible plans, lower total travel time is better.",
+      "description": "Route 10,000 deliveries with time windows on a fixed fleet, on one synthetic instance with a single 300-second budget.",
       "instances": 1,
       "datasets": [
         "SolverForge delivery-scale synthetic"
@@ -1347,7 +1395,56 @@
       "reference_covered_run_instances": 0,
       "reference_covers_run": false,
       "reference_kinds": [],
-      "reference_sources": []
+      "reference_sources": [],
+      "scale": {
+        "instances": [
+          {
+            "instance": "ds-s10000",
+            "budget": 300,
+            "shape": {
+              "deliveries": 10000,
+              "vehicles": 239
+            },
+            "metrics": [
+              {
+                "id": "hard_violations",
+                "title": "Hard-constraint violations",
+                "better": "lower",
+                "note": "Broken time windows, capacity, fleet size or delivery coverage in the returned plan. Zero is a feasible plan.",
+                "max": 1211
+              },
+              {
+                "id": "soft_cost",
+                "title": "Total travel time",
+                "better": "lower",
+                "unit": "s",
+                "note": "Driving seconds over every route, depot to depot. Lower is better.",
+                "max": 4449251
+              }
+            ],
+            "rows": [
+              {
+                "solver": "solverforge",
+                "version": "0.31.2",
+                "score": "0hard/-1379773soft",
+                "feasible": true,
+                "hard_violations": 0,
+                "soft_cost": 1379773,
+                "seconds": 301.694847755949
+              },
+              {
+                "solver": "timefold",
+                "version": "2.8.0",
+                "score": "-1211hard/-4449251soft",
+                "feasible": false,
+                "hard_violations": 1211,
+                "soft_cost": 4449251,
+                "seconds": 301.44553701695986
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
   "unavailable": []

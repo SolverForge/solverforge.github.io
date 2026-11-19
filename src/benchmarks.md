@@ -22,8 +22,8 @@ subsets are not a like-for-like quality comparison. Problems are compared separa
 
 The two **large-scale** problems at the end run one synthetic instance each, far
 larger than the catalog instances above, with a single 300-second budget. Their
-instances are generated, so they carry no reference values: feasibility decides
-first, then validated cost.
+instances are generated, so they carry no reference values: solvers rank by
+score, fewer hard-constraint violations first, then lower soft cost.
 
 <% site.data.benchmarks.problems.each do |problem| %>
 <section class="benchmark-problem" id="<%= problem.fetch('benchmark_name') %>">
@@ -35,7 +35,11 @@ first, then validated cost.
     <%= problem.fetch('result_count') %> recorded results ·
     Completed <time datetime="<%= problem.fetch('completed_at') %>"><%= problem.fetch('completed_at')[0, 10] %></time>
   </p>
-  <% if problem.fetch('reference_present') %>
+  <% if problem['scale'] %>
+    <p class="benchmark-references">
+      No published reference values exist for this synthetic instance; solvers are compared with each other by score.
+    </p>
+  <% elsif problem.fetch('reference_present') %>
     <p class="benchmark-references">
       <% if problem.fetch('reference_covers_run') %>
         Reference values for all <strong><%= problem.fetch('instances') %></strong> instances, from
@@ -60,6 +64,9 @@ first, then validated cost.
       feasibility is the comparison this run supports.
     </p>
   <% end %>
+  <% if problem['scale'] %>
+  <%= render Benchmark::Scale.new(problem: problem) %>
+  <% else %>
   <%= render Benchmark::Charts.new(problem: problem) %>
   <% problem.fetch('time_limits_seconds').sort.each_with_index do |budget, index| %>
     <% if index > 0 %><details><summary><%= budget %>-second budget</summary><% else %><h3><%= budget %>-second budget</h3><% end %>
@@ -83,6 +90,7 @@ first, then validated cost.
       </table>
     </div>
     <% if index > 0 %></details><% end %>
+  <% end %>
   <% end %>
   <details>
     <summary>Run provenance</summary>
