@@ -993,6 +993,77 @@ async function checkUseCasePages(origin) {
   return failures;
 }
 
+// Large-scale problems rank by score, hard violations first, then soft cost.
+// Every expectation is recomputed from the raw evidence score strings, never
+// from the summary the page renders.
+function checkScaleProblem(problem, section) {
+  const failures = [];
+  const fail = (issue, extra = {}) => failures.push({ path: "/benchmarks/", issue: `${problem.benchmark_name} ${issue}`, ...extra });
+  const evidence = JSON.parse(readFileSync("src/benchmarks/results.json", "utf8"));
+  const outcomes = (evidence.scale_outcomes || []).filter((row) => row.run_id === problem.id);
+  const parse = (score) => score.split("/").map((part) => 0 - parseInt(part, 10));
+  const number = (value) => value.toLocaleString("en-US");
+  const instances = [...new Set(outcomes.map((row) => row.instance))].sort();
+  if (instances.length === 0) fail("has no large-scale evidence rows");
+  if (section.scale.length !== instances.length) {
+    fail("does not render one score block per instance", { found: section.scale.length, expected: instances.length });
+  }
+  if (!/no published reference/i.test(section.referencesText)) fail("does not say it has no published reference values");
+  const totals = new Map();
+  for (const row of outcomes) {
+    const [hard, soft] = parse(row.score);
+    const total = totals.get(row.solver) || [0, 0];
+    totals.set(row.solver, [total[0] + hard, total[1] + soft]);
+  }
+  const rank = [...totals]
+    .sort((a, b) => a[1][0] - b[1][0] || a[1][1] - b[1][1] || a[0].localeCompare(b[0]))
+    .map(([solver]) => solver);
+  if (problem.solvers.join("|") !== rank.join("|")) fail("does not rank solvers by score", { found: problem.solvers, expected: rank });
+  for (const instance of instances) {
+    const block = section.scale.find((candidate) => candidate.instance === instance);
+    if (!block) {
+      fail(`is missing instance ${instance}`);
+      continue;
+    }
+    const rows = outcomes.filter((row) => row.instance === instance).map((row) => {
+      const [hard, soft] = parse(row.score);
+      const values = { hard_violations: hard, soft_cost: soft };
+      if ("unassigned_shifts" in row.native) values.assigned = row.native.shifts - row.native.unassigned_shifts;
+      return { solver: row.solver, hard, soft, values };
+    }).sort((a, b) => a.hard - b.hard || a.soft - b.soft || a.solver.localeCompare(b.solver));
+    const order = rows.map((row) => row.solver).join("|");
+    if (block.metrics.length === 0) fail(`${instance} draws no metric chart`);
+    for (const metric of block.metrics) {
+      if (metric.rows.map((row) => row.solver).join("|") !== order) {
+        fail(`${instance} chart "${metric.id}" is not in score order`, { found: metric.rows.map((row) => row.solver) });
+      }
+      for (const rendered of metric.rows) {
+        const value = rows.find((row) => row.solver === rendered.solver)?.values[metric.id];
+        const expected = value === undefined ? undefined : number(value);
+        if (expected === undefined || rendered.value.replace(/ s$/, "") !== expected) {
+          fail(`${instance} chart "${metric.id}" shows the wrong number for ${rendered.solver}`, { found: rendered.value, expected });
+        }
+        if (rendered.clipped) fail(`${instance} chart "${metric.id}" clips the number for ${rendered.solver}`);
+        if (!Number.isFinite(rendered.fill) || rendered.painted <= 0.5) {
+          fail(`${instance} chart "${metric.id}" has an invisible bar for ${rendered.solver}`, rendered);
+        }
+        if ((value === 0) !== rendered.zero) fail(`${instance} chart "${metric.id}" does not mark a measured zero for ${rendered.solver}`);
+        if (!rendered.context) fail(`${instance} chart "${metric.id}" has no context for ${rendered.solver}`);
+      }
+    }
+    if (block.table.map((row) => row.solver).join("|") !== order) {
+      fail(`${instance} score table is not in score order`, { found: block.table.map((row) => row.solver) });
+    }
+    block.table.forEach((tr, index) => {
+      const row = rows.find((candidate) => candidate.solver === tr.solver);
+      if (!row || tr.cells[0] !== String(index + 1) || tr.cells[2] !== number(row.hard)) {
+        fail(`${instance} score table shows the wrong rank or hard violations for ${tr.solver}`, { found: tr.cells });
+      }
+    });
+  }
+  return failures;
+}
+
 async function checkBenchmarksPage(origin) {
   const data = JSON.parse(readFileSync(benchmarksDataPath, "utf8"));
   const browser = await chromium.launch({
@@ -1046,13 +1117,37 @@ async function checkBenchmarksPage(origin) {
       sections: [...document.querySelectorAll("section.benchmark-problem")].map((section) => ({
         id: section.id,
         heading: section.querySelector("h2")?.textContent.trim() || "",
-        tables: [...section.querySelectorAll(".benchmark-table table")].map((table) => ({
+        tables: [...section.querySelectorAll(".benchmark-table:not([data-scale-table]) table")].map((table) => ({
           budget: Number(table.closest(".benchmark-table").getAttribute("data-budget")),
           headers: [...table.querySelectorAll("thead th")].map((th) => th.textContent.trim()),
           solvers: [...table.querySelectorAll("tbody th[scope='row']")]
             .map((th) => th.childNodes[0]?.textContent.trim() || ""),
         })),
-        rows: section.querySelectorAll("tbody tr").length,
+        rows: section.querySelectorAll(".benchmark-table:not([data-scale-table]) tbody tr").length,
+        // Large-scale problems: one block per instance, metric bars plus a score table.
+        scale: [...section.querySelectorAll("[data-benchmark-scale]")].map((block) => ({
+          instance: block.dataset.benchmarkScale,
+          metrics: [...block.querySelectorAll(".benchmark-scale__metric")].map((figure) => ({
+            id: figure.dataset.metric,
+            rows: [...figure.querySelectorAll(".benchmark-scale__row")].map((row) => {
+              const bar = row.querySelector(".benchmark-scale__bar");
+              const value = row.querySelector(".benchmark-scale__value");
+              return {
+                solver: row.dataset.solver,
+                value: value?.textContent.trim() || "",
+                clipped: value ? value.scrollWidth > value.clientWidth + 1 : true,
+                context: row.querySelector(".benchmark-scale__context")?.textContent.trim() || "",
+                fill: bar ? parseFloat(bar.style.getPropertyValue("--benchmark-bar-fill")) : NaN,
+                painted: bar ? bar.getBoundingClientRect().width : 0,
+                zero: bar ? bar.classList.contains("benchmark-scale__bar--zero") : false,
+              };
+            }),
+          })),
+          table: [...block.querySelectorAll("[data-scale-table] tbody tr")].map((tr) => ({
+            solver: tr.querySelector("th[scope='row']")?.childNodes[0]?.textContent.trim() || "",
+            cells: [...tr.querySelectorAll("td")].map((td) => td.textContent.trim()),
+          })),
+        })),
         provenance: section.querySelector("details") ? true : false,
         completed: section.querySelector("time")?.getAttribute("datetime") || "",
         referencesText: section.querySelector(".benchmark-references")?.textContent || "",
@@ -1132,7 +1227,7 @@ async function checkBenchmarksPage(origin) {
           expected: problem.title,
         });
       }
-      if (section.tables.length !== problem.time_limits_seconds.length) {
+      if (!problem.scale && section.tables.length !== problem.time_limits_seconds.length) {
         failures.push({
           path: "/benchmarks/",
           issue: `${problem.benchmark_name} shows ${problem.time_limits_seconds.length} budgets`,
@@ -1149,7 +1244,7 @@ async function checkBenchmarksPage(origin) {
         "Mean runtime",
         "Over budget",
       ];
-      for (const table of section.tables) {
+      for (const table of problem.scale ? [] : section.tables) {
         if (table.headers.join("|") !== expectedHeaders.join("|")) {
           failures.push({
             path: "/benchmarks/",
@@ -1162,7 +1257,7 @@ async function checkBenchmarksPage(origin) {
       }
       // Every tested budget must contribute its own rows, derived from the run's
       // own summaries so adding a budget cannot pass by rendering an empty table.
-      const expectedRows = problem.summaries.length;
+      const expectedRows = problem.scale ? 0 : problem.summaries.length;
       if (section.rows !== expectedRows) {
         failures.push({
           path: "/benchmarks/",
@@ -1257,6 +1352,10 @@ async function checkBenchmarksPage(origin) {
         }
       }
 
+      if (problem.scale) {
+        failures.push(...checkScaleProblem(problem, section));
+        continue;
+      }
       // Charts must cover the same solvers and budgets the tables do, in the
       // priority order: feasibility, earliest observed gate, then quality.
       // Both the count and the order are checked, so a

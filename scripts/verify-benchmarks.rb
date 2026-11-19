@@ -86,6 +86,8 @@ class BenchmarkSnapshotTest
 
   def test_each_budget_ranks_feasibility_then_earlier_gates_then_quality
     @summary.fetch("problems").each do |problem|
+      next if problem.key?("scale")
+
       problem.fetch("time_limits_seconds").each do |budget|
         rows = problem.fetch("summaries").select { |row| row.fetch("budget") == budget }
         expected = rows.sort_by do |row|
@@ -104,6 +106,41 @@ class BenchmarkSnapshotTest
         assert_equal(expected, problem.fetch("solvers")) if budget == problem.fetch("time_limits_seconds").max
       end
     end
+  end
+
+  # Recomputed from the raw score strings, not through the importer's parser.
+  def test_large_scale_problems_rank_by_score
+    scale = @summary.fetch("problems").select { |problem| problem.key?("scale") }
+    huge = @snapshot.fetch("runs").select { |run| run["benchmark_category"] == "huge_scale" }
+    assert_equal(huge.map { |run| run.fetch("benchmark_name") }.sort, scale.map { |problem| problem.fetch("benchmark_name") }.sort)
+    scale.each do |problem|
+      outcomes = @snapshot.fetch("scale_outcomes").select { |row| row.fetch("run_id") == problem.fetch("id") }
+      assert_equal(problem.fetch("result_count"), outcomes.length)
+      totals = outcomes.group_by { |row| row.fetch("solver") }.transform_values do |rows|
+        parts = rows.map { |row| row.fetch("score").split("/").map { |part| -part.to_i } }
+        [parts.sum(&:first), parts.sum(&:last)]
+      end
+      expected = totals.sort_by { |solver, (hard, soft)| [hard, soft, solver] }.map(&:first)
+      assert_equal(expected, problem.fetch("solvers"))
+      problem.fetch("scale").fetch("instances").each do |instance|
+        rows = instance.fetch("rows")
+        assert_equal(problem.fetch("solvers").length, rows.length)
+        rows.each do |row|
+          raw = outcomes.find { |outcome| outcome.fetch("instance") == instance.fetch("instance") && outcome.fetch("solver") == row.fetch("solver") }
+          hard, soft = raw.fetch("score").split("/").map { |part| -part.to_i }
+          assert_equal([hard, soft], [row.fetch("hard_violations"), row.fetch("soft_cost")])
+          native = raw.fetch("native")
+          assert_equal(native.fetch("shifts") - native.fetch("unassigned_shifts"), row.fetch("assigned")) if native.key?("unassigned_shifts")
+        end
+      end
+    end
+  end
+
+  def test_missing_large_scale_outcome_rejected
+    changed = copy(@snapshot)
+    assert(!changed.fetch("scale_outcomes").empty?, "expected large-scale outcomes in the snapshot")
+    changed.fetch("scale_outcomes").pop
+    assert_raises(ArgumentError) { BenchmarkImport.summarize(changed) }
   end
 
   def test_process_duration_does_not_change_rank
