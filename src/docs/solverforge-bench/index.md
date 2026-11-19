@@ -243,10 +243,10 @@ make bench-job-shop-scheduling-quick-db
 make bench-nightly-db
 ```
 
-`make bench-nightly-db` is the cron entrypoint. It builds all three benchmark
+`make bench-nightly-db` is the cron entrypoint. It builds all five benchmark
 stacks, applies migrations once, then runs full CVRP, canonical employee
-scheduling, and canonical job-shop scheduling, each pinned to its own core, as
-one PostgreSQL-saving nightly job.
+scheduling, canonical job-shop scheduling, hospital-scale, and delivery-scale,
+each pinned to its own core, as one PostgreSQL-saving nightly job.
 
 PostgreSQL stores run catalog data, solver versions, and per-result rows.
 Warehouse diagnostics read `benchmark_result_facts`, `latest_benchmark_runs`,
@@ -263,19 +263,30 @@ a run.
 
 The [results page](/benchmarks/) contains the latest publishable full canonical
 nightly for each problem, with the complete [downloadable evidence](/benchmarks/results.json).
-The current cohort completed on October 18–19, 2026 (UTC), from benchmark
-commit `2f71da41a82308c5f0da2f2c1cea8969991861a1`:
+The catalog cohort completed on October 31 – November 1, 2026 (UTC), from
+benchmark commit `d7ca9e3c56784cc9ee21089af314f085e18eb39b`:
 
 | Problem | Instances | Recorded results | Run |
 | --- | --- | --- | --- |
-| CVRP | 100 | 2,100 | `03ef371a-a0a2-42ff-af47-87d73d5963a7` |
-| Employee scheduling | 37 | 555 | `f3c914f9-9695-446c-aab3-1241b7249021` |
-| Job-shop scheduling | 162 | 2,430 | `e9e294de-0d5c-4db2-a1eb-c77f23171734` |
+| CVRP | 100 | 2,100 | `7f726413-3369-4ace-83ab-cd6bcc2d9110` |
+| Employee scheduling | 37 | 555 | `d335811a-0d3c-4f4b-a186-9494cd79df71` |
+| Job-shop scheduling | 162 | 2,430 | `a2c4a29a-b67d-4daf-9cef-a355e2604bd8` |
 
-These runs tested native SolverForge **0.22.0** and Python **0.6.15**; the
+These runs tested native SolverForge **0.23.0** and Python **0.7.2**; the
 [results page](/benchmarks/) lists every solver and version in each matrix.
 Each matrix covers the 1, 10, and 60 second budgets.
 Official references cover every selected instance in all three problems.
+
+The large-scale cohort completed on November 19, 2026 (UTC), from benchmark
+commit `94bccba67924011b8e79141e30c38999fcd01705`, and tested native
+SolverForge **0.31.2** at one 300-second budget:
+
+| Problem | Instances | Recorded results | Run |
+| --- | --- | --- | --- |
+| Hospital rostering at scale | 1 | 2 | `baeaef42-44a2-4cb9-9786-0902f61e33e1` |
+| Delivery routing at scale | 1 | 2 | `5669e6b7-102d-4dd6-8cee-f40f533ed5fd` |
+
+Their instances are synthetic and carry no reference value.
 
 ## Official References
 

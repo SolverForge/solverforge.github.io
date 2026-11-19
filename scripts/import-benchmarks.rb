@@ -55,7 +55,9 @@ module BenchmarkImport
   LABELS = {
     "cvrp" => ["Capacitated vehicle routing", "Assign customers to vehicle routes while respecting capacity. Lower route cost is better."],
     "employee-scheduling" => ["Employee scheduling", "Assign nurses to shifts while respecting hard rules. Among feasible schedules, lower penalty cost is better."],
-    "job-shop-scheduling" => ["Job-shop scheduling", "Sequence jobs on machines while respecting operation order and machine capacity. Lower makespan is better."]
+    "job-shop-scheduling" => ["Job-shop scheduling", "Sequence jobs on machines while respecting operation order and machine capacity. Lower makespan is better."],
+    "hospital-scale" => ["Hospital rostering at scale", "Roster 100,000 required shifts across 10,000 employees under the hospital ruleset, on one synthetic instance with a single 300-second budget. Every shift must be assigned; among feasible rosters, lower penalty cost is better."],
+    "delivery-scale" => ["Delivery routing at scale", "Route 10,000 deliveries with time windows on a fixed fleet, on one synthetic instance with a single 300-second budget. Among feasible plans, lower total travel time is better."]
   }.freeze
 
   module_function
@@ -156,6 +158,8 @@ module BenchmarkImport
     unless problems.sum { |problem| problem.fetch("result_count") } == results.length
       raise ArgumentError, "Unexpected rows outside selected runs"
     end
+    # Page order follows LABELS: the 1/10/60-second suites, then the large-scale ones.
+    problems = problems.sort_by { |problem| [LABELS.keys.index(problem.fetch("benchmark_name")) || LABELS.length, problem.fetch("benchmark_name")] }
     names = problems.map { |problem| problem.fetch("benchmark_name") }
     {
       "source" => snapshot.fetch("source"), "selection" => snapshot.fetch("selection"), "problems" => problems,

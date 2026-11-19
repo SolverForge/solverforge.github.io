@@ -20,13 +20,18 @@ remaining tie.
 is shown instead. Quality averages cover feasible results only; different solved
 subsets are not a like-for-like quality comparison. Problems are compared separately.
 
+The two **large-scale** problems at the end run one synthetic instance each, far
+larger than the catalog instances above, with a single 300-second budget. Their
+instances are generated, so they carry no reference values: feasibility decides
+first, then validated cost.
+
 <% site.data.benchmarks.problems.each do |problem| %>
 <section class="benchmark-problem" id="<%= problem.fetch('benchmark_name') %>">
   <h2><%= problem.fetch('title') %></h2>
   <p><%= problem.fetch('description') %></p>
   <p>
     <strong><%= problem.fetch('datasets').join(', ') %></strong> ·
-    <%= problem.fetch('instances') %> instances ·
+    <%= problem.fetch('instances') %> <%= problem.fetch('instances') == 1 ? 'instance' : 'instances' %> ·
     <%= problem.fetch('result_count') %> recorded results ·
     Completed <time datetime="<%= problem.fetch('completed_at') %>"><%= problem.fetch('completed_at')[0, 10] %></time>
   </p>
