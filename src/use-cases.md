@@ -5,8 +5,8 @@ page_class: page-use-cases
 description: >-
   Explore planning problems across workforce scheduling, timetabling, routing,
   manufacturing, order picking, fleet readiness, flight crew planning, a
-  personal calendar planner, and two Hermes Agent plugins that plan your week
-  and your driving trips.
+  personal calendar planner, and three Hermes Agent plugins: a workbench of
+  planning models, and two that plan your week and your driving trips.
   See how SolverForge handles resource limits, required rules, and competing goals.
 ---
 
