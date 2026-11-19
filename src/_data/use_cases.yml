@@ -968,12 +968,12 @@
   variant: product
   ribbon: "Hermes"
   eyebrow: "Built on SolverForge · Hermes Agent plugin"
-  title: "Real planning models in Hermes, on your own machine."
-  intro: "SolverForge Workbench is a Hermes Agent plugin with four planning models and every one of their constraints: employee scheduling, field service routing, pick-up and delivery routing, and task scheduling. Load or edit a dataset, tune the weights, solve, read why every rule fired, replan from a change, and compare profiles, in the chat or on the plugin's own page in Hermes Desktop."
+  title: "A planning platform inside Hermes: models, data, solves and answers."
+  intro: "SolverForge Workbench turns Hermes Agent into a planning platform on your own machine. It ships four planning models with every one of their constraints (employee scheduling, task scheduling, pick-up and delivery routing, field service routing) and hosts any model Hermes builds for you with solverforge-cli. Every model gets the same workflow: datasets you can edit, profiles of weights and settings, background solves, explanations by rule, replanning, experiments and trends, in the chat or on the plugin's own page in Hermes Desktop."
   repo_url: "https://github.com/blackopsrepl/hermes-solverforge-workbench"
   icon: "fa-solid fa-flask"
   teaser_metric: "4 models / 244 constraints / 37 Hermes tools"
-  teaser_copy: "A Hermes plugin that brings rosters, field service routes, deliveries and factory schedules onto your own machine, every rule explained."
+  teaser_copy: "Stock models for rosters, schedules and routes, models Hermes builds for you, and one workflow to solve, explain, replan and compare them."
   metrics:
     - ["4", "Stock models"]
     - ["244", "Constraints"]
@@ -982,8 +982,8 @@
     - ["OSM", "Road network for routing"]
     - ["Custom", "Models built with solverforge-cli"]
   body:
-    - "Each model ships one large demo as an ordinary dataset: a hospital month with 50 employees and 536 shifts, a factory week with 409 operations, two days of Milan patient transport, and two days of Turin building services with 30 technicians and 223 visits. Every table opens in a grid with a typed editor for each field the model reads. Profiles save constraint weights and solve settings, and solves run in the background while you keep working."
-    - "A finished run gives a verdict in words, the score per level, the model's own measures, and every constraint with the matches it blames. For anything left unplanned, fill ranks the places it could still go and what each one changes. A replan starts from the current plan and keeps what can stay, experiments rank profiles over the same datasets, and trends chart every solve over time. The routing models measure travel on OpenStreetMap roads with solverforge-maps, so the map draws the roads the solver measured. When no stock model fits, Hermes builds one with solverforge-cli, and it gets the same tools and pages."
+    - "The platform is the same for every model. A dataset is a model's input: a JSON file you import, a plan Hermes writes from what you tell it, or one of the large demos (a hospital month with 50 employees and 536 shifts, a factory week with 409 operations, two days of Milan patient transport, two days of Turin building services). Every table opens in a grid with a typed editor for each field the model reads, and every change makes a new dataset that remembers its parent. Profiles hold constraint weights and solve settings, and solves run in the background while you keep working, in the chat or on the Desktop page."
+    - "A finished run gives a verdict in words, the score per level, the model's own measures, and every constraint with the matches it blames. For anything left unplanned, fill ranks the places it could still go and what each one changes. A replan starts from the current plan and keeps what can stay, experiments rank profiles over the same datasets, and trends chart every solve over time. Plans show as rosters, schedules, assignment boards or maps; the routing models measure travel on OpenStreetMap roads with solverforge-maps. When no stock model fits, Hermes builds one with solverforge-cli, and it joins the platform with the same tools and pages."
   constraints:
     - ["Employee scheduling", "127 constraints: skills, availability, contract limits over periods, rest, rotations, hourly demand, cost and fairness."]
     - ["Field service routing", "64 constraints: skills, time windows and SLAs, breaks, multi-technician visits, coverage areas and shift limits."]
@@ -993,18 +993,18 @@
     - ["Profiles", "Every constraint's weight and every solve setting, saved per profile and compared in experiments."]
   runtime:
     video: "/videos/use-cases/hermes-solverforge-workbench-demo.mp4"
-    poster: "/images/use-cases/hermes-workbench-run.png"
+    poster: "/images/use-cases/hermes-workbench-models.png"
     label: "SolverForge Workbench · 3:14"
-    copy: "Two days of building services in Turin, 30 technicians and 223 visits: solved, explained, replanned after a sick call with 180 visits kept, and compared across two profiles; then a nurse's shift moved from the chat and a model Hermes built itself."
+    copy: "One tour of the platform: the models page, then a full workflow on one of the demos (Turin field service: data, solve, explanation, fill, a replan after a sick call, two profiles compared, trends), a hospital roster changed from the chat, and a model Hermes built itself."
   home:
-    watch: "Watch SolverForge Workbench plan two days of field service in Hermes"
-    heading: "SolverForge Workbench: real planning models in Hermes."
-    copy: "Solve, replan and compare in the chat or on the plugin's page in Hermes Desktop, and when no model fits, Hermes builds one."
-    cta: "Watch the workbench"
+    watch: "Watch a tour of SolverForge Workbench in Hermes"
+    heading: "SolverForge Workbench: a planning platform inside Hermes."
+    copy: "Edit the data, tune the weights and read why every rule fired, in the chat or on the plugin's page in Hermes Desktop."
+    cta: "Watch the tour"
   cues:
     - { at: 0, label: "0:00", key: "", text: "Four stock models land one by one with their rule counts, and a fifth you build yourself." }
     - { at: 13.44, label: "0:13", key: "", text: "The models page: every model with its latest plan." }
-    - { at: 22.06, label: "0:22", key: "", text: "Two days of building services in Turin: 30 technicians and 223 visits." }
+    - { at: 22.06, label: "0:22", key: "", text: "The workflow, on one demo: two days of building services in Turin, 30 technicians and 223 visits." }
     - { at: 32.7, label: "0:33", key: "", text: "The demo is an ordinary dataset: every table opens and edits in place." }
     - { at: 44.14, label: "0:44", key: "", text: "Solve: after a minute every hard rule holds, and two visits are left over." }
     - { at: 60.05, label: "1:00", key: "", text: "Each technician's day on the map, along the real roads." }
@@ -1018,30 +1018,42 @@
     - { at: 166.97, label: "2:47", key: "", text: "A model Hermes built with solverforge-cli opens in the same workbench." }
     - { at: 182.4, label: "3:02", key: "", text: "SolverForge Workbench, a plugin for Hermes Agent." }
   captures:
-    - image: "/images/use-cases/hermes-workbench-run.png"
+    - image: "/images/use-cases/hermes-workbench-models.png"
       width: 1600
       height: 900
-      badge: "Run"
-      alt: "A field service run in Hermes Desktop: the verdict that every hard rule holds, the score over time, and measures such as 237 visits planned, 36.1 h of travel and 30 technicians working."
-      caption: "A run in words and numbers: the verdict, the score per level and the measures."
+      badge: "Models"
+      alt: "The SolverForge Workbench models page in Hermes Desktop: employee scheduling, field service routing, pick-up and delivery routing, task scheduling, and Crew Tasks, a model Hermes built, each with its rule counts and latest plan."
+      caption: "Every model on one page: the four stock models and the ones Hermes builds."
+    - image: "/images/use-cases/hermes-workbench-roster.png"
+      width: 1600
+      height: 900
+      badge: "Roster"
+      alt: "A hospital month's roster: one row per employee across the days of the week, beside the constraints with what each one costs."
+      caption: "Employee scheduling: a hospital month as a roster, every rule beside it."
+    - image: "/images/use-cases/hermes-workbench-factory.png"
+      width: 1600
+      height: 900
+      badge: "Schedule"
+      alt: "A factory week's schedule: one lane per resource across the days, beside the constraints with what each one costs."
+      caption: "Task scheduling: a factory week, lane by lane."
     - image: "/images/use-cases/hermes-workbench-routes.png"
       width: 1600
       height: 900
       badge: "Routes"
-      alt: "The Turin routes on a map along the roads, beside a searchable list of each technician's day with visits, distance and driving time."
-      caption: "Every technician's day on the map, along the roads the solver measured."
-    - image: "/images/use-cases/hermes-workbench-fill.png"
-      width: 1600
-      height: 900
-      badge: "Fill"
-      alt: "Places for an unplanned lift maintenance visit in Vanchiglia: three technicians' days, each with the score change per level and the rules it moves, and an Apply button."
-      caption: "Places for a visit left over, each with what it changes."
+      alt: "The Turin field service routes on a map along the roads, beside a searchable list of each technician's day with visits, distance and driving time."
+      caption: "Field service routing: every technician's day on the roads the solver measured."
     - image: "/images/use-cases/hermes-workbench-experiment.png"
       width: 1600
       height: 900
       badge: "Experiment"
-      alt: "An experiment comparing Standard and Short drives on the same dataset: Standard ranks first, and the measures table shows travel time 36.15 h against 32.4 h."
-      caption: "Two profiles on the same plan, ranked, with what each one's plans come to."
+      alt: "An experiment comparing the Standard and Short drives profiles on the same dataset: Standard ranks first, and the measures table shows travel time 36.15 h against 32.4 h."
+      caption: "Two profiles on the same data, ranked, with what each one's plans come to."
+    - image: "/images/use-cases/hermes-workbench-custom.png"
+      width: 1600
+      height: 900
+      badge: "Your model"
+      alt: "A run of Crew Tasks, a model Hermes built with solverforge-cli: every hard rule kept, 30 tasks assigned, and the assignments by worker."
+      caption: "A model Hermes built, with the same runs, explanations and pages."
 
 - id: planner123
   label: "Planner123"

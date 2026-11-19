@@ -97,7 +97,7 @@ const docsStalePatterns = [
 // the rendered page, so a case that loses or gains the variant fails instead of
 // being re-classified.
 const PRODUCT_CASES = {
-  "hermes-workbench": { video: "/videos/use-cases/hermes-solverforge-workbench-demo.mp4", repo: "https://github.com/blackopsrepl/hermes-solverforge-workbench", cues: 15, captures: 4 },
+  "hermes-workbench": { video: "/videos/use-cases/hermes-solverforge-workbench-demo.mp4", repo: "https://github.com/blackopsrepl/hermes-solverforge-workbench", cues: 15, captures: 6 },
   planner123: { video: "/videos/use-cases/planner123-demoscene.mp4", repo: "https://github.com/blackopsrepl/Planner123", cues: 9, captures: 4 },
   "hermes-planner": {
     video: "/videos/use-cases/hermes-solverforge-planner-demo.mp4",
