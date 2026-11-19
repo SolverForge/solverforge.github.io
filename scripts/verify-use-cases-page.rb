@@ -11,7 +11,7 @@ require "yaml"
 ROOT = File.expand_path("..", __dir__)
 
 DATA_PATH = "src/_data/use_cases.yml"
-EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew ev planner123 hermes-planner hermes-routing].freeze
+EXPECTED_CASES = %w[hospital lessons deliveries field-service furnace orders fleet flightcrew ev hermes-workbench planner123 hermes-planner hermes-routing].freeze
 # Cases with a written guide keep it; the repository-only cases ship the app
 # source instead, and every case has its own page generated from this file.
 EXPECTED_DOCS = {
@@ -28,6 +28,7 @@ REPO_URL_PATTERN = %r{\Ahttps://github\.com/SolverForge/solverforge-usecases/tre
 # captures of the real app instead of annotated ones. The plugins also link
 # their Hermes Marketplace entry.
 PRODUCT_CASES = {
+  "hermes-workbench" => { repo: "https://github.com/blackopsrepl/hermes-solverforge-workbench" },
   "planner123" => { repo: "https://github.com/blackopsrepl/Planner123" },
   "hermes-planner" => {
     repo: "https://github.com/blackopsrepl/hermes-solverforge-planner",

@@ -97,6 +97,7 @@ const docsStalePatterns = [
 // the rendered page, so a case that loses or gains the variant fails instead of
 // being re-classified.
 const PRODUCT_CASES = {
+  "hermes-workbench": { video: "/videos/use-cases/hermes-solverforge-workbench-demo.mp4", repo: "https://github.com/blackopsrepl/hermes-solverforge-workbench", cues: 15, captures: 4 },
   planner123: { video: "/videos/use-cases/planner123-demoscene.mp4", repo: "https://github.com/blackopsrepl/Planner123", cues: 9, captures: 4 },
   "hermes-planner": {
     video: "/videos/use-cases/hermes-solverforge-planner-demo.mp4",
@@ -113,7 +114,7 @@ const PRODUCT_CASES = {
     captures: 4,
   },
 };
-const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "ev", "planner123", "hermes-planner", "hermes-routing"];
+const ALL_CASES = ["hospital", "lessons", "deliveries", "field-service", "furnace", "orders", "fleet", "flightcrew", "ev", "hermes-workbench", "planner123", "hermes-planner", "hermes-routing"];
 
 function walk(dir, predicate, out = []) {
   for (const name of readdirSync(dir)) {
