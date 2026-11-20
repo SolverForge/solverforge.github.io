@@ -72,15 +72,16 @@ cursor execution, safe native score specializations, snapshots, retained jobs,
 candidate traces, and embedded shared UI asset bytes. The
 [Python docs](/docs/solverforge-python/) state the core release the published
 package pins, and the binding follows that core's `move_thread_count`
-semantics: on the pinned core, an explicit count enables acceptor-forager
-evaluator replicas and `auto` evaluates sequentially.
+semantics: on the pinned core, `auto` chooses sequential or parallel
+acceptor-forager evaluation per step from measured costs, an explicit count
+requests evaluator replicas, and `none` stays sequential.
 `Solver.solve` releases the GIL while workers attach to execute callbacks.
 Optional attribute probes preserve non-`AttributeError` failures, including
 `KeyboardInterrupt`. Callback errors use the binding's Python exception or
 retained-job failure path without a redundant Rust panic preamble; unrelated
 Rust panics still reach the previously installed hook.
 Retained payloads expose an ordered `phases` list and `moves_speculative`, not a
-single `phase` dictionary. In the Rust use-case apps, Orders and Flight Crew
+single `phase` dictionary; the detail read adds the core's resolved phase plan. In the Rust use-case apps, Orders and Flight Crew
 project telemetry through
 app-owned camelCase fields such as `movesSpeculative`; Python exposes
 snake_case payloads. The other six Rust apps keep narrower, app-owned

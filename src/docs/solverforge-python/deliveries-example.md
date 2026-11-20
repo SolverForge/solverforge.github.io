@@ -59,9 +59,11 @@ with a history size of 100. The local-search phase stops at 100 steps and its
 accepted-count forager stops each step after four accepted candidates. The
 whole solve stops after three seconds or one second without improvement.
 
-The default `move_thread_count = "auto"` remains sequential. To request parallel
-local-search trials, set `move_thread_count = { count = 4 }` at the top level;
-list construction and k-opt construction polish remain sequential. The seed and
+The config leaves `move_thread_count` at its default `"auto"`, which decides
+per local-search step whether parallel trials on up to four evaluators pay off.
+Set `move_thread_count = "none"` at the top level to keep every step sequential,
+or `move_thread_count = { count = 4 }` to request an explicit count; list
+construction and k-opt construction polish remain sequential. The seed and
 environment mode do not make wall-clock termination reproducible across runs
 or evaluator counts. See
 [Parallel Move Evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation)
@@ -129,7 +131,7 @@ not include the full trace.
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.2
+git checkout v0.8.1
 make develop
 make deliveries-run PORT=7861
 ```
@@ -147,7 +149,7 @@ To use the published binding with the tagged source-checkout app:
 ```bash
 python3.14 -m venv .venv-examples
 . .venv-examples/bin/activate
-python -m pip install "solverforge[examples]==0.7.2"
+python -m pip install "solverforge[examples]==0.8.1"
 python -m examples.solverforge_deliveries --port 7861
 ```
 

@@ -105,10 +105,11 @@ eligible employee. Local search then uses max-10 nearby change and swap
 selectors, late acceptance, and `first_best_score_improving`. The solve stops
 after 30 seconds or 5 seconds without improvement.
 
-The config does not opt into parallel evaluation: the default
-`move_thread_count = "auto"` stays sequential. Set `move_thread_count = { count = 4 }`
-at the top level to request parallel local-search trials; construction remains
-sequential. Wall-clock limits do not guarantee identical results across runs or
+The config leaves `move_thread_count` at its default `"auto"`, which decides
+per local-search step whether parallel trials on up to four evaluators pay off.
+Set `move_thread_count = "none"` at the top level to keep every step sequential,
+or `move_thread_count = { count = 4 }` to request an explicit count;
+construction remains sequential. Wall-clock limits do not guarantee identical results across runs or
 evaluator counts. See
 [Parallel Move Evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation).
 
@@ -119,7 +120,7 @@ The app lives in the tagged source checkout:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.2
+git checkout v0.8.1
 ```
 
 ### With The Published Package
@@ -130,7 +131,7 @@ into a separate venv and start the app:
 ```bash
 python3.14 -m venv .venv-examples
 . .venv-examples/bin/activate
-python -m pip install "solverforge[examples]==0.7.2"
+python -m pip install "solverforge[examples]==0.8.1"
 python -m examples.solverforge_hospital --port 7860
 ```
 

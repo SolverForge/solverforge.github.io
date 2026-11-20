@@ -15,7 +15,7 @@ SolverForge Python has two runtime entry points:
   resume, cancel, and delete
 
 Both paths compile the authored Python schema into one immutable SolverForge
-0.23.0 runtime graph. The binding supplies dynamic state, callbacks, slot
+0.31.2 runtime graph. The binding supplies dynamic state, callbacks, slot
 capabilities, assignment groups, providers, and candidate metrics; the core owns
 phase construction, cursor execution, foraging, lifecycle control, and
 telemetry. There is no wrapper-owned fallback runner.
@@ -76,7 +76,33 @@ Supported termination fields are:
 - `unimproved_seconds_spent_limit`
 
 Termination fields can be set at the top level or under `termination`, but not
-with conflicting values in both places.
+with conflicting values in both places. Every configured solver-level criterion
+applies, combined with OR: the solve stops at whichever is reached first. A
+zero `seconds_spent_limit` or `minutes_spent_limit` is a zero budget, not an
+unlimited one.
+
+No time limit is added for you. Without any termination criterion and without
+`phases`, a solve runs construction and stops, because the default local search
+is assembled only when a criterion exists. An explicit `local_search` phase
+with no solver or phase limit runs until the process or a retained
+`cancel(...)` stops it.
+
+The core validates the whole config before the solve starts. Unknown keys,
+count fields that must be positive (`selected_count_limit`, `max_nearby` on
+the nearby selectors, `min_ruin_count`, `min_sublist_size`, conflict-repair
+limits) set to zero, and out-of-range values such as a `k_opt` `k` outside
+2 to 5 raise a runtime error before any search runs; a retained job enters
+`FAILED` with the same message.
+
+`score_director.constraint_provider` names the constraint provider by the
+`__name__` of the function passed to `@planning_solution(constraints=...)`.
+Omitting it selects that provider. A name the solution does not declare, or any
+name on a solution without constraints, fails before solving:
+
+```toml
+[score_director]
+constraint_provider = "constraints"
+```
 
 ```toml
 random_seed = 7
@@ -102,12 +128,15 @@ set from the same compiled schema and callbacks.
 
 | `move_thread_count` | Behavior |
 | --- | --- |
-| `"auto"` | default; currently sequential |
+| `"auto"` | default; per step, sequential evaluation or parallel windows on up to four evaluators, whichever the measured trial, window, and replica costs favor |
 | `"none"` | disable parallel move evaluation |
 | `{"count": 4}` | request four evaluators, including the main director |
 
 The effective count is bounded by the solve's Rayon thread count and the
-32-candidate evaluation-window ceiling. Counts of zero or one stay sequential.
+32-candidate evaluation-window ceiling. `{"count": 1}` stays sequential and
+`{"count": 0}` is a configuration error. Because `"auto"` can evaluate in
+parallel, scoring callbacks may run on several threads without any
+`move_thread_count` key; pass `"none"` to keep a solve strictly sequential.
 Construction and variable neighborhood descent remain sequential. The binding
 passes this config to the core; it does not create a Python thread pool.
 
@@ -224,6 +253,24 @@ print("discarded look-ahead trials:", telemetry["moves_speculative"])
 `moves_speculative` separately counts evaluated look-ahead trials discarded
 after an early decision or interruption; it is not accepted or applied work.
 Both run totals and phase records expose it. Sequential phases report zero.
+Run totals also carry `problem_changes_applied`, which stays `0` because the
+Python manager queues no problem changes.
+
+`telemetry_detail(job_id)` adds `selector_telemetry`, `move_telemetry`, and
+`applied_move_trace` records to the same totals, plus `resolved_phase_plan`:
+the tree of phases, construction stages, and default local-search selectors the
+core actually ran, with each node's `kind`, `attributes`, and `children`. It is
+`None` until the solve ends. Ordinary `get_status(...)` and `events(...)`
+payloads leave it out.
+
+```python
+detail = manager.telemetry_detail(handle.job_id)
+plan = detail["status"]["telemetry"]["resolved_phase_plan"]
+if plan is not None:
+    print(plan["kind"])
+    for phase in plan["children"]:
+        print(" ", phase["kind"], phase["attributes"])
+```
 
 Construction and local search publish the same engine-owned phase lifecycle and
 progress telemetry. The first observed construction work is reported promptly,

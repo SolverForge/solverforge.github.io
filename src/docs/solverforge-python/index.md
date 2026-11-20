@@ -11,11 +11,12 @@ description: >
 <h1>SolverForge Python</h1>
 
 <%= render Ui::Callout.new do %>
-The current public PyPI package is `solverforge 0.7.2`, from the tagged
-`solverforge-py v0.7.2` source for CPython 3.14. It pins the six SolverForge Rust
-dependencies to exactly `0.23.0` and embeds `solverforge-ui 0.9.0` assets for
-Python-hosted examples. Acceptor-forager local search supports opt-in
-[parallel move evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation).
+The current public PyPI package is `solverforge 0.8.1`, from the tagged
+`solverforge-py v0.8.1` source for CPython 3.14. It pins the six SolverForge Rust
+dependencies to exactly `0.31.2` and embeds `solverforge-ui 0.9.1` assets for
+Python-hosted examples. Acceptor-forager local search runs
+[parallel move evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation)
+under the default `"auto"` policy when the measured costs favor it.
 Use free-threaded CPython for concurrent Python callback execution.
 <% end %>
 
@@ -31,7 +32,7 @@ selector or move engine.
 Install the current public PyPI package:
 
 ```bash
-python3.14 -m pip install "solverforge==0.7.2"
+python3.14 -m pip install "solverforge==0.8.1"
 ```
 
 Use the tagged source checkout when developing the repository examples or
@@ -40,7 +41,7 @@ inspecting the complete source:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.2
+git checkout v0.8.1
 make develop
 . .venv/bin/activate
 ```
@@ -68,7 +69,7 @@ make develop
 | Scores | `SoftScore`, `HardSoftScore`, `HardSoftDecimalScore`, `HardMediumSoftScore` |
 | Direct solve | `Solver.solve(...)`, `Solver.analyze(...)` |
 | Retained jobs | `SolverManager`, `SolverManager.telemetry_detail(...)`, `QualifiedCandidateTraceProvenance` |
-| Runtime config, also accepted as a dictionary or a `solver.toml` file; the `move_thread_count` key controls evaluators | `SolverConfig` |
+| Runtime config, also accepted as a dictionary or a `solver.toml` file; the `move_thread_count` key controls evaluators and `score_director.constraint_provider` names the provider | `SolverConfig` |
 | Embedded UI assets | `solverforge.ui.asset(...)`, `solverforge.ui.asset_paths()` |
 
 ## Package Details
@@ -76,11 +77,11 @@ make develop
 | Surface | Current state |
 | ------- | ------------- |
 | Package name | `solverforge` |
-| Documented source line | `0.7.2` |
-| Published PyPI version | `0.7.2` |
+| Documented source line | `0.8.1` |
+| Published PyPI version | `0.8.1` |
 | Python requirement | `>=3.14` |
-| Runtime base | `solverforge 0.23.0` |
-| Embedded UI base | `solverforge-ui 0.9.0` |
+| Runtime base | `solverforge 0.31.2` |
+| Embedded UI base | `solverforge-ui 0.9.1` |
 | Repository | [SolverForge/solverforge-py](https://github.com/SolverForge/solverforge-py) |
 
 ## Sections
@@ -104,6 +105,6 @@ make develop
 
 ## Links
 
-- [SolverForge Python 0.7.x release notes](/blog/releases/2026/10/27/solverforge-python-0-7-x/)
-- [PyPI package 0.7.2](https://pypi.org/project/solverforge/0.7.2/)
-- [Python v0.7.2 source](https://github.com/SolverForge/solverforge-py/tree/v0.7.2)
+- [SolverForge Python 0.8.x release notes](/blog/releases/2026/11/20/solverforge-python-0-8-x/)
+- [PyPI package 0.8.1](https://pypi.org/project/solverforge/0.8.1/)
+- [Python v0.8.1 source](https://github.com/SolverForge/solverforge-py/tree/v0.8.1)

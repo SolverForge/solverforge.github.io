@@ -16,7 +16,7 @@ solves it, and shows the equivalent config forms.
 - Rust 1.95.0 when pip has no wheel for your platform, and for every source
   checkout build
 
-The published `solverforge 0.7.2` package ships wheels for three platforms:
+The published `solverforge 0.8.1` package ships wheels for three platforms:
 
 | Platform | Wheel tag |
 | -------- | --------- |
@@ -43,14 +43,14 @@ version:
 python3.14 -m venv .venv
 . .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install "solverforge==0.7.2"
+python -m pip install "solverforge==0.8.1"
 python -c "import solverforge; print(solverforge.__version__)"
 ```
 
 The last command prints:
 
 ```text
-0.7.2
+0.8.1
 ```
 
 ### From The Tagged Source
@@ -62,13 +62,13 @@ compiles the native extension with Rust 1.95.0:
 ```bash
 git clone https://github.com/SolverForge/solverforge-py.git
 cd solverforge-py
-git checkout v0.7.2
+git checkout v0.8.1
 make develop
 . .venv/bin/activate
 python -c "import solverforge; print(solverforge.__version__)"
 ```
 
-This also prints `0.7.2`.
+This also prints `0.8.1`.
 
 ## A Minimal Model
 
@@ -145,7 +145,7 @@ model has no preference between nurses, so both shifts keep the first one.
 
 `Solver.solve(...)` reads the Python object graph, runs SolverForge, then writes
 the solved variables and score back to a Python solution object. The schema is
-compiled into the SolverForge 0.23.0 runtime graph; Python-authored models do not
+compiled into the SolverForge 0.31.2 runtime graph; Python-authored models do not
 use a separate search engine.
 
 ## Analyze A Solution
@@ -229,9 +229,11 @@ seconds_spent_limit = 2
 When the `config` argument is `None`, `Solver.solve(...)` and `SolverManager`
 load `solver.toml` from the current directory if it exists.
 
-To enable parallel candidate evaluation, pass `"move_thread_count": {"count": 4}`
-in the dictionary or set `move_thread_count = { count = 4 }` at the top level of
-the TOML. The default `"auto"` stays sequential. See
+The default `move_thread_count = "auto"` decides per step whether to evaluate
+candidates in parallel, on up to four evaluators. Pass
+`"move_thread_count": {"count": 4}` in the dictionary or set
+`move_thread_count = { count = 4 }` at the top level of the TOML to request an
+explicit count, or `"none"` to keep every step sequential. See
 [Parallel Move Evaluation](/docs/solverforge-python/solving-and-runtime/#parallel-move-evaluation)
 for a fixed-step example, callback safety, and reproducibility limits.
 
