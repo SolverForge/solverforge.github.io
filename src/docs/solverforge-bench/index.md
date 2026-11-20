@@ -262,33 +262,34 @@ a run.
 ## Published Results
 
 The [results page](/benchmarks/) contains the latest publishable full canonical
-nightly for each problem, with the complete [downloadable evidence](/benchmarks/results.json).
-The catalog cohort completed on October 31 – November 1, 2026 (UTC), from
-benchmark commit `d7ca9e3c56784cc9ee21089af314f085e18eb39b`:
+run for each problem, with the complete [downloadable evidence](/benchmarks/results.json).
+The catalog cohort is the nightly that completed on November 19–20, 2026 (UTC),
+from benchmark commit `94bccba67924011b8e79141e30c38999fcd01705`:
 
 | Problem | Instances | Recorded results | Run |
 | --- | --- | --- | --- |
-| CVRP | 100 | 2,100 | `7f726413-3369-4ace-83ab-cd6bcc2d9110` |
-| Employee scheduling | 37 | 555 | `d335811a-0d3c-4f4b-a186-9494cd79df71` |
-| Job-shop scheduling | 162 | 2,430 | `a2c4a29a-b67d-4daf-9cef-a355e2604bd8` |
+| CVRP | 100 | 2,100 | `23f35504-9d25-4c7b-8e28-6a6fcc896d53` |
+| Employee scheduling | 37 | 555 | `28b1cb08-03f4-4148-87f5-4ca6f32ebf4a` |
+| Job-shop scheduling | 162 | 2,430 | `e8cb1fdc-8437-4b75-a791-b2eb8193636a` |
 
-These runs tested native SolverForge **0.23.0** and Python **0.7.2**; the
+These runs tested native SolverForge **0.31.2** and Python **0.7.2**; the
 [results page](/benchmarks/) lists every solver and version in each matrix.
 Each matrix covers the 1, 10, and 60 second budgets.
 Official references cover every selected instance in all three problems.
 
-The large-scale cohort completed on November 19, 2026 (UTC), from benchmark
-commit `94bccba67924011b8e79141e30c38999fcd01705`, and tested native
-SolverForge **0.31.2** at one 300-second budget:
+The large-scale cohort completed on November 20, 2026 (UTC), from benchmark
+commit `b8f7a893d64ff851e31c6401e7d8d7ba867e85c1`, and tested native
+SolverForge **0.31.2** against three other solvers on hospital rostering and
+four on delivery routing, at one 300-second budget:
 
 | Problem | Instances | Recorded results | Run |
 | --- | --- | --- | --- |
-| Hospital rostering at scale | 1 | 2 | `baeaef42-44a2-4cb9-9786-0902f61e33e1` |
-| Delivery routing at scale | 1 | 2 | `5669e6b7-102d-4dd6-8cee-f40f533ed5fd` |
+| Hospital rostering at scale | 1 | 3 | `d7d02904-14ff-491c-8033-0a731ce9a817` |
+| Delivery routing at scale | 1 | 4 | `5c2e7e7b-4099-4a68-b97d-fe9ee17fdad7` |
 
 Their instances are synthetic and carry no reference value, so the results page
 ranks their solvers by score: fewer hard-constraint violations first, then lower
-soft cost.
+soft cost. A feasible plan's score is its validator cost.
 
 ## Official References
 
