@@ -995,13 +995,14 @@ async function checkUseCasePages(origin) {
 
 // Large-scale problems rank by score, hard violations first, then soft cost.
 // Every expectation is recomputed from the raw evidence score strings, never
-// from the summary the page renders.
+// from the summary the page renders. A solver that returned no plan has no
+// score: it ranks last and its rows are empty slots, not bars.
 function checkScaleProblem(problem, section) {
   const failures = [];
   const fail = (issue, extra = {}) => failures.push({ path: "/benchmarks/", issue: `${problem.benchmark_name} ${issue}`, ...extra });
   const evidence = JSON.parse(readFileSync("src/benchmarks/results.json", "utf8"));
   const outcomes = (evidence.scale_outcomes || []).filter((row) => row.run_id === problem.id);
-  const parse = (score) => score.split("/").map((part) => 0 - parseInt(part, 10));
+  const parse = (score) => (score ? score.split("/").map((part) => 0 - parseInt(part, 10)) : [Infinity, Infinity]);
   const number = (value) => value.toLocaleString("en-US");
   const instances = [...new Set(outcomes.map((row) => row.instance))].sort();
   if (instances.length === 0) fail("has no large-scale evidence rows");
@@ -1027,7 +1028,7 @@ function checkScaleProblem(problem, section) {
     }
     const rows = outcomes.filter((row) => row.instance === instance).map((row) => {
       const [hard, soft] = parse(row.score);
-      const values = { hard_violations: hard, soft_cost: soft };
+      const values = row.score ? { hard_violations: hard, soft_cost: soft } : {};
       if ("unassigned_shifts" in row.native) values.assigned = row.native.shifts - row.native.unassigned_shifts;
       return { solver: row.solver, hard, soft, values };
     }).sort((a, b) => a.hard - b.hard || a.soft - b.soft || a.solver.localeCompare(b.solver));
@@ -1039,8 +1040,15 @@ function checkScaleProblem(problem, section) {
       }
       for (const rendered of metric.rows) {
         const value = rows.find((row) => row.solver === rendered.solver)?.values[metric.id];
-        const expected = value === undefined ? undefined : number(value);
-        if (expected === undefined || rendered.value.replace(/ s$/, "") !== expected) {
+        if (value === undefined) {
+          if (rendered.value !== "—" || Number.isFinite(rendered.fill)) {
+            fail(`${instance} chart "${metric.id}" draws a value for ${rendered.solver}, which returned no plan`, rendered);
+          }
+          if (!rendered.context) fail(`${instance} chart "${metric.id}" has no context for ${rendered.solver}`);
+          continue;
+        }
+        const expected = number(value);
+        if (rendered.value.replace(/ s$/, "") !== expected) {
           fail(`${instance} chart "${metric.id}" shows the wrong number for ${rendered.solver}`, { found: rendered.value, expected });
         }
         if (rendered.clipped) fail(`${instance} chart "${metric.id}" clips the number for ${rendered.solver}`);
@@ -1056,7 +1064,8 @@ function checkScaleProblem(problem, section) {
     }
     block.table.forEach((tr, index) => {
       const row = rows.find((candidate) => candidate.solver === tr.solver);
-      if (!row || tr.cells[0] !== String(index + 1) || tr.cells[2] !== number(row.hard)) {
+      const hardCell = Number.isFinite(row?.hard) ? number(row.hard) : "—";
+      if (!row || tr.cells[0] !== String(index + 1) || tr.cells[2] !== hardCell) {
         fail(`${instance} score table shows the wrong rank or hard violations for ${tr.solver}`, { found: tr.cells });
       }
     });
@@ -1149,6 +1158,11 @@ async function checkBenchmarksPage(origin) {
           })),
         })),
         provenance: section.querySelector("details") ? true : false,
+        named: [...section.querySelectorAll(".benchmark-solvers a[data-solver]")].map((link) => ({
+          solver: link.dataset.solver,
+          name: link.textContent.trim(),
+          href: link.getAttribute("href") || "",
+        })),
         completed: section.querySelector("time")?.getAttribute("datetime") || "",
         referencesText: section.querySelector(".benchmark-references")?.textContent || "",
         // Two charts per problem, each with a row per solver and one bar per
@@ -1269,6 +1283,16 @@ async function checkBenchmarksPage(origin) {
         failures.push({
           path: "/benchmarks/",
           issue: `${problem.benchmark_name} publishes results without run provenance`,
+        });
+      }
+      // Every compared solver is named, with its project link.
+      const named = section.named.map((entry) => entry.solver).sort().join("|");
+      if (named !== [...problem.solvers].sort().join("|") || section.named.some((entry) => !entry.name || !entry.href.startsWith("https://"))) {
+        failures.push({
+          path: "/benchmarks/",
+          issue: `${problem.benchmark_name} does not name every compared solver`,
+          found: section.named,
+          expected: problem.solvers,
         });
       }
       if (section.completed.slice(0, 10) !== problem.completed_at.slice(0, 10)) {

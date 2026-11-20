@@ -1,0 +1,23 @@
+# Display name and project link for every solver id the benchmark publishes.
+# scripts/verify-benchmarks.rb fails when a published solver has no entry.
+solverforge:
+  name: SolverForge (Rust)
+  url: https://github.com/SolverForge/solverforge
+solverforge-py:
+  name: SolverForge (Python)
+  url: https://pypi.org/project/solverforge/
+timefold:
+  name: Timefold Solver
+  url: https://github.com/TimefoldAI/timefold-solver
+ortools:
+  name: Google OR-Tools
+  url: https://github.com/google/or-tools
+highs:
+  name: HiGHS
+  url: https://github.com/ERGO-Code/HiGHS
+pyvrp:
+  name: PyVRP
+  url: https://github.com/PyVRP/PyVRP
+pyhygese:
+  name: HGS-CVRP (PyHygese)
+  url: https://github.com/chkwon/PyHygese

@@ -28,7 +28,7 @@ class Benchmark::Scale < Bridgetown::Component
   # Context a reader needs to read the number without arithmetic: hours for
   # travel seconds, share of the required total, distance from the best value.
   def context_text(metric, rows, value)
-    return "no score recorded" if value.nil?
+    return "no plan returned" if value.nil?
 
     parts = []
     parts << "#{delimit((value / 3600.0).round(1))} h" if metric["unit"] == "s"

@@ -3,6 +3,7 @@
 
 # Verify checked-in evidence offline; never query or run benchmarks.
 require "json"
+require "yaml"
 require "open3"
 require "tmpdir"
 require_relative "import-benchmarks"
@@ -109,6 +110,8 @@ class BenchmarkSnapshotTest
   end
 
   # Recomputed from the raw score strings, not through the importer's parser.
+  # A solver that returned no plan has no score and ranks after every scored
+  # solver; a feasible plan's score is its validator cost.
   def test_large_scale_problems_rank_by_score
     scale = @summary.fetch("problems").select { |problem| problem.key?("scale") }
     huge = @snapshot.fetch("runs").select { |run| run["benchmark_category"] == "huge_scale" }
@@ -116,19 +119,28 @@ class BenchmarkSnapshotTest
     scale.each do |problem|
       outcomes = @snapshot.fetch("scale_outcomes").select { |row| row.fetch("run_id") == problem.fetch("id") }
       assert_equal(problem.fetch("result_count"), outcomes.length)
+      parse = ->(score) { score && score.split("/").map { |part| -part.to_i } }
       totals = outcomes.group_by { |row| row.fetch("solver") }.transform_values do |rows|
-        parts = rows.map { |row| row.fetch("score").split("/").map { |part| -part.to_i } }
-        [parts.sum(&:first), parts.sum(&:last)]
+        parts = rows.map { |row| parse.call(row["score"]) }
+        parts.all? ? [parts.sum(&:first), parts.sum(&:last)] : [Float::INFINITY, Float::INFINITY]
       end
       expected = totals.sort_by { |solver, (hard, soft)| [hard, soft, solver] }.map(&:first)
+      outcomes.each do |outcome|
+        result = @snapshot.fetch("results").find do |row|
+          row.fetch("run_id") == outcome.fetch("run_id") && row.fetch("instance") == outcome.fetch("instance") && row.fetch("solver") == outcome.fetch("solver")
+        end
+        next unless result.fetch("hard_feasible") == true
+
+        assert_equal([0, result.fetch("cost").to_i], parse.call(outcome.fetch("score")))
+      end
       assert_equal(expected, problem.fetch("solvers"))
       problem.fetch("scale").fetch("instances").each do |instance|
         rows = instance.fetch("rows")
         assert_equal(problem.fetch("solvers").length, rows.length)
         rows.each do |row|
           raw = outcomes.find { |outcome| outcome.fetch("instance") == instance.fetch("instance") && outcome.fetch("solver") == row.fetch("solver") }
-          hard, soft = raw.fetch("score").split("/").map { |part| -part.to_i }
-          assert_equal([hard, soft], [row.fetch("hard_violations"), row.fetch("soft_cost")])
+          hard, soft = parse.call(raw["score"])
+          assert_equal([hard, soft], [row["hard_violations"], row["soft_cost"]])
           native = raw.fetch("native")
           assert_equal(native.fetch("shifts") - native.fetch("unassigned_shifts"), row.fetch("assigned")) if native.key?("unassigned_shifts")
         end
@@ -181,10 +193,19 @@ class BenchmarkSnapshotTest
   def test_only_full_runs
     @snapshot.fetch("runs").each do |run|
       assert_equal("candidate", run.fetch("run_kind"))
-      assert_equal(true, run.fetch("nightly"))
       assert_equal(false, run.fetch("git_dirty"))
     end
     assert(@snapshot.fetch("results").all? { |row| row.fetch("dataset_set") == "canonical" })
+  end
+
+  def test_every_published_solver_is_named
+    names = YAML.safe_load_file(File.join(BenchmarkImport::ROOT, "src/_data/benchmark_solvers.yml"))
+    @summary.fetch("problems").flat_map { |problem| problem.fetch("solvers") }.uniq.each do |solver|
+      assert(names.key?(solver), "#{solver} has no entry in src/_data/benchmark_solvers.yml")
+      entry = names.fetch(solver, {})
+      assert(!entry["name"].to_s.empty?, "#{solver} has no display name")
+      assert(entry["url"].to_s.start_with?("https://"), "#{solver} has no project link")
+    end
   end
 
   def test_published_problems_have_hand_written_copy

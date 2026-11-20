@@ -22,7 +22,7 @@ module BenchmarkImport
         id, benchmark_name, completed_at, run_kind, nightly, result_count,
         git_commit, git_dirty, solvers, time_limits_seconds, benchmark_category
       FROM publishable_benchmark_runs r
-      WHERE run_kind = 'candidate' AND nightly IS TRUE
+      WHERE run_kind = 'candidate'
         AND EXISTS (SELECT 1 FROM publishable_benchmark_result_facts f WHERE f.run_id = r.id)
         AND NOT EXISTS (SELECT 1 FROM publishable_benchmark_result_facts f
           WHERE f.run_id = r.id AND f.dataset_set IS DISTINCT FROM 'canonical')
@@ -30,7 +30,7 @@ module BenchmarkImport
     )
     SELECT json_build_object(
       'source', 'publishable_benchmark_result_facts',
-      'selection', 'Latest publishable full canonical nightly candidate run per problem, by completed_at',
+      'selection', 'Latest publishable full canonical candidate run per problem, by completed_at',
       'runs', (SELECT json_agg(selected ORDER BY benchmark_name) FROM selected),
       'results', (SELECT json_agg(row_to_json(public_result) ORDER BY benchmark_name, instance, time_limit_seconds, solver)
         FROM (
@@ -44,7 +44,9 @@ module BenchmarkImport
       'scale_outcomes', (SELECT json_agg(row_to_json(scale_outcome) ORDER BY benchmark_name, instance, time_limit_seconds, solver)
         FROM (
           SELECT f.run_id, f.benchmark_name, f.instance, f.solver, f.time_limit_seconds,
-            COALESCE(f.native_fields #>> '{solver_metadata,fresh_score}', f.native_fields ->> 'native_reported_score') AS score,
+            CASE WHEN f.hard_feasible THEN '0hard/' || (-f.cost)::bigint || 'soft'
+              ELSE COALESCE(f.native_fields #>> '{solver_metadata,fresh_score}', f.native_fields ->> 'native_reported_score')
+            END AS score,
             f.native_fields - 'solver_metadata' AS native
           FROM publishable_benchmark_result_facts f JOIN selected s ON s.id = f.run_id
           WHERE s.benchmark_category = 'huge_scale'
@@ -171,8 +173,8 @@ module BenchmarkImport
 
     problems = runs.map do |run|
       rows = results.select { |row| row.fetch("run_id") == run.fetch("id") }
-      unless run.fetch("run_kind") == "candidate" && run.fetch("nightly") == true && rows.all? { |row| row.fetch("dataset_set") == "canonical" }
-        raise ArgumentError, "Only full canonical nightly candidate runs may be published"
+      unless run.fetch("run_kind") == "candidate" && rows.all? { |row| row.fetch("dataset_set") == "canonical" }
+        raise ArgumentError, "Only full canonical candidate runs may be published"
       end
       unless rows.length == run.fetch("result_count")
         raise ArgumentError, "Incomplete result snapshot for #{run.fetch('benchmark_name')}"

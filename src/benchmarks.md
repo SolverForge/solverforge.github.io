@@ -5,7 +5,7 @@ page_class: benchmarks-page
 description: Latest full benchmark results from solverforge-bench, grouped by problem and labeled with the versions actually tested.
 ---
 
-Latest completed **full canonical nightly runs**, with the versions actually tested.
+Latest completed **full canonical runs**, with the versions actually tested.
 Quick and partial runs are excluded; these are not measurements of newer releases.
 
 **Read the gates from left to right: 1s → 10s → 60s.** First, compare how many
@@ -34,6 +34,10 @@ score, fewer hard-constraint violations first, then lower soft cost.
     <%= problem.fetch('instances') %> <%= problem.fetch('instances') == 1 ? 'instance' : 'instances' %> ·
     <%= problem.fetch('result_count') %> recorded results ·
     Completed <time datetime="<%= problem.fetch('completed_at') %>"><%= problem.fetch('completed_at')[0, 10] %></time>
+  </p>
+  <p class="benchmark-solvers">
+    Solvers:
+    <% problem.fetch('solvers').each_with_index do |solver, index| %><%= ', ' if index > 0 %><% entry = site.data.benchmark_solvers.fetch(solver) %><a href="<%= entry.fetch('url') %>" data-solver="<%= solver %>"><%= entry.fetch('name') %></a> (<code><%= solver %></code>)<% end %>
   </p>
   <% if problem['scale'] %>
     <p class="benchmark-references">
@@ -94,7 +98,7 @@ score, fewer hard-constraint violations first, then lower soft cost.
   <% end %>
   <details>
     <summary>Run provenance</summary>
-    <p>Full canonical nightly candidate · completed <%= problem.fetch('completed_at') %> (UTC). The warehouse's publication checks passed; the benchmark repository was clean.</p>
+    <p>Full canonical <%= problem['nightly'] == false ? 'candidate run' : 'nightly candidate' %> · completed <%= problem.fetch('completed_at') %> (UTC). The warehouse's publication checks passed; the benchmark repository was clean.</p>
     <p>Run <code><%= problem.fetch('id') %></code><br />Harness commit <a href="https://github.com/SolverForge/solverforge-bench/commit/<%= problem.fetch('git_commit') %>"><code><%= problem.fetch('git_commit')[0, 12] %></code></a>.</p>
   </details>
 </section>
