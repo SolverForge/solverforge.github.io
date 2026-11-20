@@ -293,14 +293,16 @@ REQUIRED_TEXT = {
     "RAYON_NUM_THREADS", "32"
   ],
   "src/_posts/releases/2026-06-02-solverforge-python-0-4-x.md" => [
-    "The current binding is `solverforge 0.7.2` on core `0.23.0`",
-    "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
+    "The current binding is `solverforge 0.8.1` on core `0.31.2`",
+    "/blog/releases/2026/11/20/solverforge-python-0-8-x/"
   ],
   "src/_posts/releases/2026-07-03-solverforge-python-0-5-x.md" => [
-    "The current binding is `solverforge 0.7.2` on core `0.23.0`",
-    "/blog/releases/2026/10/27/solverforge-python-0-7-x/"
+    "The current binding is `solverforge 0.8.1` on core `0.31.2`",
+    "/blog/releases/2026/11/20/solverforge-python-0-8-x/"
   ],
   "src/_posts/releases/2026-10-27-solverforge-python-0-7-x.md" => [
+    "The current binding is `solverforge 0.8.1` on core `0.31.2`",
+    "/blog/releases/2026/11/20/solverforge-python-0-8-x/",
     "**SolverForge Python 0.7.x** follows `solverforge 0.6.15`",
     "solverforge==0.7.2", "`0.7.2` | 2026-10-28", "`0.7.1` | 2026-10-28", "`0.7.0` | 2026-10-27",
     "22833923229c008a70c385e05c76072a5d87c75f",
@@ -486,10 +488,24 @@ crates.io on 2026-10-14",
     "DenseKeys::add", "per event", "at most once"
   ],
   "src/docs/solverforge-python/index.md" => [
-    "solverforge-py v0.7.2",
-    "solverforge==0.7.2",
-    "solverforge 0.23.0",
-    "solverforge-ui 0.9.0"
+    "solverforge-py v0.8.1",
+    "solverforge==0.8.1",
+    "solverforge 0.31.2",
+    "solverforge-ui 0.9.1",
+    "/blog/releases/2026/11/20/solverforge-python-0-8-x/"
+  ],
+  "src/_posts/releases/2026-11-20-solverforge-python-0-8-x.md" => [
+    "**SolverForge Python 0.8.x** follows `solverforge 0.7.2`",
+    "solverforge==0.8.1", "`0.8.1` | 2026-11-20", "`0.8.0` | 2026-11-20",
+    "never published", "6776c18c76134b40ecc8a459c6d74fe771c49210",
+    "7c8a5f8a3dbfbbedd7e72e4295b797d8faca7dce",
+    "44814575001", "44814580348", "44812794516", "44812798819",
+    "44eea1e3f1f5035e128e7d1c1ae9814c53347730b98e54fb49877def76e7f064",
+    "5e6e05d284e1430571e2f50051fb4d71c717327150c66996517cf076005d81bf",
+    "6ad1f1285a01c663f75efb8c864eb3c9239b5eb43a2cf6d12bdd381b95825862",
+    "7b9c92a1a86dabb94176316161062641c225c0e53af13db353f19ba57074c377",
+    "exactly\n`=0.31.2`", "`resolved_phase_plan`", "`problem_changes_applied`",
+    "score_director.constraint_provider", "no implicit time limit"
   ],
   "src/docs/solverforge-python/modeling.md" => [
     "`candidate_values` is also the native hard domain",
@@ -591,10 +607,12 @@ crates.io on 2026-10-14",
     "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-ui = { version = \"#{ReleasePins::UI}\" }` |"
   ],
   "src/docs/solverforge-python/getting-started.md" => [
-    "SolverForge 0.23.0", "`cp314` ABI, not `cp314t`"
+    "SolverForge 0.31.2", "`cp314` ABI, not `cp314t`", "solverforge==0.8.1"
   ],
   "src/docs/solverforge-python/solving-and-runtime.md" => [
-    "0.23.0 runtime graph", "moves_speculative", "discarded_speculative",
+    "0.31.2 runtime graph", "`resolved_phase_plan`", "`problem_changes_applied`",
+    "No time limit is added for you", "`score_director.constraint_provider`",
+    "`{\"count\": 0}` is a configuration error", "moves_speculative", "discarded_speculative",
     "phases = telemetry[\"phases\"]", "releases the GIL",
     "not a universal cross-count guarantee",
     "## Callback Errors And Interrupts", "`KeyboardInterrupt`", "`except Exception`",
@@ -652,8 +670,8 @@ crates.io on 2026-10-14",
   "src/reference/crate-map.md" => [
     "solverforge #{CORE}",
     "`AcceptedCount(4)` for list models and `AcceptedCount(32)` for\nscalar groups",
-    "solverforge 0.7.2",
-    "solverforge-py v0.7.2"
+    "solverforge 0.8.1",
+    "solverforge-py v0.8.1"
   ],
   "src/reference/lifecycle-pause-resume-contract.md" => [
     "solverforge #{CORE}",
@@ -720,13 +738,13 @@ crates.io on 2026-10-14",
     "retained `KeyOf` keys", "caller-owned", "`RowChanges` is gone",
     "lists are updated in place", "residual predicates", "duplicate",
     "benchmark results or measured performance gains",
-    "solverforge-py 0.7.2",
-    "40672018229", "40672022045",
-    "22833923229c008a70c385e05c76072a5d87c75f",
+    "solverforge-py 0.8.1",
+    "44814575001", "44814580348",
+    "6776c18c76134b40ecc8a459c6d74fe771c49210",
     "Callback failures and interrupts",
-    "over one compiled SolverForge 0.23.0 runtime graph",
+    "over one compiled SolverForge 0.31.2 runtime graph",
     "`moves_speculative`, `discarded_speculative`",
-    "solverforge-ui 0.9.0",
+    "solverforge-ui 0.9.1",
     "**Explicit configuration**", "**Constraint weights and problem changes**"
   ],
   "src/docs/getting-started/solverforge-hospital-use-case.md" => [
@@ -782,8 +800,8 @@ crates.io on 2026-10-14",
     "pinned"
   ],
       "src/_posts/releases/2026-09-29-solverforge-python-0-6-10-x.md" => [
-    "The current binding is `solverforge 0.7.2` on core `0.23.0`",
-    "/blog/releases/2026/10/27/solverforge-python-0-7-x/",
+    "The current binding is `solverforge 0.8.1` on core `0.31.2`",
+    "/blog/releases/2026/11/20/solverforge-python-0-8-x/",
     "solverforge-py 0.6.15",
     "solverforge==0.6.15",
     "solverforge 0.22.0",
@@ -820,8 +838,8 @@ crates.io on 2026-10-14",
     "repository-only"
   ],
   "src/_posts/releases/2026-07-13-solverforge-python-0-6-x.md" => [
-    "The current Python source line is `solverforge-py 0.7.2`",
-    "/blog/releases/2026/10/27/solverforge-python-0-7-x/",
+    "The current Python source line is `solverforge-py 0.8.1`",
+    "/blog/releases/2026/11/20/solverforge-python-0-8-x/",
     "`0.6.10` | 2026-09-29",
     "`0.6.6` | 2026-08-11",
     "`0.6.5` | 2026-07-29",
@@ -866,8 +884,8 @@ FORBIDDEN_TEXT = {
   "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => ["is the current maps line", "Use the crates.io package pin"],
   "src/docs/solverforge-maps/routing.md" => ["snaps both endpoints to the nearest graph nodes"],
   "src/docs/solverforge-maps/getting-started.md" => ["snaps both endpoints to the nearest graph nodes"],
-  "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.7.0", "solverforge==0.7.1", "git checkout v0.7.0", "git checkout v0.7.1", "solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
-  "src/docs/solverforge-python/solving-and-runtime.md" => ["0.22.0 runtime graph"],
+  "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.7.2", "git checkout v0.7.2", "0.23.0 runtime", "solverforge==0.7.0", "solverforge==0.7.1", "git checkout v0.7.0", "git checkout v0.7.1", "solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
+  "src/docs/solverforge-python/solving-and-runtime.md" => ["0.22.0 runtime graph", "0.23.0 runtime graph", "currently sequential", "Counts of zero or one stay sequential"],
   "src/docs/solverforge/index.md" => [
     "These pages track `solverforge 0.25.0`", "solverforge@=0.25.0", "tree/v0.25.0",
     "These pages track `solverforge 0.26.0`", "solverforge@=0.26.0", "tree/v0.26.0",
