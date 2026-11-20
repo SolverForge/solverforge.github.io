@@ -153,7 +153,7 @@ instance).
 | Previous core release | `solverforge 0.31.1` | Row-level cascading rescoring and one-pass grouped recreate, on the 0.31.0 policy |
 | Previous core line | `solverforge 0.30.1` | Cascading list shadows across owners; see the [0.30.x release note](/blog/releases/2026/11/15/solverforge-0-30-x/) |
 | CLI | `solverforge-cli 4.2.0` | Fresh scaffolds target core `0.31.2`; see the [4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/) |
-| Python | `solverforge-py 0.7.2` / PyPI `solverforge 0.7.2` | Compiled onto core `0.23.0`; upgrading the Rust core does not retarget these wheels |
+| Python | `solverforge-py 0.8.1` / PyPI `solverforge 0.8.1` | Compiled onto core `0.31.2` from 2026-11-20; see the [Python 0.8.x release note](/blog/releases/2026/11/20/solverforge-python-0-8-x/). This core shipped while Python was `0.7.2` on core `0.23.0` |
 | Worked use cases | November 18 app releases | All nine pin core `0.31.2` and UI `0.9.1`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/#november-18-releases-solverforge-0312) |
 | UI | `solverforge-ui 0.9.1` | Unchanged |
 | Maps | `solverforge-maps 2.3.3` | Unchanged |

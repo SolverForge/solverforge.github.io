@@ -9,6 +9,13 @@ description: >
   preserve interrupts and report callback errors without a Rust panic preamble.
 ---
 
+<%= render Ui::Callout.new(title: "Historical Python release", variant: "warning") do %>
+The current binding is `solverforge 0.8.1` on core `0.31.2`; see the
+[0.8.x release note](/blog/releases/2026/11/20/solverforge-python-0-8-x/).
+The versions, install commands, and publication status below describe this
+historical release, not the current PyPI package.
+<% end %>
+
 **SolverForge Python 0.7.x** follows `solverforge 0.6.15`. The line started
 with `0.7.0` on 2026-10-27; the current PyPI package is `solverforge 0.7.2`,
 published on 2026-10-28. Install it with

@@ -9,8 +9,8 @@ description: >
 ---
 
 <%= render Ui::Callout.new(title: "Historical Python release", variant: "warning") do %>
-The current binding is `solverforge 0.7.2` on core `0.23.0`; see the
-[0.7.x release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
+The current binding is `solverforge 0.8.1` on core `0.31.2`; see the
+[0.8.x release note](/blog/releases/2026/11/20/solverforge-python-0-8-x/).
 This article records the 0.6.x runtime bases and their historical API shape.
 <% end %>
 

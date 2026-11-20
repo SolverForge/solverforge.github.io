@@ -20,8 +20,8 @@ The `solverforge-cli 4.2.0` line scaffolds core `0.31.2` (4.0.4 targeted
 `0.26.1`, 4.0.0 and 4.0.1 targeted `0.25.1`, 4.0.2 and 4.0.3 targeted `0.26.0`, 3.9.0 targeted
 `0.25.0`, 3.8.x targeted `0.24.0`, 3.7.x targeted `0.23.0`, 3.6.0 targeted `0.22.0`; 3.4.0 targeted
 `0.20.4`, 3.5.0 targeted `0.21.0`, 3.5.1 targeted `0.21.2`, and 3.5.2 targeted
-`0.21.3`); Python 0.7.2 targets core 0.23.0 (see the
-[Python line note](/blog/releases/2026/10/27/solverforge-python-0-7-x/)); the
+`0.21.3`); Python 0.8.1 targets core 0.31.2 (see the
+[Python line note](/blog/releases/2026/11/20/solverforge-python-0-8-x/)); the
 November 18 app releases target core 0.31.2 (see the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/)).
 <% end %>

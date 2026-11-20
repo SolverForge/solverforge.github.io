@@ -72,13 +72,14 @@ the final app tag, `solverforge-lessons@3.0.6`
 Furnace, Orders, Fleet, and Flight crew are repository-only. See the
 [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/).
 
-SolverForge Python has a tagged `solverforge-py 0.7.2` source line for CPython
-3.14, compiled onto the `solverforge 0.23.0` runtime with embedded
-`solverforge-ui 0.9.0` assets; PyPI serves `solverforge 0.7.2`. Python's
-exact-tag [CI](https://github.com/SolverForge/solverforge-py/actions/runs/40672018229)
-and [release/PyPI publication](https://github.com/SolverForge/solverforge-py/actions/runs/40672022045)
-passed at `22833923229c008a70c385e05c76072a5d87c75f`. See the
-[0.7.x Python release note](/blog/releases/2026/10/27/solverforge-python-0-7-x/).
+SolverForge Python has a tagged `solverforge-py 0.8.1` source line for CPython
+3.14, compiled onto the `solverforge 0.31.2` runtime with embedded
+`solverforge-ui 0.9.1` assets; PyPI serves `solverforge 0.8.1`. Python's
+exact-tag [CI](https://github.com/SolverForge/solverforge-py/actions/runs/44814575001)
+and [release/PyPI publication](https://github.com/SolverForge/solverforge-py/actions/runs/44814580348)
+passed at `6776c18c76134b40ecc8a459c6d74fe771c49210`. The `0.8.0` number was
+tagged but never published: its release run could not build the macOS wheel.
+See the [0.8.x Python release note](/blog/releases/2026/11/20/solverforge-python-0-8-x/).
 The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 `solverforge-maps 2.3.4`; both SolverForge agent skills live in the
 `solverforge-cli` repository.
@@ -90,7 +91,7 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 | ------------- | ------------------- | ----------- |
 | **Rust Core** | Published; CI and release passed | Native Rust constraint solver published as `solverforge 0.31.2`: every termination criterion applied with no hidden time limit, measured automatic parallel evaluation, seeded and checked assert modes, framework partitioned search, validated configuration, replica directors built by `ScoreDirector::with_replicas`, late acceptance that keeps its history across soft-level improvements, pluggable CVRP route metrics, bounded Clarke-Wright savings, list element groups, cascading list shadows across owners, constraint matches with planning ids, and a measured default search policy; Rust `1.95` |
 | **CLI Scaffold** | Published; CI and release passed | `solverforge-cli 4.2.0` targets `solverforge 0.31.2`, web `solverforge-ui 0.9.1` + `solverforge-maps 2.3.3`, MCP `rmcp 3.9.0`; constraints declared in `src/constraints/mod.rs` and assembled in `src/constraints/assemble.rs` |
-| **Python** | Published; CI and release passed | `solverforge-py 0.7.2` compiles dynamic CPython 3.14 models into the `solverforge 0.23.0` runtime; PyPI publishes `solverforge 0.7.2` |
+| **Python** | Published; CI and release passed | `solverforge-py 0.8.1` compiles dynamic CPython 3.14 models into the `solverforge 0.31.2` runtime with `solverforge-ui 0.9.1`; PyPI publishes `solverforge 0.8.1` |
 | **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.6`, `solverforge-lessons@3.0.6`, `solverforge-deliveries@3.0.7`, `solverforge-fsr@3.0.7`, plus the repository-only `solverforge-furnace@4.0.3`, `solverforge-orders@0.3.5`, `solverforge-fleet@0.2.5`, `solverforge-flightcrew@0.3.6`, and `solverforge-ev@0.1.0`; all nine target `solverforge 0.31.2` and `solverforge-ui 0.9.1` |
 | **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.2.0` scaffolds it directly |
 | **Maps** | Published | `solverforge-maps 2.3.3` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, and identifies its client to Overpass |
@@ -157,8 +158,8 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 
 ## Python Package
 
-- **Install**: `python3.14 -m pip install "solverforge==0.7.2"`; use the
-  matching `solverforge-py` `v0.7.2` tag for source and example development.
+- **Install**: `python3.14 -m pip install "solverforge==0.8.1"`; use the
+  matching `solverforge-py` `v0.8.1` tag for source and example development.
 - **Modeling**: Python classes, decorators, scalar variables, list variables,
   explicit assignment metadata, scoped route/savings bundles, named candidate
   metrics, hard per-row scalar candidate domains, native static same-value
@@ -169,7 +170,12 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
   failure. Recognized callback-error payloads do not print a redundant Rust
   panic preamble, while unrelated Rust panics reach the previous hook.
 - **Runtime entry points**: `Solver.solve(...)`, `Solver.analyze(...)`, and
-  `SolverManager(config=None)` over one compiled SolverForge 0.23.0 runtime graph.
+  `SolverManager(config=None)` over one compiled SolverForge 0.31.2 runtime graph,
+  with `score_director.constraint_provider` naming the solution's provider.
+- **Termination and config**: every configured termination criterion applies
+  with no implicit time limit; the core rejects unknown keys and zero-valued
+  count fields before solving. `move_thread_count = "auto"` decides per step
+  whether to evaluate in parallel.
 - **Constraint surface**: callback-authored unary streams, binary stream-level
   joins, grouped counts, balance scoring, fixed or callback-computed weights,
   unassigned-list scoring, list precedence/makespan scoring, indexed-presence
@@ -564,13 +570,14 @@ scaffolds aligned as releases move.
 
 ### Python Package
 
-`solverforge-py 0.7.2` is the current tagged SolverForge Python source line for
+`solverforge-py 0.8.1` is the current tagged SolverForge Python source line for
 CPython 3.14. It compiles explicit Python model metadata into the
-`solverforge 0.23.0` runtime, supports opt-in parallel acceptor-forager
-trial evaluation, retains every phase's telemetry, and keeps shared
-`solverforge-ui 0.9.0` assets. Consumers migrate the single `phase` dictionary
-to the ordered `phases` list and read the last entry for a running progress
-snapshot, guarding an empty list before any phase starts. The automatic release workflow
+`solverforge 0.31.2` runtime, applies every configured termination criterion
+with no implicit time limit, follows the core's measured `"auto"` parallel
+evaluation policy, selects the constraint provider by name, reports the
+resolved phase plan in detailed retained telemetry, and keeps shared
+`solverforge-ui 0.9.1` assets. The 0.7.x line moved retained telemetry from the
+single `phase` dictionary to the ordered `phases` list. The automatic release workflow
 publishes the source distribution and CPython 3.14 wheels to PyPI for every
 tagged patch. `0.6.6` (2026-08-11) enforces each row's imported candidate set
 as the hard domain for every native scalar mutation and adds
