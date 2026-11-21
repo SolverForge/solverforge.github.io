@@ -129,6 +129,42 @@ cost displays without recomputing every pair as a separate route. If a pair is
 unreachable, both matrices use `UNREACHABLE`. If the indices are outside the
 matrix bounds, the accessors return `None`.
 
+## Measure Travel at Busy Times
+
+OpenStreetMap carries no traffic, so a busy period is described as roads that
+take longer to drive. `slowed()` returns the same network with each edge's
+travel time multiplied by the factors of the slowdowns that apply to it, and
+every matrix or route computed on it measures travel during that period:
+
+```rust
+use solverforge_maps::{BoundingBox, RoadClass, SnapAccess, Slowdown};
+
+let streets = Slowdown::new(1.6)
+    .expect("a factor above zero")
+    .roads([RoadClass::Primary, RoadClass::Secondary, RoadClass::Residential]);
+let centre = Slowdown::new(1.3)
+    .expect("a factor above zero")
+    .roads([RoadClass::Trunk])
+    .area(BoundingBox::new(45.04, 7.63, 45.10, 7.72));
+
+let rush = network.slowed(&[streets, centre]);
+let access = vec![SnapAccess::Both; locations.len()];
+let morning = rush.compute_matrix_with_access(&locations, &access, None).await;
+```
+
+- A slowdown applies to the road classes it lists, or to every road when it
+  lists none; with an area, only to edges whose midpoint lies inside it.
+- Slowdowns that overlap multiply. A factor must be a finite number above
+  zero (`SlowdownError` otherwise); a factor below 1 makes roads faster.
+- Nodes, distances and connectivity stay the same: places snap to the same
+  roads and every pair stays reachable, while the fastest path and its time
+  may change.
+
+Each edge's `RoadClass` comes from its `highway` tag; links take the class of
+the road they serve, and any other tag is `RoadClass::Other`.
+`RoadClass::parse("living_street")` and `as_str()` convert to and from
+configuration names.
+
 ## Geometry for Frontend Visualization
 
 `RouteResult` includes geometry that can be rendered directly on a web map. For compact transmission, `solverforge-maps` also exposes Google polyline helpers.
