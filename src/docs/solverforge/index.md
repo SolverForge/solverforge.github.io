@@ -22,7 +22,7 @@ compiles against that release. The workspace declares Rust `1.95`.
 
 For end-to-end app scaffolding, prefer the standalone
 [`solverforge-cli`](https://github.com/solverforge/solverforge-cli) workflow.
-`solverforge-cli 4.2.0` scaffolds `solverforge 0.31.2`; an app
+`solverforge-cli 4.2.2` scaffolds `solverforge 0.31.2`; an app
 scaffolded by it or by an earlier CLI pins an older core, so read the
 `solverforge` version in its `Cargo.toml` and see the
 [0.31.x upgrade checklist](/blog/releases/2026/11/17/solverforge-0-31-x/#upgrade-checklist)

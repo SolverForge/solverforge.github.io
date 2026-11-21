@@ -42,7 +42,8 @@ The generated app reads this file through the
 working directory, so keep that argument when you edit the solution. The file
 is compiled into the app: rebuild and restart after changing it. The runtime
 rejects unknown keys: a solve started with a misspelled key ends `FAILED` at
-once. `solverforge check` does not detect unknown keys.
+once. `solverforge check` and `solverforge config set` load the file with the
+runtime's own configuration parser, so they report the same error first.
 
 This is the user-owned search layer. Edit it directly or use the CLI helpers.
 
@@ -131,7 +132,7 @@ Fresh projects also start with an app spec like this:
 name = "my-scheduler"
 starter = "neutral-shell"
 shell = "web"
-cli_version = "4.2.0"
+cli_version = "4.2.2"
 
 [runtime]
 target = "solverforge 0.31.2"
@@ -147,7 +148,7 @@ name = "Plan"
 score = "HardSoftScore"
 ```
 
-This example reflects the `solverforge-cli 4.2.0` web scaffold target. Fresh
+This example reflects the `solverforge-cli 4.2.2` web scaffold target. Fresh
 web generated apps target `solverforge 0.31.2`, take the CLI's
 `solverforge-ui 0.9.1` scaffold target, and omit `ui_source` entirely for the
 `api`, `cli`, and `mcp` shells.

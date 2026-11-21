@@ -43,12 +43,13 @@ saying so; run `cargo build` to compile.
 | each declared constraint module has a call in `src/constraints/assemble.rs`, and each call a module | Errors for unwired or unknown modules |
 | every `mod.rs` and `lib.rs` under `src/` holds only declarations | Errors for functions, types, impls, constants, macro definitions, inline module bodies, or non-doc inner attributes |
 | `solver.toml` exists                                 | Warns if missing |
-| `move_thread_count` and candidate-trace settings      | Errors for invalid runtime forms or trace capacity |
+| `solver.toml` loads in the runtime                    | Errors for unknown keys, invalid values, and malformed TOML, with the runtime's message |
 | entities have solvable fields                        | Warns for entities with no scalar or list variable |
 | scalar-group and conflict-repair references          | Errors when generated model-resource refs are stale |
 
-`check` does not reject unknown `solver.toml` keys; the runtime does, and a
-solve started with one ends `FAILED` at once.
+`check` parses `solver.toml` with the runtime's own configuration type, so a
+file it accepts is a file the runtime loads; a solve started with a file it
+rejects would end `FAILED` at once.
 
 ## `solverforge routes`
 
@@ -138,10 +139,11 @@ Subcommands:
 | `set`      | `solverforge config set <KEY> <VALUE>` | Set a dotted TOML key path in `solver.toml` |
 
 `config set` parses values as integer, float, boolean (`true` or `false`), then
-string. Intermediate TOML tables are created when needed. `check` and
-`config set` reject invalid `move_thread_count` forms: use `"auto"`, `"none"`,
-or a table with one positive integer `count`, not a bare integer. Invalid
-settings are rejected before `config set` writes the file. See
+string. Intermediate TOML tables are created when needed. `config set` loads
+the edited file with the runtime's configuration parser before writing it, so
+an unknown key or an invalid value (a bare integer for `move_thread_count`,
+which takes `"auto"`, `"none"`, or a table with one positive integer `count`)
+leaves `solver.toml` unchanged, and the error names the key. See
 [parallel evaluation](/docs/solverforge-cli/configuration/#parallel-local-search-evaluation)
 for the default, pool caps, and rebuild requirement.
 
