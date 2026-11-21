@@ -1,0 +1,10 @@
+<div class="wb-search" data-workbench-search>
+  <label class="wb-toolbar__search">
+    <span class="wb-toolbar__label">Search all <%= total %> constraints</span>
+    <input type="search" data-workbench-query autocomplete="off" spellcheck="false"
+           placeholder="rst btwn, overtime, parts, travel time">
+  </label>
+  <p class="wb-toolbar__status" data-workbench-status aria-live="polite" hidden></p>
+  <div class="wb-search__results" data-workbench-results></div>
+  <script type="application/json" data-workbench-index><%= index.to_json.gsub("</", "<\\/").html_safe %></script>
+</div>

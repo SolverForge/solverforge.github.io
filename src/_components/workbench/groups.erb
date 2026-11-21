@@ -1,0 +1,11 @@
+<div class="wb-groups">
+  <p>
+    <a href="<%= url %>"><%= model["constraints"].size %> constraints</a> in <%= groups.size %> groups:
+    <%= counts["hard"] %> hard, <%= counts["medium"] %> medium and <%= counts["soft"] %> soft.
+  </p>
+  <ul class="wb-groups__list">
+    <% groups.each do |group, rules| %>
+      <li><a href="<%= url(group) %>"><%= group %></a> <span class="wb-groups__count"><%= levels(rules) %></span></li>
+    <% end %>
+  </ul>
+</div>

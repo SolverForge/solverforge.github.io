@@ -2,7 +2,7 @@ import "$styles/index.scss"
 import "$styles/syntax-highlighting.css"
 import components from "$components/**/*.{js,jsx,js.rb,css}"
 import { initializeSearch } from "./search"
-import { initializeWorkbenchExplorer } from "./workbench"
+import { initializeWorkbenchRules, initializeWorkbenchSearch } from "./workbench"
 import { initializeDemosceneCues, initializeUseCaseCarousel, initializeUseCaseLightbox } from "./use-cases"
 
 const initializeDocsSidebar = () => {
@@ -108,5 +108,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initializeUseCaseLightbox()
   initializeDemosceneCues()
   initializeSearch()
-  initializeWorkbenchExplorer()
+  initializeWorkbenchRules()
+  initializeWorkbenchSearch()
 })

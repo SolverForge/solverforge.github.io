@@ -1,0 +1,40 @@
+<div class="wb-data" data-workbench-data="<%= model["id"] %>">
+  <% model["tables"].each do |table| %>
+    <h2 id="table-<%= table["id"] %>"><%= table["label"] %> <code><%= table["path"] %></code></h2>
+    <div class="wb-table-wrap">
+      <table class="wb-table wb-table--fields">
+        <thead><tr><th>Field</th><th>Label</th><th>Kind</th><th>Required</th><th>Values</th></tr></thead>
+        <tbody>
+          <% table["columns"].each do |column| %>
+            <tr>
+              <td><code><%= column["name"] %></code></td>
+              <td><%= column["label"] %></td>
+              <td><%= kind(column) %><% unless subfields(column).empty? %>: <code><%= subfields(column) %></code><% end %></td>
+              <td><%= column["read_only"] ? "written by the solver" : (column["optional"] ? "optional" : "required") %></td>
+              <td><%= values(column) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
+  <% unless model["parameters"].empty? %>
+    <h2 id="parameters">Parameters</h2>
+    <p>Settings of the model itself. A profile or a dataset sets them; the default applies otherwise.</p>
+    <div class="wb-table-wrap">
+      <table class="wb-table">
+        <thead><tr><th>Parameter</th><th>Default</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <% model["parameters"].each do |param| %>
+            <tr>
+              <td><code><%= param["name"] %></code><br><%= param["label"] %></td>
+              <td><%= param["default"] %><%= " #{param["unit"]}" if param["unit"] && param["default"] %></td>
+              <td><%= param["description"] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

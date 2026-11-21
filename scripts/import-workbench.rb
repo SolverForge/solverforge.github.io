@@ -8,7 +8,7 @@
 #
 #   ruby scripts/import-workbench.rb path/to/solverforge-workbench-x86_64-unknown-linux-musl
 #
-# The docs pages, the constraint explorer and verify-workbench.rb all read the
+# The docs pages, the constraint search and verify-workbench.rb all read the
 # file this writes, so nothing on the site restates a count by hand.
 require "json"
 require "open3"

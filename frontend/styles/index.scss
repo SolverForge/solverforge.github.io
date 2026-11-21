@@ -2597,16 +2597,28 @@ body.use-case-lightbox-open {
   font-size: 0.88rem;
 }
 
-// SolverForge Workbench docs: model tables, constraint lists and the explorer.
+// SolverForge Workbench docs: model tables, constraint cards and searches.
 .wb-table-wrap {
   overflow-x: auto;
   margin-bottom: 1.25rem;
 }
 
 .prose .wb-table {
+  display: table;
   width: 100%;
   border-collapse: collapse;
   font-size: 0.92rem;
+}
+
+.prose .wb-data h2 {
+  margin-top: 2rem;
+  font-size: 1.45rem;
+}
+
+.prose .wb-data h2 code {
+  font-size: 0.8em;
+  font-weight: 500;
+  vertical-align: 0.1em;
 }
 
 .prose .wb-table th,
@@ -2621,72 +2633,28 @@ body.use-case-lightbox-open {
   font-weight: 700;
 }
 
-.wb-rules,
-.wb-explorer__list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 1.5rem;
-}
-
-.wb-rule,
-.wb-hit {
-  padding: 0.65rem 0.85rem;
-  margin-bottom: 0.5rem;
-  border: 1px solid var(--sf-border);
-  border-radius: var(--sf-radius-sm);
-  background: var(--sf-panel);
-}
-
-.wb-rule:target {
-  border-color: var(--sf-accent);
-}
-
-.wb-rule__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.5rem;
-}
-
-.wb-rule__name {
-  font-weight: 700;
-}
-
-.wb-rule__name mark {
-  background: none;
-  color: var(--sf-gold);
-  text-decoration: underline;
-}
-
-.prose .wb-rule__text,
-.prose .wb-hit__where {
-  margin: 0.3rem 0 0;
-}
-
-.wb-hit__where {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
 .wb-level,
 .wb-flag {
+  flex: none;
   font-family: "JetBrains Mono", monospace;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.5;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  padding: 0.05rem 0.4rem;
+  padding: 0 0.4rem;
   border: 1px solid var(--sf-border);
   border-radius: var(--sf-radius-sm);
 }
 
 .wb-level--hard {
   border-color: #d9534f;
-  color: #e57373;
+  color: #c0392b;
 }
 
 .wb-level--medium {
   border-color: #c98b3a;
-  color: var(--sf-gold);
+  color: #a8691d;
 }
 
 .wb-level--soft {
@@ -2694,29 +2662,130 @@ body.use-case-lightbox-open {
   color: var(--sf-accent);
 }
 
-.wb-explorer__controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
+.wb-flag {
+  color: var(--sf-text-soft);
+  text-transform: none;
+  letter-spacing: 0;
 }
 
-.wb-explorer__search,
-.wb-explorer__filter {
+// The heading as written; workbench.js turns it and its explanation into a card.
+.prose h3.wb-rule {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.prose h2[id^="group-"] {
+  margin-top: 2.25rem;
+  font-size: 1.45rem;
+}
+
+.prose .wb-card {
+  margin: 0 0 0.5rem;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-panel);
+  scroll-margin-top: 6rem;
+}
+
+.prose .wb-card[open] {
+  border-color: var(--sf-accent);
+}
+
+.wb-card__summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.wb-card__summary::-webkit-details-marker {
+  display: none;
+}
+
+.wb-card__summary::before {
+  content: "";
+  flex: none;
+  width: 0.45rem;
+  height: 0.45rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  opacity: 0.6;
+}
+
+.wb-card[open] > .wb-card__summary::before {
+  transform: rotate(45deg);
+}
+
+.wb-card__name {
+  flex: 1 1 auto;
+  font-weight: 650;
+}
+
+.wb-card__name mark,
+.wb-hit mark {
+  background: none;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--sf-accent);
+  text-decoration-thickness: 2px;
+}
+
+.wb-card__link {
+  flex: none;
+  padding: 0 0.25rem;
+  color: var(--sf-text-soft);
+  text-decoration: none;
+  opacity: 0.6;
+}
+
+.wb-card__link:hover {
+  opacity: 1;
+}
+
+.wb-card__body {
+  padding: 0 1rem 0.4rem 2.05rem;
+  border-top: 1px solid var(--sf-border);
+}
+
+.wb-card__body > :first-child {
+  margin-top: 0.85rem;
+}
+
+.wb-toolbar,
+.wb-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.5rem 0.75rem;
+  margin: 1.25rem 0 1rem;
+}
+
+.wb-search {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.wb-toolbar__search,
+.wb-toolbar__filter {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
 }
 
-.wb-explorer__label {
+.wb-toolbar__label {
   font-size: 0.8rem;
-  opacity: 0.8;
+  color: var(--sf-text-soft);
 }
 
-.wb-explorer__controls input,
-.wb-explorer__controls select {
+.wb-toolbar input,
+.wb-toolbar select,
+.wb-search input {
   font: inherit;
-  padding: 0.5rem 0.65rem;
+  padding: 0.55rem 0.7rem;
   color: inherit;
   background: var(--sf-panel);
   border: 1px solid var(--sf-border);
@@ -2724,9 +2793,67 @@ body.use-case-lightbox-open {
   min-width: 0;
 }
 
-.wb-explorer__status {
+.prose .wb-toolbar__status {
+  grid-column: 1 / -1;
+  margin: 0;
   font-size: 0.9rem;
-  opacity: 0.8;
+  color: var(--sf-text-soft);
+}
+
+.wb-search__model h3 {
+  margin: 1rem 0 0.4rem;
+  font-size: 1.05rem;
+}
+
+.prose .wb-search__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prose .wb-hit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem 0.6rem;
+  margin: 0;
+  padding: 0.45rem 0.1rem;
+  border-bottom: 1px solid var(--sf-border);
+}
+
+.wb-hit a {
+  font-weight: 600;
+}
+
+.wb-hit__where {
+  font-size: 0.85rem;
+  color: var(--sf-text-soft);
+}
+
+.wb-search__more {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.prose .wb-groups__list {
+  columns: 2 16rem;
+  padding-left: 1.1rem;
+}
+
+.wb-groups__count {
+  font-size: 0.85rem;
+  color: var(--sf-text-soft);
+}
+
+@media (max-width: 640px) {
+  .wb-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .wb-card__body {
+    padding-left: 0.9rem;
+  }
 }
 
 

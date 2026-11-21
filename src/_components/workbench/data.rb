@@ -1,6 +1,6 @@
 # Reads src/_data/workbench.json: the stock models as the Workbench engine
-# release describes them. Every count and constraint on the Workbench pages
-# comes from here.
+# release describes them. Names, groups, levels and counts on the Workbench
+# pages come from here; the explanations are written in the pages.
 module Workbench
   module Data
     LEVELS = %w[hard medium soft].freeze
@@ -20,12 +20,25 @@ module Workbench
       models(site).find { |m| m["id"] == id } || raise("no Workbench model #{id}")
     end
 
+    def constraint(site, id, name)
+      model(site, id)["constraints"].find { |c| c["name"] == name } ||
+        raise("the #{id} model has no constraint #{name.inspect}")
+    end
+
     def slug(text)
       text.downcase.gsub(/[^a-z0-9]+/, "-").gsub(/\A-|-\z/, "")
     end
 
     def page_url(id)
       "/docs/solverforge-workbench/#{id}/"
+    end
+
+    def constraints_url(id)
+      "/docs/solverforge-workbench/#{id}/constraints/"
+    end
+
+    def data_url(id)
+      "/docs/solverforge-workbench/#{id}/data/"
     end
 
     def rule_anchor(constraint)

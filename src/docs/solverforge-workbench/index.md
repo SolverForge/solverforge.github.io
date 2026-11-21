@@ -42,18 +42,17 @@ appears in the sidebar.
 
 <%= render Workbench::Models.new(site: site) %>
 
-Each model page explains what the model plans, lists every constraint by group
-with what it costs, and documents every table and field of its datasets:
+Each model has three pages: what it plans and how it scores, every constraint
+explained with the fields it reads and an example, and its dataset format.
 
-- [Employee scheduling](/docs/solverforge-workbench/employee-scheduling/)
-- [Task scheduling](/docs/solverforge-workbench/task-scheduling/)
-- [Pick-up and delivery routing](/docs/solverforge-workbench/pickup-delivery-routing/)
-- [Field service routing](/docs/solverforge-workbench/field-service-routing/)
+## Find a constraint
 
-The [constraint explorer](/docs/solverforge-workbench/constraints/) searches all
-<%= site.data.workbench["models"].sum { |m| m["constraints"].size } %>
-constraints at once, with the same fuzzy match as the Workbench's own lists:
-`rst btwn` finds *Rest between shifts*.
+Search every model's constraints at once. The match is fuzzy in the same way
+as the Workbench's own lists: a substring always matches, and otherwise the
+letters must appear in order, starting words, so `rst btwn` finds *Rest between
+shifts*. Each result opens the constraint's explanation.
+
+<%= render Workbench::Search.new(site: site) %>
 
 ## How a plan is scored
 
@@ -69,8 +68,7 @@ Each constraint states its level and what one violation costs, in the unit
 the description names (seconds, minutes, one hour per unit, the task's
 priority). A **weight** multiplies that cost: 1 is as designed, 0 switches the
 constraint off, 10 makes it ten times as important. A few constraints are off
-unless a profile or dataset weighs them; the model pages and the explorer mark
-them.
+unless a profile or dataset weighs them; the constraints pages mark them.
 
 ## The workflow
 

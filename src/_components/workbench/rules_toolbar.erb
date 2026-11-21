@@ -1,0 +1,17 @@
+<div class="wb-toolbar" data-workbench-rules="<%= model["id"] %>">
+  <label class="wb-toolbar__search">
+    <span class="wb-toolbar__label">Search <%= model["constraints"].size %> constraints</span>
+    <input type="search" data-workbench-query autocomplete="off" spellcheck="false"
+           placeholder="Name, group or anything the explanation says">
+  </label>
+  <label class="wb-toolbar__filter">
+    <span class="wb-toolbar__label">Level</span>
+    <select data-workbench-level>
+      <option value="">Every level</option>
+      <% levels.each do |level| %>
+        <option value="<%= level %>"><%= level.capitalize %> (<%= counts[level] %>)</option>
+      <% end %>
+    </select>
+  </label>
+  <p class="wb-toolbar__status" data-workbench-status aria-live="polite" hidden></p>
+</div>

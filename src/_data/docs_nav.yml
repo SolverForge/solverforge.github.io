@@ -191,14 +191,32 @@ docs:
     children:
       - title: Employee Scheduling
         href: /docs/solverforge-workbench/employee-scheduling/
+        children:
+          - title: Constraints
+            href: /docs/solverforge-workbench/employee-scheduling/constraints/
+          - title: Data
+            href: /docs/solverforge-workbench/employee-scheduling/data/
       - title: Task Scheduling
         href: /docs/solverforge-workbench/task-scheduling/
+        children:
+          - title: Constraints
+            href: /docs/solverforge-workbench/task-scheduling/constraints/
+          - title: Data
+            href: /docs/solverforge-workbench/task-scheduling/data/
       - title: Pick-up and Delivery Routing
         href: /docs/solverforge-workbench/pickup-delivery-routing/
+        children:
+          - title: Constraints
+            href: /docs/solverforge-workbench/pickup-delivery-routing/constraints/
+          - title: Data
+            href: /docs/solverforge-workbench/pickup-delivery-routing/data/
       - title: Field Service Routing
         href: /docs/solverforge-workbench/field-service-routing/
-      - title: Constraint Explorer
-        href: /docs/solverforge-workbench/constraints/
+        children:
+          - title: Constraints
+            href: /docs/solverforge-workbench/field-service-routing/constraints/
+          - title: Data
+            href: /docs/solverforge-workbench/field-service-routing/data/
   - title: solverforge-maps
     href: /docs/solverforge-maps/
     children:

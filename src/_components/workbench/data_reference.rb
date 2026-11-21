@@ -1,41 +1,11 @@
-# One stock model as the engine describes it: its demo, every constraint by
-# group with its level and what it costs, the data tables a dataset holds, and
-# the model's parameters.
-class Workbench::Model < Bridgetown::Component
-  def initialize(site:, id:)
-    @site = site
-    @model = Workbench::Data.model(site, id)
+# A model's dataset format as the engine describes it: every table at its JSON
+# path with every field the model reads, the model's parameters and its demo.
+class Workbench::DataReference < Bridgetown::Component
+  def initialize(site:, model:)
+    @model = Workbench::Data.model(site, model)
   end
 
   attr_reader :model
-
-  def site
-    @site
-  end
-
-  def counts
-    Workbench::Data.counts(@model)
-  end
-
-  def groups
-    Workbench::Data.groups(@model)
-  end
-
-  def anchor(constraint)
-    Workbench::Data.rule_anchor(constraint)
-  end
-
-  def group_anchor(group)
-    Workbench::Data.group_anchor(group)
-  end
-
-  def off?(constraint)
-    Workbench::Data.off_by_default?(constraint)
-  end
-
-  def explorer_url
-    relative_url("/docs/solverforge-workbench/constraints/?model=#{@model["id"]}")
-  end
 
   # The field's kind in words: "list of objects", "minutes", "date time"...
   def kind(column)
