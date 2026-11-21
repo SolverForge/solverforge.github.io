@@ -6,8 +6,10 @@
 #
 # - the data holds the four stock models, each constraint with a name unique
 #   in its model, a group, a level and a one-sentence description;
-# - every model has its page rendering that model, and the docs nav links the
-#   overview, the four pages and the explorer;
+# - every model has its overview, data and constraints pages, and the
+#   constraints page explains every constraint the engine scores, exactly once,
+#   under its own group, with what it reads, costs, an example and its weight;
+# - the docs nav links the overview and each model's three pages;
 # - the Workbench product case states the same constraint counts.
 #
 # With --engine BIN it also describes every model with that engine binary and
@@ -38,7 +40,7 @@ module VerifyWorkbench
     failures << "engine_version missing" unless data["engine_version"].to_s.match?(/\A\d+\.\d+\.\d+\z/)
     failures << "models are #{models.map { |m| m["id"] }}, not #{MODELS}" unless models.map { |m| m["id"] } == MODELS
     models.each { |model| failures.concat(check_model(model)) }
-    failures.concat(check_pages)
+    failures.concat(check_pages(models))
     failures.concat(check_product(models))
     engine = argv.index("--engine") && argv[argv.index("--engine") + 1]
     failures.concat(check_engine(engine, data)) if engine
@@ -69,23 +71,72 @@ module VerifyWorkbench
     failures
   end
 
-  def check_pages
+  PART = %w[Reads Cost Example Weight].freeze
+
+  def check_pages(models)
     failures = []
-    MODELS.each do |id|
-      path = File.join(ROOT, "src/docs/solverforge-workbench/#{id}.md")
-      next failures << "missing page #{path}" unless File.file?(path)
-      failures << "#{id}.md does not render its model" unless File.read(path).include?(%(Workbench::Model.new(site: site, id: "#{id}")))
+    dir = File.join(ROOT, "src/docs/solverforge-workbench")
+    models.each do |model|
+      id = model["id"]
+      {
+        "index.md" => %(Workbench::Groups.new(site: site, model: "#{id}")),
+        "data.md" => %(Workbench::DataReference.new(site: site, model: "#{id}")),
+        "constraints.md" => %(<% m = "#{id}" %>),
+      }.each do |file, mark|
+        path = File.join(dir, id, file)
+        next failures << "missing page #{id}/#{file}" unless File.file?(path)
+        failures << "#{id}/#{file} does not render its model" unless File.read(path).include?(mark)
+      end
+      path = File.join(dir, id, "constraints.md")
+      failures.concat(check_explanations(model, File.read(path))) if File.file?(path)
     end
-    explorer = File.join(ROOT, "src/docs/solverforge-workbench/constraints.md")
-    failures << "constraints.md does not render the explorer" unless File.file?(explorer) && File.read(explorer).include?("Workbench::Explorer.new")
     nav = YAML.safe_load_file(File.join(ROOT, "src/_data/docs_nav.yml"))
     section = nav.fetch("docs").find { |item| item["href"] == "/docs/solverforge-workbench/" }
     if section
-      hrefs = Array(section["children"]).map { |c| c["href"] }
-      expected = MODELS.map { |id| "/docs/solverforge-workbench/#{id}/" } + ["/docs/solverforge-workbench/constraints/"]
+      children = Array(section["children"])
+      hrefs = children.map { |c| c["href"] }
+      expected = MODELS.map { |id| "/docs/solverforge-workbench/#{id}/" }
       failures << "docs nav lists #{hrefs}, not #{expected}" unless hrefs == expected
+      children.each do |child|
+        pages = Array(child["children"]).map { |c| c["href"] }
+        want = %w[constraints data].map { |p| "#{child["href"]}#{p}/" }
+        failures << "docs nav under #{child["href"]} lists #{pages}, not #{want}" unless pages == want
+      end
     else
       failures << "docs nav has no SolverForge Workbench section"
+    end
+    failures
+  end
+
+  # Each constraint of the engine appears once on the model's constraints
+  # page, under the heading of its own group, followed by an explanation with
+  # every part; nothing else is explained there.
+  def check_explanations(model, text)
+    id = model["id"]
+    failures = []
+    group = nil
+    seen = Hash.new(0)
+    sections = text.split(/^(?=## |<%= render Workbench::Rule\.new)/)
+    sections.each do |part|
+      if (heading = part[/\A## (.+?) \{#group-[a-z0-9-]+\}/, 1])
+        group = heading
+        next
+      end
+      name = part[/\A<%= render Workbench::Rule\.new\(site: site, model: m, name: "([^"]+)"\) %>/, 1]
+      next unless name
+      seen[name] += 1
+      rule = model["constraints"].find { |r| r["name"] == name }
+      next failures << "#{id}: explains #{name.inspect}, which the engine does not score" unless rule
+      failures << "#{id}: #{name.inspect} sits under #{group.inspect}, its group is #{rule["group"].inspect}" unless group == rule["group"]
+      PART.each do |label|
+        failures << "#{id}: #{name.inspect} has no **#{label}:** line" unless part.include?("**#{label}:**")
+      end
+      intro = part.lines.drop(1).take_while { |l| !l.start_with?("- **") }.join.strip
+      failures << "#{id}: #{name.inspect} has no explanation before its details" if intro.length < 40
+    end
+    model["constraints"].each do |rule|
+      n = seen[rule["name"]]
+      failures << "#{id}: #{rule["name"].inspect} is explained #{n} times" unless n == 1
     end
     failures
   end

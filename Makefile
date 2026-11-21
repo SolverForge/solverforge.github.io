@@ -52,7 +52,7 @@ help:
 	@printf '  make verify-ui-getting-started  Build, boot, and browser-load the solverforge-ui Getting Started app\n'
 	@printf '  make verify-python-docs         Replay the Python pages against the PyPI package\n'
 	@printf '  make verify-companion-docs      Check maps, bench, and boundary pages against published sources\n'
-	@printf '  make verify-workbench           Check the Workbench docs against their engine data (ENGINE=<bin> also re-describes)\n'
+	@printf '  make verify-workbench           Check the Workbench docs explain every engine constraint (ENGINE=<bin> also re-describes)\n'
 	@printf '  make ci-local                   Run the same gate used by CI\n'
 	@printf '  make pre-release                Run the release-readiness gate\n'
 	@printf '\nInspection\n'

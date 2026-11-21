@@ -1837,44 +1837,92 @@ async function checkBrandFilm(origin) {
   return failures;
 }
 
-// The SolverForge Workbench docs render every constraint of
-// src/_data/workbench.json: each model page lists its own, the explorer lists
-// all of them and its fuzzy search finds "Rest between shifts" from "rst btwn"
-// and narrows to one model.
+// The SolverForge Workbench docs, used as a reader would: each model's
+// constraints page folds every constraint the engine scores into a card that a
+// click opens to its explanation, a link to one opens it in a fresh page, its
+// search narrows the model's rules, its data page documents every table, and
+// the section's search lists nothing until typed, then finds "Rest between
+// shifts" from "rst btwn" and opens its explanation.
 async function checkWorkbenchDocs(origin) {
   const data = JSON.parse(readFileSync("src/_data/workbench.json", "utf8"));
-  const total = data.models.reduce((sum, model) => sum + model.constraints.length, 0);
   const browser = await chromium.launch(chromiumOptions());
-  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
   const failures = [];
+  const ready = (page) => page.waitForSelector("[data-workbench-ready]", { timeout: 8000 }).then(() => true, () => false);
   try {
     for (const model of data.models) {
-      const path = `/docs/solverforge-workbench/${model.id}/`;
+      const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+      const base = `/docs/solverforge-workbench/${model.id}/`;
+      const path = `${base}constraints/`;
       await page.goto(`${origin}${path}`, { waitUntil: "load" });
-      const rules = await page.locator(".wb-rule").count();
-      if (rules !== model.constraints.length) failures.push({ path, issue: "model page does not list every constraint", rules, expected: model.constraints.length });
-      const tables = await page.locator(".wb-table--fields").count();
-      if (tables !== model.tables.length) failures.push({ path, issue: "model page does not document every data table", tables, expected: model.tables.length });
+      if (!(await ready(page))) {
+        failures.push({ path, issue: "constraints page never initialised" });
+        await page.close();
+        continue;
+      }
+      const cards = await page.evaluate(() => [...document.querySelectorAll("details.wb-card")].map((c) => ({
+        id: c.id,
+        name: c.querySelector(".wb-card__name").textContent,
+        open: c.open,
+      })));
+      const names = cards.map((c) => c.name).sort();
+      const expected = model.constraints.map((c) => c.name).sort();
+      if (JSON.stringify(names) !== JSON.stringify(expected)) failures.push({ path, issue: "cards are not the engine's constraints", shown: names.length, expected: expected.length });
+      if (cards.some((c) => c.open)) failures.push({ path, issue: "a card is open before it is clicked" });
+      const empty = [];
+      for (let i = 0; i < cards.length; i += 1) {
+        const card = page.locator("details.wb-card").nth(i);
+        await card.locator("summary").click();
+        const text = await card.evaluate((c) => (c.open ? c.querySelector(".wb-card__body").innerText : ""));
+        if (!/Reads:/.test(text) || !/Cost:/.test(text) || !/Example:/.test(text) || text.length < 150) empty.push(cards[i].name);
+      }
+      if (empty.length) failures.push({ path, issue: "clicking these cards shows no full explanation", rules: empty.slice(0, 5), count: empty.length });
+      const first = model.constraints[0].name;
+      await page.fill("[data-workbench-query]", first);
+      const found = await page.evaluate(() => [...document.querySelectorAll("details.wb-card")].filter((c) => !c.hidden).map((c) => c.querySelector(".wb-card__name").textContent));
+      if (found[0] !== first || found.length >= cards.length) failures.push({ path, issue: "search does not put the named rule first and narrow the list", query: first, top: found.slice(0, 3) });
+      await page.close();
+      const target = cards[Math.floor(cards.length / 2)];
+      const deep = await browser.newPage({ viewport: { width: 390, height: 1000 } });
+      await deep.goto(`${origin}${path}#${target.id}`, { waitUntil: "load" });
+      await ready(deep);
+      await deep.waitForTimeout(200);
+      const landed = await deep.evaluate((id) => {
+        const card = document.getElementById(id);
+        if (!card) return null;
+        const r = card.getBoundingClientRect();
+        return { open: card.open, top: r.top, inView: r.top >= 0 && r.top < window.innerHeight, overflow: document.documentElement.scrollWidth > window.innerWidth };
+      }, target.id);
+      if (!landed || !landed.open || !landed.inView) failures.push({ path: `${path}#${target.id}`, issue: "a link to a constraint does not open it in view", landed });
+      if (landed?.overflow) failures.push({ path, issue: "constraints page overflows a phone screen" });
+      await deep.close();
+      const dataPage = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+      await dataPage.goto(`${origin}${base}data/`, { waitUntil: "load" });
+      const tables = await dataPage.locator(".wb-table--fields").count();
+      if (tables !== model.tables.length) failures.push({ path: `${base}data/`, issue: "data page does not document every table", tables, expected: model.tables.length });
+      await dataPage.close();
     }
-    const path = "/docs/solverforge-workbench/constraints/";
+    const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+    const path = "/docs/solverforge-workbench/";
     await page.goto(`${origin}${path}`, { waitUntil: "load" });
-    const ready = await page.waitForSelector("[data-workbench-explorer][data-workbench-ready]", { timeout: 8000 }).then(() => true, () => false);
-    if (!ready) {
-      failures.push({ path, issue: "constraint explorer never initialised" });
+    if (!(await ready(page))) {
+      failures.push({ path, issue: "constraint search never initialised" });
     } else {
-      const visible = () => page.evaluate(() => [...document.querySelectorAll(".wb-hit")].filter((e) => !e.hidden).map((e) => ({ name: e.dataset.name, model: e.dataset.model })));
-      const all = await visible();
-      if (all.length !== total) failures.push({ path, issue: "explorer does not list every constraint", shown: all.length, expected: total });
-      await page.fill("[data-workbench-query]", "rst btwn");
-      const rest = await visible();
-      if (!rest.length || !rest[0].name.startsWith("Rest between shifts")) failures.push({ path, issue: "fuzzy search does not rank Rest between shifts first for 'rst btwn'", top: rest.slice(0, 3) });
-      if (rest.length >= total) failures.push({ path, issue: "fuzzy search did not narrow the list", shown: rest.length });
-      await page.fill("[data-workbench-query]", "");
-      await page.selectOption("[data-workbench-model]", "task-scheduling");
-      const ts = await visible();
-      const expected = data.models.find((m) => m.id === "task-scheduling").constraints.length;
-      if (ts.length !== expected || ts.some((r) => r.model !== "task-scheduling")) failures.push({ path, issue: "model filter does not show exactly that model's constraints", shown: ts.length, expected });
+      if ((await page.locator(".wb-search .wb-hit").count()) !== 0) failures.push({ path, issue: "search lists constraints before anything is typed" });
+      await page.fill("[data-workbench-search] [data-workbench-query]", "rst btwn");
+      const top = await page.locator(".wb-search .wb-hit a").first();
+      const name = await top.textContent();
+      if (!name.startsWith("Rest between shifts")) failures.push({ path, issue: "fuzzy search does not rank Rest between shifts first for 'rst btwn'", top: name });
+      await top.click();
+      await page.waitForLoadState("load");
+      await ready(page);
+      await page.waitForTimeout(200);
+      const opened = await page.evaluate(() => {
+        const card = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+        return card ? { open: card.open, name: card.querySelector(".wb-card__name")?.textContent } : null;
+      });
+      if (!opened?.open || !opened.name?.startsWith("Rest between shifts")) failures.push({ path, issue: "a search result does not open its explanation", opened });
     }
+    await page.close();
   } catch (error) {
     failures.push({ path: "/docs/solverforge-workbench/", issue: "workbench docs check threw", error: String(error) });
   }
