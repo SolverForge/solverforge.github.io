@@ -8,6 +8,12 @@ description: >
   off one-way fragments and closed stubs.
 ---
 
+<%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
+This post records an older maps line. The current release is
+`solverforge-maps 2.4.0`; see the
+[2.4 maps release note](/blog/releases/2026/11/21/solverforge-maps-2-4-x/).
+<% end %>
+
 **solverforge-maps 2.3.4 was published on November 18, 2026**, following
 `solverforge-maps 2.3.3`. It is available on
 [crates.io](https://crates.io/crates/solverforge-maps/2.3.4), documented on
@@ -95,7 +101,7 @@ Regions cached under an older version are fetched and rebuilt on first use.
 
 | Product | Version | Maps dependency |
 | ------- | ------- | --------------- |
-| `solverforge-maps` | `2.3.4` | current |
+| `solverforge-maps` | `2.3.4` | last 2.3 patch |
 | `solverforge-cli` web scaffold | `4.2.2` | `solverforge-maps = { version = "2.3.3" }` |
 | `solverforge-deliveries` | `3.0.1` | `solverforge-maps 2.1.5` |
 | `solverforge-fsr` | `3.0.1` | `solverforge-maps 2.1.5` |

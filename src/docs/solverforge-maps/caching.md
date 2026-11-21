@@ -26,7 +26,7 @@ downloaded.
 
 The file cache is versioned. A release that changes how the graph is built
 moves the cache version, and regions cached under the old version are fetched
-and rebuilt on first use. `solverforge-maps 2.3.4` writes cache version `7`.
+and rebuilt on first use. `solverforge-maps 2.4.0` writes cache version `8`.
 
 ## Inspect Cache Stats
 

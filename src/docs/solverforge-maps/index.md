@@ -8,9 +8,9 @@ description: >
 ---
 
 <%= render Ui::Callout.new do %>
-This section tracks the published `solverforge-maps 2.3.4` crate.
+This section tracks the published `solverforge-maps 2.4.0` crate.
 `solverforge-cli` web scaffolds declare `solverforge-maps = "2.3.3"`, which
-Cargo resolves to 2.3.4 in a new project.
+Cargo resolves to 2.4.0 in a new project.
 <% end %>
 
 `solverforge-maps` is SolverForge's Rust library for map-backed routing workflows. It is designed for vehicle routing and similar optimization problems where you need to turn geographic coordinates into travel times, same-path route distances, route geometries, and network diagnostics.
@@ -28,6 +28,8 @@ Cargo resolves to 2.3.4 in a new project.
 - **Access-aware snapping** that keeps itinerary stops off one-way fragments
   and closed stubs
 - **Travel-time matrices** with same-path route distances for feeding VRP and dispatch solvers
+- **Slowdowns for busy periods**: chosen road classes, anywhere or inside an
+  area, take longer to drive, to measure travel at rush hour
 - **Route geometries** for frontend visualization and polyline transport
 - **Connectivity diagnostics** for debugging unreachable pairs and bad map regions
 

@@ -9,8 +9,8 @@ description: >
 
 <%= render Ui::Callout.new(title: "Historical release note", variant: "warning") do %>
 This post records an older maps line. The current release is
-`solverforge-maps 2.3.3`; see the
-[2.2 and 2.3 maps release note](/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/).
+`solverforge-maps 2.4.0`; see the
+[2.4 maps release note](/blog/releases/2026/11/21/solverforge-maps-2-4-x/).
 <% end %>
 
 **solverforge-maps 2.1.x** was the maps line for routing and delivery

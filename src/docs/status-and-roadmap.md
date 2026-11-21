@@ -82,7 +82,7 @@ passed at `6776c18c76134b40ecc8a459c6d74fe771c49210`. The `0.8.0` number was
 tagged but never published: its release run could not build the macOS wheel.
 See the [0.8.x Python release note](/blog/releases/2026/11/20/solverforge-python-0-8-x/).
 The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
-`solverforge-maps 2.3.4`; both SolverForge agent skills live in the
+`solverforge-maps 2.4.0`; both SolverForge agent skills live in the
 `solverforge-cli` repository.
 <% end %>
 
@@ -95,7 +95,7 @@ The current UI line is `solverforge-ui 0.9.1`, and the current maps line is
 | **Python** | Published; CI and release passed | `solverforge-py 0.8.1` compiles dynamic CPython 3.14 models into the `solverforge 0.31.2` runtime with `solverforge-ui 0.9.1`; PyPI publishes `solverforge 0.8.1` |
 | **Worked Use Cases** | Released; tag Space syncs passed | `solverforge-hospital@3.0.6`, `solverforge-lessons@3.0.6`, `solverforge-deliveries@3.0.7`, `solverforge-fsr@3.0.7`, plus the repository-only `solverforge-furnace@4.0.3`, `solverforge-orders@0.3.5`, `solverforge-fleet@0.2.5`, `solverforge-flightcrew@0.3.6`, and `solverforge-ev@0.1.0`; all nine target `solverforge 0.31.2` and `solverforge-ui 0.9.1` |
 | **UI** | Published | `solverforge-ui 0.9.1` exposes framework-neutral embedded assets; `solverforge-cli 4.2.2` scaffolds it directly |
-| **Maps** | Published | `solverforge-maps 2.3.3` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, and identifies its client to Overpass |
+| **Maps** | Published | `solverforge-maps 2.4.0` builds car-legal road graphs, reports street names on routes, snaps itinerary stops by access direction, slows chosen roads for busy periods, and identifies its client to Overpass |
 
 ## Try It Today
 
