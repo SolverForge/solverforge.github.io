@@ -254,6 +254,7 @@ class ProfileResolver
     return "solverforge-maps-current" if path.end_with?("2026-05-03-solverforge-maps-2-1-x.md")
     return "solverforge-maps-current" if path.end_with?("2026-11-06-solverforge-maps-2-2-2-3-x.md")
     return "solverforge-maps-current" if path.end_with?("2026-11-21-solverforge-maps-2-4-x.md")
+    return "solverforge-maps-current" if path.end_with?("2026-11-21-solverforge-maps-2-5-x.md")
     return "solverforge-ui-current" if path.start_with?("src/docs/solverforge-ui/")
 
     "solverforge-current"

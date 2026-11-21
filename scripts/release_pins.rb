@@ -15,7 +15,7 @@ module ReleasePins
     "solverforge" => "0.31.2",
     "solverforge-cli" => "4.2.2",
     "solverforge-ui" => "0.9.1",
-    "solverforge-maps" => "2.4.0"
+    "solverforge-maps" => "2.5.0"
   }.freeze
 
   RUNTIME = CURRENT.fetch("solverforge")
