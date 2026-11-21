@@ -26,7 +26,11 @@ downloaded.
 
 The file cache is versioned. A release that changes how the graph is built
 moves the cache version, and regions cached under the old version are fetched
-and rebuilt on first use. `solverforge-maps 2.4.0` writes cache version `8`.
+and rebuilt on first use. `solverforge-maps 2.5.0` writes cache version `8`.
+
+Each travel mode has its own cache entries. A bicycle or foot network's key
+carries `~bicycle` or `~foot` after the area, and a region is only ever served
+by a cached network of the same mode; car keys carry no suffix.
 
 ## Inspect Cache Stats
 

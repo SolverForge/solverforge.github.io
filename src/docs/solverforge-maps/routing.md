@@ -165,6 +165,31 @@ the road they serve, and any other tag is `RoadClass::Other`.
 `RoadClass::parse("living_street")` and `as_str()` convert to and from
 configuration names.
 
+## Travel by Bicycle or on Foot
+
+`load_or_fetch` loads the network a car drives. `load_or_fetch_for` loads the
+same area for a `TravelMode`, and every matrix or route computed on it
+measures travel in that mode:
+
+```rust
+use solverforge_maps::{RoadNetwork, TravelMode};
+
+let bikes = RoadNetwork::load_or_fetch_for(&bbox, &config, TravelMode::Bicycle, None).await?;
+let walk = RoadNetwork::load_or_fetch_for(&bbox, &config, TravelMode::Foot, None).await?;
+let by_bike = bikes.compute_matrix(&locations, None).await;
+let on_foot = walk.compute_matrix(&locations, None).await;
+```
+
+| Mode | Ways | One-way streets | Speed |
+| ---- | ---- | --------------- | ----- |
+| `Car` | `NetworkConfig::highway_types`, open to cars | followed | `SpeedProfile` |
+| `Bicycle` | streets, tracks, paths and cycleways; footways and pedestrian streets where `bicycle` allows it | followed, unless `oneway:bicycle=no` | 15 km/h |
+| `Foot` | every street and path but motorways and trunk roads, steps included | ignored | 5 km/h |
+
+A bicycle is shut out by `bicycle`, `vehicle` or `access` tags, a walker by
+`foot` or `access`. Each mode is cached on its own, so loading a bicycle
+network never replaces the car's.
+
 ## Geometry for Frontend Visualization
 
 `RouteResult` includes geometry that can be rendered directly on a web map. For compact transmission, `solverforge-maps` also exposes Google polyline helpers.
