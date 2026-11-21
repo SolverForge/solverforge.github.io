@@ -18,7 +18,8 @@ EXPECTED_DOCS = {
   "hospital" => ["/docs/getting-started/solverforge-hospital-use-case/", "src/docs/getting-started/solverforge-hospital-use-case.md"],
   "lessons" => ["/docs/getting-started/solverforge-lessons-use-case/", "src/docs/getting-started/solverforge-lessons-use-case.md"],
   "deliveries" => ["/docs/getting-started/solverforge-deliveries-use-case/", "src/docs/getting-started/solverforge-deliveries-use-case.md"],
-  "field-service" => ["/docs/getting-started/solverforge-fsr-use-case/", "src/docs/getting-started/solverforge-fsr-use-case.md"]
+  "field-service" => ["/docs/getting-started/solverforge-fsr-use-case/", "src/docs/getting-started/solverforge-fsr-use-case.md"],
+  "hermes-workbench" => ["/docs/solverforge-workbench/", "src/docs/solverforge-workbench/index.md"]
 }.freeze
 EXPECTED_SPACES = %w[hospital lessons deliveries field-service].freeze
 REPO_CASES = %w[furnace orders fleet flightcrew ev].freeze

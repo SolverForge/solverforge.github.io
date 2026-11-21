@@ -13,7 +13,7 @@ export NODE_VERSION_REQUIRED
 # syntax errors, which makes `make doctor` look broken even when checks pass.
 unexport BASH_FUNC_mc%%
 
-.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-demo-videos verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy verify-solver-config verify-ui-getting-started verify-python-docs verify-companion-docs
+.PHONY: help doctor install frontend frontend-watch build test lint check-public-pages ci-local pre-release verify-release-surface verify-benchmarks verify-use-cases verify-demo-videos verify-cli-release verify-rust-snippets verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page start clean version verify-rust-snippets-legacy verify-solver-config verify-ui-getting-started verify-python-docs verify-companion-docs verify-workbench
 
 define status
 	@printf '\n==> %s\n' "$(1)"
@@ -52,6 +52,7 @@ help:
 	@printf '  make verify-ui-getting-started  Build, boot, and browser-load the solverforge-ui Getting Started app\n'
 	@printf '  make verify-python-docs         Replay the Python pages against the PyPI package\n'
 	@printf '  make verify-companion-docs      Check maps, bench, and boundary pages against published sources\n'
+	@printf '  make verify-workbench           Check the Workbench docs against their engine data (ENGINE=<bin> also re-describes)\n'
 	@printf '  make ci-local                   Run the same gate used by CI\n'
 	@printf '  make pre-release                Run the release-readiness gate\n'
 	@printf '\nInspection\n'
@@ -119,6 +120,8 @@ test: frontend verify-benchmarks
 	@ruby scripts/verify-python-docs.rb --static
 	$(call status,Verifying maps, bench, and boundary pages against published sources)
 	@ruby scripts/verify-companion-docs.rb
+	$(call status,Verifying the SolverForge Workbench docs against their engine data)
+	@ruby scripts/verify-workbench.rb
 
 lint:
 	$(call status,Checking Ruby syntax)
@@ -136,7 +139,7 @@ check-public-pages:
 # page's validation commands). CI runs them in their own matrix job.
 TUTORIAL_REPLAYS ?= verify-hospital-tutorial verify-lessons-tutorial verify-deliveries-tutorial verify-fsr-tutorial
 
-ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-demo-videos verify-rust-snippets verify-rust-snippets-legacy verify-solver-config verify-companion-docs build check-public-pages verify-ui-getting-started verify-python-docs verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page $(TUTORIAL_REPLAYS)
+ci-local: doctor lint verify-release-surface verify-benchmarks verify-use-cases verify-demo-videos verify-rust-snippets verify-rust-snippets-legacy verify-solver-config verify-companion-docs verify-workbench build check-public-pages verify-ui-getting-started verify-python-docs verify-maintenance-walkthrough verify-cli-getting-started verify-serio-page $(TUTORIAL_REPLAYS)
 
 pre-release: verify-cli-release ci-local
 	$(call status,Ready for release)
@@ -207,6 +210,10 @@ verify-ui-getting-started:
 verify-python-docs:
 	$(call status,Replaying the Python docs against the PyPI package)
 	@ruby scripts/verify-python-docs.rb
+
+verify-workbench:
+	$(call status,Verifying the SolverForge Workbench docs against their engine data)
+	@ruby scripts/verify-workbench.rb $(if $(ENGINE),--engine $(ENGINE))
 
 verify-companion-docs:
 	$(call status,Checking maps, bench, and boundary pages against published sources)

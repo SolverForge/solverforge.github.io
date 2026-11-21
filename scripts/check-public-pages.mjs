@@ -1837,6 +1837,51 @@ async function checkBrandFilm(origin) {
   return failures;
 }
 
+// The SolverForge Workbench docs render every constraint of
+// src/_data/workbench.json: each model page lists its own, the explorer lists
+// all of them and its fuzzy search finds "Rest between shifts" from "rst btwn"
+// and narrows to one model.
+async function checkWorkbenchDocs(origin) {
+  const data = JSON.parse(readFileSync("src/_data/workbench.json", "utf8"));
+  const total = data.models.reduce((sum, model) => sum + model.constraints.length, 0);
+  const browser = await chromium.launch(chromiumOptions());
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1100 } });
+  const failures = [];
+  try {
+    for (const model of data.models) {
+      const path = `/docs/solverforge-workbench/${model.id}/`;
+      await page.goto(`${origin}${path}`, { waitUntil: "load" });
+      const rules = await page.locator(".wb-rule").count();
+      if (rules !== model.constraints.length) failures.push({ path, issue: "model page does not list every constraint", rules, expected: model.constraints.length });
+      const tables = await page.locator(".wb-table--fields").count();
+      if (tables !== model.tables.length) failures.push({ path, issue: "model page does not document every data table", tables, expected: model.tables.length });
+    }
+    const path = "/docs/solverforge-workbench/constraints/";
+    await page.goto(`${origin}${path}`, { waitUntil: "load" });
+    const ready = await page.waitForSelector("[data-workbench-explorer][data-workbench-ready]", { timeout: 8000 }).then(() => true, () => false);
+    if (!ready) {
+      failures.push({ path, issue: "constraint explorer never initialised" });
+    } else {
+      const visible = () => page.evaluate(() => [...document.querySelectorAll(".wb-hit")].filter((e) => !e.hidden).map((e) => ({ name: e.dataset.name, model: e.dataset.model })));
+      const all = await visible();
+      if (all.length !== total) failures.push({ path, issue: "explorer does not list every constraint", shown: all.length, expected: total });
+      await page.fill("[data-workbench-query]", "rst btwn");
+      const rest = await visible();
+      if (!rest.length || !rest[0].name.startsWith("Rest between shifts")) failures.push({ path, issue: "fuzzy search does not rank Rest between shifts first for 'rst btwn'", top: rest.slice(0, 3) });
+      if (rest.length >= total) failures.push({ path, issue: "fuzzy search did not narrow the list", shown: rest.length });
+      await page.fill("[data-workbench-query]", "");
+      await page.selectOption("[data-workbench-model]", "task-scheduling");
+      const ts = await visible();
+      const expected = data.models.find((m) => m.id === "task-scheduling").constraints.length;
+      if (ts.length !== expected || ts.some((r) => r.model !== "task-scheduling")) failures.push({ path, issue: "model filter does not show exactly that model's constraints", shown: ts.length, expected });
+    }
+  } catch (error) {
+    failures.push({ path: "/docs/solverforge-workbench/", issue: "workbench docs check threw", error: String(error) });
+  }
+  await browser.close();
+  return failures;
+}
+
 // The describe, solve, repair session video: the full player with its scene
 // list on the Agent Skill page, and the plain player under the home hero. The
 // source, poster, and cue count are pinned here, the duration is measured from
@@ -1959,6 +2004,7 @@ let benchmarksDocs = [];
 let releaseDocs = [];
 let brandFilm = [];
 let sessionVideo = [];
+let workbenchDocs = [];
 
 try {
   layoutFailures = await checkLayout(origin, paths);
@@ -1970,6 +2016,7 @@ try {
   releaseDocs = await checkReleaseDocs(origin);
   brandFilm = await checkBrandFilm(origin);
   sessionVideo = await checkSessionVideo(origin);
+  workbenchDocs = await checkWorkbenchDocs(origin);
 } finally {
   server.close();
 }
@@ -1988,6 +2035,7 @@ const summary = {
   releaseDocs,
   brandFilm,
   sessionVideo,
+  workbenchDocs,
   layoutFailures,
 };
 
@@ -2005,6 +2053,7 @@ if (
   releaseDocs.length ||
   brandFilm.length ||
   sessionVideo.length ||
+  workbenchDocs.length ||
   layoutFailures.length
 ) {
   process.exit(1);
