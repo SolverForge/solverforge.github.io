@@ -1,0 +1,17 @@
+<div class="wb-models">
+  <table class="wb-table">
+    <thead>
+      <tr><th>Model</th><th>Constraints</th><th>What it plans</th></tr>
+    </thead>
+    <tbody>
+      <% rows.each do |model| %>
+        <% c = counts(model) %>
+        <tr data-workbench-model="<%= model["id"] %>">
+          <td><a href="<%= relative_url(Workbench::Data.page_url(model["id"])) %>"><%= model["name"] %></a></td>
+          <td><span class="wb-count"><%= model["constraints"].size %></span>: <%= c["hard"] %> hard, <%= c["medium"] %> medium, <%= c["soft"] %> soft, in <%= groups(model) %> groups</td>
+          <td><%= model["summary"] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

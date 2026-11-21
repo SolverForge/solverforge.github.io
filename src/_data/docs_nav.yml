@@ -186,6 +186,19 @@ docs:
             href: /docs/solverforge/solver/termination/
           - title: SolverManager
             href: /docs/solverforge/solver/solver-manager/
+  - title: SolverForge Workbench
+    href: /docs/solverforge-workbench/
+    children:
+      - title: Employee Scheduling
+        href: /docs/solverforge-workbench/employee-scheduling/
+      - title: Task Scheduling
+        href: /docs/solverforge-workbench/task-scheduling/
+      - title: Pick-up and Delivery Routing
+        href: /docs/solverforge-workbench/pickup-delivery-routing/
+      - title: Field Service Routing
+        href: /docs/solverforge-workbench/field-service-routing/
+      - title: Constraint Explorer
+        href: /docs/solverforge-workbench/constraints/
   - title: solverforge-maps
     href: /docs/solverforge-maps/
     children:

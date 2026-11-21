@@ -2597,6 +2597,139 @@ body.use-case-lightbox-open {
   font-size: 0.88rem;
 }
 
+// SolverForge Workbench docs: model tables, constraint lists and the explorer.
+.wb-table-wrap {
+  overflow-x: auto;
+  margin-bottom: 1.25rem;
+}
+
+.prose .wb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.prose .wb-table th,
+.prose .wb-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--sf-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.wb-count {
+  font-weight: 700;
+}
+
+.wb-rules,
+.wb-explorer__list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+}
+
+.wb-rule,
+.wb-hit {
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-sm);
+  background: var(--sf-panel);
+}
+
+.wb-rule:target {
+  border-color: var(--sf-accent);
+}
+
+.wb-rule__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.wb-rule__name {
+  font-weight: 700;
+}
+
+.wb-rule__name mark {
+  background: none;
+  color: var(--sf-gold);
+  text-decoration: underline;
+}
+
+.prose .wb-rule__text,
+.prose .wb-hit__where {
+  margin: 0.3rem 0 0;
+}
+
+.wb-hit__where {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.wb-level,
+.wb-flag {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.05rem 0.4rem;
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-sm);
+}
+
+.wb-level--hard {
+  border-color: #d9534f;
+  color: #e57373;
+}
+
+.wb-level--medium {
+  border-color: #c98b3a;
+  color: var(--sf-gold);
+}
+
+.wb-level--soft {
+  border-color: var(--sf-accent);
+  color: var(--sf-accent);
+}
+
+.wb-explorer__controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.wb-explorer__search,
+.wb-explorer__filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.wb-explorer__label {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+
+.wb-explorer__controls input,
+.wb-explorer__controls select {
+  font: inherit;
+  padding: 0.5rem 0.65rem;
+  color: inherit;
+  background: var(--sf-panel);
+  border: 1px solid var(--sf-border);
+  border-radius: var(--sf-radius-sm);
+  min-width: 0;
+}
+
+.wb-explorer__status {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+
 @media (max-width: 1120px) {
   .site-header__actions {
     grid-column: 1 / -1;
@@ -2744,6 +2877,10 @@ body.use-case-lightbox-open {
 }
 
 @media (max-width: 760px) {
+  .wb-explorer__controls {
+    grid-template-columns: 1fr;
+  }
+
   html {
     scroll-padding-top: 10rem;
   }
