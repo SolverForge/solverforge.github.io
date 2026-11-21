@@ -5,12 +5,13 @@ draft: false
 description: >
   solverforge-cli 4.1.0 adds the resolved phase plan, the policy a solve
   actually ran, to the telemetry generated apps expose over HTTP and SSE.
-  4.2.0 moves fresh scaffolds to SolverForge 0.31.2.
+  4.2.0 moves fresh scaffolds to SolverForge 0.31.2; 4.2.1 and 4.2.2 make
+  `check` and `config set` load solver.toml with the runtime's own parser.
 ---
 
-**solverforge-cli 4.2.0 was published on November 18, 2026**, one day after
-`4.1.0`. `solverforge-cli 4.2.0` targets
-`solverforge 0.31.2`, and 4.1.0 targets `solverforge 0.31.1`. Both keep
+**solverforge-cli 4.2.2 was published on November 21, 2026**, a day after
+`4.2.1`. `solverforge-cli 4.2.2` targets
+`solverforge 0.31.2`, as 4.2.0 and 4.2.1 do, and 4.1.0 targets `solverforge 0.31.1`. All of them keep
 `solverforge-ui 0.9.1` and `solverforge-maps 2.3.3` in the web shell and
 `rmcp 3.9.0` in the MCP shell. The project layout is the 4.0 layout:
 constraint modules declared in `src/constraints/mod.rs` and assembled in
@@ -41,16 +42,52 @@ self-join pair pattern) are unchanged. 4.2.0 changes nothing else. See the
 [0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/) for what
 the runtime line adds.
 
+### `solver.toml` checked by the runtime's parser (4.2.1, 4.2.2)
+
+`solverforge check` and `solverforge config set` load `solver.toml` with
+`solverforge-config`, the configuration type the generated app uses, pinned
+to the scaffold runtime target. A key the runtime does not know, such as a
+stray `[app]` table, now fails `check` with the runtime's own message instead
+of passing it and failing every solve at start. `config set` refuses to write
+a file the runtime would reject. The two hand-written checks for
+`move_thread_count` and `candidate_trace` are gone; the runtime parser covers
+both. Scaffold targets and generated files are unchanged. In 4.2.1 a rejected
+`config set` printed the parse error without the key; 4.2.2 starts the message
+with `cannot set` and the dotted key, for example
+`` cannot set `move_thread_count.count` ``.
+
 ## Published Version Boundaries
 
 | Surface | Version | Role |
 | ------- | ------- | ---- |
-| CLI | `solverforge-cli 4.2.0` | Fresh scaffolds target `solverforge 0.31.2` |
+| CLI | `solverforge-cli 4.2.2` | Fresh scaffolds target `solverforge 0.31.2` |
 | Runtime | `solverforge 0.31.2` | 0.31 line; see the [0.31.x release note](/blog/releases/2026/11/17/solverforge-0-31-x/) |
 | Previous CLI line | `solverforge-cli 4.0.4` | Scaffolds `solverforge 0.26.1` with the same project layout; see the [4.0.x release note](/blog/releases/2026/11/10/solverforge-cli-4-0-x/) |
 | Web UI | `solverforge-ui 0.9.1` | Web shell only |
 | Maps | `solverforge-maps 2.3.3` | Web shell only |
 | MCP SDK | `rmcp 3.9.0` | MCP shell only |
+
+The `4.2.2` [GitHub Release](https://github.com/SolverForge/solverforge-cli/releases/tag/v4.2.2)
+was published at `2026-11-21T07:34:40Z`, and crates.io records the package at
+`2026-11-21T07:41:59Z`. Its artifact (SHA-256
+`84ae9fc20bb838d42e7954404c5adf24ca9ee47f13b6e7a3a2da0e66641762c7`) was built
+from the tag commit `bd0b5427cc985067a905d4a9361a9fc160429551`, where the
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/44878598757)
+passed and the
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/44878601505)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/44878601542)
+workflows succeeded.
+
+The `4.2.1` [GitHub Release](https://github.com/SolverForge/solverforge-cli/releases/tag/v4.2.1)
+was published at `2026-11-20T23:51:43Z`, and crates.io records the package at
+`2026-11-20T23:41:00Z`. Its artifact (SHA-256
+`74cfe8f3a3f4a1d5182f594f646897fa85f8f63557a58f4a7c7e45da420ddb51`) was built
+from the tag commit `9428468cd009bdea80fd24f0eaba9c79dcfd36cc`, where the
+[CI run](https://github.com/SolverForge/solverforge-cli/actions/runs/44835073190)
+passed and the
+[Publish](https://github.com/SolverForge/solverforge-cli/actions/runs/44835077788)
+and [Release](https://github.com/SolverForge/solverforge-cli/actions/runs/44835077773)
+workflows succeeded.
 
 The `4.2.0` [GitHub Release](https://github.com/SolverForge/solverforge-cli/releases/tag/v4.2.0)
 was published at `2026-11-18T09:19:15Z`, and crates.io records the package at
@@ -77,16 +114,18 @@ workflows succeeded.
 
 | Version | Date | Notes |
 | ------- | ---- | ----- |
+| `4.2.2` | 2026-11-21 | A rejected `config set` names the key it was setting; scaffold targets unchanged. Exact-commit CI passed. |
+| `4.2.1` | 2026-11-20 | `check` and `config set` load `solver.toml` with the runtime's configuration parser; scaffold targets unchanged. Exact-commit CI passed. |
 | `4.2.0` | 2026-11-18 | Fresh scaffolds target `solverforge 0.31.2`; nothing else changes. Exact-commit CI passed. |
 | `4.1.0` | 2026-11-17 | Fresh scaffolds target `solverforge 0.31.1`; generated telemetry carries `resolvedPhasePlan`; UI, maps, and MCP targets and the project layout unchanged. Exact-commit CI passed. |
 
 ## Upgrade Checklist
 
-- Install with `cargo install solverforge-cli --version 4.2.0 --locked --force`
+- Install with `cargo install solverforge-cli --version 4.2.2 --locked --force`
   and inspect `solverforge --version`.
 - Replace an installed `solverforge-modeling` skill by running
   `./scripts/install-skill` again, with the same `--agent`, `--project`, or
-  `--dir` options, from a `solverforge-cli` checkout at `v4.2.0`.
+  `--dir` options, from a `solverforge-cli` checkout at `v4.2.2`.
 - Upgrading the CLI does not change existing apps. To move an app to the 0.31
   line, change its `solverforge` dependency (and any direct `solverforge-*`
   dependency) and the `[runtime]` lines of `solverforge.app.toml`, then follow
@@ -101,4 +140,6 @@ workflows succeeded.
 - [Solver Phases](/docs/solverforge/solver/phases/#resolved-phase-plan)
 - [4.0.4 to 4.1.0 comparison](https://github.com/SolverForge/solverforge-cli/compare/v4.0.4...v4.1.0)
 - [4.1.0 to 4.2.0 comparison](https://github.com/SolverForge/solverforge-cli/compare/v4.1.0...v4.2.0)
-- [4.2.0 GitHub Release](https://github.com/SolverForge/solverforge-cli/releases/tag/v4.2.0)
+- [4.2.0 to 4.2.1 comparison](https://github.com/SolverForge/solverforge-cli/compare/v4.2.0...v4.2.1)
+- [4.2.1 to 4.2.2 comparison](https://github.com/SolverForge/solverforge-cli/compare/v4.2.1...v4.2.2)
+- [4.2.2 GitHub Release](https://github.com/SolverForge/solverforge-cli/releases/tag/v4.2.2)

@@ -96,7 +96,7 @@ workflow change.
 | Retired number | `solverforge-py v0.8.0` | Tagged, never published to PyPI |
 | Previous Python package | `solverforge 0.7.2` | Core `0.23.0`; 30/60-second cap on solves without a time limit |
 | Rust core | `solverforge 0.31.2` | Separate registry release; see the [core release note](/blog/releases/2026/11/17/solverforge-0-31-x/) |
-| CLI | `solverforge-cli 4.2.0` | Fresh scaffolds target core `0.31.2`; see the [CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/) |
+| CLI | `solverforge-cli 4.2.2` | Fresh scaffolds target core `0.31.2`; see the [CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/) |
 | Rust use-case bundle | November 18 app releases | All nine pin core `0.31.2` and UI `0.9.1`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/#november-18-releases-solverforge-0312) |
 
 The `v0.8.1` source tag points to

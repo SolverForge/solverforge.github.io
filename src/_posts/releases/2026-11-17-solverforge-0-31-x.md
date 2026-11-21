@@ -17,7 +17,7 @@ floor. `cargo add solverforge` installs 0.31.2, and docs.rs serves the 0.31.2
 API. The one breaking change, in 0.31.0, touches the lower-level list slot and
 configuration structs: struct literals and exhaustive matches over them need
 the new fields and variants. Models that only use the attribute macros and
-`solver.toml` upgrade by moving the pin. `solverforge-cli 4.2.0` scaffolds
+`solver.toml` upgrade by moving the pin. `solverforge-cli 4.2.2` scaffolds
 0.31.2, and the nine worked use cases pin 0.31.2.
 
 ## What Changed
@@ -152,7 +152,7 @@ instance).
 | Core runtime | `solverforge 0.31.2` | Rust `1.95`; list element groups; joint cascading groups; row-level cascading rescoring; one-pass grouped recreate; fixed fleets completed after Clarke-Wright; measured default search effort and family weights; a fifth of a time limit for the optional pass |
 | Previous core release | `solverforge 0.31.1` | Row-level cascading rescoring and one-pass grouped recreate, on the 0.31.0 policy |
 | Previous core line | `solverforge 0.30.1` | Cascading list shadows across owners; see the [0.30.x release note](/blog/releases/2026/11/15/solverforge-0-30-x/) |
-| CLI | `solverforge-cli 4.2.0` | Fresh scaffolds target core `0.31.2`; see the [4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/) |
+| CLI | `solverforge-cli 4.2.2` | Fresh scaffolds target core `0.31.2`; see the [4.1.x and 4.2.x CLI release note](/blog/releases/2026/11/18/solverforge-cli-4-1-4-2-x/) |
 | Python | `solverforge-py 0.8.1` / PyPI `solverforge 0.8.1` | Compiled onto core `0.31.2` from 2026-11-20; see the [Python 0.8.x release note](/blog/releases/2026/11/20/solverforge-python-0-8-x/). This core shipped while Python was `0.7.2` on core `0.23.0` |
 | Worked use cases | November 18 app releases | All nine pin core `0.31.2` and UI `0.9.1`; see the [use-case 3.0 release note](/blog/releases/2026/11/03/solverforge-usecases-3-0/#november-18-releases-solverforge-0312) |
 | UI | `solverforge-ui 0.9.1` | Unchanged |

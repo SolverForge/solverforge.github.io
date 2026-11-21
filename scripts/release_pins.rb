@@ -13,7 +13,7 @@ require "uri"
 module ReleasePins
   CURRENT = {
     "solverforge" => "0.31.2",
-    "solverforge-cli" => "4.2.0",
+    "solverforge-cli" => "4.2.2",
     "solverforge-ui" => "0.9.1",
     "solverforge-maps" => "2.3.4"
   }.freeze
