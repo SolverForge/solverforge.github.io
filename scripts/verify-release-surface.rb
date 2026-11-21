@@ -583,26 +583,34 @@ crates.io on 2026-10-14",
   "src/docs/solverforge-maps/index.md" => [
     "This section tracks the published `solverforge-maps #{ReleasePins::MAPS}` crate.",
     "web scaffolds declare `solverforge-maps = \"#{ReleasePins::CLI_SCAFFOLD_MAPS}\"`",
-    "**Car-legal road graphs**", "**Street names on every route**", "**Access-aware snapping**"
+    "**Car-legal road graphs**", "**Street names on every route**", "**Access-aware snapping**",
+    "**Slowdowns for busy periods**"
   ],
   "src/docs/solverforge-maps/routing.md" => [
     "## Read the Streets Along a Route", "`StreetRun`", "edges_with_names_iter()",
     "### Snap by Itinerary Role", "compute_matrix_with_access", "SnapAccess::Incoming",
-    "snap_road_index_with_access"
+    "snap_road_index_with_access", "## Measure Travel at Busy Times", "network.slowed(&[streets, centre])"
   ],
   "src/docs/solverforge-maps/getting-started.md" => [
     "motorway_link", "`destination` stays open", "route.streets"
   ],
-  "src/docs/solverforge-maps/caching.md" => ["cache version `7`"],
+  "src/docs/solverforge-maps/caching.md" => ["`solverforge-maps #{ReleasePins::MAPS}` writes cache version `8`"],
+  "src/_posts/releases/2026-11-21-solverforge-maps-2-4-x.md" => [
+    "**solverforge-maps #{ReleasePins::MAPS} was published on November 21, 2026**",
+    "44889903862", "44889903928", "44889902327", "`efaa2ed`",
+    "`2.4.0` | 2026-11-21", "RoadNetwork::slowed()", "cache moves to version `8`",
+    "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-maps = { version = \"#{ReleasePins::CLI_SCAFFOLD_MAPS}\" }`, which resolves to `#{ReleasePins::MAPS}` |"
+  ],
   "src/_posts/releases/2026-11-06-solverforge-maps-2-2-2-3-x.md" => [
-    "**solverforge-maps #{ReleasePins::MAPS} was published on November 18, 2026**",
+    "Historical release note", "/blog/releases/2026/11/21/solverforge-maps-2-4-x/",
+    "**solverforge-maps 2.3.4 was published on November 18, 2026**",
     "44396715207", "44396715198", "44394585321", "`79edff5`",
     "`2.3.4` | 2026-11-18", "`2.3.3` | 2026-11-06", "`2.3.2` | 2026-11-06", "`2.3.1` | 2026-11-06",
     "`2.3.0` | 2026-11-06", "`2.2.0` | 2026-11-06",
     "| `solverforge-cli` web scaffold | `#{CLI}` | `solverforge-maps = { version = \"#{ReleasePins::CLI_SCAFFOLD_MAPS}\" }` |"
   ],
   "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => [
-    "Historical release note", "/blog/releases/2026/11/06/solverforge-maps-2-2-2-3-x/",
+    "Historical release note", "/blog/releases/2026/11/21/solverforge-maps-2-4-x/",
     "`2.1.5` | 2026-11-03"
   ],
   "src/_posts/releases/2026-11-07-solverforge-ui-0-9-x.md" => [
@@ -887,6 +895,7 @@ FORBIDDEN_TEXT = {
   ],
   "src/reference/crate-map.md" => ["ReplicaDescriptor", "AcceptedCount(256)", "solverforge 0.27.0", "tree/v0.27.0", "solverforge 0.25.0", "solverforge 0.26.0", "tree/v0.26.0", "solverforge 0.26.1", "tree/v0.26.1"],
   "src/_posts/releases/2026-05-03-solverforge-maps-2-1-x.md" => ["is the current maps line", "Use the crates.io package pin"],
+  "src/_posts/releases/2026-11-06-solverforge-maps-2-2-2-3-x.md" => ["| `2.3.4` | current |"],
   "src/docs/solverforge-maps/routing.md" => ["snaps both endpoints to the nearest graph nodes"],
   "src/docs/solverforge-maps/getting-started.md" => ["snaps both endpoints to the nearest graph nodes"],
   "src/docs/solverforge-python/getting-started.md" => ["solverforge==0.7.2", "git checkout v0.7.2", "0.23.0 runtime", "solverforge==0.7.0", "solverforge==0.7.1", "git checkout v0.7.0", "git checkout v0.7.1", "solverforge==0.6.15", "v0.6.15", "0.22.0 runtime"],
