@@ -11,6 +11,13 @@ layout: default
         <p class="use-case-detail__intro"><%= use_case.fetch("intro") %></p>
       </div>
       <ul class="use-case-detail__links">
+        <% if use_case["docs_url"] %>
+          <li>
+            <a class="use-case-doc-link" href="<%= relative_url(use_case.fetch("docs_url")) %>">
+              Read the guide <i class="fa-solid fa-book-open"></i>
+            </a>
+          </li>
+        <% end %>
         <li>
           <a class="use-case-doc-link" href="<%= use_case.fetch("repo_url") %>" target="_blank" rel="noopener">
             App source <i class="fa-brands fa-github"></i>

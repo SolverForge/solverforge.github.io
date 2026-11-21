@@ -970,13 +970,14 @@
   eyebrow: "Built on SolverForge · Hermes Agent plugin"
   title: "A planning platform inside Hermes: models, data, solves and answers."
   intro: "SolverForge Workbench turns Hermes Agent into a planning platform on your own machine. It ships four planning models with every one of their constraints (employee scheduling, task scheduling, pick-up and delivery routing, field service routing) and hosts any model Hermes builds for you with solverforge-cli. Every model gets the same workflow: datasets you can edit, profiles of weights and settings, background solves, explanations by rule, replanning, experiments and trends, in the chat or on the plugin's own page in Hermes Desktop."
+  docs_url: "/docs/solverforge-workbench/"
   repo_url: "https://github.com/blackopsrepl/hermes-solverforge-workbench"
   icon: "fa-solid fa-flask"
-  teaser_metric: "4 models / 244 constraints / 37 Hermes tools"
+  teaser_metric: "4 models / 250 constraints / 37 Hermes tools"
   teaser_copy: "Stock models for rosters, schedules and routes, models Hermes builds for you, and one workflow to solve, explain, replan and compare them."
   metrics:
     - ["4", "Stock models"]
-    - ["244", "Constraints"]
+    - ["250", "Constraints"]
     - ["4", "Large demos"]
     - ["37", "Hermes tools"]
     - ["OSM", "Road network for routing"]
@@ -986,9 +987,9 @@
     - "A finished run gives a verdict in words, the score per level, the model's own measures, and every constraint with the matches it blames. For anything left unplanned, fill ranks the places it could still go and what each one changes. A replan starts from the current plan and keeps what can stay, experiments rank profiles over the same datasets, and trends chart every solve over time. Plans show as rosters, schedules, assignment boards or maps; the routing models measure travel on OpenStreetMap roads with solverforge-maps. When no stock model fits, Hermes builds one with solverforge-cli, and it joins the platform with the same tools and pages."
   constraints:
     - ["Employee scheduling", "127 constraints: skills, availability, contract limits over periods, rest, rotations, hourly demand, cost and fairness."]
-    - ["Field service routing", "64 constraints: skills, time windows and SLAs, breaks, multi-technician visits, coverage areas and shift limits."]
-    - ["Pick-up and delivery routing", "36 constraints: stop order, vehicle capacity, time windows and SLAs, breaks, priorities and overtime."]
-    - ["Task scheduling", "17 constraints: time windows, dependencies, resource fit, changeovers, due dates, makespan and idle time."]
+    - ["Field service routing", "66 constraints: skills, time windows and SLAs, breaks, multi-technician visits, coverage areas, parts, shared tools and shift limits."]
+    - ["Pick-up and delivery routing", "39 constraints: stop order, vehicle capacity, parts, time windows and SLAs, breaks, priorities, overtime and fleet size."]
+    - ["Task scheduling", "18 constraints: time windows, dependencies, resource fit, parts in stock, changeovers, due dates, makespan and idle time."]
     - ["Your own models", "A solverforge-cli project, built on your machine and hosted with the same tools and pages."]
     - ["Profiles", "Every constraint's weight and every solve setting, saved per profile and compared in experiments."]
   runtime:
